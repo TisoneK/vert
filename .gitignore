@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# user-uploaded files (served from public/uploads/* at runtime)
+# DO NOT commit user content
+/public/uploads/
+
 
 # typescript
 *.tsbuildinfo

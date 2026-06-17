@@ -1,7 +1,8 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings, ChevronUp, Film } from 'lucide-react'
+import { useRef, useState, useEffect, useCallback } from 'react'
+import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Film } from 'lucide-react'
+import Hls from 'hls.js'
 
 interface VideoPlayerProps {
   videoUrl: string
@@ -10,9 +11,33 @@ interface VideoPlayerProps {
   format?: string
 }
 
+type QualityLevel = {
+  label: string
+  /** Index passed to hls.currentLevel, or -1 for "Auto" */
+  level: number
+}
+
+function isHlsUrl(url: string): boolean {
+  return /\.m3u8(\?|$)/i.test(url)
+}
+
+function heightToLabel(h: number): string {
+  if (h >= 2160) return '4K'
+  if (h >= 1440) return '1440p'
+  if (h >= 1080) return '1080p'
+  if (h >= 720) return '720p'
+  if (h >= 480) return '480p'
+  if (h >= 360) return '360p'
+  if (h >= 240) return '240p'
+  if (h > 0) return `${h}p`
+  return 'Source'
+}
+
 export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait' }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const hlsRef = useRef<Hls | null>(null)
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(1)
@@ -21,37 +46,135 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [duration, setDuration] = useState(0)
   const [showSettings, setShowSettings] = useState(false)
   const [playbackSpeed, setPlaybackSpeed] = useState(1)
-  const [quality, setQuality] = useState('1080p')
+
+  // Quality state — real values, populated from hls.js levels or the video element
+  const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([])
+  const [currentQuality, setCurrentQuality] = useState<number>(-1) // -1 = Auto
+  const [sourceLabel, setSourceLabel] = useState<string>('Auto')
+
   const [demoClicked, setDemoClicked] = useState(false)
 
+  // Reset error/quality state when the source URL changes — uses the
+  // "store information from previous renders" pattern from the React docs
+  // (https://react.dev/reference/react/useState#storing-information-from-previous-renders)
+  // to avoid calling setState synchronously inside an effect.
+  const [prevUrl, setPrevUrl] = useState(videoUrl)
+  if (prevUrl !== videoUrl) {
+    setPrevUrl(videoUrl)
+    setHasError(false)
+    setQualityLevels([])
+    setCurrentQuality(-1)
+    setSourceLabel('Auto')
+  }
+
+  // --- Wire up the video element + hls.js when src changes ---
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-    const handleTimeUpdate = () => setCurrentTime(video.currentTime)
-    const handleLoadedMetadata = () => setDuration(video.duration)
-    video.addEventListener('timeupdate', handleTimeUpdate)
-    video.addEventListener('loadedmetadata', handleLoadedMetadata)
-    return () => {
-      video.removeEventListener('timeupdate', handleTimeUpdate)
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata)
-    }
-  }, [])
 
-  const togglePlay = () => {
+    let disposed = false
+
+    // Cleanup any prior hls instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy()
+      hlsRef.current = null
+    }
+
+    const onLoadedMeta = () => setDuration(video.duration)
+    const onTimeUpdate = () => setCurrentTime(video.currentTime)
+    video.addEventListener('loadedmetadata', onLoadedMeta)
+    video.addEventListener('timeupdate', onTimeUpdate)
+
+    if (isHlsUrl(videoUrl)) {
+      // Adaptive streaming path — use hls.js
+      if (Hls.isSupported()) {
+        const hls = new Hls({ enableWorker: true })
+        hlsRef.current = hls
+        hls.loadSource(videoUrl)
+        hls.attachMedia(video)
+
+        hls.on(Hls.Events.MANIFEST_PARSED, (_event, data) => {
+          if (disposed) return
+          // Build the quality menu from the actual levels
+          const levels: QualityLevel[] = [
+            { label: 'Auto', level: -1 },
+            ...data.levels
+              .map((lvl, idx) => ({
+                label: lvl.height ? heightToLabel(lvl.height) : `Level ${idx + 1}`,
+                level: idx,
+              }))
+              // Show highest first (matches YouTube convention)
+              .reverse(),
+          ]
+          setQualityLevels(levels)
+          setCurrentQuality(-1)
+        })
+
+        hls.on(Hls.Events.LEVEL_SWITCHED, (_event, data) => {
+          if (disposed) return
+          const lvl = hls.levels[data.level]
+          setSourceLabel(lvl?.height ? heightToLabel(lvl.height) : `Level ${data.level + 1}`)
+        })
+
+        hls.on(Hls.Events.ERROR, (_event, data) => {
+          if (data.fatal) setHasError(true)
+        })
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari native HLS — no level switching API exposed, expose a single
+        // "Auto (native)" entry. This setState is gated on a capability check
+        // that is stable per URL change, so it cannot trigger cascading renders.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setQualityLevels([{ label: 'Auto (native)', level: -1 }])
+        video.src = videoUrl
+      } else {
+        // HLS not supported at all — fall back to error UI.
+        setHasError(true)
+      }
+    } else {
+      // Progressive download — single source, no level switching.
+      // setQualityLevels([]) is also called from the prevUrl block above; we
+      // keep it here for clarity when the URL is the first one mounted.
+      setQualityLevels([])
+      video.src = videoUrl
+      // Once metadata loads, label the quality based on the actual video height
+      const onMetaForQuality = () => {
+        if (disposed) return
+        const h = (video as HTMLVideoElement & { videoHeight?: number }).videoHeight
+        if (h && h > 0) {
+          setSourceLabel(`${heightToLabel(h)} (source)`)
+        } else {
+          setSourceLabel('Source')
+        }
+      }
+      video.addEventListener('loadedmetadata', onMetaForQuality, { once: true })
+    }
+
+    return () => {
+      disposed = true
+      video.removeEventListener('loadedmetadata', onLoadedMeta)
+      video.removeEventListener('timeupdate', onTimeUpdate)
+      if (hlsRef.current) {
+        hlsRef.current.destroy()
+        hlsRef.current = null
+      }
+    }
+  }, [videoUrl])
+
+  // --- Controls ---
+  const togglePlay = useCallback(() => {
     if (!videoRef.current) return
     if (isPlaying) {
       videoRef.current.pause()
     } else {
       videoRef.current.play().catch(() => setHasError(true))
     }
-    setIsPlaying(!isPlaying)
-  }
+  }, [isPlaying])
 
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     if (!videoRef.current) return
     videoRef.current.muted = !isMuted
     setIsMuted(!isMuted)
-  }
+  }, [isMuted])
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const vol = parseFloat(e.target.value)
@@ -86,6 +209,16 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     setShowSettings(false)
   }
 
+  const handleQualityChange = (level: number) => {
+    if (hlsRef.current) {
+      // -1 means auto-quality
+      hlsRef.current.currentLevel = level
+      setCurrentQuality(level)
+      setSourceLabel(level === -1 ? 'Auto' : (qualityLevels.find((q) => q.level === level)?.label ?? 'Auto'))
+    }
+    setShowSettings(false)
+  }
+
   const formatTime = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600)
     const mins = Math.floor((seconds % 3600) / 60)
@@ -96,7 +229,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  // Always use 16:9 for the player area regardless of video format
+  // Demo placeholder for seeded sample URLs (these are intentionally fake in dev)
   const isSampleVideo = videoUrl.startsWith('/uploads/sample-')
 
   if (hasError || isSampleVideo) {
@@ -109,9 +242,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             <Play className="h-12 w-12 text-zinc-600" />
           </div>
         )}
-        {/* Dark overlay for readability */}
         <div className="absolute inset-0 bg-zinc-900/40" />
-        {/* Demo content badge */}
         <div className="absolute top-3 left-3 px-2 py-0.5 bg-violet-600/80 text-white rounded text-[10px] font-bold uppercase tracking-wider">
           Demo
         </div>
@@ -133,7 +264,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             <p className="text-zinc-300 text-sm font-medium text-center px-6">Video playback will be available when real content is uploaded</p>
             <button
               onClick={() => setDemoClicked(false)}
-              className="mt-2 px-3 py-1 text-xs text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded transition-colors"
+              className="mt-2 px-3 py-1 text-xs text-zinc-300 hover:text-white hover:bg-white/10 rounded transition-colors"
             >
               Dismiss
             </button>
@@ -149,7 +280,6 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     <div ref={containerRef} className="relative aspect-video bg-black rounded-lg overflow-hidden group">
       <video
         ref={videoRef}
-        src={videoUrl}
         poster={thumbnailUrl || undefined}
         className="w-full h-full object-contain"
         onClick={togglePlay}
@@ -160,7 +290,6 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
       {/* Controls overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        {/* Progress bar */}
         <div
           className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0"
           onClick={handleProgressClick}
@@ -178,7 +307,6 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </button>
 
-          {/* Volume */}
           <div className="flex items-center gap-1.5">
             <button onClick={toggleMute} className="text-white hover:text-violet-400 transition-colors p-1">
               {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
@@ -194,7 +322,6 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             />
           </div>
 
-          {/* Time */}
           <span className="text-xs text-zinc-300 font-mono">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
@@ -206,31 +333,46 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="text-white hover:text-violet-400 transition-colors p-1"
+              aria-label="Settings"
             >
               <Settings className="h-4 w-4" />
             </button>
             {showSettings && (
               <div className="absolute bottom-full right-0 mb-2 w-48 bg-white border border-zinc-200 shadow-lg rounded-lg py-2 z-50">
-                <p className="px-3 py-1 text-xs font-medium text-zinc-700 uppercase tracking-wider">Quality</p>
-                {['1080p', '720p', '480p'].map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => { setQuality(q); setShowSettings(false) }}
-                    className={`w-full text-left px-3 py-1.5 text-sm transition-colors ${
-                      quality === q ? 'text-violet-600 bg-violet-50' : 'text-zinc-600 hover:bg-zinc-100'
-                    }`}
-                  >
-                    {q}
-                  </button>
-                ))}
-                <div className="border-t border-zinc-200 my-1" />
-                <p className="px-3 py-1 text-xs font-medium text-zinc-700 uppercase tracking-wider">Speed</p>
+                {/* Quality section — only shown when HLS levels are available */}
+                {qualityLevels.length > 0 ? (
+                  <>
+                    <p className="px-3 py-1 text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                      Quality {currentQuality === -1 && sourceLabel !== 'Auto' && `· ${sourceLabel}`}
+                    </p>
+                    {qualityLevels.map((q) => (
+                      <button
+                        key={`${q.label}-${q.level}`}
+                        onClick={() => handleQualityChange(q.level)}
+                        className={`w-full text-left px-3 py-1.5 text-sm transition-colors ${
+                          currentQuality === q.level ? 'text-violet-600 bg-violet-50' : 'text-zinc-700 hover:bg-zinc-100'
+                        }`}
+                      >
+                        {q.label}
+                      </button>
+                    ))}
+                    <div className="border-t border-zinc-200 my-1" />
+                  </>
+                ) : (
+                  // Progressive download — single source, just show its label
+                  <>
+                    <p className="px-3 py-1 text-xs font-medium text-zinc-500 uppercase tracking-wider">Quality</p>
+                    <div className="px-3 py-1.5 text-sm text-zinc-700">{sourceLabel}</div>
+                    <div className="border-t border-zinc-200 my-1" />
+                  </>
+                )}
+                <p className="px-3 py-1 text-xs font-medium text-zinc-500 uppercase tracking-wider">Speed</p>
                 {[0.5, 1, 1.5, 2].map((speed) => (
                   <button
                     key={speed}
                     onClick={() => handleSpeedChange(speed)}
                     className={`w-full text-left px-3 py-1.5 text-sm transition-colors ${
-                      playbackSpeed === speed ? 'text-violet-600 bg-violet-50' : 'text-zinc-600 hover:bg-zinc-100'
+                      playbackSpeed === speed ? 'text-violet-600 bg-violet-50' : 'text-zinc-700 hover:bg-zinc-100'
                     }`}
                   >
                     {speed}x{speed === 1 ? ' (Normal)' : ''}
@@ -240,8 +382,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             )}
           </div>
 
-          {/* Fullscreen */}
-          <button onClick={toggleFullscreen} className="text-white hover:text-violet-400 transition-colors p-1">
+          <button onClick={toggleFullscreen} className="text-white hover:text-violet-400 transition-colors p-1" aria-label="Fullscreen">
             <Maximize className="h-4 w-4" />
           </button>
         </div>

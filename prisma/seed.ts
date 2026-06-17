@@ -393,6 +393,78 @@ async function main() {
   }
   console.log('✅ Created playlists for all channels')
 
+  // Create sample notifications for user1 (recipient) triggered by other users
+  await prisma.notification.deleteMany()
+
+  const user1Channel = await prisma.channel.findFirst({
+    where: { userId: users[0].id },
+  })
+
+  const sampleNotifications: Array<{
+    userId: string
+    type: string
+    title: string
+    message: string
+    actorId: string
+    relatedVideoId?: string
+    relatedChannelId?: string
+    isRead: boolean
+    minutesAgo: number
+  }> = [
+    {
+      userId: users[0].id,
+      type: 'subscription',
+      title: 'New subscriber',
+      message: `${users[1].username} subscribed to your channel${user1Channel ? ` "${user1Channel.channelName}"` : ''}`,
+      actorId: users[1].id,
+      relatedChannelId: user1Channel?.id ?? null,
+      isRead: false,
+      minutesAgo: 2,
+    },
+    {
+      userId: users[0].id,
+      type: 'vote',
+      title: 'Video liked',
+      message: `Your video "${allVideos[0].title}" just got 10 new likes`,
+      actorId: users[2].id,
+      relatedVideoId: allVideos[0].id,
+      isRead: false,
+      minutesAgo: 47,
+    },
+    {
+      userId: users[0].id,
+      type: 'comment',
+      title: 'New comment',
+      message: `${users[2].username} commented: "Loved this! Watch till the end 🔥"`,
+      actorId: users[2].id,
+      relatedVideoId: allVideos[0].id,
+      isRead: false,
+      minutesAgo: 180,
+    },
+    {
+      userId: users[0].id,
+      type: 'system',
+      title: 'Welcome to Vert',
+      message: 'Thanks for joining! Complete your channel profile to start gaining subscribers.',
+      actorId: users[0].id,
+      isRead: true,
+      minutesAgo: 60 * 24 * 3,
+    },
+  ]
+
+  const now = Date.now()
+  for (const n of sampleNotifications) {
+    const { minutesAgo, ...fields } = n
+    await prisma.notification.create({
+      data: {
+        ...fields,
+        actorId: fields.actorId,
+        createdAt: new Date(now - minutesAgo * 60 * 1000),
+      },
+    })
+  }
+  console.log(`✅ Created ${sampleNotifications.length} notifications for ${users[0].username}`)
+
   console.log('\n🎉 Seed completed successfully!')
   console.log('📧 Admin login: admin@vert.com / admin123')
   console.log('📧 User login: user1-5@vert.com / password123')

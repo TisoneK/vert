@@ -27,6 +27,7 @@ model User {
   adminActions   AdminAction[]
   watchHistory   WatchHistory[]
   savedVideos    SavedVideo[]
+  notifications  Notification[]
 }
 
 model Channel {
@@ -199,4 +200,24 @@ model SavedVideo {
   video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
   @@id([userId, videoId])
+}
+
+/// In-app notification delivered to a specific user.
+/// Types are intentionally string-typed so we can add new kinds
+/// (subscription, comment, vote, flag, admin, system) without migrations.
+model Notification {
+  id              String   @id @default(cuid())
+  userId          String   // recipient
+  type            String   // subscription | comment | vote | flag | admin | system
+  title           String
+  message         String
+  actorId         String?  // who triggered it (null for system)
+  relatedVideoId  String?  // optional context
+  relatedChannelId String?
+  isRead          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
 }
