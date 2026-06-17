@@ -1,0 +1,251 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/store'
+import { timeAgo } from '@/lib/utils-vert'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Send, Trash2, ThumbsUp, ChevronDown } from 'lucide-react'
+import { CommentSkeleton } from './Skeleton'
+
+interface Comment {
+  id: string
+  content: string
+  createdAt: string
+  isRemoved: boolean
+  likeCount?: number
+  user: {
+    id: string
+    username: string
+    avatarUrl: string | null
+  }
+}
+
+interface CommentSectionProps {
+  videoId: string
+}
+
+type SortOption = 'top' | 'newest'
+
+export function CommentSection({ videoId }: CommentSectionProps) {
+  const { user } = useAuth()
+  const [comments, setComments] = useState<Comment[]>([])
+  const [newComment, setNewComment] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
+  const [sort, setSort] = useState<SortOption>('top')
+  const [likedComments, setLikedComments] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    fetchComments(1, true)
+  }, [videoId, sort])
+
+  async function fetchComments(pageNum: number, reset = false) {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/v1/videos/${videoId}/comments?page=${pageNum}&limit=20`)
+      const data = await res.json()
+      if (reset) {
+        setComments(data.comments)
+      } else {
+        setComments((prev) => [...prev, ...data.comments])
+      }
+      setHasMore(pageNum < data.pagination.totalPages)
+    } catch (error) {
+      console.error('Failed to fetch comments:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleSubmit() {
+    if (!newComment.trim() || !user) return
+    setSubmitting(true)
+    try {
+      const res = await fetch(`/api/v1/videos/${videoId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newComment.trim() }),
+      })
+      if (res.ok) {
+        const comment = await res.json()
+        setComments((prev) => [comment, ...prev])
+        setNewComment('')
+      }
+    } catch (error) {
+      console.error('Comment error:', error)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleDelete(commentId: string) {
+    try {
+      const res = await fetch(`/api/v1/comments/${commentId}`, { method: 'DELETE' })
+      if (res.ok) {
+        setComments((prev) => prev.filter((c) => c.id !== commentId))
+      }
+    } catch (error) {
+      console.error('Delete comment error:', error)
+    }
+  }
+
+  const toggleCommentLike = (commentId: string) => {
+    setLikedComments((prev) => {
+      const next = new Set(prev)
+      if (next.has(commentId)) {
+        next.delete(commentId)
+      } else {
+        next.add(commentId)
+      }
+      return next
+    })
+  }
+
+  const sortedComments = [...comments].sort((a, b) => {
+    if (sort === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    return 0 // 'top' - default order from API
+  })
+
+  return (
+    <div className="mt-6">
+      {/* Header with count and sort */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-zinc-900">
+          {comments.length} Comment{comments.length !== 1 ? 's' : ''}
+        </h3>
+        <div className="relative">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortOption)}
+            className="appearance-none bg-transparent text-xs text-zinc-600 pr-4 pl-2 py-1 cursor-pointer hover:text-zinc-800 focus:outline-none"
+          >
+            <option value="top">Top comments</option>
+            <option value="newest">Newest first</option>
+          </select>
+          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-600 pointer-events-none" />
+        </div>
+      </div>
+
+      {/* Add comment */}
+      {user ? (
+        <div className="flex gap-3 mb-6">
+          <div className="shrink-0">
+            <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
+              {user.username[0]?.toUpperCase()}
+            </div>
+          </div>
+          <div className="flex-1">
+            <Textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add a comment..."
+              className="bg-zinc-50 border-zinc-200 text-zinc-700 placeholder:text-zinc-400 min-h-[60px] resize-none text-sm focus-visible:ring-violet-600"
+            />
+            <div className="flex justify-end mt-2">
+              <Button
+                size="sm"
+                onClick={handleSubmit}
+                disabled={submitting || !newComment.trim()}
+                className="bg-violet-600 hover:bg-violet-700 text-white font-medium active:scale-95 transition-transform duration-100"
+              >
+                {submitting ? (
+                  <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Send className="h-3.5 w-3.5 mr-1.5" />
+                    Comment
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-zinc-700 mb-6">Log in to add a comment.</p>
+      )}
+
+      {/* Comments list */}
+      {loading && comments.length === 0 ? (
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <CommentSkeleton key={i} />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
+          {sortedComments.map((comment) => (
+            <div key={comment.id} className="flex gap-3 group">
+              <div className="shrink-0">
+                {comment.user.avatarUrl ? (
+                  <img
+                    src={comment.user.avatarUrl}
+                    alt={comment.user.username}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
+                    {comment.user.username[0]?.toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-zinc-600">
+                    {comment.user.username}
+                  </span>
+                  <span className="text-[11px] text-zinc-600">
+                    {timeAgo(comment.createdAt)}
+                  </span>
+                </div>
+                <p className="text-sm text-zinc-600 mt-0.5">{comment.content}</p>
+                {/* Like & Reply */}
+                <div className="flex items-center gap-3 mt-1.5">
+                  <button
+                    onClick={() => toggleCommentLike(comment.id)}
+                    className={`flex items-center gap-1 text-[11px] transition-colors ${
+                      likedComments.has(comment.id) ? 'text-violet-600' : 'text-zinc-600 hover:text-zinc-800'
+                    }`}
+                  >
+                    <ThumbsUp className="h-3 w-3" />
+                    {likedComments.has(comment.id) ? '1' : ''}
+                  </button>
+                  <button className="text-[11px] text-zinc-600 hover:text-zinc-800 transition-colors font-medium">
+                    Reply
+                  </button>
+                </div>
+              </div>
+              {user && (user.id === comment.user.id || user.role === 'admin') && (
+                <button
+                  onClick={() => handleDelete(comment.id)}
+                  className="shrink-0 text-zinc-500 hover:text-red-600 transition-colors p-1 opacity-0 group-hover:opacity-100"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="flex justify-center mt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              const nextPage = page + 1
+              setPage(nextPage)
+              fetchComments(nextPage)
+            }}
+            className="text-zinc-600 hover:text-zinc-900 text-sm"
+          >
+            Load More Comments
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}
