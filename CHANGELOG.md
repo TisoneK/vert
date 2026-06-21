@@ -41,6 +41,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Site no longer crashes when `prisma generate` hasn't run.** Previously a missing Prisma client binary would crash the entire app at import time; now only the route that needs the DB fails, and the UI shell still renders.
 
+### Security
+
+- **Dependency audit pass** — closed 44 of 54 known vulnerabilities (81% reduction).
+  - Updated `next` from `16.1.3` → `16.2.9`, patching 15 Next.js CVEs (4 high, including SSRF in WebSocket upgrades, middleware/proxy bypass via dynamic route parameter injection, and DoS in Server Components).
+  - Updated 18 other direct deps to latest patch versions within their existing semver ranges (`next-auth`, `prisma`, `react`, `zod`, `zustand`, etc.).
+  - Added `overrides` to `package.json` for 11 transitive deps that had upstream fixes but were pinned by parents:
+    - `prismjs` → `^1.30.0` (DOM clobbering)
+    - `js-cookie` → `^3.0.6` (prototype hijack)
+    - `@babel/core` → `^7.29.1` (arbitrary file read)
+    - `picomatch` → `^2.3.2` (ReDoS)
+    - `brace-expansion` → `^2.0.3` (memory exhaustion)
+    - `minimatch` → `^9.0.5` (multiple ReDoS)
+    - `postcss` → `^8.5.10` (XSS via unescaped `</style>`)
+    - `flatted` → `^3.4.0` (DoS + prototype pollution)
+    - `js-yaml` → `^4.1.2` (DoS in merge key handling)
+    - `diff` → `^5.2.2` (DoS in parsePatch)
+    - `uuid` → `^11.1.1` (missing buffer bounds check)
+  - **10 vulnerabilities remain and cannot be fixed without upstream changes:**
+    - `lodash@4.17.21` + `lodash-es@4.17.21` (3 CVEs) — no patched version published; latest release is still vulnerable per the advisory.
+    - `defu@<=6.1.4` (1 high) — Prisma pins to 6.x via `@prisma/config → c12`; overriding to 7.x breaks Prisma's resolution.
+    - These will resolve when upstream maintainers publish patched versions.
+
 ---
 
 ## [Unreleased — earlier batch]
