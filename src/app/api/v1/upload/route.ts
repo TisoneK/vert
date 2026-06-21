@@ -3,6 +3,7 @@ import { writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { getCurrentUser } from '@/lib/auth-helpers'
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 
 /**
  * POST /api/v1/upload
@@ -51,6 +52,10 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
+
+  // Rate limit by user — 10 uploads/min is plenty for power users, blocks spam.
+  const rl = rateLimit(req, RATE_LIMITS.upload, `user:${user.id}`)
+  if (!rl.ok) return rl.response!
 
   let form: FormData
   try {

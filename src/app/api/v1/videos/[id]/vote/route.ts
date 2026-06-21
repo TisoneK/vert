@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 
 export async function POST(
   req: NextRequest,
@@ -12,6 +13,10 @@ export async function POST(
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
+
+    // Rate limit by user — 60 votes/min is well above any human rate.
+    const rl = rateLimit(req, RATE_LIMITS.vote, `user:${user.id}`)
+    if (!rl.ok) return rl.response!
 
     const body = await req.json()
     const { voteType } = body

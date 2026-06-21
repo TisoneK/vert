@@ -1,121 +1,141 @@
 # Vert
-## Badges
 
-- [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-- [![Release](https://img.shields.io/github/v/bao/vert?color=blue)](https://github.com/bao/vert/releases)
-- [![License](https://img.shields.io/github/license/bao/vert)](LICENSE)
-- [![npm version](https://img.shields.io/npm/v/nextjs_tailwind_shadcn_ts)](https://www.npmjs.com/package/nextjs_tailwind_shadcn_ts)
-- [![Dependencies](https://img.shields.io/badge/dependencies-up--to--date-brightgreen)](#)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
+[![License](https://img.shields.io/github/license/TisoneK/vert)](LICENSE)
+[![Dependencies](https://img.shields.io/badge/dependencies-up--to--date-brightgreen)](#)
 
 ## Table of Contents
 
-- Overview
-- Quickstart
-- Installation
-- Environment
-- Scripts
-- Development
-- Testing
-- Deployment
-- Prisma / Database
-- Contributing
-- Code of Conduct
-- Security
-- Authors
-- License
-- Changelog
+- [Overview](#overview)
+- [Quickstart](#quickstart)
+- [Installation](#installation)
+- [Environment](#environment)
+- [Scripts](#scripts)
+- [Development](#development)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Prisma / Database](#prisma--database)
+- [Architecture](#architecture)
+- [Contributing](#contributing)
+- [Security](#security)
+- [Changelog](#changelog)
 
 ## Overview
 
-`Vert` is a full-stack Next.js application scaffolded for fast development and production deployments. It includes common features such as auth, API routes, Prisma ORM, and a component library.
-## Overview
-
-`Vert` is a full-stack Next.js application scaffolded for fast development and production deployments. It includes common features such as auth, API routes, Prisma ORM, and a component library.
+`Vert` is a portrait-first video platform built with Next.js 16 (App Router),
+React 19, TypeScript, Prisma, and Tailwind CSS v4. The current v1 deployment
+uses SQLite + local-filesystem uploads as a deliberate trade-off for fast
+iteration — see [ARCHITECTURE.md](./ARCHITECTURE.md) for the rationale and
+the migration triggers that would force a move to Postgres / S3 / Cloudflare
+Stream.
 
 ## Quickstart
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run db:generate    # generate Prisma client
+bun run db:push        # create SQLite DB + apply schema
+bun prisma/seed.ts     # (optional) load demo data
+bun run dev            # http://localhost:3000
 ```
+
+Demo logins after seeding:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@vert.com` | `admin123` |
+| Member | `user1@vert.com` … `user5@vert.com` | `password123` |
 
 ## Installation
 
 1. Clone the repository
-2. Install dependencies: `npm install`
-3. Create a `.env` from `.env.example` and set required env vars
+2. Install dependencies: `bun install` (Node 20+ also works with `npm install`)
+3. Create a `.env.local` from the variables listed under [Environment](#environment)
+4. Run `bun run db:generate` and `bun run db:push` to set up the database
 
 ## Environment
 
-Required environment variables (example names):
+Required environment variables (set in `.env.local`, never committed):
 
-- `DATABASE_URL` — Prisma database connection string
-- `NEXTAUTH_SECRET` — NextAuth secret
-- `NODE_ENV` — `development` | `production`
+- `DATABASE_URL` — Prisma connection string (e.g. `file:./dev.db` for SQLite)
+- `NEXTAUTH_SECRET` — random secret for JWT signing (generate with `openssl rand -hex 32`)
+- `NEXTAUTH_URL` — app URL (e.g. `http://localhost:3000` for dev)
 
-Store secrets securely (CI secrets, cloud environment variables, or Vault).
+Optional (only when upload storage is migrated off local FS — see `ARCHITECTURE.md`):
+
+- `STORAGE_BUCKET`, `STORAGE_ACCESS_KEY`, `STORAGE_SECRET_KEY`, `STORAGE_ENDPOINT`
+
+Store secrets securely in production (Vercel dashboard, CI secrets, or Vault).
 
 ## Scripts
 
-- `npm run dev` — runs Next.js in development on port 3000
-- `npm run build` — builds the app for production
-- `npm run start` — starts the production server
-- `npm run lint` — runs ESLint
-- Prisma helpers: `db:push`, `db:generate`, `db:migrate`, `db:reset` (see below)
+- `bun run dev` — runs Next.js in development on port 3000
+- `bun run build` — builds the app for production (standalone output)
+- `bun run start` — starts the production server
+- `bun run lint` — runs ESLint
+- Prisma helpers: `db:push`, `db:generate`, `db:migrate`, `db:reset`
 
 ## Development
 
-- Run `npm run dev` and open `http://localhost:3000`
-- Frontend files live under `src/components` and `src/app`
-- API routes are in `src/app/api`
+- Run `bun run dev` and open `http://localhost:3000`
+- Frontend files live under `src/components/vert/`
+- API routes are in `src/app/api/v1/` (REST) and `src/app/api/auth/` (NextAuth)
+- Do not edit `src/components/ui/` directly — those are shadcn/ui primitives
 
 ## Testing
 
-Add your test runner and scripts. Example with Jest/Playwright would go here.
+No test runner is configured yet. When adding tests, the recommended stack is:
+- **Vitest** for unit tests
+- **Playwright** for end-to-end tests
+- Run via `bun run test` (script to be added)
 
 ## Deployment
 
-- This project builds into a standalone Next server. The `build` script prepares `.next/standalone` for production.
-- Recommended deployment targets: Vercel (serverless), Bun on Docker, or a Node-compatible host.
+- The project builds into a standalone Next.js server (`.next/standalone/`).
+- Recommended deployment target: **Vercel** (auto-redeploy on push to `main`).
+- Environment variables must be set in the Vercel dashboard — code-only pushes do not propagate env changes.
 
 ## Prisma / Database
 
 Prisma helper scripts included in `package.json`:
 
-- `npm run db:push` — push Prisma schema to the database
-- `npm run db:generate` — generate Prisma client
-- `npm run db:migrate` — run migrations (development)
-- `npm run db:reset` — reset the database and apply migrations
+- `bun run db:push` — push Prisma schema to the database (dev workflow)
+- `bun run db:generate` — generate Prisma client (run after schema changes)
+- `bun run db:migrate` — create + apply a migration (production workflow)
+- `bun run db:reset` — reset the database and re-apply migrations
 
 Edit `prisma/schema.prisma` and set `DATABASE_URL` before running migrations.
+
+Note: `src/lib/db.ts` uses a lazy-initialized Prisma client (Proxy pattern) so
+that a missing `prisma generate` no longer crashes the entire app at import
+time. See the file header for details.
+
+## Architecture
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for:
+- The v1 architectural choices (SQLite, local-FS uploads, single-route SPA) and why they were chosen
+- The originally-spec'd design (Postgres, Clerk, Cloudflare Stream, Redis) and why it was deferred
+- Migration triggers that would force each deferral to be revisited
+- A file map for new contributors
 
 ## Contributing
 
 - Fork the repo, create a feature branch, open a pull request.
-- Follow the existing code style and run `npm run lint`.
-
-## Code of Conduct
-
-Please follow a professional and respectful code of conduct in issues and PRs.
+- Follow the existing code style and run `bun run lint` before submitting.
+- For changes that affect data shape or API contracts, update `CHANGELOG.md`.
 
 ## Security
 
 - Report security issues to the maintainers privately.
 - Do not commit secrets; use env vars or secret stores.
-
-## Authors
-
-- Project: Vert maintainers
-
-## License
-
-Add a `LICENSE` file to indicate project licensing. This repository currently has no license.
+- All API routes are auth-checked via `getCurrentUser` / `requireAdmin` from `src/lib/auth-helpers.ts`.
+- Passwords are hashed with bcryptjs (cost factor 12); `passwordHash` is never serialized in API responses.
 
 ## Changelog
 
-See [Changelog](CHANGELOG.md).
+See [CHANGELOG.md](./CHANGELOG.md).
 
 ## Acknowledgements
 
-- Built with Next.js, Tailwind CSS, Prisma, and shadcn-style components.
+- Built with Next.js, Tailwind CSS, Prisma, shadcn/ui, and hls.js.
 

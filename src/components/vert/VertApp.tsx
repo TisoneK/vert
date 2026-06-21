@@ -1,6 +1,6 @@
 'use client'
 
-import { useNavigation, useAuth } from '@/lib/store'
+import { useNavigation, useAuth, pathToView } from '@/lib/store'
 import { useEffect, useState } from 'react'
 import { signOut } from 'next-auth/react'
 import { Header } from './Header'
@@ -24,7 +24,7 @@ import { CreatorStudio } from './CreatorStudio'
 import { ContactPage } from './ContactPage'
 
 export function VertApp() {
-  const { currentView } = useNavigation()
+  const { currentView, navigate } = useNavigation()
   const { setUser, isLoading, user } = useAuth()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
@@ -42,6 +42,34 @@ export function VertApp() {
     }
     fetchSession()
   }, [setUser])
+
+  // Sync Zustand navigation store with the browser URL.
+  //
+  // On mount: parse window.location and navigate to it (without pushing a
+  // duplicate history entry). This is what makes deep links work — when a
+  // user lands on /watch/<id> directly, VertApp renders the right view.
+  //
+  // On popstate (back/forward button): re-parse and navigate.
+  useEffect(() => {
+    function syncFromUrl() {
+      const next = pathToView(window.location.pathname)
+      if (next) {
+        // Special case: /search?q=... reads the query string
+        if (next.page === 'search') {
+          const q = new URLSearchParams(window.location.search).get('q') || ''
+          navigate({ page: 'search', query: q }, { skipHistoryPush: true })
+        } else {
+          navigate(next, { skipHistoryPush: true })
+        }
+      }
+    }
+
+    // Initial sync on mount
+    syncFromUrl()
+
+    window.addEventListener('popstate', syncFromUrl)
+    return () => window.removeEventListener('popstate', syncFromUrl)
+  }, [navigate])
 
   const handleLogout = async () => {
     try {

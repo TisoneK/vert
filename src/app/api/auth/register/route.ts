@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { db } from '@/lib/db'
+import { rateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit by IP — blocks account-creation spam.
+    // 5 signups per minute per IP is well above any legitimate use.
+    const ip = getClientIp(req)
+    const rl = rateLimit(req, RATE_LIMITS.signup, `ip:${ip}`)
+    if (!rl.ok) return rl.response!
+
     const body = await req.json()
     const { email, username, password } = body
 
