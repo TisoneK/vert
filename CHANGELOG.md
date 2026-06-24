@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Two jobs: `build` (lint + next build) and `prisma-schema-check` (validates schema against a throwaway SQLite DB).
   - Uses Bun for consistency with local dev.
   - `concurrency` block cancels in-progress runs when a new commit is pushed to the same ref.
+  - **Reverted** in the next batch — Vercel handles CI/CD via auto-deploy on push, so a duplicate GitHub Actions pipeline added noise without value. The workflow file (`.github/workflows/ci.yml`) was removed; the lint + build steps now run as part of Vercel's deployment pipeline.
 
 - **`ARCHITECTURE.md`** — new file documenting the v1 architectural choices (SQLite, local-FS uploads, single-route SPA, NextAuth) and why they were chosen, alongside the originally-spec'd design (Postgres, Clerk, Cloudflare Stream, Redis) and the migration triggers that would force each deferral to be revisited.
 
