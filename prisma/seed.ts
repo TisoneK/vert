@@ -465,6 +465,65 @@ async function main() {
   }
   console.log(`✅ Created ${sampleNotifications.length} notifications for ${users[0].username}`)
 
+  // Create tags + attach to videos
+  await prisma.videoTag.deleteMany()
+  await prisma.tag.deleteMany()
+
+  const tagPool = [
+    'tutorial', 'beginner', 'diy', 'creative', 'satisfying',
+    'asmr', 'food', 'recipe', 'travel', 'adventure',
+    'tech', 'review', 'shorts', 'viral', 'aesthetic',
+    'morning', 'routine', 'budget', 'hack', 'easy',
+  ]
+
+  const tagRecords = await Promise.all(
+    tagPool.map((name) =>
+      prisma.tag.create({
+        data: {
+          name: name.toLowerCase(),
+          label: `#${name}`,
+        },
+      })
+    )
+  )
+
+  let totalTagLinks = 0
+  for (const video of allVideos) {
+    const titleLower = video.title.toLowerCase()
+    const descLower = (video.description || '').toLowerCase()
+    const matchedTags = new Set<string>()
+
+    for (const tag of tagPool) {
+      if (titleLower.includes(tag) || descLower.includes(tag)) {
+        matchedTags.add(tag)
+      }
+    }
+
+    while (matchedTags.size < 2) {
+      matchedTags.add(tagPool[Math.floor(Math.random() * tagPool.length)])
+    }
+    while (matchedTags.size > 4) {
+      const arr = Array.from(matchedTags)
+      matchedTags.delete(arr[Math.floor(Math.random() * arr.length)]!)
+    }
+
+    const selectedTagIds = Array.from(matchedTags).map(
+      (name) => tagRecords.find((t) => t.name === name)!.id
+    )
+
+    await prisma.videoTag.createMany({
+      data: selectedTagIds.map((tagId) => ({ videoId: video.id, tagId })),
+    })
+    totalTagLinks += selectedTagIds.length
+  }
+
+  for (const tag of tagRecords) {
+    const count = await prisma.videoTag.count({ where: { tagId: tag.id } })
+    await prisma.tag.update({ where: { id: tag.id }, data: { usageCount: count } })
+  }
+
+  console.log(`✅ Created ${tagRecords.length} tags with ${totalTagLinks} video-tag links`)
+
   console.log('\n🎉 Seed completed successfully!')
   console.log('📧 Admin login: admin@vert.com / admin123')
   console.log('📧 User login: user1-5@vert.com / password123')

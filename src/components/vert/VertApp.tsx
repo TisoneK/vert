@@ -18,6 +18,7 @@ import { MobileNav } from './MobileNav'
 import { TrendingPage } from './TrendingPage'
 import { ExplorePage } from './ExplorePage'
 import { CategoryPage } from './CategoryPage'
+import { TagPage } from './TagPage'
 import { HistoryPage } from './HistoryPage'
 import { SavedPage } from './SavedPage'
 import { CreatorStudio } from './CreatorStudio'
@@ -154,6 +155,8 @@ export function VertApp() {
         return <TrendingPage />
       case 'category':
         return <CategoryPage slug={currentView.slug} />
+      case 'tag':
+        return <TagPage slug={currentView.slug} />
       case 'explore':
         return <ExplorePage />
       case 'history':

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useNavigation } from '@/lib/store'
+import { useNavigation, useAuth } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { VideoShelf } from './VideoShelf'
 import { ShelfSkeleton } from './Skeleton'
@@ -25,6 +25,7 @@ interface Video {
     user: { avatarUrl: string | null }
   }
   categories: Array<{ name: string; slug: string }>
+  tags?: Array<{ name: string; label: string }>
 }
 
 interface Category {
@@ -36,8 +37,10 @@ interface Category {
 
 export function HomeFeed() {
   const { navigate } = useNavigation()
+  const { user } = useAuth()
   const [videos, setVideos] = useState<Video[]>([])
   const [trendingVideos, setTrendingVideos] = useState<Video[]>([])
+  const [forYouVideos, setForYouVideos] = useState<Video[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [activeFormat, setActiveFormat] = useState<string | null>(null)
@@ -46,7 +49,8 @@ export function HomeFeed() {
     fetchCategories()
     fetchTrending()
     fetchVideos()
-  }, [])
+    if (user) fetchForYou()
+  }, [user])
 
   useEffect(() => {
     fetchVideos()
@@ -73,6 +77,25 @@ export function HomeFeed() {
       }
     } catch (error) {
       console.error('Failed to fetch trending:', error)
+    }
+  }
+
+  async function fetchForYou() {
+    try {
+      const res = await fetch('/api/v1/feed/for-you?limit=12', { cache: 'no-store' })
+      if (res.ok) {
+        const data = await res.json()
+        // Only show the shelf if the response is actually personalized —
+        // if the user has no watch history, the API returns trending and we
+        // don't want a duplicate shelf next to the Featured one.
+        if (data.personalized) {
+          setForYouVideos(data.videos)
+        } else {
+          setForYouVideos([])
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch for-you:', error)
     }
   }
 
@@ -132,6 +155,23 @@ export function HomeFeed() {
         </>
       ) : (
         <>
+          {/* "For You" shelf — only for logged-in users with watch history.
+              The fetchForYou() helper gates on data.personalized so we don't
+              show a duplicate trending shelf. */}
+          {forYouVideos.length > 0 && !activeFormat && (
+            <VideoShelf
+              title="For You"
+              icon={<Sparkles className="h-4 w-4 text-violet-600" />}
+              onSeeAll={() => navigate({ page: 'explore' })}
+            >
+              {forYouVideos.map((video) => (
+                <div key={video.id} className="shrink-0 w-[200px]">
+                  <VideoCard video={video} />
+                </div>
+              ))}
+            </VideoShelf>
+          )}
+
           {/* Featured shelf with hero card */}
           {trendingVideos.length > 0 && !activeFormat && (
             <VideoShelf

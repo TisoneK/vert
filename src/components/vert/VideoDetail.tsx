@@ -139,6 +139,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   }
 
   const categories = (video.categories as Array<{ name: string; slug: string }>) || []
+  const tags = (video.tags as Array<{ name: string; label: string }>) || []
   const format = (video.format as string) || 'portrait'
   const description = video.description as string | null
 
@@ -183,6 +184,21 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
             {categories.length > 0 && (
               <div className="mt-2">
                 <CategoryBadge categories={categories} max={5} />
+              </div>
+            )}
+
+            {/* Tags — clickable chips */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {tags.map((tag) => (
+                  <button
+                    key={tag.name}
+                    onClick={() => navigate({ page: 'tag', slug: tag.name })}
+                    className="px-2 py-1 bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-900 rounded-md text-xs font-medium transition-colors"
+                  >
+                    {tag.label}
+                  </button>
+                ))}
               </div>
             )}
 

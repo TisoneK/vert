@@ -24,6 +24,7 @@ interface VideoCardProps {
       }
     }
     categories?: Array<{ name: string; slug: string }>
+    tags?: Array<{ name: string; label: string }>
   }
   watchProgress?: number
   showContextMenu?: boolean
@@ -186,6 +187,26 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
           </p>
           {video.categories && video.categories.length > 0 && (
             <CategoryBadge categories={video.categories} max={2} />
+          )}
+          {/* Tags — show up to 3 as clickable chips */}
+          {video.tags && video.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {video.tags.slice(0, 3).map((tag) => (
+                <button
+                  key={tag.name}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    navigate({ page: 'tag', slug: tag.name })
+                  }}
+                  className="text-[10px] text-violet-600 hover:text-violet-800 hover:underline font-medium transition-colors"
+                >
+                  {tag.label}
+                </button>
+              ))}
+              {video.tags.length > 3 && (
+                <span className="text-[10px] text-zinc-400">+{video.tags.length - 3}</span>
+              )}
+            </div>
           )}
         </div>
       </div>

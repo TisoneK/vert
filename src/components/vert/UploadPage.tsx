@@ -29,6 +29,8 @@ export function UploadPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [format, setFormat] = useState('portrait')
   const [categories, setCategories] = useState<Category[]>([])
+  const [tagInput, setTagInput] = useState('')
+  const [tags, setTags] = useState<string[]>([])
 
   useEffect(() => {
     fetchCategories()
@@ -70,6 +72,28 @@ export function UploadPage() {
           ? [...prev, catId]
           : prev
     )
+  }
+
+  const commitTag = (raw: string) => {
+    const normalized = raw.toLowerCase().replace(/[^a-z0-9]/g, '')
+    if (!normalized) return
+    if (tags.includes(normalized)) return
+    if (tags.length >= 8) return
+    setTags((prev) => [...prev, normalized])
+  }
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault()
+      commitTag(tagInput)
+      setTagInput('')
+    } else if (e.key === 'Backspace' && tagInput === '' && tags.length > 0) {
+      setTags((prev) => prev.slice(0, -1))
+    }
+  }
+
+  const removeTag = (tag: string) => {
+    setTags((prev) => prev.filter((t) => t !== tag))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,6 +142,7 @@ export function UploadPage() {
           format,
           status: 'ready',
           categoryIds: selectedCategories,
+          tags,
         }),
       })
 
@@ -291,6 +316,50 @@ export function UploadPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Tag input — freeform hashtags */}
+        <div>
+          <Label className="text-zinc-600 mb-2 block text-sm">
+            Tags <span className="text-zinc-400 font-normal">(up to 8 — press Enter or comma to add)</span>
+          </Label>
+          <div className="flex flex-wrap items-center gap-2 p-2 bg-zinc-100 border border-zinc-300 rounded-lg focus-within:ring-2 focus-within:ring-violet-600 focus-within:border-violet-600 transition-colors">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-violet-100 text-violet-700 rounded-md text-xs font-medium"
+              >
+                #{tag}
+                <button
+                  type="button"
+                  onClick={() => removeTag(tag)}
+                  className="text-violet-400 hover:text-violet-700 transition-colors"
+                  aria-label={`Remove tag ${tag}`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+            {tags.length < 8 && (
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                onBlur={() => {
+                  if (tagInput.trim()) {
+                    commitTag(tagInput)
+                    setTagInput('')
+                  }
+                }}
+                placeholder={tags.length === 0 ? "e.g. tutorial, diy, satisfying" : "Add another…"}
+                className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-zinc-800 placeholder:text-zinc-400"
+              />
+            )}
+          </div>
+          {tags.length === 8 && (
+            <p className="text-xs text-zinc-500 mt-1">Tag limit reached (8 max)</p>
+          )}
         </div>
 
         {/* Submit */}
