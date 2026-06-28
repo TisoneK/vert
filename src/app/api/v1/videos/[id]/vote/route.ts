@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
+import { createNotification } from '@/lib/notifications'
 
 export async function POST(
   req: NextRequest,
@@ -25,7 +26,10 @@ export async function POST(
       return NextResponse.json({ error: 'Vote type must be "like" or "dislike"' }, { status: 400 })
     }
 
-    const video = await db.video.findUnique({ where: { id: videoId } })
+    const video = await db.video.findUnique({
+      where: { id: videoId },
+      include: { channel: { select: { userId: true } } },
+    })
     if (!video || video.isRemoved) {
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
@@ -60,6 +64,18 @@ export async function POST(
             dislikeCount: voteType === 'dislike' ? { increment: 1 } : { decrement: 1 },
           },
         })
+        // Notify on like — don't notify on dislike (noise).
+        // Don't notify if the user is liking their own video.
+        if (voteType === 'like' && video.channel.userId !== user.id) {
+          await createNotification({
+            userId: video.channel.userId,
+            type: 'vote',
+            title: 'Video liked',
+            message: `${user.username} liked your video "${video.title}"`,
+            actorId: user.id,
+            relatedVideoId: videoId,
+          })
+        }
         return NextResponse.json({ action: 'changed', voteType })
       }
     }
@@ -75,6 +91,18 @@ export async function POST(
         dislikeCount: voteType === 'dislike' ? { increment: 1 } : undefined,
       },
     })
+    // Notify on like — don't notify on dislike (noise).
+    // Don't notify if the user is liking their own video.
+    if (voteType === 'like' && video.channel.userId !== user.id) {
+      await createNotification({
+        userId: video.channel.userId,
+        type: 'vote',
+        title: 'Video liked',
+        message: `${user.username} liked your video "${video.title}"`,
+        actorId: user.id,
+        relatedVideoId: videoId,
+      })
+    }
 
     return NextResponse.json({ action: 'created', voteType }, { status: 201 })
   } catch (error) {

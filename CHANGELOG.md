@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Notifications are now wired to real events** — previously the NotificationCenter only showed seed data; now it fills up organically as users interact.
+  - New helper module `src/lib/notifications.ts` with `createNotification()` and `notifyAllAdmins()` — both best-effort (errors swallowed) so a notification failure never breaks the parent action.
+  - **Subscription created** → channel owner gets a "New subscriber" notification (`type: subscription`) with the subscriber's username and channel name.
+  - **Comment created** → video owner gets a "New comment" notification (`type: comment`) with the commenter's username and a snippet of the comment (truncated to 80 chars). Skipped if the user is commenting on their own video.
+  - **Like created** (new vote OR changed from dislike→like) → video owner gets a "Video liked" notification (`type: vote`). Dislikes do not generate notifications (would just be noise). Skipped if the user is liking their own video.
+  - **Flag created** → all admin users get a "Video flagged for review" notification (`type: flag`) with the reporter's username, video title, and reason. Uses `notifyAllAdmins()` which batches a `createMany` to all active admins in one query.
+  - Self-action guard on all three user-facing events: subscribing to / commenting on / liking your own content does not generate a notification.
+
 - **Personalized "For You" feed** — recommendation engine that ranks videos by user affinity.
   - New API route: `GET /api/v1/feed/for-you` (authenticated; falls back to trending for unauthed users or users with no watch history).
   - Affinity scoring algorithm:
