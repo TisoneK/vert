@@ -31,15 +31,24 @@ export function VertApp() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
 
-  // Fetch session on mount
+  // Fetch session on mount — with a 3-second timeout so the app never
+  // gets stuck on the loading spinner if the session endpoint is slow
+  // or unresponsive (cold DB start, network issue, etc.).
   useEffect(() => {
     async function fetchSession() {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 3000)
       try {
-        const res = await fetch('/api/auth/session-info')
+        const res = await fetch('/api/auth/session-info', {
+          signal: controller.signal,
+        })
         const data = await res.json()
-        setUser(data.user)
+        setUser(data.user ?? null)
       } catch {
+        // Timeout, network error, or JSON parse error — treat as logged out
         setUser(null)
+      } finally {
+        clearTimeout(timeout)
       }
     }
     fetchSession()
@@ -83,21 +92,23 @@ export function VertApp() {
     useNavigation.getState().navigate({ page: 'home' })
   }
 
+  // Unauthed visitors on the home page see the landing page immediately —
+  // don't block on the session check. If the user turns out to be logged in,
+  // the store updates and this re-renders to the app shell.
+  // Deep links (/watch/<id>, etc.) still wait for the session check so we
+  // know whether to show save/vote UI.
+  if (!user && currentView.page === 'home') {
+    return <LandingPage />
+  }
+
+  // For deep-link routes, show a minimal spinner while we check the session.
+  // The 3-second timeout on the fetch (above) guarantees this never hangs.
   if (isLoading) {
-    // Minimal loading state — just a centered spinner on white.
-    // The old skeleton made the app feel broken before it even loaded.
     return (
       <div className="h-screen bg-white flex items-center justify-center">
         <div className="h-8 w-8 border-2 border-zinc-200 border-t-violet-600 rounded-full animate-spin" />
       </div>
     )
-  }
-
-  // Unauthed visitors on the home page see the landing page instead of the
-  // app shell. Deep links (/watch/<id>, /channel/<id>) still render the shell
-  // so shared content is viewable without an account.
-  if (!user && currentView.page === 'home') {
-    return <LandingPage />
   }
 
   const renderView = () => {
