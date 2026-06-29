@@ -8,7 +8,6 @@ import {
   Clock,
   Bookmark,
   Compass,
-  Settings,
   Shield,
   BarChart3,
   ChevronDown,
@@ -21,8 +20,6 @@ import {
   Newspaper,
   Monitor,
   Mail,
-  HelpCircle,
-  Info,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -109,9 +106,6 @@ export function Sidebar({ collapsed }: SidebarProps) {
 
   const footerItems = [
     { icon: Mail, label: 'Contact Us', action: () => navigate({ page: 'contact' }), active: currentView.page === 'contact' },
-    { icon: Settings, label: 'Settings', action: () => {}, active: false },
-    { icon: HelpCircle, label: 'Help', action: () => {}, active: false },
-    { icon: Info, label: 'About', action: () => {}, active: false },
   ]
 
   if (collapsed) {
@@ -347,8 +341,8 @@ export function Sidebar({ collapsed }: SidebarProps) {
             </button>
           ))}
         </div>
-        <p className="text-[10px] text-zinc-600 px-3 mt-2">
-          Vert v2.0
+        <p className="text-[10px] text-zinc-400 px-3 mt-2">
+          Vert v1.0
         </p>
       </div>
     </aside>

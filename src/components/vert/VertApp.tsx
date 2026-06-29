@@ -23,6 +23,7 @@ import { HistoryPage } from './HistoryPage'
 import { SavedPage } from './SavedPage'
 import { CreatorStudio } from './CreatorStudio'
 import { ContactPage } from './ContactPage'
+import { LandingPage } from './LandingPage'
 
 export function VertApp() {
   const { currentView, navigate } = useNavigation()
@@ -83,52 +84,20 @@ export function VertApp() {
   }
 
   if (isLoading) {
+    // Minimal loading state — just a centered spinner on white.
+    // The old skeleton made the app feel broken before it even loaded.
     return (
-      <div className="h-screen overflow-hidden bg-white text-zinc-900 flex flex-col">
-        {/* Skeleton header */}
-        <header className="shrink-0 h-14 bg-white border-b border-zinc-200 px-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-zinc-200 animate-pulse" />
-            <div className="w-12 h-5 rounded bg-zinc-200 animate-pulse hidden sm:block" />
-          </div>
-          <div className="w-48 h-8 rounded-full bg-zinc-200 animate-pulse hidden md:block" />
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-zinc-200 animate-pulse" />
-            <div className="w-8 h-8 rounded-lg bg-zinc-200 animate-pulse" />
-            <div className="w-7 h-7 rounded-full bg-zinc-200 animate-pulse" />
-          </div>
-        </header>
-        <div className="flex flex-1 overflow-hidden">
-          {/* Skeleton sidebar */}
-          <aside className="hidden md:flex flex-col w-56 shrink-0 bg-white border-r border-zinc-200 py-3 px-2 gap-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-9 rounded-lg bg-zinc-100 animate-pulse" />
-            ))}
-            <div className="my-2 border-t border-zinc-200" />
-            {Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="h-9 rounded-lg bg-zinc-100 animate-pulse" />
-            ))}
-          </aside>
-          {/* Skeleton content */}
-          <main className="flex-1 p-4 md:p-6">
-            <div className="flex gap-2 mb-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="w-20 h-8 rounded-lg bg-zinc-200 animate-pulse" />
-              ))}
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="aspect-video rounded-lg bg-zinc-200" />
-                  <div className="mt-2 h-3.5 w-3/4 rounded bg-zinc-200" />
-                  <div className="mt-1.5 h-3 w-1/2 rounded bg-zinc-200" />
-                </div>
-              ))}
-            </div>
-          </main>
-        </div>
+      <div className="h-screen bg-white flex items-center justify-center">
+        <div className="h-8 w-8 border-2 border-zinc-200 border-t-violet-600 rounded-full animate-spin" />
       </div>
     )
+  }
+
+  // Unauthed visitors on the home page see the landing page instead of the
+  // app shell. Deep links (/watch/<id>, /channel/<id>) still render the shell
+  // so shared content is viewable without an account.
+  if (!user && currentView.page === 'home') {
+    return <LandingPage />
   }
 
   const renderView = () => {

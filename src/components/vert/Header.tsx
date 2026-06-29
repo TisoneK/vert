@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react'
 import { NotificationCenter } from './NotificationCenter'
+import { Logo } from './Logo'
 import { Button } from '@/components/ui/button'
 
 interface HeaderProps {
@@ -22,23 +23,16 @@ interface HeaderProps {
   onToggleMobileDrawer: () => void
 }
 
-const trendingSearches = ['Trending now', 'Music videos', 'Tech reviews', 'Gaming highlights', 'Sports recap']
-
 export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: HeaderProps) {
   const { navigate } = useNavigation()
   const { user } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
-  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showMobileSearch, setShowMobileSearch] = useState(false)
-  const searchRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setShowSearchSuggestions(false)
-      }
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setShowProfileMenu(false)
       }
@@ -52,15 +46,8 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
     if (searchQuery.trim()) {
       navigate({ page: 'search', query: searchQuery.trim() })
       setSearchQuery('')
-      setShowSearchSuggestions(false)
       setShowMobileSearch(false)
     }
-  }
-
-  const handleSuggestionClick = (suggestion: string) => {
-    navigate({ page: 'search', query: suggestion })
-    setShowSearchSuggestions(false)
-    setShowMobileSearch(false)
   }
 
   return (
@@ -86,40 +73,24 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
             onClick={() => navigate({ page: 'home' })}
             className="flex items-center gap-1.5"
           >
-            <span className="text-lg font-bold text-zinc-900">Vert</span>
+            <Logo size={26} />
+            <span className="text-lg font-bold text-zinc-900 tracking-tight">Vert</span>
           </button>
         </div>
 
         {/* Center: Search bar (desktop) */}
-        <div ref={searchRef} className="hidden md:flex flex-1 max-w-lg mx-4 relative">
+        <div className="hidden md:flex flex-1 max-w-lg mx-4 relative">
           <form onSubmit={handleSearch} className="w-full">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setShowSearchSuggestions(true)}
-                placeholder="Search videos..."
+                placeholder="Search videos, creators, tags…"
                 className="w-full pl-9 pr-4 py-2 bg-zinc-100 rounded-full text-sm text-zinc-600 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-violet-600 transition-colors"
               />
             </div>
           </form>
-          {/* Search suggestions dropdown */}
-          {showSearchSuggestions && (
-            <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-zinc-200 shadow-lg rounded-lg py-2 z-50">
-              <p className="px-4 py-1.5 text-xs font-medium text-zinc-500 uppercase tracking-wider">Trending</p>
-              {trendingSearches.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => handleSuggestionClick(s)}
-                  className="w-full text-left px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-100 transition-colors flex items-center gap-2"
-                >
-                  <Search className="h-3.5 w-3.5 text-zinc-500" />
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Right: Actions */}
@@ -244,11 +215,10 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
             </button>
           </form>
           <div className="mt-2">
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-1">Trending</p>
-            {trendingSearches.map((s) => (
+            {['Trending now', 'Music videos', 'Tech reviews', 'Gaming highlights', 'Sports recap'].map((s) => (
               <button
                 key={s}
-                onClick={() => handleSuggestionClick(s)}
+                onClick={() => { navigate({ page: 'search', query: s }); setShowMobileSearch(false) }}
                 className="w-full text-left py-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors"
               >
                 {s}
