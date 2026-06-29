@@ -14,7 +14,6 @@ import {
   X,
 } from 'lucide-react'
 import { NotificationCenter } from './NotificationCenter'
-import { Logo } from './Logo'
 import { Button } from '@/components/ui/button'
 
 interface HeaderProps {
@@ -73,7 +72,6 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
             onClick={() => navigate({ page: 'home' })}
             className="flex items-center gap-1.5"
           >
-            <Logo size={26} />
             <span className="text-lg font-bold text-zinc-900 tracking-tight">Vert</span>
           </button>
         </div>

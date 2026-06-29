@@ -169,7 +169,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
       <div className="px-4 md:px-6 pb-6">
         <h2 className="text-base font-semibold text-zinc-900 mb-4">Videos</h2>
         {videos.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {videos.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}

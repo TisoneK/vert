@@ -88,7 +88,7 @@ export function ExplorePage() {
 
       {/* Category grid */}
       <h2 className="text-base font-semibold text-zinc-900 mb-4">Browse Categories</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {categories.map((cat) => {
           const Icon = categoryIconMap[cat.slug] || Film
           return (

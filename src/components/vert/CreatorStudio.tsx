@@ -152,7 +152,7 @@ export function CreatorStudio() {
   if (loading && tab === 'studio') {
     return (
       <div className="p-4 md:p-6 max-w-5xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-24 bg-zinc-200 rounded-lg animate-pulse" />
           ))}
@@ -220,7 +220,7 @@ export function CreatorStudio() {
       {tab === 'studio' && (
         <>
           {/* Stats overview */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
             {statCards.map((stat) => (
               <div key={stat.label} className="bg-zinc-50 rounded-lg p-4 border border-zinc-200">
                 <div className="flex items-center justify-between mb-2">
@@ -306,7 +306,7 @@ export function CreatorStudio() {
           {analyticsLoading ? (
             <div className="space-y-4">
               <div className="h-24 bg-zinc-200 rounded-lg animate-pulse" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="h-24 bg-zinc-200 rounded-lg animate-pulse" />
                 ))}
@@ -345,7 +345,7 @@ export function CreatorStudio() {
               {/* Totals stat cards */}
               <div>
                 <h3 className="text-sm font-semibold text-zinc-900 mb-3">Totals</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <AnalyticsStatCard icon={Eye} label="Total Views" value={analytics.totals.totalViews} color="text-violet-600" />
                   <AnalyticsStatCard icon={ThumbsUp} label="Total Likes" value={analytics.totals.totalLikes} color="text-emerald-600" />
                   <AnalyticsStatCard icon={Film} label="Total Videos" value={analytics.totals.totalVideos} color="text-blue-600" />

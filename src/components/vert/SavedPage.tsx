@@ -94,7 +94,7 @@ export function SavedPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
@@ -108,7 +108,7 @@ export function SavedPage() {
           <p className="text-sm text-zinc-700 mt-1">Save videos to watch them later</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {saved.map((entry) => (
             <div key={entry.videoId} className="relative group">
               <VideoCard video={entry.video} />

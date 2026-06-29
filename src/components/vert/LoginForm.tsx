@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label'
 import { LogIn } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { signIn } from 'next-auth/react'
-import { Logo } from './Logo'
 
 export function LoginForm() {
   const { navigate } = useNavigation()
@@ -59,8 +58,8 @@ export function LoginForm() {
     <div className="flex items-center justify-center min-h-[80vh] p-4 animate-vert-fade-in">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Logo size={48} className="mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-zinc-900">Welcome back</h1>
+          <span className="text-2xl font-bold text-zinc-900 tracking-tight">Vert</span>
+          <h1 className="text-xl font-bold text-zinc-900 mt-4">Welcome back</h1>
           <p className="text-zinc-500 text-sm mt-1">Log in to continue watching and creating</p>
         </div>
 

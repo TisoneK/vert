@@ -200,7 +200,7 @@ export function AdminDashboard() {
         <>
           {analyticsLoading ? (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="h-24 bg-zinc-200 rounded-lg animate-pulse" />
                 ))}
@@ -213,7 +213,7 @@ export function AdminDashboard() {
               {/* Overview stat cards */}
               <div>
                 <h2 className="text-sm font-semibold text-zinc-900 mb-3">Overview</h2>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                   <StatCard icon={Users} label="Total Users" value={analytics.overview.totalUsers} color="text-violet-600" />
                   <StatCard icon={Film} label="Total Videos" value={analytics.overview.totalVideos} color="text-emerald-600" />
                   <StatCard icon={PlayCircle} label="Total Views" value={analytics.overview.totalViews} color="text-blue-600" />
