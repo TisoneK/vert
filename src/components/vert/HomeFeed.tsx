@@ -269,8 +269,8 @@ export function HomeFeed() {
               <div className="w-14 h-14 rounded-full bg-zinc-200 flex items-center justify-center mb-4">
                 <Film className="h-6 w-6 text-zinc-600" />
               </div>
-              <h2 className="text-base font-semibold text-zinc-900">No videos found</h2>
-              <p className="text-sm text-zinc-700 mt-1">Try adjusting your filters</p>
+              <h2 className="text-base font-semibold text-zinc-900">Nothing here yet</h2>
+              <p className="text-sm text-zinc-500 mt-1">Try a different format filter or check back later.</p>
             </div>
           )}
         </>

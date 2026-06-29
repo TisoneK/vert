@@ -158,7 +158,7 @@ export function CategoryPage({ slug }: { slug: string }) {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-zinc-700">No videos in this category yet</p>
+          <p className="text-zinc-500">No videos in this category yet — be the first to add one.</p>
         </div>
       )}
 

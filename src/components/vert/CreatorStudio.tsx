@@ -242,7 +242,7 @@ export function CreatorStudio() {
             </div>
             {videos.length === 0 ? (
               <div className="p-8 text-center">
-                <p className="text-zinc-700">No videos yet</p>
+                <p className="text-zinc-500">You haven&apos;t uploaded any videos yet.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -365,7 +365,7 @@ export function CreatorStudio() {
                   <h3 className="text-sm font-semibold text-zinc-900">Top 5 Videos</h3>
                 </div>
                 {analytics.topVideos.length === 0 ? (
-                  <div className="p-6 text-center text-zinc-700 text-sm">No videos yet</div>
+                  <div className="p-6 text-center text-zinc-500 text-sm">No videos yet.</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -402,7 +402,7 @@ export function CreatorStudio() {
                   <h3 className="text-sm font-semibold text-zinc-900">Recent Uploads</h3>
                 </div>
                 {analytics.recentVideos.length === 0 ? (
-                  <div className="p-6 text-center text-zinc-700 text-sm">No videos yet</div>
+                  <div className="p-6 text-center text-zinc-500 text-sm">No videos yet.</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">

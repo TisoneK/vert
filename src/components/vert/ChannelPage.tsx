@@ -175,7 +175,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
             ))}
           </div>
         ) : (
-          <p className="text-zinc-700 text-sm">No videos yet.</p>
+          <p className="text-zinc-500 text-sm">No videos uploaded yet.</p>
         )}
       </div>
     </div>

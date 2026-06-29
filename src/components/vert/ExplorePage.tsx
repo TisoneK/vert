@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
-import { Compass, Music, Trophy, Gamepad2, Film, Newspaper, Monitor, Cpu } from 'lucide-react'
+import { Music, Trophy, Gamepad2, Film, Newspaper, Monitor, Cpu, Compass } from 'lucide-react'
 import { ShelfSkeleton } from './Skeleton'
 
 interface Category {
@@ -63,31 +63,8 @@ export function ExplorePage() {
 
   return (
     <div className="p-4 md:p-6 animate-vert-fade-in">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-1">
-          <Compass className="h-5 w-5 text-zinc-600" />
-          <h1 className="text-xl font-bold text-zinc-900">Explore</h1>
-        </div>
-        <p className="text-zinc-700 text-sm">Discover content by category</p>
-      </div>
+      <h1 className="text-xl font-bold text-zinc-900 mb-6">Categories</h1>
 
-      {/* Featured section */}
-      <div className="mb-8 p-5 rounded-lg bg-zinc-50 border border-zinc-200">
-        <h2 className="text-base font-semibold text-zinc-900 mb-2">Featured on Vert</h2>
-        <p className="text-zinc-600 text-sm mb-4">
-          Browse categories to find your next favorite content
-        </p>
-        <button
-          onClick={() => navigate({ page: 'trending' })}
-          className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-colors active:scale-95 duration-100"
-        >
-          See What&apos;s Trending
-        </button>
-      </div>
-
-      {/* Category grid */}
-      <h2 className="text-base font-semibold text-zinc-900 mb-4">Browse Categories</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {categories.map((cat) => {
           const Icon = categoryIconMap[cat.slug] || Film
@@ -95,20 +72,15 @@ export function ExplorePage() {
             <button
               key={cat.id}
               onClick={() => navigate({ page: 'category', slug: cat.slug })}
-              className="group relative overflow-hidden rounded-lg p-4 text-left bg-zinc-50 border border-zinc-200 hover:border-zinc-300 transition-all hover:-translate-y-0.5 hover:shadow-lg duration-200"
+              className="group rounded-lg p-4 text-left bg-white border border-zinc-200 hover:border-zinc-300 transition-colors"
             >
-              <div className="relative">
-                <div className="w-10 h-10 rounded-lg bg-zinc-200 flex items-center justify-center mb-3">
-                  <Icon className="h-5 w-5 text-zinc-600" />
-                </div>
-                <h3 className="text-sm font-semibold text-zinc-900">{cat.name}</h3>
-                <p className="text-zinc-700 text-xs mt-1">
-                  {cat.videoCount} video{cat.videoCount !== 1 ? 's' : ''}
-                </p>
-                {cat.description && (
-                  <p className="text-zinc-600 text-[10px] mt-1 line-clamp-2">{cat.description}</p>
-                )}
+              <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center mb-3">
+                <Icon className="h-4 w-4 text-zinc-600" />
               </div>
+              <h3 className="text-sm font-semibold text-zinc-900 group-hover:text-zinc-600 transition-colors">{cat.name}</h3>
+              <p className="text-zinc-500 text-xs mt-0.5">
+                {cat.videoCount} {cat.videoCount === 1 ? 'video' : 'videos'}
+              </p>
             </button>
           )
         })}

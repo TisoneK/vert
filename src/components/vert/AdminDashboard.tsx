@@ -260,7 +260,7 @@ export function AdminDashboard() {
                   <h2 className="text-sm font-semibold text-zinc-900">Top 5 Videos</h2>
                 </div>
                 {analytics.topVideos.length === 0 ? (
-                  <div className="p-6 text-center text-zinc-700 text-sm">No videos yet</div>
+                  <div className="p-6 text-center text-zinc-500 text-sm">No videos.</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -297,7 +297,7 @@ export function AdminDashboard() {
                   <h2 className="text-sm font-semibold text-zinc-900">Top 5 Channels</h2>
                 </div>
                 {analytics.topChannels.length === 0 ? (
-                  <div className="p-6 text-center text-zinc-700 text-sm">No channels yet</div>
+                  <div className="p-6 text-center text-zinc-500 text-sm">No channels.</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
