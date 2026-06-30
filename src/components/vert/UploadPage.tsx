@@ -30,6 +30,7 @@ export function UploadPage() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [format, setFormat] = useState('portrait')
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null) // actual w/h ratio
   const [categories, setCategories] = useState<Category[]>([])
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState<string[]>([])
@@ -66,20 +67,18 @@ export function UploadPage() {
       const h = video.videoHeight
       if (w === 0 || h === 0) return // couldn't read — keep default 'portrait'
 
+      // Store the actual aspect ratio so the container fits the video exactly
+      setVideoAspectRatio(w / h)
+
       let detected: 'portrait' | 'landscape' | 'square'
-      let ratio: string
       if (w > h) {
         detected = 'landscape'
-        ratio = '16:9'
       } else if (w < h) {
         detected = 'portrait'
-        ratio = '9:16'
       } else {
         detected = 'square'
-        ratio = '1:1'
       }
       setFormat(detected)
-      // Revoke the object URL on the temp element
       URL.revokeObjectURL(video.src)
     }
     video.onerror = () => {
@@ -218,7 +217,11 @@ export function UploadPage() {
     }
   }
 
-  const formatAspect = format === 'portrait' ? 'aspect-[9/16]' : format === 'landscape' ? 'aspect-video' : 'aspect-square'
+  // Use the actual video aspect ratio if we have it; fall back to format-based guess
+  const containerStyle = videoAspectRatio
+    ? { aspectRatio: `${videoAspectRatio}` }
+    : undefined
+  const fallbackAspect = format === 'portrait' ? 'aspect-[9/16]' : format === 'landscape' ? 'aspect-video' : 'aspect-square'
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 animate-vert-fade-in">
@@ -241,7 +244,10 @@ export function UploadPage() {
                 )}
               </Label>
               {videoPreview ? (
-                <div className={`relative ${formatAspect} w-full max-w-[280px] bg-zinc-900 rounded-lg overflow-hidden`}>
+                <div
+                  className="relative w-full max-w-[280px] bg-zinc-900 rounded-lg overflow-hidden"
+                  style={containerStyle || undefined}
+                >
                   <video
                     src={videoPreview}
                     className="w-full h-full object-contain"
@@ -249,14 +255,14 @@ export function UploadPage() {
                   />
                   <button
                     type="button"
-                    onClick={() => { setVideoFile(null); setVideoPreview(null) }}
+                    onClick={() => { setVideoFile(null); setVideoPreview(null); setVideoAspectRatio(null) }}
                     className="absolute top-2 right-2 bg-white/80 text-zinc-600 rounded-full p-1 hover:bg-white transition-colors shadow-sm"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               ) : (
-                <label className={`flex flex-col items-center justify-center ${formatAspect} w-full max-w-[280px] bg-white rounded-lg border-2 border-dashed border-zinc-300 hover:border-violet-400 cursor-pointer transition-colors`}>
+                <label className={`flex flex-col items-center justify-center ${fallbackAspect} w-full max-w-[280px] bg-white rounded-lg border-2 border-dashed border-zinc-300 hover:border-violet-400 cursor-pointer transition-colors`}>
                   <Film className="h-8 w-8 text-zinc-400 mb-2" />
                   <p className="text-zinc-700 text-sm font-medium">Select video</p>
                   <p className="text-zinc-400 text-xs mt-1">MP4, WebM, MOV · max 200MB</p>

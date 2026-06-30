@@ -42,6 +42,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(1)
   const [hasError, setHasError] = useState(false)
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [showSettings, setShowSettings] = useState(false)
@@ -80,7 +81,13 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       hlsRef.current = null
     }
 
-    const onLoadedMeta = () => setDuration(video.duration)
+    const onLoadedMeta = () => {
+      setDuration(video.duration)
+      // Capture actual video dimensions for proper aspect ratio
+      if (video.videoWidth > 0 && video.videoHeight > 0) {
+        setVideoAspectRatio(video.videoWidth / video.videoHeight)
+      }
+    }
     const onTimeUpdate = () => setCurrentTime(video.currentTime)
     video.addEventListener('loadedmetadata', onLoadedMeta)
     video.addEventListener('timeupdate', onTimeUpdate)
@@ -234,7 +241,10 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
   if (hasError || isSampleVideo) {
     return (
-      <div className="relative aspect-video bg-zinc-900 rounded-lg overflow-hidden">
+      <div
+        className="relative bg-zinc-900 rounded-lg overflow-hidden w-full"
+        style={videoAspectRatio ? { aspectRatio: `${videoAspectRatio}` } : { aspectRatio: '16/9' }}
+      >
         {thumbnailUrl ? (
           <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover" />
         ) : (
@@ -277,7 +287,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div ref={containerRef} className="relative aspect-video bg-black rounded-lg overflow-hidden group">
+    <div
+      ref={containerRef}
+      className="relative bg-black rounded-lg overflow-hidden group w-full"
+      style={videoAspectRatio ? { aspectRatio: `${videoAspectRatio}` } : { aspectRatio: '16/9' }}
+    >
       <video
         ref={videoRef}
         poster={thumbnailUrl || undefined}

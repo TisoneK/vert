@@ -1,10 +1,21 @@
 import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
 import { compare } from 'bcryptjs'
 import { db } from '@/lib/db'
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      // Don't throw if env vars aren't set — just disable the provider
+      // by returning empty strings. This lets the app run without Google
+      // configured (e.g. during local dev).
+      ...((!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET)
+        ? { clientId: '', clientSecret: '' }
+        : {}),
+    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -18,8 +29,6 @@ export const authOptions: NextAuthOptions = {
 
         const identifier = credentials.identifier.trim()
 
-        // Look up the user by either email or username.
-        // Prisma doesn't have an OR-on-unique, so we use findFirst with OR.
         const user = await db.user.findFirst({
           where: {
             OR: [
@@ -56,10 +65,68 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      // For Google OAuth: auto-create the user if they don't exist yet
+      if (account?.provider === 'google' && user.email) {
+        const existing = await db.user.findUnique({
+          where: { email: user.email.toLowerCase() },
+        })
+
+        if (!existing) {
+          // Create a new user from Google profile data
+          const username = (user.name || user.email?.split('@')[0] || 'user')
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '')
+            .slice(0, 20)
+
+          // Ensure username is unique
+          let uniqueUsername = username
+          let suffix = 1
+          while (
+            await db.user.findUnique({ where: { username: uniqueUsername } })
+          ) {
+            uniqueUsername = `${username}${suffix}`
+            suffix++
+          }
+
+          await db.user.create({
+            data: {
+              email: user.email.toLowerCase(),
+              username: uniqueUsername,
+              role: 'member',
+              isActive: true,
+              emailVerified: true,
+              oauthProvider: 'google',
+              avatarUrl: user.image || null,
+              channel: {
+                create: {
+                  channelName: uniqueUsername,
+                },
+              },
+            },
+          })
+        }
+      }
+      return true
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id
-        token.role = (user as unknown as { role: string }).role
+        // For Google sign-in, load the user's role from DB since the
+        // Google profile doesn't include it
+        if (account?.provider === 'google' && user.email) {
+          const dbUser = await db.user.findUnique({
+            where: { email: user.email.toLowerCase() },
+            select: { id: true, role: true, username: true },
+          })
+          if (dbUser) {
+            token.id = dbUser.id
+            token.role = dbUser.role
+            token.username = dbUser.username
+          }
+        } else {
+          token.role = (user as unknown as { role: string }).role
+        }
       }
       return token
     },
