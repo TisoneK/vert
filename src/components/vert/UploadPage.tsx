@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Upload, Film, ImagePlus, X } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import { upload } from '@vercel/blob/client'
+import { put } from '@vercel/blob/client'
 
 interface Category {
   id: string
@@ -136,31 +136,46 @@ export function UploadPage() {
     setUploading(true)
     setUploadProgress(0)
     try {
-      // Upload directly to Vercel Blob from the browser using the @vercel/blob
-      // client upload() function. This function calls our /api/v1/upload route
-      // internally to get a client token, then uploads the file bytes directly
-      // to Blob's storage — bypassing the serverless 4.5 MB body limit.
-      const blob = await upload(videoFile.name, videoFile, {
+      // Step 1: Get a client upload token from our server
+      const tokenRes = await fetch(
+        `/api/v1/upload?contentType=${encodeURIComponent(videoFile.type)}&filename=${encodeURIComponent(videoFile.name)}`,
+      )
+      if (!tokenRes.ok) {
+        const err = await tokenRes.json().catch(() => ({}))
+        throw new Error(err.error || 'Failed to get upload token')
+      }
+      const { token, pathname } = await tokenRes.json()
+
+      // Step 2: Upload directly to Vercel Blob from the browser using put()
+      // The file bytes go straight to Blob's storage, bypassing the
+      // serverless 4.5 MB body limit.
+      const blob = await put(pathname, videoFile, {
         access: 'public',
         contentType: videoFile.type,
-        handleUploadUrl: '/api/v1/upload',
+        token,
         onUploadProgress: (progress) => {
           setUploadProgress(progress.percentage)
         },
       })
 
-      // Upload thumbnail if provided (same client-side flow)
+      // Step 3: Upload thumbnail if provided (same flow)
       let thumbnailUrl: string | null = null
       if (thumbnailFile) {
-        const thumbBlob = await upload(thumbnailFile.name, thumbnailFile, {
-          access: 'public',
-          contentType: thumbnailFile.type,
-          handleUploadUrl: '/api/v1/upload',
-        })
-        thumbnailUrl = thumbBlob.url
+        const thumbTokenRes = await fetch(
+          `/api/v1/upload?contentType=${encodeURIComponent(thumbnailFile.type)}&filename=${encodeURIComponent(thumbnailFile.name)}`,
+        )
+        if (thumbTokenRes.ok) {
+          const { token: thumbToken, pathname: thumbPathname } = await thumbTokenRes.json()
+          const thumbBlob = await put(thumbPathname, thumbnailFile, {
+            access: 'public',
+            contentType: thumbnailFile.type,
+            token: thumbToken,
+          })
+          thumbnailUrl = thumbBlob.url
+        }
       }
 
-      // Create the video record with the Blob URL
+      // Step 4: Create the video record with the Blob URL
       const createRes = await fetch('/api/v1/videos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
