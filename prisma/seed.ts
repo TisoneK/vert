@@ -47,8 +47,33 @@ async function main() {
     { email: 'user5@vert.com', username: 'techcraft', channelName: 'Tech Craft' },
   ]
 
-  const users = []
-  const channels = []
+  const users: Array<{
+    id: string
+    email: string
+    username: string
+    channel: {
+      id: string
+      channelName: string
+      description: string | null
+      bannerUrl: string | null
+      subscriberCount: number
+      videoCount: number
+      isSuspended: boolean
+      userId: string
+      createdAt: Date
+    } | null
+  }> = []
+  const channels: Array<{
+    id: string
+    channelName: string
+    description: string | null
+    bannerUrl: string | null
+    subscriberCount: number
+    videoCount: number
+    isSuspended: boolean
+    userId: string
+    createdAt: Date
+  }> = []
 
   for (const data of memberData) {
     const user = await prisma.user.create({
@@ -63,7 +88,7 @@ async function main() {
         channel: {
           create: {
             channelName: data.channelName,
-            description: `Welcome to ${data.channelName}! Creating amazing vertical content just for you.`,
+            description: `${data.channelName}'s channel.`,
             subscriberCount: Math.floor(Math.random() * 5000) + 100,
             videoCount: 0,
           },
@@ -95,7 +120,14 @@ async function main() {
     { name: 'Other', slug: 'other', description: 'Everything else' },
   ]
 
-  const categories = []
+  const categories: Array<{
+    id: string
+    name: string
+    slug: string
+    description: string | null
+    iconUrl: string | null
+    createdAt: Date
+  }> = []
   for (const cat of categoryData) {
     const category = await prisma.category.create({ data: cat })
     categories.push(category)
@@ -145,7 +177,23 @@ async function main() {
     ],
   ]
 
-  const allVideos = []
+  const allVideos: Array<{
+    id: string
+    title: string
+    description: string | null
+    channelId: string
+    videoUrl: string
+    thumbnailUrl: string | null
+    durationSeconds: number | null
+    aspectRatio: string
+    format: string
+    status: string
+    viewCount: number
+    likeCount: number
+    dislikeCount: number
+    isRemoved: boolean
+    createdAt: Date
+  }> = []
 
   for (let i = 0; i < channels.length; i++) {
     const channel = channels[i]
@@ -406,8 +454,8 @@ async function main() {
     title: string
     message: string
     actorId: string
-    relatedVideoId?: string
-    relatedChannelId?: string
+    relatedVideoId?: string | null
+    relatedChannelId?: string | null
     isRead: boolean
     minutesAgo: number
   }> = [

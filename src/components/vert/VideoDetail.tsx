@@ -274,24 +274,6 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                         {copiedLink ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
                         {copiedLink ? 'Copied!' : 'Copy link'}
                       </button>
-                      <button
-                        onClick={() => setShowShareMenu(false)}
-                        className="w-full text-left px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 transition-colors"
-                      >
-                        Embed
-                      </button>
-                      <button
-                        onClick={() => setShowShareMenu(false)}
-                        className="w-full text-left px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 transition-colors"
-                      >
-                        Twitter
-                      </button>
-                      <button
-                        onClick={() => setShowShareMenu(false)}
-                        className="w-full text-left px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 transition-colors"
-                      >
-                        Facebook
-                      </button>
                     </div>
                   )}
                 </div>
