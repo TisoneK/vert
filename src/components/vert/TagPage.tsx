@@ -88,7 +88,7 @@ export function TagPage({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="p-4 md:p-6 animate-vert-fade-in">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto animate-vert-fade-in">
       {/* Breadcrumb */}
       <button
         onClick={() => navigate({ page: 'explore' })}
@@ -146,13 +146,13 @@ export function TagPage({ slug }: { slug: string }) {
 
       {/* Videos grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
         </div>
       ) : videos.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {videos.map((video) => (
             <VideoCard key={video.id} video={video} />
           ))}

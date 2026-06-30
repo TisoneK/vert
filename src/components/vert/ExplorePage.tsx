@@ -62,10 +62,10 @@ export function ExplorePage() {
   }
 
   return (
-    <div className="p-4 md:p-6 animate-vert-fade-in">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto animate-vert-fade-in">
       <h1 className="text-xl font-bold text-zinc-900 mb-6">Categories</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {categories.map((cat) => {
           const Icon = categoryIconMap[cat.slug] || Film
           return (
