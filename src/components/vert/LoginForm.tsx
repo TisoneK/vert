@@ -64,7 +64,7 @@ export function LoginForm() {
 
   return (
     <div className="flex items-center justify-center min-h-[80vh] p-4 animate-vert-fade-in">
-      <div className="w-full max-w-md bg-white md:border md:border-zinc-200 md:shadow-lg md:rounded-2xl md:p-8">
+      <div className="w-full max-w-md bg-white border border-zinc-200 shadow-lg rounded-2xl p-8">
         <div className="text-center mb-8">
           <span className="text-2xl font-bold text-zinc-900 tracking-tight">Vert</span>
           <h1 className="text-xl font-bold text-zinc-900 mt-4">Welcome back</h1>
