@@ -1,139 +1,136 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { put } from '@vercel/blob'
+import { generateClientTokenFromReadWriteToken, handleUpload } from '@vercel/blob/client'
 import { getCurrentUser } from '@/lib/auth-helpers'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 
 /**
- * POST /api/v1/upload
+ * Client-side upload flow for Vercel Blob.
  *
- * Accepts multipart/form-data with a single file field. The field name is
- * permissive — the UI currently uses "video" for both video files and
- * thumbnails, so we accept `video`, `thumbnail`, `file`, or the first field
- * we find.
+ * Two routes in one file:
+ *   GET  /api/v1/upload  → generates a client token (server-side, uses BLOB_READ_WRITE_TOKEN)
+ *   POST /api/v1/upload  → validates the upload after the client finished (server-side)
  *
- * Files are stored in Vercel Blob (persistent object storage with a CDN).
- * The old local-filesystem implementation didn't survive on Vercel's
- * ephemeral serverless runtime — files were deleted immediately after
- * the request finished.
- *
- * Returns { url, filename, size, mimeType, originalName } with HTTP 201.
+ * The actual file bytes go directly from the browser to Vercel Blob,
+ * bypassing the 4.5 MB serverless function body limit. The server only
+ * generates a token and validates the result — it never touches the file.
  */
 
-const MAX_BYTES = 200 * 1024 * 1024 // 200 MB hard cap
+function generatePathname(userId: string, mime: string, originalName: string): string {
+  const now = new Date()
+  const ym = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`
+  const userIdShort = userId.slice(-8)
+  const randomId = crypto.randomUUID()
 
-const ALLOWED_MIME_PREFIXES = [
-  'video/',
-  'image/',
-]
+  // Derive extension from MIME or original filename
+  const extByMime: Record<string, string> = {
+    'video/mp4': 'mp4',
+    'video/webm': 'webm',
+    'video/quicktime': 'mov',
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+  }
+  let ext = extByMime[mime]
+  if (!ext) {
+    const match = originalName.toLowerCase().match(/\.([a-z0-9]{2,5})$/)
+    ext = match?.[1] || 'bin'
+  }
 
-const EXT_BY_MIME: Record<string, string> = {
-  'video/mp4': 'mp4',
-  'video/webm': 'webm',
-  'video/quicktime': 'mov',
-  'video/x-matroska': 'mkv',
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-  'image/avif': 'avif',
+  return `uploads/${ym}/${userIdShort}-${randomId}.${ext}`
 }
 
-function safeExt(filename: string, mime: string): string {
-  if (EXT_BY_MIME[mime]) return EXT_BY_MIME[mime]
-  const parsed = filename.toLowerCase().match(/\.([a-z0-9]{2,5})$/)
-  if (parsed) return parsed[1]!
-  return 'bin'
-}
-
-export async function POST(req: NextRequest) {
-  // Auth — any logged-in user can upload
+/**
+ * GET /api/v1/upload?pathname=...&contentType=...
+ * Returns a client token that the browser uses to upload directly to Vercel Blob.
+ */
+export async function GET(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
-  // Rate limit by user — 10 uploads/min is plenty for power users, blocks spam.
   const rl = rateLimit(req, RATE_LIMITS.upload, `user:${user.id}`)
   if (!rl.ok) return rl.response!
 
-  let form: FormData
+  const { searchParams } = new URL(req.url)
+  const contentType = searchParams.get('contentType') || 'application/octet-stream'
+  const requestedPathname = searchParams.get('pathname')
+
+  // For security, the server generates the pathname — the client can't choose it.
+  // We use the requested pathname only to derive the extension.
+  const pathname = generatePathname(user.id, contentType, requestedPathname || '')
+
   try {
-    form = await req.formData()
+    const clientToken = await generateClientTokenFromReadWriteToken({
+      token: process.env.BLOB_READ_WRITE_TOKEN!,
+      pathname,
+      // Allow common video + image types
+      allowedContentTypes: [
+        'video/mp4', 'video/webm', 'video/quicktime', 'video/x-matroska',
+        'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif',
+      ],
+      // 200 MB max
+      maximumSizeInBytes: 200 * 1024 * 1024,
+    })
+
+    return NextResponse.json({
+      token: clientToken,
+      pathname,
+    })
+  } catch (err) {
+    console.error('Failed to generate Blob client token:', err)
+    return NextResponse.json(
+      { error: 'Failed to generate upload token' },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * POST /api/v1/upload
+ * Validates the upload after the client finished uploading to Vercel Blob.
+ * Body: { token: string }
+ * Returns: { url, pathname, size, mimeType }
+ */
+export async function POST(req: NextRequest) {
+  const user = await getCurrentUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  const rl = rateLimit(req, RATE_LIMITS.upload, `user:${user.id}`)
+  if (!rl.ok) return rl.response!
+
+  let body: { token?: string }
+  try {
+    body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Expected multipart/form-data' }, { status: 400 })
+    return NextResponse.json({ error: 'Expected JSON body with token' }, { status: 400 })
   }
 
-  // Find the first file field (permissive on name)
-  const acceptedNames = ['video', 'thumbnail', 'file']
-  let file: File | null = null
-  for (const name of acceptedNames) {
-    const candidate = form.get(name)
-    if (candidate instanceof File && candidate.size > 0) {
-      file = candidate
-      break
-    }
+  if (!body.token) {
+    return NextResponse.json({ error: 'Missing upload token' }, { status: 400 })
   }
-  if (!file) {
-    for (const value of form.values()) {
-      if (value instanceof File && value.size > 0) {
-        file = value
-        break
-      }
-    }
-  }
-  if (!file) {
-    return NextResponse.json({ error: 'No file provided' }, { status: 400 })
-  }
-
-  // Size guard
-  if (file.size > MAX_BYTES) {
-    return NextResponse.json(
-      { error: `File too large (max ${MAX_BYTES / (1024 * 1024)} MB)` },
-      { status: 413 }
-    )
-  }
-
-  // Type guard
-  const mime = file.type || ''
-  const isAllowed = ALLOWED_MIME_PREFIXES.some((p) => mime.startsWith(p))
-  if (!isAllowed) {
-    return NextResponse.json(
-      { error: `Unsupported file type: ${mime || 'unknown'}` },
-      { status: 415 }
-    )
-  }
-
-  // Build a unique pathname for Vercel Blob.
-  // Pattern: uploads/<yyyy-mm>/<userIdShort>-<uuid>.<ext>
-  const now = new Date()
-  const ym = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`
-  const ext = safeExt(file.name, mime)
-  const userIdShort = user.id.slice(-8)
-  const randomId = crypto.randomUUID()
-  const pathname = `uploads/${ym}/${userIdShort}-${randomId}.${ext}`
 
   try {
-    const blob = await put(pathname, file, {
-      access: 'public',
-      contentType: mime || undefined,
-      // addRandomSuffix is false because we already generated a uuid above
-      addRandomSuffix: false,
+    const blob = await handleUpload(body.token, {
+      token: process.env.BLOB_READ_WRITE_TOKEN!,
     })
 
     return NextResponse.json(
       {
         url: blob.url,
         pathname: blob.pathname,
-        size: file.size,
-        mimeType: mime,
-        originalName: file.name || null,
+        size: blob.size,
+        mimeType: blob.contentType,
       },
       { status: 201 }
     )
   } catch (err) {
-    console.error('Vercel Blob upload error:', err)
+    console.error('Blob handleUpload error:', err)
     return NextResponse.json(
-      { error: 'Failed to upload file to storage' },
+      { error: 'Upload validation failed' },
       { status: 500 }
     )
   }

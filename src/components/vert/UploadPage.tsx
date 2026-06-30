@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Upload, Film, ImagePlus, X } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { upload } from '@vercel/blob/client'
 
 interface Category {
   id: string
@@ -26,6 +27,7 @@ export function UploadPage() {
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [format, setFormat] = useState('portrait')
   const [categories, setCategories] = useState<Category[]>([])
@@ -133,34 +135,48 @@ export function UploadPage() {
     if (!videoFile || !title || !user?.channelId) return
 
     setUploading(true)
+    setUploadProgress(0)
     try {
-      const videoFormData = new FormData()
-      videoFormData.append('video', videoFile)
-      const uploadRes = await fetch('/api/v1/upload', {
-        method: 'POST',
-        body: videoFormData,
+      // Step 1: Get a client upload token from the server
+      const tokenRes = await fetch(
+        `/api/v1/upload?contentType=${encodeURIComponent(videoFile.type)}&pathname=${encodeURIComponent(videoFile.name)}`,
+      )
+      if (!tokenRes.ok) {
+        const err = await tokenRes.json().catch(() => ({}))
+        throw new Error(err.error || 'Failed to get upload token')
+      }
+      const { token, pathname } = await tokenRes.json()
+
+      // Step 2: Upload directly to Vercel Blob from the browser
+      // This bypasses the serverless 4.5 MB body limit — the file goes
+      // straight to Blob's storage, not through our API route.
+      const blob = await upload(pathname, videoFile, {
+        access: 'public',
+        contentType: videoFile.type,
+        token,
+        onUploadProgress: (progress) => {
+          setUploadProgress(progress.percentage)
+        },
       })
 
-      if (!uploadRes.ok) {
-        throw new Error('Upload failed')
-      }
-
-      const uploadData = await uploadRes.json()
-
+      // Step 3: Upload thumbnail if provided (same client-side flow)
       let thumbnailUrl = null
       if (thumbnailFile) {
-        const thumbFormData = new FormData()
-        thumbFormData.append('video', thumbnailFile)
-        const thumbRes = await fetch('/api/v1/upload', {
-          method: 'POST',
-          body: thumbFormData,
-        })
-        if (thumbRes.ok) {
-          const thumbData = await thumbRes.json()
-          thumbnailUrl = thumbData.url
+        const thumbTokenRes = await fetch(
+          `/api/v1/upload?contentType=${encodeURIComponent(thumbnailFile.type)}&pathname=${encodeURIComponent(thumbnailFile.name)}`,
+        )
+        if (thumbTokenRes.ok) {
+          const { token: thumbToken, pathname: thumbPathname } = await thumbTokenRes.json()
+          const thumbBlob = await upload(thumbPathname, thumbnailFile, {
+            access: 'public',
+            contentType: thumbnailFile.type,
+            token: thumbToken,
+          })
+          thumbnailUrl = thumbBlob.url
         }
       }
 
+      // Step 4: Create the video record with the Blob URL
       const createRes = await fetch('/api/v1/videos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -168,7 +184,7 @@ export function UploadPage() {
           channelId: user.channelId,
           title,
           description,
-          videoUrl: uploadData.url,
+          videoUrl: blob.url,
           thumbnailUrl,
           aspectRatio: format === 'portrait' ? '9:16' : format === 'landscape' ? '16:9' : '1:1',
           format,
@@ -179,12 +195,13 @@ export function UploadPage() {
       })
 
       if (!createRes.ok) {
-        throw new Error('Failed to create video')
+        const err = await createRes.json().catch(() => ({}))
+        throw new Error(err.error || 'Failed to create video')
       }
 
       toast({
         title: 'Video uploaded!',
-        description: 'Your video has been uploaded successfully.',
+        description: 'Your video is now live.',
       })
 
       navigate({ page: 'home' })
@@ -192,11 +209,12 @@ export function UploadPage() {
       console.error('Upload error:', error)
       toast({
         title: 'Upload failed',
-        description: 'Something went wrong. Please try again.',
+        description: error instanceof Error ? error.message : 'Something went wrong. Please try again.',
         variant: 'destructive',
       })
     } finally {
       setUploading(false)
+      setUploadProgress(0)
     }
   }
 
@@ -382,7 +400,7 @@ export function UploadPage() {
           {uploading ? (
             <>
               <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-              Uploading...
+              {uploadProgress > 0 ? `Uploading… ${Math.round(uploadProgress)}%` : 'Uploading…'}
             </>
           ) : (
             <>
