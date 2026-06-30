@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   title: "Vert",
   description: "Watch and share portrait video.",
   icons: {
-    // Plain "V" on a dark square — no gradient, no violet, matches the wordmark
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23111' width='100' height='100'/><text x='50' y='72' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='system-ui,sans-serif'>V</text></svg>",
+    // "V" on a violet rounded square — brand mark
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237c3aed' rx='20' width='100' height='100'/><text x='50' y='72' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='system-ui,sans-serif'>V</text></svg>",
   },
   openGraph: {
     title: "Vert",
