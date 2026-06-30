@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Upload, Film, ImagePlus, X, Smartphone, Monitor, Square } from 'lucide-react'
+import { Upload, Film, ImagePlus, X } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface Category {
@@ -48,11 +48,43 @@ export function UploadPage() {
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setVideoFile(file)
-      const url = URL.createObjectURL(file)
-      setVideoPreview(url)
+    if (!file) return
+
+    setVideoFile(file)
+    const url = URL.createObjectURL(file)
+    setVideoPreview(url)
+
+    // Auto-detect orientation from the video file itself — no manual selector needed.
+    // We create a temporary <video> element, load the file, read videoWidth/videoHeight,
+    // and set the format accordingly.
+    const video = document.createElement('video')
+    video.preload = 'metadata'
+    video.onloadedmetadata = () => {
+      const w = video.videoWidth
+      const h = video.videoHeight
+      if (w === 0 || h === 0) return // couldn't read — keep default 'portrait'
+
+      let detected: 'portrait' | 'landscape' | 'square'
+      let ratio: string
+      if (w > h) {
+        detected = 'landscape'
+        ratio = '16:9'
+      } else if (w < h) {
+        detected = 'portrait'
+        ratio = '9:16'
+      } else {
+        detected = 'square'
+        ratio = '1:1'
+      }
+      setFormat(detected)
+      // Revoke the object URL on the temp element
+      URL.revokeObjectURL(video.src)
     }
+    video.onerror = () => {
+      // If metadata fails to load, keep the default 'portrait'
+      URL.revokeObjectURL(video.src)
+    }
+    video.src = url
   }
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,13 +201,6 @@ export function UploadPage() {
   }
 
   const formatAspect = format === 'portrait' ? 'aspect-[9/16]' : format === 'landscape' ? 'aspect-video' : 'aspect-square'
-  const formatLabel = format === 'portrait' ? '9:16' : format === 'landscape' ? '16:9' : '1:1'
-
-  const formatOptions = [
-    { value: 'portrait', label: 'Portrait', ratio: '9:16', icon: Smartphone },
-    { value: 'landscape', label: 'Landscape', ratio: '16:9', icon: Monitor },
-    { value: 'square', label: 'Square', ratio: '1:1', icon: Square },
-  ]
 
   return (
     <div className="max-w-2xl mx-auto p-4 md:p-6 animate-vert-fade-in">
@@ -184,7 +209,14 @@ export function UploadPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Video upload area */}
         <div>
-          <Label className="text-zinc-600 mb-2 block text-sm">Video File *</Label>
+          <Label className="text-zinc-600 mb-2 block text-sm">
+            Video File *
+            {videoFile && (
+              <span className="ml-2 text-xs text-zinc-400 font-normal">
+                {format === 'portrait' ? 'portrait (9:16)' : format === 'landscape' ? 'landscape (16:9)' : 'square (1:1)'} · auto-detected
+              </span>
+            )}
+          </Label>
           {videoPreview ? (
             <div className={`relative ${formatAspect} max-w-xs mx-auto bg-zinc-200 rounded-lg overflow-hidden`}>
               <video
@@ -274,29 +306,6 @@ export function UploadPage() {
           />
         </div>
 
-        {/* Format selector */}
-        <div>
-          <Label className="text-zinc-600 mb-2 block text-sm">Video Format</Label>
-          <div className="flex gap-3">
-            {formatOptions.map((fmt) => (
-              <button
-                key={fmt.value}
-                type="button"
-                onClick={() => setFormat(fmt.value)}
-                className={`flex-1 p-3 rounded-lg border text-center transition-colors active:scale-95 duration-100 ${
-                  format === fmt.value
-                    ? 'border-violet-600 bg-violet-50 text-zinc-900'
-                    : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300'
-                }`}
-              >
-                <fmt.icon className="h-4 w-4 mx-auto mb-1.5" />
-                <p className="text-xs font-medium">{fmt.label}</p>
-                <p className="text-[10px] text-zinc-700 mt-0.5">{fmt.ratio}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Category selector */}
         <div>
           <Label className="text-zinc-600 mb-2 block text-sm">Categories (select up to 3)</Label>
@@ -376,7 +385,7 @@ export function UploadPage() {
           ) : (
             <>
               <Upload className="h-4 w-4 mr-2" />
-              Upload Video ({formatLabel})
+              Upload Video
             </>
           )}
         </Button>
