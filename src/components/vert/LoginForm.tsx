@@ -123,14 +123,6 @@ export function LoginForm() {
             </button>
           </p>
         </div>
-
-        <div className="mt-8 p-4 bg-zinc-50 rounded-lg border border-zinc-200">
-          <p className="text-zinc-700 text-xs mb-2">Demo Accounts:</p>
-          <div className="space-y-1 text-xs text-zinc-700">
-            <p>Admin: admin@vert.com / admin123</p>
-            <p>User: user1@vert.com / password123</p>
-          </div>
-        </div>
       </div>
     </div>
   )
