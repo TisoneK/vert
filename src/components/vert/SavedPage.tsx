@@ -94,7 +94,7 @@ export function SavedPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
@@ -105,10 +105,10 @@ export function SavedPage() {
             <Bookmark className="h-6 w-6 text-zinc-600" />
           </div>
           <h2 className="text-base font-semibold text-zinc-900">Nothing saved yet</h2>
-          <p className="text-sm text-zinc-700 mt-1">Save videos to watch them later</p>
+          <p className="text-sm text-zinc-500 mt-1">Tap the bookmark on any video to save it for later.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {saved.map((entry) => (
             <div key={entry.videoId} className="relative group">
               <VideoCard video={entry.video} />
