@@ -8,20 +8,29 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        identifier: { label: 'Email or username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password are required')
+        if (!credentials?.identifier || !credentials?.password) {
+          throw new Error('Email or username and password are required')
         }
 
-        const user = await db.user.findUnique({
-          where: { email: credentials.email },
+        const identifier = credentials.identifier.trim()
+
+        // Look up the user by either email or username.
+        // Prisma doesn't have an OR-on-unique, so we use findFirst with OR.
+        const user = await db.user.findFirst({
+          where: {
+            OR: [
+              { email: identifier.toLowerCase() },
+              { username: identifier },
+            ],
+          },
         })
 
         if (!user || !user.passwordHash) {
-          throw new Error('Invalid email or password')
+          throw new Error('Invalid email/username or password')
         }
 
         if (!user.isActive) {
@@ -30,7 +39,7 @@ export const authOptions: NextAuthOptions = {
 
         const isValid = await compare(credentials.password, user.passwordHash)
         if (!isValid) {
-          throw new Error('Invalid email or password')
+          throw new Error('Invalid email/username or password')
         }
 
         return {

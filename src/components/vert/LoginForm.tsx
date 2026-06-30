@@ -13,7 +13,7 @@ export function LoginForm() {
   const { navigate } = useNavigation()
   const { setUser } = useAuth()
   const { toast } = useToast()
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -25,13 +25,13 @@ export function LoginForm() {
 
     try {
       const result = await signIn('credentials', {
-        email,
+        identifier,
         password,
         redirect: false,
       })
 
       if (result?.error) {
-        setError('Invalid email or password')
+        setError('Invalid email/username or password')
       } else {
         const sessionRes = await fetch('/api/auth/session-info')
         const sessionData = await sessionRes.json()
@@ -65,13 +65,13 @@ export function LoginForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email" className="text-zinc-600 mb-2 block text-sm">Email</Label>
+            <Label htmlFor="identifier" className="text-zinc-600 mb-2 block text-sm">Email or username</Label>
             <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              id="identifier"
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="you@example.com or yourname"
               className="bg-zinc-100 border-zinc-300 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
               required
             />

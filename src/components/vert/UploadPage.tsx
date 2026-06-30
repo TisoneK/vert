@@ -249,7 +249,9 @@ export function UploadPage() {
 
         {/* Thumbnail upload */}
         <div>
-          <Label className="text-zinc-600 mb-2 block text-sm">Thumbnail</Label>
+          <Label className="text-zinc-600 mb-2 block text-sm">
+            Thumbnail <span className="text-zinc-400 font-normal">(optional)</span>
+          </Label>
           <div className="flex items-center gap-4">
             {thumbnailPreview ? (
               <div className="relative">
