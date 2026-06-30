@@ -221,194 +221,204 @@ export function UploadPage() {
   const formatAspect = format === 'portrait' ? 'aspect-[9/16]' : format === 'landscape' ? 'aspect-video' : 'aspect-square'
 
   return (
-    <div className="max-w-2xl mx-auto p-4 md:p-6 animate-vert-fade-in">
+    <div className="max-w-5xl mx-auto p-4 md:p-6 animate-vert-fade-in">
       <h1 className="text-xl font-bold text-zinc-900 mb-6">Upload Video</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Video upload area */}
-        <div>
-          <Label className="text-zinc-600 mb-2 block text-sm">
-            Video File *
-            {videoFile && (
-              <span className="ml-2 text-xs text-zinc-400 font-normal">
-                {format === 'portrait' ? 'portrait (9:16)' : format === 'landscape' ? 'landscape (16:9)' : 'square (1:1)'} · auto-detected
-              </span>
-            )}
-          </Label>
-          {videoPreview ? (
-            <div className={`relative ${formatAspect} max-w-xs mx-auto bg-zinc-200 rounded-lg overflow-hidden`}>
-              <video
-                src={videoPreview}
-                className="w-full h-full object-contain"
-                muted
-              />
-              <button
-                type="button"
-                onClick={() => { setVideoFile(null); setVideoPreview(null) }}
-                className="absolute top-2 right-2 bg-white/80 text-zinc-600 rounded-full p-1 hover:bg-white transition-colors shadow-sm"
-              >
-                <X className="h-4 w-4" />
-              </button>
+      <form onSubmit={handleSubmit}>
+        {/* Two-column layout on desktop: preview on left, details on right */}
+        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 lg:gap-8">
+
+          {/* LEFT: Video + thumbnail preview */}
+          <div className="space-y-4">
+            {/* Video upload / preview */}
+            <div>
+              <Label className="text-zinc-600 mb-2 block text-sm">
+                Video *
+                {videoFile && (
+                  <span className="ml-2 text-xs text-zinc-400 font-normal">
+                    {format} · auto-detected
+                  </span>
+                )}
+              </Label>
+              {videoPreview ? (
+                <div className={`relative ${formatAspect} w-full max-w-[280px] bg-zinc-900 rounded-lg overflow-hidden`}>
+                  <video
+                    src={videoPreview}
+                    className="w-full h-full object-contain"
+                    muted
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setVideoFile(null); setVideoPreview(null) }}
+                    className="absolute top-2 right-2 bg-white/80 text-zinc-600 rounded-full p-1 hover:bg-white transition-colors shadow-sm"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className={`flex flex-col items-center justify-center ${formatAspect} w-full max-w-[280px] bg-white rounded-lg border-2 border-dashed border-zinc-300 hover:border-violet-400 cursor-pointer transition-colors`}>
+                  <Film className="h-8 w-8 text-zinc-400 mb-2" />
+                  <p className="text-zinc-700 text-sm font-medium">Select video</p>
+                  <p className="text-zinc-400 text-xs mt-1">MP4, WebM, MOV · max 200MB</p>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
             </div>
-          ) : (
-            <label className={`flex flex-col items-center justify-center ${formatAspect} max-w-xs mx-auto bg-white rounded-lg border-2 border-dashed border-zinc-300 hover:border-violet-400 cursor-pointer transition-colors`}>
-              <Film className="h-10 w-10 text-zinc-600 mb-3" />
-              <p className="text-zinc-700 text-sm font-medium">Select video file</p>
-              <p className="text-zinc-700 text-xs mt-1">MP4, WebM, MOV (max 100MB)</p>
-              <input
-                type="file"
-                accept="video/*"
-                onChange={handleVideoChange}
-                className="hidden"
-              />
-            </label>
-          )}
-        </div>
 
-        {/* Thumbnail upload */}
-        <div>
-          <Label className="text-zinc-600 mb-2 block text-sm">
-            Thumbnail <span className="text-zinc-400 font-normal">(optional)</span>
-          </Label>
-          <div className="flex items-center gap-4">
-            {thumbnailPreview ? (
-              <div className="relative">
-                <img
-                  src={thumbnailPreview}
-                  alt="Thumbnail"
-                  className="w-24 h-40 object-cover rounded-lg"
-                />
-                <button
-                  type="button"
-                  onClick={() => { setThumbnailFile(null); setThumbnailPreview(null) }}
-                  className="absolute -top-2 -right-2 bg-white/80 text-zinc-600 rounded-full p-0.5 shadow-sm"
-                >
-                  <X className="h-3 w-3" />
-                </button>
+            {/* Thumbnail */}
+            <div>
+              <Label className="text-zinc-600 mb-2 block text-sm">
+                Thumbnail <span className="text-zinc-400 font-normal">(optional)</span>
+              </Label>
+              {thumbnailPreview ? (
+                <div className="relative inline-block">
+                  <img
+                    src={thumbnailPreview}
+                    alt="Thumbnail"
+                    className="w-full max-w-[280px] aspect-[9/16] object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setThumbnailFile(null); setThumbnailPreview(null) }}
+                    className="absolute top-2 right-2 bg-white/80 text-zinc-600 rounded-full p-1 hover:bg-white transition-colors shadow-sm"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-zinc-200 hover:border-violet-400 cursor-pointer transition-colors w-fit">
+                  <ImagePlus className="h-4 w-4 text-zinc-600" />
+                  <span className="text-zinc-600 text-sm">Add thumbnail</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleThumbnailChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
+          {/* RIGHT: Details */}
+          <div className="space-y-5">
+            {/* Title */}
+            <div>
+              <Label htmlFor="title" className="text-zinc-600 mb-2 block text-sm">Title *</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Give your video a title"
+                className="bg-zinc-100 border-zinc-300 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+                required
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <Label htmlFor="description" className="text-zinc-600 mb-2 block text-sm">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Tell viewers about your video"
+                className="bg-zinc-100 border-zinc-300 text-zinc-800 placeholder:text-zinc-400 min-h-[100px] resize-none focus-visible:ring-violet-600"
+              />
+            </div>
+
+            {/* Categories */}
+            <div>
+              <Label className="text-zinc-600 mb-2 block text-sm">
+                Categories <span className="text-zinc-400 font-normal">(up to 3)</span>
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => toggleCategory(cat.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      selectedCategories.includes(cat.id)
+                        ? 'bg-violet-600 text-white'
+                        : 'bg-white text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 border border-zinc-200'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
               </div>
-            ) : (
-              <label className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-zinc-200 hover:border-violet-400 cursor-pointer transition-colors">
-                <ImagePlus className="h-4 w-4 text-zinc-600" />
-                <span className="text-zinc-600 text-sm">Add thumbnail</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleThumbnailChange}
-                  className="hidden"
-                />
-              </label>
-            )}
+            </div>
+
+            {/* Tags */}
+            <div>
+              <Label className="text-zinc-600 mb-2 block text-sm">
+                Tags <span className="text-zinc-400 font-normal">(up to 8)</span>
+              </Label>
+              <div className="flex flex-wrap items-center gap-2 p-2 bg-zinc-100 border border-zinc-300 rounded-lg focus-within:ring-2 focus-within:ring-violet-600 focus-within:border-violet-600 transition-colors">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-violet-100 text-violet-700 rounded-md text-xs font-medium"
+                  >
+                    #{tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="text-violet-400 hover:text-violet-700 transition-colors"
+                      aria-label={`Remove tag ${tag}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+                {tags.length < 8 && (
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleTagKeyDown}
+                    onBlur={() => {
+                      if (tagInput.trim()) {
+                        commitTag(tagInput)
+                        setTagInput('')
+                      }
+                    }}
+                    placeholder={tags.length === 0 ? "tutorial, diy, satisfying…" : "Add another…"}
+                    className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-zinc-800 placeholder:text-zinc-400"
+                  />
+                )}
+              </div>
+              {tags.length === 8 && (
+                <p className="text-xs text-zinc-500 mt-1">Tag limit reached</p>
+              )}
+            </div>
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              disabled={!videoFile || !title || uploading}
+              className="w-full sm:w-auto sm:min-w-[200px] bg-violet-600 hover:bg-violet-700 text-white font-medium active:scale-95 transition-transform duration-100"
+            >
+              {uploading ? (
+                <>
+                  <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  {uploadProgress > 0 ? `Uploading… ${Math.round(uploadProgress)}%` : 'Uploading…'}
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Video
+                </>
+              )}
+            </Button>
           </div>
         </div>
-
-        {/* Title */}
-        <div>
-          <Label htmlFor="title" className="text-zinc-600 mb-2 block text-sm">Title *</Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Give your video a catchy title"
-            className="bg-zinc-100 border-zinc-300 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
-            required
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <Label htmlFor="description" className="text-zinc-600 mb-2 block text-sm">Description</Label>
-          <Textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Tell viewers about your video"
-            className="bg-zinc-100 border-zinc-300 text-zinc-800 placeholder:text-zinc-400 min-h-[100px] resize-none focus-visible:ring-violet-600"
-          />
-        </div>
-
-        {/* Category selector */}
-        <div>
-          <Label className="text-zinc-600 mb-2 block text-sm">Categories (select up to 3)</Label>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => toggleCategory(cat.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  selectedCategories.includes(cat.id)
-                    ? 'bg-violet-600 text-white'
-                    : 'bg-white text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tag input — freeform hashtags */}
-        <div>
-          <Label className="text-zinc-600 mb-2 block text-sm">
-            Tags <span className="text-zinc-400 font-normal">(up to 8 — press Enter or comma to add)</span>
-          </Label>
-          <div className="flex flex-wrap items-center gap-2 p-2 bg-zinc-100 border border-zinc-300 rounded-lg focus-within:ring-2 focus-within:ring-violet-600 focus-within:border-violet-600 transition-colors">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1 px-2 py-1 bg-violet-100 text-violet-700 rounded-md text-xs font-medium"
-              >
-                #{tag}
-                <button
-                  type="button"
-                  onClick={() => removeTag(tag)}
-                  className="text-violet-400 hover:text-violet-700 transition-colors"
-                  aria-label={`Remove tag ${tag}`}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-            {tags.length < 8 && (
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleTagKeyDown}
-                onBlur={() => {
-                  if (tagInput.trim()) {
-                    commitTag(tagInput)
-                    setTagInput('')
-                  }
-                }}
-                placeholder={tags.length === 0 ? "e.g. tutorial, diy, satisfying" : "Add another…"}
-                className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-zinc-800 placeholder:text-zinc-400"
-              />
-            )}
-          </div>
-          {tags.length === 8 && (
-            <p className="text-xs text-zinc-500 mt-1">Tag limit reached (8 max)</p>
-          )}
-        </div>
-
-        {/* Submit */}
-        <Button
-          type="submit"
-          disabled={!videoFile || !title || uploading}
-          className="w-full bg-violet-600 hover:bg-violet-700 text-white font-medium active:scale-95 transition-transform duration-100"
-        >
-          {uploading ? (
-            <>
-              <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-              {uploadProgress > 0 ? `Uploading… ${Math.round(uploadProgress)}%` : 'Uploading…'}
-            </>
-          ) : (
-            <>
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Video
-            </>
-          )}
-        </Button>
       </form>
     </div>
   )
