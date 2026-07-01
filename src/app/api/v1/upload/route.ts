@@ -7,10 +7,8 @@ import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
  * GET /api/v1/upload?contentType=...&filename=...
  *
  * Generates a client token that the browser uses to upload directly to
- * Vercel Blob. The actual file bytes go browser → Blob, bypassing the
- * serverless 4.5 MB body limit.
- *
- * The client then calls put() from @vercel/blob/client with this token.
+ * Vercel Blob via put(). The file bytes go browser → Blob, bypassing
+ * the serverless 4.5 MB body limit.
  */
 
 const ALLOWED_CONTENT_TYPES = [
@@ -49,6 +47,19 @@ export async function GET(req: NextRequest) {
   const rl = rateLimit(req, RATE_LIMITS.upload, `user:${user.id}`)
   if (!rl.ok) return rl.response!
 
+  // Check if BLOB_READ_WRITE_TOKEN is configured
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+  if (!blobToken) {
+    console.error('BLOB_READ_WRITE_TOKEN is not set in environment variables')
+    return NextResponse.json(
+      {
+        error: 'Upload storage is not configured. BLOB_READ_WRITE_TOKEN environment variable is missing.',
+        code: 'BLOB_TOKEN_MISSING',
+      },
+      { status: 500 }
+    )
+  }
+
   const { searchParams } = new URL(req.url)
   const contentType = searchParams.get('contentType') || ''
   const filename = searchParams.get('filename') || ''
@@ -58,14 +69,17 @@ export async function GET(req: NextRequest) {
   }
 
   if (!ALLOWED_CONTENT_TYPES.includes(contentType)) {
-    return NextResponse.json({ error: `Unsupported file type: ${contentType}` }, { status: 415 })
+    return NextResponse.json(
+      { error: `Unsupported file type: ${contentType}. Allowed: ${ALLOWED_CONTENT_TYPES.join(', ')}` },
+      { status: 415 }
+    )
   }
 
   const pathname = generatePathname(user.id, contentType, filename)
 
   try {
     const clientToken = await generateClientTokenFromReadWriteToken({
-      token: process.env.BLOB_READ_WRITE_TOKEN!,
+      token: blobToken,
       pathname,
       allowedContentTypes: ALLOWED_CONTENT_TYPES,
       maximumSizeInBytes: MAX_SIZE,
@@ -76,9 +90,16 @@ export async function GET(req: NextRequest) {
       pathname,
     })
   } catch (err) {
-    console.error('Failed to generate Blob client token:', err)
+    // Return the ACTUAL error so we can debug — don't swallow it
+    const errorMsg = err instanceof Error ? err.message : String(err)
+    console.error('Failed to generate Blob client token:', errorMsg)
+
     return NextResponse.json(
-      { error: 'Failed to generate upload token' },
+      {
+        error: 'Failed to generate upload token',
+        details: errorMsg,
+        code: 'BLOB_TOKEN_GENERATION_FAILED',
+      },
       { status: 500 }
     )
   }
