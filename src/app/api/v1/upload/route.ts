@@ -47,13 +47,16 @@ export async function GET(req: NextRequest) {
   const rl = rateLimit(req, RATE_LIMITS.upload, `user:${user.id}`)
   if (!rl.ok) return rl.response!
 
-  // Check if BLOB_READ_WRITE_TOKEN is configured
-  const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+  // Check if a Blob token is configured.
+  // We read from VERT_BLOB_TOKEN first (manually set, lets us use a public
+  // store without fighting Vercel's locked env vars), then fall back to the
+  // standard BLOB_READ_WRITE_TOKEN (auto-set when a store is connected).
+  const blobToken = process.env.VERT_BLOB_TOKEN || process.env.BLOB_READ_WRITE_TOKEN
   if (!blobToken) {
-    console.error('BLOB_READ_WRITE_TOKEN is not set in environment variables')
+    console.error('No Blob token found. Set VERT_BLOB_TOKEN or BLOB_READ_WRITE_TOKEN.')
     return NextResponse.json(
       {
-        error: 'Upload storage is not configured. BLOB_READ_WRITE_TOKEN environment variable is missing.',
+        error: 'Upload storage is not configured. Set VERT_BLOB_TOKEN environment variable.',
         code: 'BLOB_TOKEN_MISSING',
       },
       { status: 500 }
