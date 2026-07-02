@@ -169,13 +169,13 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
       <div className="px-4 md:px-6 pb-6">
         <h2 className="text-base font-semibold text-zinc-900 mb-4">Videos</h2>
         {videos.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {videos.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
           </div>
         ) : (
-          <p className="text-zinc-700 text-sm">No videos yet.</p>
+          <p className="text-zinc-500 text-sm">No videos uploaded yet.</p>
         )}
       </div>
     </div>

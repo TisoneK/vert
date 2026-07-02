@@ -24,6 +24,20 @@ export async function GET(
         votes: {
           select: { userId: true, voteType: true },
         },
+        categories: {
+          select: {
+            category: {
+              select: { id: true, name: true, slug: true },
+            },
+          },
+        },
+        tags: {
+          select: {
+            tag: {
+              select: { id: true, name: true, label: true },
+            },
+          },
+        },
       },
     })
 
@@ -37,7 +51,14 @@ export async function GET(
       data: { viewCount: { increment: 1 } },
     })
 
-    return NextResponse.json({ ...video, viewCount: video.viewCount + 1 })
+    // Flatten join tables for the response (same shape as /api/v1/videos)
+    const formatted = {
+      ...video,
+      categories: video.categories.map((vc) => vc.category),
+      tags: video.tags.map((vt) => vt.tag),
+    }
+
+    return NextResponse.json({ ...formatted, viewCount: video.viewCount + 1 })
   } catch (error) {
     console.error('Video get error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

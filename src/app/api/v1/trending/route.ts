@@ -38,6 +38,13 @@ export async function GET(req: NextRequest) {
             },
           },
         },
+        tags: {
+          select: {
+            tag: {
+              select: { id: true, name: true, label: true },
+            },
+          },
+        },
       },
       orderBy: [
         { viewCount: 'desc' },
@@ -49,6 +56,7 @@ export async function GET(req: NextRequest) {
     const formattedVideos = videos.map((v) => ({
       ...v,
       categories: v.categories.map((vc) => vc.category),
+      tags: v.tags.map((vt) => vt.tag),
       trendingScore: v.viewCount + v.likeCount * 2,
     }))
 

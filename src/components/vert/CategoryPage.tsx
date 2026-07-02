@@ -101,7 +101,7 @@ export function CategoryPage({ slug }: { slug: string }) {
   const Icon = category ? (categoryIconMap[category.slug] || Film) : Film
 
   return (
-    <div className="p-4 md:p-6 animate-vert-fade-in">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto animate-vert-fade-in">
       {/* Breadcrumb */}
       <button
         onClick={() => navigate({ page: 'explore' })}
@@ -145,20 +145,20 @@ export function CategoryPage({ slug }: { slug: string }) {
 
       {/* Videos grid */}
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
         </div>
       ) : videos.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {videos.map((video) => (
             <VideoCard key={video.id} video={video} />
           ))}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-zinc-700">No videos in this category yet</p>
+          <p className="text-zinc-500">No videos in this category yet — be the first to add one.</p>
         </div>
       )}
 
