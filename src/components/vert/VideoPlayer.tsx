@@ -241,9 +241,16 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
   if (hasError || isSampleVideo) {
     return (
+      <div className="w-full flex justify-center bg-zinc-900 rounded-lg overflow-hidden">
       <div
-        className="relative bg-zinc-900 rounded-lg overflow-hidden w-full"
-        style={videoAspectRatio ? { aspectRatio: `${videoAspectRatio}` } : { aspectRatio: '16/9' }}
+        className="relative bg-zinc-900 overflow-hidden"
+        style={{
+          aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+          maxWidth: videoAspectRatio && videoAspectRatio < 1
+            ? 'min(420px, 70vh)'
+            : '100%',
+          width: '100%',
+        }}
       >
         {thumbnailUrl ? (
           <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover" />
@@ -281,16 +288,24 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         )}
       </div>
+      </div>
     )
   }
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
+    <div className="w-full flex justify-center bg-black rounded-lg overflow-hidden">
     <div
       ref={containerRef}
-      className="relative bg-black rounded-lg overflow-hidden group w-full"
-      style={videoAspectRatio ? { aspectRatio: `${videoAspectRatio}` } : { aspectRatio: '16/9' }}
+      className="relative bg-black overflow-hidden group"
+      style={{
+        aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+        maxWidth: videoAspectRatio && videoAspectRatio < 1
+          ? 'min(420px, 70vh)'  // portrait: cap width so height stays reasonable
+          : '100%',              // landscape/square: full width
+        width: '100%',
+      }}
     >
       <video
         ref={videoRef}
@@ -413,6 +428,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }
