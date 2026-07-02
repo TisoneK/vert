@@ -112,20 +112,28 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id
-        // For Google sign-in, load the user's role from DB since the
-        // Google profile doesn't include it
-        if (account?.provider === 'google' && user.email) {
-          const dbUser = await db.user.findUnique({
+        // Always load the role from DB — the user object from authorize()
+        // may not include role because NextAuth's User type doesn't have it.
+        // This is more reliable than casting.
+        const dbUser = await db.user.findUnique({
+          where: { id: user.id },
+          select: { id: true, role: true, username: true },
+        })
+        if (dbUser) {
+          token.id = dbUser.id
+          token.role = dbUser.role
+          token.username = dbUser.username
+        } else if (user.email) {
+          // Fallback for Google sign-in where user.id might not be set yet
+          const byEmail = await db.user.findUnique({
             where: { email: user.email.toLowerCase() },
             select: { id: true, role: true, username: true },
           })
-          if (dbUser) {
-            token.id = dbUser.id
-            token.role = dbUser.role
-            token.username = dbUser.username
+          if (byEmail) {
+            token.id = byEmail.id
+            token.role = byEmail.role
+            token.username = byEmail.username
           }
-        } else {
-          token.role = (user as unknown as { role: string }).role
         }
       }
       return token

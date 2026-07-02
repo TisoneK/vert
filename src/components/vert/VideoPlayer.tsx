@@ -304,7 +304,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         maxWidth: videoAspectRatio && videoAspectRatio < 1
           ? 'min(420px, 70vh)'  // portrait: cap width so height stays reasonable
           : '100%',              // landscape/square: full width
-        width: '100%',
+        width: videoAspectRatio && videoAspectRatio < 1
+          ? 'auto'              // portrait: let maxWidth control the size
+          : '100%',             // landscape/square: full width
       }}
     >
       <video
