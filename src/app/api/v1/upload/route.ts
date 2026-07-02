@@ -51,12 +51,12 @@ export async function GET(req: NextRequest) {
   // We read from VERT_BLOB_TOKEN first (manually set, lets us use a public
   // store without fighting Vercel's locked env vars), then fall back to the
   // standard BLOB_READ_WRITE_TOKEN (auto-set when a store is connected).
-  const blobToken = process.env.VERT_BLOB_TOKEN || process.env.BLOB_READ_WRITE_TOKEN
+  const blobToken = process.env.VERT_BLOB_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN
   if (!blobToken) {
-    console.error('No Blob token found. Set VERT_BLOB_TOKEN or BLOB_READ_WRITE_TOKEN.')
+    console.error('No Blob token found. Set VERT_BLOB_READ_WRITE_TOKEN or BLOB_READ_WRITE_TOKEN.')
     return NextResponse.json(
       {
-        error: 'Upload storage is not configured. Set VERT_BLOB_TOKEN environment variable.',
+        error: 'Upload storage is not configured. Set VERT_BLOB_READ_WRITE_TOKEN environment variable.',
         code: 'BLOB_TOKEN_MISSING',
       },
       { status: 500 }
