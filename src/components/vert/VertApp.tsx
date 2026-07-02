@@ -143,7 +143,18 @@ export function VertApp() {
       case 'search':
         return <SearchResults query={currentView.query} />
       case 'admin':
-        return user?.role === 'admin' ? <AdminDashboard /> : <HomeFeed />
+        return user?.role === 'admin' ? <AdminDashboard /> : (
+          <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
+            <p className="text-6xl font-bold text-zinc-900 tracking-tight">403</p>
+            <p className="text-zinc-500 mt-2 text-sm">You don&apos;t have access to this page.</p>
+            <button
+              onClick={() => navigate({ page: 'home' })}
+              className="mt-6 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Go home
+            </button>
+          </div>
+        )
       case 'profile':
         return user ? <ProfilePage /> : <LoginForm />
       case 'login':
