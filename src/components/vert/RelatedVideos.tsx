@@ -64,7 +64,14 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
     )
   }
 
-  if (videos.length === 0) return null
+  if (videos.length === 0) {
+    return (
+      <div>
+        <p className="text-sm font-medium text-zinc-600 mb-3">Up Next</p>
+        <p className="text-xs text-zinc-400">No more videos yet.</p>
+      </div>
+    )
+  }
 
   return (
     <div>

@@ -246,8 +246,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         className="relative bg-zinc-900 overflow-hidden"
         style={{
           aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+          maxHeight: 'calc(100vh - 200px)',
           maxWidth: videoAspectRatio && videoAspectRatio < 1
-            ? 'min(420px, 70vh)'
+            ? 'calc((100vh - 200px) * 0.5625)'
             : '100%',
           width: '100%',
         }}
@@ -301,12 +302,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       className="relative bg-black overflow-hidden group"
       style={{
         aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+        maxHeight: 'calc(100vh - 200px)',
         maxWidth: videoAspectRatio && videoAspectRatio < 1
-          ? 'min(420px, 70vh)'  // portrait: cap width so height stays reasonable
-          : '100%',              // landscape/square: full width
-        width: videoAspectRatio && videoAspectRatio < 1
-          ? 'auto'              // portrait: let maxWidth control the size
-          : '100%',             // landscape/square: full width
+          ? 'calc((100vh - 200px) * 0.5625)'  // portrait: derive width from max height
+          : '100%',
+        width: '100%',
       }}
     >
       <video

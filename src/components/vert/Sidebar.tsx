@@ -176,10 +176,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <button
             key={item.label}
             onClick={item.action}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
               item.active
-                ? 'bg-violet-50 text-zinc-900 border-l-2 border-violet-600'
-                : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 border-l-2 border-transparent'
+                ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
             <item.icon className="h-4 w-4 shrink-0" />
@@ -197,10 +197,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
               <button
                 key={item.label}
                 onClick={item.action}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
                   item.active
-                    ? 'bg-violet-50 text-zinc-900 border-l-2 border-violet-600'
-                    : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 border-l-2 border-transparent'
+                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
                 <item.icon className="h-4 w-4 shrink-0" />
@@ -218,7 +218,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <div>
             <button
               onClick={() => setChannelsExpanded(!channelsExpanded)}
-              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-zinc-800 uppercase tracking-wider"
+              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold outline-none text-zinc-800 uppercase tracking-wider"
             >
               Popular Channels
               {channelsExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -254,7 +254,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <div>
             <button
               onClick={() => setCategoriesExpanded(!categoriesExpanded)}
-              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-zinc-800 uppercase tracking-wider"
+              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold outline-none text-zinc-800 uppercase tracking-wider"
             >
               Categories
               {categoriesExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -267,7 +267,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
                     <button
                       key={cat.id}
                       onClick={() => navigate({ page: 'category', slug: cat.slug })}
-                      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm outline-none transition-colors ${
                         currentView.page === 'category' && (currentView as { slug: string }).slug === cat.slug
                           ? 'bg-violet-50 text-zinc-900'
                           : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50'
@@ -299,10 +299,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
             {user.channelId && (
               <button
                 onClick={() => navigate({ page: 'creator-studio' })}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
                   currentView.page === 'creator-studio'
-                    ? 'bg-violet-50 text-zinc-900 border-l-2 border-violet-600'
-                    : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 border-l-2 border-transparent'
+                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
                 <BarChart3 className="h-4 w-4 shrink-0" />
@@ -312,10 +312,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
             {user.role === 'admin' && (
               <button
                 onClick={() => navigate({ page: 'admin' })}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
                   currentView.page === 'admin'
-                    ? 'bg-violet-50 text-zinc-900 border-l-2 border-violet-600'
-                    : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 border-l-2 border-transparent'
+                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
                 <Shield className="h-4 w-4 shrink-0" />
