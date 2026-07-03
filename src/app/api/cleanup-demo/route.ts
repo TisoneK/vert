@@ -66,9 +66,10 @@ export async function GET(req: NextRequest) {
     })
     deleted.demoUsers = demoUsers.count
 
-    // 6. Delete any orphaned channels
+    // 6. Delete any orphaned channels (userId no longer in users table)
+    const allUserIds = (await prisma.user.findMany({ select: { id: true } })).map(u => u.id)
     const channels = await prisma.channel.deleteMany({
-      where: { user: null },
+      where: { userId: { notIn: allUserIds } },
     })
     deleted.orphanedChannels = channels.count
 
