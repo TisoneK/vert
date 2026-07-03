@@ -1,10 +1,9 @@
 'use client'
 
-import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
-import { ArrowLeft, Film, Music, Trophy, Gamepad2, Newspaper, Monitor, Cpu } from 'lucide-react'
+import { ArrowLeft, Hash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CardSkeleton } from './Skeleton'
 
@@ -23,35 +22,20 @@ interface Video {
     user: { avatarUrl: string | null }
   }
   categories: Array<{ name: string; slug: string }>
+  tags: Array<{ name: string; label: string }>
 }
 
-interface CategoryInfo {
+interface TagInfo {
   id: string
   name: string
-  slug: string
-  description: string | null
+  label: string
+  usageCount: number
 }
 
-const categoryIconMap: Record<string, React.ElementType> = {
-  music: Music,
-  sports: Trophy,
-  gaming: Gamepad2,
-  entertainment: Film,
-  news: Newspaper,
-  education: Monitor,
-  comedy: Film,
-  tech: Cpu,
-  travel: Film,
-  food: Film,
-  fitness: Trophy,
-  art: Film,
-  other: Film,
-}
-
-export function CategoryPage({ slug }: { slug: string }) {
+export function TagPage({ slug }: { slug: string }) {
   const { navigate } = useNavigation()
   const [videos, setVideos] = useState<Video[]>([])
-  const [category, setCategory] = useState<CategoryInfo | null>(null)
+  const [tag, setTag] = useState<TagInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [sort, setSort] = useState<'latest' | 'trending' | 'popular'>('latest')
   const [page, setPage] = useState(1)
@@ -59,10 +43,10 @@ export function CategoryPage({ slug }: { slug: string }) {
 
   useEffect(() => {
     setPage(1)
-    fetchCategoryVideos(1, true)
+    fetchTagVideos(1, true)
   }, [slug, sort])
 
-  async function fetchCategoryVideos(pageNum: number, reset = false) {
+  async function fetchTagVideos(pageNum: number, reset = false) {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -70,19 +54,23 @@ export function CategoryPage({ slug }: { slug: string }) {
         limit: '12',
         sort,
       })
-      const res = await fetchWithRetry(`/api/v1/categories/${slug}/videos?${params}`)
+      const res = await fetch(`/api/v1/tags/${encodeURIComponent(slug)}/videos?${params}`)
       if (res.ok) {
         const data = await res.json()
-        setCategory(data.category)
+        setTag(data.tag)
         if (reset) {
           setVideos(data.videos)
         } else {
           setVideos((prev) => [...prev, ...data.videos])
         }
         setHasMore(pageNum < data.pagination.totalPages)
+      } else if (res.status === 404) {
+        setTag(null)
+        setVideos([])
+        setHasMore(false)
       }
     } catch (error) {
-      console.error('Failed to fetch category videos:', error)
+      console.error('Failed to fetch tag videos:', error)
     } finally {
       setLoading(false)
     }
@@ -96,10 +84,8 @@ export function CategoryPage({ slug }: { slug: string }) {
   const loadMore = () => {
     const nextPage = page + 1
     setPage(nextPage)
-    fetchCategoryVideos(nextPage)
+    fetchTagVideos(nextPage)
   }
-
-  const Icon = category ? (categoryIconMap[category.slug] || Film) : Film
 
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto animate-vert-fade-in">
@@ -112,20 +98,34 @@ export function CategoryPage({ slug }: { slug: string }) {
         Back to Explore
       </button>
 
-      {/* Category header */}
-      {category && (
+      {/* Tag header */}
+      {tag ? (
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-zinc-200 flex items-center justify-center">
-              <Icon className="h-5 w-5 text-zinc-600" />
+            <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center">
+              <Hash className="h-5 w-5 text-violet-600" />
             </div>
-            <h1 className="text-xl font-bold text-zinc-900">{category.name}</h1>
+            <div>
+              <h1 className="text-xl font-bold text-zinc-900">{tag.label}</h1>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                {tag.usageCount} {tag.usageCount === 1 ? 'video' : 'videos'}
+              </p>
+            </div>
           </div>
-          {category.description && (
-            <p className="text-zinc-600 text-sm">{category.description}</p>
-          )}
         </div>
-      )}
+      ) : !loading ? (
+        <div className="mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-zinc-200 flex items-center justify-center">
+              <Hash className="h-5 w-5 text-zinc-500" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-zinc-900">#{slug}</h1>
+              <p className="text-xs text-zinc-500 mt-0.5">Tag not found</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Sort tabs */}
       <div className="flex gap-2 mb-6">
@@ -159,7 +159,7 @@ export function CategoryPage({ slug }: { slug: string }) {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-zinc-500">No videos in this category yet — be the first to add one.</p>
+          <p className="text-zinc-500">No videos with this tag yet.</p>
         </div>
       )}
 

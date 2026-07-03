@@ -42,6 +42,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(1)
   const [hasError, setHasError] = useState(false)
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [showSettings, setShowSettings] = useState(false)
@@ -80,7 +81,13 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       hlsRef.current = null
     }
 
-    const onLoadedMeta = () => setDuration(video.duration)
+    const onLoadedMeta = () => {
+      setDuration(video.duration)
+      // Capture actual video dimensions for proper aspect ratio
+      if (video.videoWidth > 0 && video.videoHeight > 0) {
+        setVideoAspectRatio(video.videoWidth / video.videoHeight)
+      }
+    }
     const onTimeUpdate = () => setCurrentTime(video.currentTime)
     video.addEventListener('loadedmetadata', onLoadedMeta)
     video.addEventListener('timeupdate', onTimeUpdate)
@@ -234,7 +241,20 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
   if (hasError || isSampleVideo) {
     return (
-      <div className="relative aspect-video bg-zinc-900 rounded-lg overflow-hidden">
+      <div className="w-full flex justify-center rounded-lg overflow-hidden">
+      <div
+        className="relative bg-zinc-900 overflow-hidden"
+        style={{
+          aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+          ...(videoAspectRatio && videoAspectRatio < 1 ? {
+            maxHeight: 'calc(100vh - 200px)',
+            maxWidth: 'calc((100vh - 200px) * 0.5625)',
+            width: 'auto',
+          } : {
+            width: '100%',
+          }),
+        }}
+      >
         {thumbnailUrl ? (
           <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover" />
         ) : (
@@ -271,13 +291,31 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         )}
       </div>
+      </div>
     )
   }
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div ref={containerRef} className="relative aspect-video bg-black rounded-lg overflow-hidden group">
+    <div className="w-full flex justify-center rounded-lg overflow-hidden">
+    <div
+      ref={containerRef}
+      className="relative bg-black overflow-hidden group rounded-lg"
+      style={{
+        aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+        // Portrait: on mobile cap at 65vh (leaves room for title + actions below),
+        // on desktop cap at calc(100vh - 200px). Width derived from height.
+        // Landscape/square: full width.
+        ...(videoAspectRatio && videoAspectRatio < 1 ? {
+          maxHeight: '65vh',
+          maxWidth: 'calc(65vh * 0.5625)',
+          width: 'auto',
+        } : {
+          width: '100%',
+        }),
+      }}
+    >
       <video
         ref={videoRef}
         poster={thumbnailUrl || undefined}
@@ -399,6 +437,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }

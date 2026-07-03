@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { notifyAllAdmins } from '@/lib/notifications'
 
 export async function POST(
   req: NextRequest,
@@ -42,6 +43,16 @@ export async function POST(
         reason,
         status: 'pending',
       },
+    })
+
+    // Notify all admins — flagged content needs moderation review.
+    // Best-effort; failure doesn't fail the flag action itself.
+    await notifyAllAdmins({
+      type: 'flag',
+      title: 'Video flagged for review',
+      message: `${user.username} flagged "${video.title}" — reason: ${reason}`,
+      actorId: user.id,
+      relatedVideoId: videoId,
     })
 
     return NextResponse.json(flag, { status: 201 })

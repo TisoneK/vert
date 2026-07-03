@@ -95,7 +95,7 @@ export function HistoryPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 animate-vert-fade-in">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto animate-vert-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -136,7 +136,7 @@ export function HistoryPage() {
             <Clock className="h-6 w-6 text-zinc-600" />
           </div>
           <h2 className="text-base font-semibold text-zinc-900">No watch history</h2>
-          <p className="text-sm text-zinc-700 mt-1">Videos you watch will appear here</p>
+          <p className="text-sm text-zinc-500 mt-1">Videos you watch will show up here.</p>
         </div>
       ) : (
         <div className="space-y-2">

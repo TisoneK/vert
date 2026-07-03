@@ -7,9 +7,11 @@ interface VideoShelfProps {
   title: string
   children: React.ReactNode
   onSeeAll?: () => void
+  /** Optional icon rendered before the title (e.g. <Sparkles /> for "For You"). */
+  icon?: React.ReactNode
 }
 
-export function VideoShelf({ title, children, onSeeAll }: VideoShelfProps) {
+export function VideoShelf({ title, children, onSeeAll, icon }: VideoShelfProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
@@ -33,7 +35,10 @@ export function VideoShelf({ title, children, onSeeAll }: VideoShelfProps) {
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-3 px-1">
-        <h2 className="text-base font-semibold text-zinc-900">{title}</h2>
+        <h2 className="text-base font-semibold text-zinc-900 flex items-center gap-1.5">
+          {icon}
+          {title}
+        </h2>
         {onSeeAll && (
           <button
             onClick={onSeeAll}

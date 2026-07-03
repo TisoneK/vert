@@ -8,7 +8,6 @@ import {
   Clock,
   Bookmark,
   Compass,
-  Settings,
   Shield,
   BarChart3,
   ChevronDown,
@@ -21,8 +20,6 @@ import {
   Newspaper,
   Monitor,
   Mail,
-  HelpCircle,
-  Info,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -56,8 +53,8 @@ export function Sidebar({ collapsed }: SidebarProps) {
   const { user } = useAuth()
   const [categories, setCategories] = useState<SidebarCategory[]>([])
   const [channels, setChannels] = useState<SidebarChannel[]>([])
-  const [categoriesExpanded, setCategoriesExpanded] = useState(true)
-  const [channelsExpanded, setChannelsExpanded] = useState(true)
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false)
+  const [channelsExpanded, setChannelsExpanded] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -98,20 +95,16 @@ export function Sidebar({ collapsed }: SidebarProps) {
   const mainNavItems = [
     { icon: Home, label: 'Home', action: () => navigate({ page: 'home' }), active: isActive('home') },
     { icon: Compass, label: 'Explore', action: () => navigate({ page: 'explore' }), active: isActive('explore') },
-    { icon: Clock, label: 'Watch Later', action: () => navigate({ page: 'saved' }), active: isActive('saved') },
     { icon: Flame, label: 'Trending', action: () => navigate({ page: 'trending' }), active: isActive('trending') },
   ]
 
   const personalNavItems = user ? [
     { icon: Clock, label: 'History', action: () => navigate({ page: 'history' }), active: isActive('history') },
-    { icon: Bookmark, label: 'Watch Later', action: () => navigate({ page: 'saved' }), active: isActive('saved') },
+    { icon: Bookmark, label: 'Saved', action: () => navigate({ page: 'saved' }), active: isActive('saved') },
   ] : []
 
   const footerItems = [
     { icon: Mail, label: 'Contact Us', action: () => navigate({ page: 'contact' }), active: currentView.page === 'contact' },
-    { icon: Settings, label: 'Settings', action: () => {}, active: false },
-    { icon: HelpCircle, label: 'Help', action: () => {}, active: false },
-    { icon: Info, label: 'About', action: () => {}, active: false },
   ]
 
   if (collapsed) {
@@ -183,10 +176,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <button
             key={item.label}
             onClick={item.action}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
               item.active
-                ? 'bg-violet-50 text-zinc-900 border-l-2 border-violet-600'
-                : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 border-l-2 border-transparent'
+                ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
             <item.icon className="h-4 w-4 shrink-0" />
@@ -204,10 +197,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
               <button
                 key={item.label}
                 onClick={item.action}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
                   item.active
-                    ? 'bg-violet-50 text-zinc-900 border-l-2 border-violet-600'
-                    : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 border-l-2 border-transparent'
+                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
                 <item.icon className="h-4 w-4 shrink-0" />
@@ -225,7 +218,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <div>
             <button
               onClick={() => setChannelsExpanded(!channelsExpanded)}
-              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-zinc-800 uppercase tracking-wider"
+              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold outline-none text-zinc-800 uppercase tracking-wider"
             >
               Popular Channels
               {channelsExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -261,7 +254,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <div>
             <button
               onClick={() => setCategoriesExpanded(!categoriesExpanded)}
-              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-zinc-800 uppercase tracking-wider"
+              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold outline-none text-zinc-800 uppercase tracking-wider"
             >
               Categories
               {categoriesExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -274,7 +267,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
                     <button
                       key={cat.id}
                       onClick={() => navigate({ page: 'category', slug: cat.slug })}
-                      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm outline-none transition-colors ${
                         currentView.page === 'category' && (currentView as { slug: string }).slug === cat.slug
                           ? 'bg-violet-50 text-zinc-900'
                           : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50'
@@ -306,10 +299,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
             {user.channelId && (
               <button
                 onClick={() => navigate({ page: 'creator-studio' })}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
                   currentView.page === 'creator-studio'
-                    ? 'bg-violet-50 text-zinc-900 border-l-2 border-violet-600'
-                    : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 border-l-2 border-transparent'
+                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
                 <BarChart3 className="h-4 w-4 shrink-0" />
@@ -319,10 +312,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
             {user.role === 'admin' && (
               <button
                 onClick={() => navigate({ page: 'admin' })}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
                   currentView.page === 'admin'
-                    ? 'bg-violet-50 text-zinc-900 border-l-2 border-violet-600'
-                    : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 border-l-2 border-transparent'
+                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
                 <Shield className="h-4 w-4 shrink-0" />
@@ -347,8 +340,8 @@ export function Sidebar({ collapsed }: SidebarProps) {
             </button>
           ))}
         </div>
-        <p className="text-[10px] text-zinc-600 px-3 mt-2">
-          Vert v2.0
+        <p className="text-[10px] text-zinc-400 px-3 mt-2">
+          Vert v1.0
         </p>
       </div>
     </aside>

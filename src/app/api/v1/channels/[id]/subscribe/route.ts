@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { createNotification } from '@/lib/notifications'
 
 export async function POST(
   req: NextRequest,
@@ -39,6 +40,17 @@ export async function POST(
     await db.channel.update({
       where: { id: channelId },
       data: { subscriberCount: { increment: 1 } },
+    })
+
+    // Notify the channel owner that they have a new subscriber.
+    // Best-effort — failure here doesn't fail the subscribe action.
+    await createNotification({
+      userId: channel.userId,
+      type: 'subscription',
+      title: 'New subscriber',
+      message: `${user.username} subscribed to your channel "${channel.channelName}"`,
+      actorId: user.id,
+      relatedChannelId: channelId,
     })
 
     return NextResponse.json({ message: 'Subscribed' }, { status: 201 })

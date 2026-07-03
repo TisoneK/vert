@@ -165,7 +165,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
           </div>
         </div>
       ) : (
-        <p className="text-sm text-zinc-700 mb-6">Log in to add a comment.</p>
+        <p className="text-sm text-zinc-500 mb-6">Log in to add a comment.</p>
       )}
 
       {/* Comments list */}
@@ -175,6 +175,10 @@ export function CommentSection({ videoId }: CommentSectionProps) {
             <CommentSkeleton key={i} />
           ))}
         </div>
+      ) : sortedComments.length === 0 ? (
+        <p className="text-sm text-zinc-500 py-4">
+          No comments yet. Be the first to say something.
+        </p>
       ) : (
         <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
           {sortedComments.map((comment) => (

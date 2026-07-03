@@ -109,13 +109,13 @@ export function SearchResults({ query }: SearchResultsProps) {
       )}
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
         </div>
       ) : videos.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {videos.map((video) => (
             <VideoCard key={video.id} video={video} />
           ))}
@@ -125,8 +125,8 @@ export function SearchResults({ query }: SearchResultsProps) {
           <div className="w-14 h-14 rounded-full bg-zinc-200 flex items-center justify-center mb-4">
             <Search className="h-6 w-6 text-zinc-600" />
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">No results found</h2>
-          <p className="text-sm text-zinc-700 mt-1">Try searching for something else</p>
+          <h2 className="text-base font-semibold text-zinc-900">No results for that</h2>
+          <p className="text-sm text-zinc-500 mt-1">Try different keywords.</p>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20">

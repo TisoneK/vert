@@ -9,6 +9,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Notifications are now wired to real events** — previously the NotificationCenter only showed seed data; now it fills up organically as users interact.
+  - New helper module `src/lib/notifications.ts` with `createNotification()` and `notifyAllAdmins()` — both best-effort (errors swallowed) so a notification failure never breaks the parent action.
+  - **Subscription created** → channel owner gets a "New subscriber" notification (`type: subscription`) with the subscriber's username and channel name.
+  - **Comment created** → video owner gets a "New comment" notification (`type: comment`) with the commenter's username and a snippet of the comment (truncated to 80 chars). Skipped if the user is commenting on their own video.
+  - **Like created** (new vote OR changed from dislike→like) → video owner gets a "Video liked" notification (`type: vote`). Dislikes do not generate notifications (would just be noise). Skipped if the user is liking their own video.
+  - **Flag created** → all admin users get a "Video flagged for review" notification (`type: flag`) with the reporter's username, video title, and reason. Uses `notifyAllAdmins()` which batches a `createMany` to all active admins in one query.
+  - Self-action guard on all three user-facing events: subscribing to / commenting on / liking your own content does not generate a notification.
+
+- **Personalized "For You" feed** — recommendation engine that ranks videos by user affinity.
+  - New API route: `GET /api/v1/feed/for-you` (authenticated; falls back to trending for unauthed users or users with no watch history).
+  - Affinity scoring algorithm:
+    - **+5 per shared tag** with the user's watch-history videos (strongest signal — uses the new Tag model)
+    - **+3 per shared category** with watch history
+    - **+4 if subscribed** to the video's channel
+    - **+2 if user has upvoted** any video from this channel
+    - **+1 recency bonus** per 7 days since upload (capped at +3)
+    - **−10 if user has disliked** this specific video (excludes it from the feed)
+  - Excludes already-watched videos and the user's own uploads to keep the feed fresh.
+  - Cold-start friendly: videos with zero affinity still appear (sorted after scored videos, ordered by viewCount).
+  - Response includes `personalized: true/false` flag so the UI can show the shelf only when there's actual personalization (avoids duplicating the trending shelf).
+  - Debug payload (`watchedCount`, `tagAffinitySize`, etc.) included for transparency — can be stripped in a future pass if needed.
+  - New "For You" shelf at the top of `HomeFeed`, with a Sparkles icon. Only renders for logged-in users with watch history.
+  - `VideoShelf` component extended with an optional `icon` prop (used for the Sparkles icon on the For You shelf).
+
+- **Hashtags on videos** — freeform tagging system for video discovery.
+  - New Prisma models: `Tag` (id, name, label, usageCount) and `VideoTag` (join table, cascade-delete on video).
+  - Distinct from `Category` — categories are curated taxonomy, tags are creator-defined and reflect how the community actually describes content.
+  - New API routes: `GET /api/v1/tags` (popular, filterable) and `GET /api/v1/tags/[slug]/videos` (paginated).
+  - `POST /api/v1/videos` accepts `tags: string[]`, normalizes, dedupes, caps at 8.
+  - New deep-link route `/tag/[slug]` + new `TagPage` component.
+  - Tag input on `UploadPage`; clickable chips on `VideoCard` (up to 3) and `VideoDetail` (all).
+  - Seed creates 20 starter tags and attaches 2-4 to each of the 21 demo videos.
+
 - **Deep-linkable routes** — videos, channels, categories, search, trending, and explore now have their own URLs.
   - `/watch/[id]`, `/channel/[id]`, `/category/[slug]`, `/search?q=`, `/trending`, `/explore` all render the `<VertApp />` shell, which parses the URL on mount and syncs the Zustand navigation store.
   - Browser back/forward now works (popstate listener added in `VertApp`).

@@ -12,6 +12,7 @@ export type View =
   | { page: 'signup' }
   | { page: 'trending' }
   | { page: 'category'; slug: string }
+  | { page: 'tag'; slug: string }
   | { page: 'explore' }
   | { page: 'history' }
   | { page: 'saved' }
@@ -39,6 +40,8 @@ export function viewToPath(view: View): string {
       return `/channel/${view.channelId}`
     case 'category':
       return `/category/${view.slug}`
+    case 'tag':
+      return `/tag/${view.slug}`
     case 'search':
       return `/search?q=${encodeURIComponent(view.query)}`
     case 'trending':
@@ -74,6 +77,9 @@ export function pathToView(pathname: string): View | null {
 
   const categoryMatch = path.match(/^\/category\/(.+)$/)
   if (categoryMatch) return { page: 'category', slug: decodeURIComponent(categoryMatch[1]) }
+
+  const tagMatch = path.match(/^\/tag\/(.+)$/)
+  if (tagMatch) return { page: 'tag', slug: decodeURIComponent(tagMatch[1]) }
 
   const searchMatch = path.match(/^\/search$/)
   if (searchMatch) {

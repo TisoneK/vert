@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("PRISMA_DATABASE_URL")
 }
 
 model User {
@@ -69,6 +70,7 @@ model Video {
   votes           Vote[]
   flags           Flag[]
   categories      VideoCategory[]
+  tags            VideoTag[]
   playlistItems   PlaylistItem[]
   watchHistory    WatchHistory[]
   savedBy         SavedVideo[]
@@ -220,4 +222,30 @@ model Notification {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead, createdAt])
+}
+
+/// Freeform tag (hashtag) attached to videos for discovery.
+/// Distinct from Category (curated taxonomy) — tags are creator-defined
+/// and reflect how the community actually describes content.
+model Tag {
+  id        String      @id @default(cuid())
+  name      String      @unique // normalized: lowercase, no spaces
+  label     String      // display form, preserves original casing
+  usageCount Int        @default(0) // denormalized for fast "popular tags" queries
+  createdAt DateTime    @default(now())
+
+  videos    VideoTag[]
+}
+
+/// Join table — many-to-many between Video and Tag.
+/// Cascade-delete on Video so removing a video cleans up its tag associations.
+model VideoTag {
+  videoId String
+  tagId   String
+
+  video   Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, tagId])
+  @@index([tagId])
 }
