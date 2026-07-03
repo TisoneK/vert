@@ -304,11 +304,12 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       className="relative bg-black overflow-hidden group rounded-lg"
       style={{
         aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
-        // Portrait: cap height so it doesn't take 2+ screens, derive width from height
-        // Landscape/square: full width, no height cap (Dailymotion-style)
+        // Portrait: on mobile cap at 65vh (leaves room for title + actions below),
+        // on desktop cap at calc(100vh - 200px). Width derived from height.
+        // Landscape/square: full width.
         ...(videoAspectRatio && videoAspectRatio < 1 ? {
-          maxHeight: 'calc(100vh - 200px)',
-          maxWidth: 'calc((100vh - 200px) * 0.5625)',
+          maxHeight: '65vh',
+          maxWidth: 'calc(65vh * 0.5625)',
           width: 'auto',
         } : {
           width: '100%',
