@@ -241,7 +241,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
   if (hasError || isSampleVideo) {
     return (
-      <div className="w-full flex justify-center bg-zinc-900 rounded-lg overflow-hidden">
+      <div className="w-full flex justify-center rounded-lg overflow-hidden">
       <div
         className="relative bg-zinc-900 overflow-hidden"
         style={{
@@ -296,7 +296,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div className="w-full flex justify-center bg-black rounded-lg overflow-hidden">
+    <div className="w-full flex justify-center rounded-lg overflow-hidden">
     <div
       ref={containerRef}
       className="relative bg-black overflow-hidden group"
@@ -306,7 +306,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         maxWidth: videoAspectRatio && videoAspectRatio < 1
           ? 'calc((100vh - 200px) * 0.5625)'  // portrait: derive width from max height
           : '100%',
-        width: '100%',
+        width: videoAspectRatio && videoAspectRatio < 1
+          ? 'auto'  // portrait: let maxWidth control the width
+          : '100%', // landscape/square: fill container
       }}
     >
       <video

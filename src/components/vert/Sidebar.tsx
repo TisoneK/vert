@@ -53,8 +53,8 @@ export function Sidebar({ collapsed }: SidebarProps) {
   const { user } = useAuth()
   const [categories, setCategories] = useState<SidebarCategory[]>([])
   const [channels, setChannels] = useState<SidebarChannel[]>([])
-  const [categoriesExpanded, setCategoriesExpanded] = useState(true)
-  const [channelsExpanded, setChannelsExpanded] = useState(true)
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false)
+  const [channelsExpanded, setChannelsExpanded] = useState(false)
 
   useEffect(() => {
     let cancelled = false
