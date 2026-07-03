@@ -299,7 +299,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     <div className="w-full flex justify-center rounded-lg overflow-hidden">
     <div
       ref={containerRef}
-      className="relative bg-black overflow-hidden group"
+      className="relative bg-black overflow-hidden group rounded-lg"
       style={{
         aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
         maxHeight: 'calc(100vh - 200px)',
