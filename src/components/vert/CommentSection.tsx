@@ -1,5 +1,6 @@
 'use client'
 
+import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/store'
 import { timeAgo } from '@/lib/utils-vert'
@@ -45,7 +46,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
   async function fetchComments(pageNum: number, reset = false) {
     setLoading(true)
     try {
-      const res = await fetch(`/api/v1/videos/${videoId}/comments?page=${pageNum}&limit=20`)
+      const res = await fetchWithRetry(`/api/v1/videos/${videoId}/comments?page=${pageNum}&limit=20`)
       const data = await res.json()
       if (reset) {
         setComments(data.comments)

@@ -1,5 +1,6 @@
 'use client'
 
+import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
@@ -47,7 +48,7 @@ export function TrendingPage() {
 
   async function fetchCategories() {
     try {
-      const res = await fetch('/api/v1/categories')
+      const res = await fetchWithRetry('/api/v1/categories')
       if (res.ok) {
         const data = await res.json()
         setCategories(data.categories)
@@ -62,7 +63,7 @@ export function TrendingPage() {
     try {
       const params = new URLSearchParams({ limit: '20' })
       if (category) params.set('category', category)
-      const res = await fetch(`/api/v1/trending?${params}`)
+      const res = await fetchWithRetry(`/api/v1/trending?${params}`)
       if (res.ok) {
         const data = await res.json()
         setVideos(data.videos)

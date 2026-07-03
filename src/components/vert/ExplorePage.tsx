@@ -1,5 +1,6 @@
 'use client'
 
+import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
 import { Compass, Music, Trophy, Gamepad2, Film, Newspaper, Monitor, Cpu } from 'lucide-react'
@@ -41,7 +42,7 @@ export function ExplorePage() {
   async function fetchCategories() {
     setLoading(true)
     try {
-      const res = await fetch('/api/v1/categories')
+      const res = await fetchWithRetry('/api/v1/categories')
       if (res.ok) {
         const data = await res.json()
         setCategories(data.categories)

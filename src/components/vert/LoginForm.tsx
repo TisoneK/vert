@@ -1,5 +1,6 @@
 'use client'
 
+import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState } from 'react'
 import { useAuth, useNavigation } from '@/lib/store'
 import { Button } from '@/components/ui/button'
@@ -33,7 +34,7 @@ export function LoginForm() {
       if (result?.error) {
         setError('Invalid email or password')
       } else {
-        const sessionRes = await fetch('/api/auth/session-info')
+        const sessionRes = await fetchWithRetry('/api/auth/session-info')
         const sessionData = await sessionRes.json()
 
         if (sessionData.user) {

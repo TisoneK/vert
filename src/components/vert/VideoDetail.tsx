@@ -1,5 +1,6 @@
 'use client'
 
+import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoPlayer } from './VideoPlayer'
@@ -78,12 +79,12 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   async function fetchVideo() {
     setLoading(true)
     try {
-      const res = await fetch(`/api/v1/videos/${videoId}`)
+      const res = await fetchWithRetry(`/api/v1/videos/${videoId}`)
       if (res.ok) {
         const data = await res.json()
         setVideo(data)
         const votes = data.votes as { userId: string; voteType: string }[]
-        const sessionRes = await fetch('/api/auth/session-info')
+        const sessionRes = await fetchWithRetry('/api/auth/session-info')
         const sessionData = await sessionRes.json()
         if (sessionData.user) {
           const userVoteRecord = votes?.find((v) => v.userId === sessionData.user.id)

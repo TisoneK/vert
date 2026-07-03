@@ -1,5 +1,6 @@
 'use client'
 
+import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
@@ -39,7 +40,7 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
   async function fetchRelated() {
     setLoading(true)
     try {
-      const res = await fetch(`/api/v1/videos/${videoId}/related?limit=10`)
+      const res = await fetchWithRetry(`/api/v1/videos/${videoId}/related?limit=10`)
       if (res.ok) {
         const data = await res.json()
         setVideos(data.videos)

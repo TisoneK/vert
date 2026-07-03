@@ -1,5 +1,6 @@
 'use client'
 
+import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
@@ -69,7 +70,7 @@ export function CategoryPage({ slug }: { slug: string }) {
         limit: '12',
         sort,
       })
-      const res = await fetch(`/api/v1/categories/${slug}/videos?${params}`)
+      const res = await fetchWithRetry(`/api/v1/categories/${slug}/videos?${params}`)
       if (res.ok) {
         const data = await res.json()
         setCategory(data.category)

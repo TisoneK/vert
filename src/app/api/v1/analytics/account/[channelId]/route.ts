@@ -70,7 +70,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
           viewCount: true,
           likeCount: true,
           createdAt: true,
-          _count: { comments: { where: { isRemoved: false } } },
+          _count: { select: { comments: { where: { isRemoved: false } } } },
         },
       }),
       // Recent 5 uploads

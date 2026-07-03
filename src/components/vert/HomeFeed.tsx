@@ -1,4 +1,5 @@
 'use client'
+import { fetchWithRetry } from '@/lib/fetch-retry'
 
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
@@ -54,7 +55,7 @@ export function HomeFeed() {
 
   async function fetchCategories() {
     try {
-      const res = await fetch('/api/v1/categories')
+      const res = await fetchWithRetry('/api/v1/categories')
       if (res.ok) {
         const data = await res.json()
         setCategories(data.categories)
