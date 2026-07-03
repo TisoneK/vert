@@ -246,11 +246,13 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         className="relative bg-zinc-900 overflow-hidden"
         style={{
           aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
-          maxHeight: 'calc(100vh - 200px)',
-          maxWidth: videoAspectRatio && videoAspectRatio < 1
-            ? 'calc((100vh - 200px) * 0.5625)'
-            : '100%',
-          width: '100%',
+          ...(videoAspectRatio && videoAspectRatio < 1 ? {
+            maxHeight: 'calc(100vh - 200px)',
+            maxWidth: 'calc((100vh - 200px) * 0.5625)',
+            width: 'auto',
+          } : {
+            width: '100%',
+          }),
         }}
       >
         {thumbnailUrl ? (
@@ -302,13 +304,15 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       className="relative bg-black overflow-hidden group rounded-lg"
       style={{
         aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
-        maxHeight: 'calc(100vh - 200px)',
-        maxWidth: videoAspectRatio && videoAspectRatio < 1
-          ? 'calc((100vh - 200px) * 0.5625)'  // portrait: derive width from max height
-          : '100%',
-        width: videoAspectRatio && videoAspectRatio < 1
-          ? 'auto'  // portrait: let maxWidth control the width
-          : '100%', // landscape/square: fill container
+        // Portrait: cap height so it doesn't take 2+ screens, derive width from height
+        // Landscape/square: full width, no height cap (Dailymotion-style)
+        ...(videoAspectRatio && videoAspectRatio < 1 ? {
+          maxHeight: 'calc(100vh - 200px)',
+          maxWidth: 'calc((100vh - 200px) * 0.5625)',
+          width: 'auto',
+        } : {
+          width: '100%',
+        }),
       }}
     >
       <video
