@@ -144,185 +144,153 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const description = video.description as string | null
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6 animate-vert-fade-in">
-      {/* Breadcrumbs */}
-      <div className="flex items-center gap-2 mb-3 text-xs text-zinc-600">
-        <button onClick={() => navigate({ page: 'home' })} className="hover:text-zinc-700 transition-colors">Home</button>
-        <span>/</span>
-        {categories.length > 0 && (
-          <>
-            <button
-              onClick={() => navigate({ page: 'category', slug: categories[0].slug })}
-              className="hover:text-zinc-700 transition-colors"
-            >
-              {categories[0].name}
-            </button>
-            <span>/</span>
-          </>
-        )}
-        <span className="text-zinc-600 truncate max-w-[200px]">{video.title as string}</span>
+    <div className="max-w-5xl mx-auto animate-vert-fade-in">
+      {/* Video player — full width on mobile, no padding */}
+      <div className="w-full">
+        <VideoPlayer
+          videoUrl={video.videoUrl as string}
+          thumbnailUrl={video.thumbnailUrl as string | null}
+          title={video.title as string}
+          format={format}
+        />
       </div>
 
-      <div className={`grid grid-cols-1 gap-6 ${
-        format === 'portrait' ? 'lg:grid-cols-[1fr_300px]' : 'lg:grid-cols-[1fr_320px]'
-      }`}>
-        {/* Left column: player + info */}
+      {/* Two-column on desktop, stacked on mobile */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 p-4 md:p-6">
+        {/* Left column: info + comments */}
         <div>
-          {/* Video player */}
-          <VideoPlayer
-            videoUrl={video.videoUrl as string}
-            thumbnailUrl={video.thumbnailUrl as string | null}
-            title={video.title as string}
-            format={format}
-          />
+          {/* Title + views — compact like Dailymotion mobile */}
+          <h1 className="text-base md:text-lg font-bold text-zinc-900 mt-3">
+            {video.title as string}
+          </h1>
+          <div className="flex items-center gap-2 text-xs text-zinc-500 mt-1">
+            <span>{formatViews(video.viewCount as number)} views</span>
+            <span>·</span>
+            <span>{timeAgo(video.createdAt as string)}</span>
+          </div>
 
-          {/* Video info */}
-          <div className="mt-4">
-            <h1 className="text-lg font-bold text-zinc-900">
-              {video.title as string}
-            </h1>
-
-            {/* Category badges */}
-            {categories.length > 0 && (
-              <div className="mt-2">
-                <CategoryBadge categories={categories} max={5} />
-              </div>
-            )}
-
-            {/* Tags — clickable chips */}
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {tags.map((tag) => (
-                  <button
-                    key={tag.name}
-                    onClick={() => navigate({ page: 'tag', slug: tag.name })}
-                    className="px-2 py-1 bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-900 rounded-md text-xs font-medium transition-colors"
-                  >
-                    {tag.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Channel row + actions */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4">
-              {/* Channel info */}
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex items-center gap-3 cursor-pointer"
-                  onClick={() => navigate({ page: 'channel', channelId: channel.id })}
-                >
-                  {channel.user.avatarUrl ? (
-                    <img
-                      src={channel.user.avatarUrl}
-                      alt={channel.channelName}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 font-bold">
-                      {channel.channelName[0]?.toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <div className="flex items-center gap-1">
-                      <p className="text-sm font-semibold text-zinc-900">{channel.channelName}</p>
-                      <svg className="w-3.5 h-3.5 text-violet-600" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                      </svg>
-                    </div>
-                    <p className="text-xs text-zinc-600">{formatSubscribers(channel.subscriberCount)}</p>
-                  </div>
-                </div>
-                <SubscribeButton
-                  channelId={channel.id}
-                  initialSubscribed={false}
-                  subscriberCount={channel.subscriberCount}
-                />
-              </div>
-
-              {/* Action row */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <VoteButtons
-                  videoId={video.id as string}
-                  likeCount={video.likeCount as number}
-                  dislikeCount={video.dislikeCount as number}
-                  userVote={userVote}
-                />
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {tags.map((tag) => (
                 <button
-                  onClick={toggleSave}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors active:scale-95 duration-100 ${
-                    isSaved
-                      ? 'bg-zinc-100 text-violet-600'
-                      : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200'
-                  }`}
+                  key={tag.name}
+                  onClick={() => navigate({ page: 'tag', slug: tag.name })}
+                  className="px-2 py-1 bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-900 rounded-md text-xs font-medium transition-colors"
                 >
-                  {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
-                  {isSaved ? 'Saved' : 'Save'}
+                  {tag.label}
                 </button>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-sm font-medium transition-colors active:scale-95 duration-100"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    Share
-                  </button>
-                  {showShareMenu && (
-                    <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 shadow-lg rounded-lg py-1 z-50">
-                      <button
-                        onClick={() => { handleCopyLink(); setShowShareMenu(false) }}
-                        className="w-full text-left px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 flex items-center gap-2 transition-colors"
-                      >
-                        {copiedLink ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
-                        {copiedLink ? 'Copied!' : 'Copy link'}
-                      </button>
-                    </div>
-                  )}
+              ))}
+            </div>
+          )}
+
+          {/* Channel + actions — single row on mobile */}
+          <div className="flex items-center justify-between gap-2 mt-3">
+            {/* Channel */}
+            <div className="flex items-center gap-2 min-w-0">
+              <div
+                className="flex items-center gap-2 cursor-pointer shrink-0"
+                onClick={() => navigate({ page: 'channel', channelId: channel.id })}
+              >
+                {channel.user.avatarUrl ? (
+                  <img
+                    src={channel.user.avatarUrl}
+                    alt={channel.channelName}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
+                    {channel.channelName[0]?.toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-zinc-900 truncate">{channel.channelName}</p>
+                  <p className="text-[11px] text-zinc-500">{formatSubscribers(channel.subscriberCount)}</p>
                 </div>
-                <FlagDialog videoId={video.id as string} />
               </div>
+              <SubscribeButton
+                channelId={channel.id}
+                initialSubscribed={false}
+                subscriberCount={channel.subscriberCount}
+              />
             </div>
 
-            {/* Stats row */}
-            <div className="flex items-center gap-2 text-xs text-zinc-600 mt-3">
-              <span className="flex items-center gap-1">
-                <Eye className="h-3.5 w-3.5" />
-                {formatViews(video.viewCount as number)} views
-              </span>
-              <span>·</span>
-              <span>{timeAgo(video.createdAt as string)}</span>
-              {format !== 'portrait' && (
-                <>
-                  <span>·</span>
-                  <span className="capitalize text-xs bg-zinc-100 px-2 py-0.5 rounded">{format}</span>
-                </>
-              )}
-            </div>
-
-            {/* Description */}
-            {description && (
-              <div className="mt-4 p-3 bg-zinc-50 rounded-lg">
-                <p className={`text-sm text-zinc-600 whitespace-pre-wrap ${!descriptionExpanded && 'line-clamp-2'}`}>
-                  {description}
-                </p>
-                {description.length > 100 && (
-                  <button
-                    onClick={() => setDescriptionExpanded(!descriptionExpanded)}
-                    className="text-xs text-zinc-600 font-medium mt-1 hover:text-zinc-900 transition-colors"
-                  >
-                    {descriptionExpanded ? 'Show less' : 'Show more'}
-                  </button>
+            {/* Action buttons — compact row */}
+            <div className="flex items-center gap-1 shrink-0">
+              <VoteButtons
+                videoId={video.id as string}
+                likeCount={video.likeCount as number}
+                dislikeCount={video.dislikeCount as number}
+                userVote={userVote}
+              />
+              <button
+                onClick={toggleSave}
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  isSaved
+                    ? 'bg-zinc-100 text-violet-600'
+                    : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200'
+                }`}
+              >
+                {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowShareMenu(!showShareMenu)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-xs font-medium transition-colors"
+                >
+                  <Share2 className="h-4 w-4" />
+                </button>
+                {showShareMenu && (
+                  <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-zinc-200 shadow-lg rounded-lg py-1 z-50">
+                    <button
+                      onClick={() => { handleCopyLink(); setShowShareMenu(false) }}
+                      className="w-full text-left px-3 py-2 text-xs text-zinc-600 hover:bg-zinc-100 flex items-center gap-2"
+                    >
+                      {copiedLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                      {copiedLink ? 'Copied!' : 'Copy link'}
+                    </button>
+                  </div>
                 )}
               </div>
-            )}
+              <FlagDialog videoId={video.id as string} />
+            </div>
+          </div>
 
-            {/* Comments */}
-            <CommentSection videoId={video.id as string} />
+          {/* Description */}
+          {description && (
+            <div className="mt-3 p-3 bg-zinc-50 rounded-lg">
+              <p className={`text-sm text-zinc-600 whitespace-pre-wrap ${!descriptionExpanded && 'line-clamp-2'}`}>
+                {description}
+              </p>
+              {description.length > 100 && (
+                <button
+                  onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                  className="text-xs text-zinc-500 font-medium mt-1 hover:text-zinc-900"
+                >
+                  {descriptionExpanded ? 'Show less' : 'Show more'}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Categories */}
+          {categories.length > 0 && (
+            <div className="mt-3">
+              <CategoryBadge categories={categories} max={5} />
+            </div>
+          )}
+
+          {/* Comments */}
+          <CommentSection videoId={video.id as string} />
+
+          {/* Related videos — below comments on mobile, right rail on desktop */}
+          <div className="lg:hidden mt-6">
+            <RelatedVideos videoId={videoId} />
           </div>
         </div>
 
-        {/* Right column: related videos */}
-        <div>
+        {/* Right column: related videos — desktop only */}
+        <div className="hidden lg:block">
           <RelatedVideos videoId={videoId} />
         </div>
       </div>
