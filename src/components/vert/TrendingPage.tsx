@@ -83,7 +83,7 @@ export function TrendingPage() {
   const gridVideos = videos.slice(1)
 
   return (
-    <div className="p-4 md:p-6 animate-vert-fade-in">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto animate-vert-fade-in">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
@@ -121,7 +121,7 @@ export function TrendingPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
@@ -178,7 +178,7 @@ export function TrendingPage() {
 
           {/* Trending grid */}
           {gridVideos.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {gridVideos.map((video, index) => (
                 <div key={video.id} className="relative">
                   <VideoCard video={video} />

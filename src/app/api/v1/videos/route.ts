@@ -71,6 +71,13 @@ export async function GET(req: NextRequest) {
               },
             },
           },
+          tags: {
+            select: {
+              tag: {
+                select: { id: true, name: true, label: true },
+              },
+            },
+          },
         },
         orderBy,
         skip,
@@ -82,6 +89,7 @@ export async function GET(req: NextRequest) {
     const formattedVideos = videos.map((v) => ({
       ...v,
       categories: v.categories.map((vc) => vc.category),
+      tags: v.tags.map((vt) => vt.tag),
     }))
 
     return NextResponse.json({
@@ -108,7 +116,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { channelId, title, description, videoUrl, thumbnailUrl, durationSeconds, aspectRatio, format, categoryIds } = body
+    const { channelId, title, description, videoUrl, thumbnailUrl, durationSeconds, aspectRatio, format, categoryIds, tags: tagNames } = body
 
     if (!channelId || !title || !videoUrl) {
       return NextResponse.json(
@@ -130,6 +138,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Channel is suspended' }, { status: 403 })
     }
 
+    // Normalize incoming tags: lowercase, strip non-alphanumeric, dedupe, cap at 8
+    const normalizedTags = Array.isArray(tagNames)
+      ? Array.from(new Set(
+          tagNames
+            .map((t: unknown) => typeof t === 'string' ? t : '')
+            .map((t: string) => t.toLowerCase().replace(/[^a-z0-9]/g, ''))
+            .filter((t: string) => t.length > 0 && t.length <= 32)
+        )).slice(0, 8) as string[]
+      : []
+
+    // Upsert tag records (create if missing) and capture their ids
+    let tagLinks: Array<{ tagId: string }> = []
+    if (normalizedTags.length > 0) {
+      const tagRecords = await Promise.all(
+        normalizedTags.map((name) =>
+          db.tag.upsert({
+            where: { name },
+            update: {},
+            create: { name, label: `#${name}` },
+          })
+        )
+      )
+      tagLinks = tagRecords.map((t) => ({ tagId: t.id }))
+    }
+
     const video = await db.video.create({
       data: {
         channelId,
@@ -148,8 +181,19 @@ export async function POST(req: NextRequest) {
               })),
             }
           : undefined,
+        tags: tagLinks.length
+          ? { create: tagLinks }
+          : undefined,
       },
     })
+
+    // Bump usageCount for any newly-attached tags
+    if (tagLinks.length > 0) {
+      await db.tag.updateMany({
+        where: { id: { in: tagLinks.map((l) => l.tagId) } },
+        data: { usageCount: { increment: 1 } },
+      })
+    }
 
     // Update channel video count
     await db.channel.update({

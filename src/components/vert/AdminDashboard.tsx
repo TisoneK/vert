@@ -228,7 +228,7 @@ export function AdminDashboard() {
                   <TrendingUp className="h-4 w-4 text-zinc-600" />
                   <h2 className="text-sm font-semibold text-zinc-900">Growth (Last 30 Days)</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   <StatCard icon={Users} label="New Users" value={analytics.growth.newUsers} color="text-violet-600" />
                   <StatCard icon={Film} label="New Videos" value={analytics.growth.newVideos} color="text-emerald-600" />
                   <StatCard icon={UserCircle} label="New Channels" value={analytics.growth.newChannels} color="text-amber-600" />
@@ -260,7 +260,7 @@ export function AdminDashboard() {
                   <h2 className="text-sm font-semibold text-zinc-900">Top 5 Videos</h2>
                 </div>
                 {analytics.topVideos.length === 0 ? (
-                  <div className="p-6 text-center text-zinc-700 text-sm">No videos yet</div>
+                  <div className="p-6 text-center text-zinc-500 text-sm">No videos.</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -297,7 +297,7 @@ export function AdminDashboard() {
                   <h2 className="text-sm font-semibold text-zinc-900">Top 5 Channels</h2>
                 </div>
                 {analytics.topChannels.length === 0 ? (
-                  <div className="p-6 text-center text-zinc-700 text-sm">No channels yet</div>
+                  <div className="p-6 text-center text-zinc-500 text-sm">No channels.</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">

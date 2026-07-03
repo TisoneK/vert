@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
+import { createNotification } from '@/lib/notifications'
 
 export async function GET(
   req: NextRequest,
@@ -66,7 +67,10 @@ export async function POST(
       return NextResponse.json({ error: 'Comment content is required' }, { status: 400 })
     }
 
-    const video = await db.video.findUnique({ where: { id: videoId } })
+    const video = await db.video.findUnique({
+      where: { id: videoId },
+      include: { channel: { select: { userId: true } } },
+    })
     if (!video || video.isRemoved) {
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
@@ -83,6 +87,18 @@ export async function POST(
         },
       },
     })
+
+    // Notify the video owner — but only if it's not them commenting on their own video.
+    if (video.channel.userId !== user.id) {
+      await createNotification({
+        userId: video.channel.userId,
+        type: 'comment',
+        title: 'New comment',
+        message: `${user.username} commented on your video: "${content.trim().slice(0, 80)}${content.trim().length > 80 ? '…' : ''}"`,
+        actorId: user.id,
+        relatedVideoId: videoId,
+      })
+    }
 
     return NextResponse.json(comment, { status: 201 })
   } catch (error) {
