@@ -144,7 +144,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const description = video.description as string | null
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6 animate-vert-fade-in">
+    <div className="max-w-5xl mx-auto p-4 md:p-6 animate-vert-fade-in">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 mb-3 text-xs text-zinc-600">
         <button onClick={() => navigate({ page: 'home' })} className="hover:text-zinc-700 transition-colors">Home</button>
@@ -163,7 +163,9 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
         <span className="text-zinc-600 truncate max-w-[200px]">{video.title as string}</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+      <div className={`grid grid-cols-1 gap-6 ${
+        format === 'portrait' ? 'lg:grid-cols-[1fr_300px]' : 'lg:grid-cols-[1fr_320px]'
+      }`}>
         {/* Left column: player + info */}
         <div>
           {/* Video player */}

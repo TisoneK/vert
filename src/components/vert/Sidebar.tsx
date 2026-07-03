@@ -95,13 +95,12 @@ export function Sidebar({ collapsed }: SidebarProps) {
   const mainNavItems = [
     { icon: Home, label: 'Home', action: () => navigate({ page: 'home' }), active: isActive('home') },
     { icon: Compass, label: 'Explore', action: () => navigate({ page: 'explore' }), active: isActive('explore') },
-    { icon: Clock, label: 'Watch Later', action: () => navigate({ page: 'saved' }), active: isActive('saved') },
     { icon: Flame, label: 'Trending', action: () => navigate({ page: 'trending' }), active: isActive('trending') },
   ]
 
   const personalNavItems = user ? [
     { icon: Clock, label: 'History', action: () => navigate({ page: 'history' }), active: isActive('history') },
-    { icon: Bookmark, label: 'Watch Later', action: () => navigate({ page: 'saved' }), active: isActive('saved') },
+    { icon: Bookmark, label: 'Saved', action: () => navigate({ page: 'saved' }), active: isActive('saved') },
   ] : []
 
   const footerItems = [
