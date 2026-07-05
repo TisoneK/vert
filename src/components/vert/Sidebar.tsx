@@ -20,12 +20,7 @@ import {
   Newspaper,
   Monitor,
   Cpu,
-  Utensils,
-  Palette,
-  Dumbbell,
-  Sparkles,
   Mail,
-  type LucideIcon,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -41,7 +36,7 @@ interface SidebarChannel {
   user: { avatarUrl: string | null }
 }
 
-const categoryIconMap: Record<string, LucideIcon> = {
+const categoryIconMap: Record<string, React.ElementType> = {
   music: Music,
   sports: Trophy,
   gaming: Gamepad2,
@@ -49,11 +44,11 @@ const categoryIconMap: Record<string, LucideIcon> = {
   news: Newspaper,
   tech: Cpu,
   education: Monitor,
-  comedy: Sparkles,
+  comedy: Film,
   travel: Compass,
-  food: Utensils,
-  fitness: Dumbbell,
-  art: Palette,
+  food: Film,
+  fitness: Trophy,
+  art: Film,
   other: Film,
 }
 

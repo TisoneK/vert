@@ -87,23 +87,21 @@ export function TrendingPage() {
     <div className="p-4 md:p-6 max-w-5xl mx-auto animate-vert-fade-in">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-2 mb-1.5">
-          <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
-            <Flame className="h-4 w-4 text-orange-500" />
-          </div>
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Trending</h1>
+        <div className="flex items-center gap-2 mb-1">
+          <Flame className="h-5 w-5 text-orange-500" />
+          <h1 className="text-xl font-bold text-zinc-900">Trending</h1>
         </div>
-        <p className="text-zinc-500 text-sm ml-10">What&apos;s hot right now on Vert</p>
+        <p className="text-zinc-500 text-sm">What&apos;s hot right now on Vert</p>
       </div>
 
       {/* Category filter tabs */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-6 shelf-scroll">
         <button
           onClick={() => handleCategoryFilter(null)}
-          className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
+          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
             !activeCategory
-              ? 'bg-zinc-900 text-white'
-              : 'bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:border-zinc-300'
+              ? 'bg-violet-600 text-white'
+              : 'bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
           }`}
         >
           All
@@ -112,10 +110,10 @@ export function TrendingPage() {
           <button
             key={cat.slug}
             onClick={() => handleCategoryFilter(cat.slug)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
               activeCategory === cat.slug
-                ? 'bg-zinc-900 text-white'
-                : 'bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:border-zinc-300'
+                ? 'bg-violet-600 text-white'
+                : 'bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
             {cat.name}
@@ -142,39 +140,36 @@ export function TrendingPage() {
           {/* Hero section with top trending video */}
           {heroVideo && (
             <div
-              className="relative mb-8 rounded-xl overflow-hidden cursor-pointer group shadow-md hover:shadow-xl transition-all duration-200 ring-1 ring-zinc-200/60"
+              className="relative mb-8 rounded-lg overflow-hidden cursor-pointer group shadow-sm hover:shadow-md transition-all duration-200"
               onClick={() => navigate({ page: 'video', videoId: heroVideo.id })}
             >
               <div className="aspect-video bg-zinc-200">
                 {heroVideo.thumbnailUrl ? (
                   <img src={heroVideo.thumbnailUrl} alt={heroVideo.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-zinc-200 to-zinc-300 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-md">
-                      <Play className="h-7 w-7 text-zinc-700 fill-zinc-700 ml-0.5" />
-                    </div>
+                  <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
+                    <Play className="h-10 w-10 text-zinc-500" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-500 text-white rounded-full text-[11px] font-bold uppercase tracking-wide">
-                      <Flame className="h-3 w-3" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="px-2 py-0.5 bg-orange-500 text-white rounded text-[10px] font-bold uppercase tracking-wide">
                       #1 Trending
                     </span>
                     {heroVideo.categories?.slice(0, 2).map((cat) => (
                       <span
                         key={cat.slug}
-                        className="px-2 py-0.5 bg-white/15 backdrop-blur-sm text-white rounded-full text-[11px] font-medium border border-white/10"
+                        className="px-2 py-0.5 bg-white/15 backdrop-blur-sm text-white rounded-full text-[11px] font-medium"
                       >
                         {cat.name}
                       </span>
                     ))}
                   </div>
-                  <h2 className="text-lg md:text-2xl font-bold text-white mb-2 leading-tight line-clamp-2">
+                  <h2 className="text-lg md:text-xl font-bold text-white mb-1 leading-tight line-clamp-2">
                     {heroVideo.title}
                   </h2>
-                  <p className="text-zinc-200 text-sm">
+                  <p className="text-zinc-300 text-sm">
                     {heroVideo.channel.channelName} · {formatViews(heroVideo.viewCount)} views
                   </p>
                 </div>
@@ -188,7 +183,7 @@ export function TrendingPage() {
               {gridVideos.map((video, index) => (
                 <div key={video.id} className="relative">
                   <VideoCard video={video} />
-                  <div className="absolute top-2 left-2 bg-zinc-900/85 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
+                  <div className="absolute top-1.5 left-1.5 bg-zinc-900/75 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                     #{index + 2}
                   </div>
                 </div>

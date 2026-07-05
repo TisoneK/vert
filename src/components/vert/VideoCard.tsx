@@ -78,10 +78,8 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
             className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-100 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-200">
-              <Play className="h-5 w-5 text-zinc-700 fill-zinc-700 ml-0.5" />
-            </div>
+          <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
+            <Play className="h-8 w-8 text-zinc-500" />
           </div>
         )}
 
@@ -111,9 +109,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
 
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 shadow-md transition-all duration-200">
-            <Play className="h-5 w-5 text-zinc-900 fill-zinc-900 ml-0.5" />
-          </div>
+          <Play className="h-8 w-8 text-white opacity-0 group-hover:opacity-80 transition-opacity duration-200" />
         </div>
 
         {/* Context menu button */}
