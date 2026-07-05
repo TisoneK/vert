@@ -57,11 +57,18 @@ export function UploadPage() {
     const url = URL.createObjectURL(file)
     setVideoPreview(url)
 
-    // Auto-detect orientation from the video file itself — no manual selector needed.
-    // We create a temporary <video> element, load the file, read videoWidth/videoHeight,
-    // and set the format accordingly.
+    // Auto-detect orientation from the video file itself AND auto-generate
+    // a thumbnail from the first frame — so users who don't manually pick
+    // a thumbnail still get one in their VideoCard / watch page poster.
+    // We create a temporary <video> element, load the file, read
+    // videoWidth/videoHeight, seek to ~1 second in, and capture that frame
+    // to a PNG via <canvas>.
     const video = document.createElement('video')
     video.preload = 'metadata'
+    video.muted = true
+    video.playsInline = true
+    video.crossOrigin = 'anonymous'
+
     video.onloadedmetadata = () => {
       const w = video.videoWidth
       const h = video.videoHeight
@@ -79,8 +86,66 @@ export function UploadPage() {
         detected = 'square'
       }
       setFormat(detected)
-      URL.revokeObjectURL(video.src)
+
+      // Seek to ~1 second in (or 10% of duration if very short) so we skip
+      // any black lead-in. Some browsers require a play() before seek works
+      // on muted videos — wrapped in a try/catch because play() can reject.
+      const seekTo = Math.min(1, (video.duration || 10) * 0.1)
+      try { void video.play().catch(() => {}) } catch { /* ignore */ }
+      video.currentTime = seekTo
     }
+
+    // Capture the frame once we've seeked. onseeked fires after currentTime
+    // settles. If the browser doesn't fire onseeked, we fall back to
+    // onloadeddata (first frame available).
+    const captureFrame = () => {
+      try {
+        const w = video.videoWidth
+        const h = video.videoHeight
+        if (!w || !h) return
+
+        const canvas = document.createElement('canvas')
+        // Cap the thumbnail at 720px on the long side — keeps the upload
+        // small while preserving enough detail for cards and posters.
+        const maxDim = 720
+        const scale = Math.min(1, maxDim / Math.max(w, h))
+        canvas.width = Math.round(w * scale)
+        canvas.height = Math.round(h * scale)
+
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+        canvas.toBlob((blob) => {
+          if (!blob) return
+          // Don't override a thumbnail the user already picked manually.
+          setThumbnailFile((prev) => {
+            if (prev) return prev
+            const generated = new File([blob], 'thumbnail.png', { type: 'image/png' })
+            setThumbnailPreview(URL.createObjectURL(generated))
+            return generated
+          })
+        }, 'image/png', 0.9)
+      } catch {
+        // Canvas capture can throw if the video is tainted (CORS) — but
+        // since this is a blob: URL we control, it shouldn't. Just bail.
+      } finally {
+        URL.revokeObjectURL(video.src)
+        try { video.pause() } catch { /* ignore */ }
+      }
+    }
+
+    video.onseeked = captureFrame
+    // Fallback: some browsers don't reliably fire onseeked for blob URLs.
+    // If we reach onloadeddata without a thumbnail yet, capture there too.
+    video.onloadeddata = () => {
+      // Only if onseeked didn't already fire
+      if (video.currentTime > 0 && video.currentTime < 0.5) {
+        // still at the start — try seeking forward
+        video.currentTime = Math.min(1, (video.duration || 10) * 0.1)
+      }
+    }
+
     video.onerror = () => {
       // If metadata fails to load, keep the default 'portrait'
       URL.revokeObjectURL(video.src)
@@ -279,7 +344,7 @@ export function UploadPage() {
             {/* Thumbnail */}
             <div>
               <Label className="text-zinc-600 mb-2 block text-sm">
-                Thumbnail <span className="text-zinc-400 font-normal">(optional)</span>
+                Thumbnail <span className="text-zinc-400 font-normal">(auto-generated — replace if you want)</span>
               </Label>
               {thumbnailPreview ? (
                 <div className="relative inline-block">

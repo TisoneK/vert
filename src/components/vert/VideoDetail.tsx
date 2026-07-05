@@ -153,6 +153,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
           thumbnailUrl={video.thumbnailUrl as string | null}
           title={video.title as string}
           format={format}
+          videoId={video.id as string}
         />
       </div>
 

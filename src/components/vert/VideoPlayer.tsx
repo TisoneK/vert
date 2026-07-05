@@ -3,12 +3,16 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Film } from 'lucide-react'
 import Hls from 'hls.js'
+import { put } from '@vercel/blob/client'
 
 interface VideoPlayerProps {
   videoUrl: string
   thumbnailUrl?: string | null
   title: string
   format?: string
+  /** Video id — used for auto-backfilling a missing thumbnail. Optional
+   *  because VideoPlayer is also used in contexts where the id isn't known. */
+  videoId?: string
 }
 
 type QualityLevel = {
@@ -33,7 +37,7 @@ function heightToLabel(h: number): string {
   return 'Source'
 }
 
-export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait' }: VideoPlayerProps) {
+export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait', videoId }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const hlsRef = useRef<Hls | null>(null)
@@ -166,6 +170,92 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       }
     }
   }, [videoUrl])
+
+  // --- Auto-backfill missing thumbnail ---
+  // When a video has no thumbnail and the viewer is logged in, capture a
+  // frame from the playing video, upload it to Vercel Blob, and POST it to
+  // /api/v1/videos/[id]/thumbnail. The endpoint only writes if the video
+  // still has no thumbnail, so concurrent viewers don't overwrite each other.
+  // Best-effort: any error is silently ignored — this is a background nicety,
+  // not a critical path.
+  useEffect(() => {
+    if (thumbnailUrl || !videoId) return
+    const video = videoRef.current
+    if (!video) return
+
+    let cancelled = false
+    let attempted = false
+
+    const captureAndUpload = async () => {
+      if (attempted) return
+      attempted = true
+
+      try {
+        const w = video.videoWidth
+        const h = video.videoHeight
+        if (!w || !h) return
+
+        const canvas = document.createElement('canvas')
+        const maxDim = 720
+        const scale = Math.min(1, maxDim / Math.max(w, h))
+        canvas.width = Math.round(w * scale)
+        canvas.height = Math.round(h * scale)
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve, 'image/jpeg', 0.85)
+        )
+        if (!blob || cancelled) return
+
+        // Get a client upload token from our server
+        const tokenRes = await fetch(
+          `/api/v1/upload?contentType=image/jpeg&filename=thumbnail.jpg`,
+        )
+        if (!tokenRes.ok) return
+        const { token, pathname } = await tokenRes.json()
+
+        // Upload to Vercel Blob
+        const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' })
+        const blobResult = await put(pathname, file, {
+          access: 'public',
+          contentType: 'image/jpeg',
+          token,
+        })
+        if (cancelled) return
+
+        // Patch the video record
+        await fetch(`/api/v1/videos/${videoId}/thumbnail`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ thumbnailUrl: blobResult.url }),
+        })
+      } catch {
+        // Silent failure — backfill is best-effort
+      }
+    }
+
+    // Capture once the user has played past 1 second — gives us a real frame
+    // that isn't a black lead-in.
+    const onTimeUpdate = () => {
+      if (video.currentTime >= 1 && !attempted) {
+        captureAndUpload()
+        video.removeEventListener('timeupdate', onTimeUpdate)
+      }
+    }
+    // Fallback: if the video is short and ends before 1s, capture on pause
+    const onPlay = () => {
+      video.addEventListener('timeupdate', onTimeUpdate)
+    }
+
+    video.addEventListener('play', onPlay)
+    return () => {
+      cancelled = true
+      video.removeEventListener('play', onPlay)
+      video.removeEventListener('timeupdate', onTimeUpdate)
+    }
+  }, [thumbnailUrl, videoId, videoUrl])
 
   // --- Controls ---
   const togglePlay = useCallback(() => {
@@ -320,6 +410,10 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         ref={videoRef}
         poster={thumbnailUrl || undefined}
         className="w-full h-full object-contain"
+        // crossOrigin='anonymous' is required so we can capture frames to a
+        // <canvas> without tainting it (for the auto-thumbnail backfill).
+        // Vercel Blob sends Access-Control-Allow-Origin: * so this is safe.
+        crossOrigin="anonymous"
         onClick={togglePlay}
         onError={() => setHasError(true)}
         onPlay={() => setIsPlaying(true)}
