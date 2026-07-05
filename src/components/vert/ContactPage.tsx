@@ -70,7 +70,7 @@ export function ContactPage() {
               onChange={(e) => setName(e.target.value)}
               required
               placeholder="Your name"
-              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-colors"
+              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent transition-colors"
             />
           </div>
           <div>
@@ -81,7 +81,7 @@ export function ContactPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="you@example.com"
-              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-colors"
+              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent transition-colors"
             />
           </div>
         </div>
@@ -93,7 +93,7 @@ export function ContactPage() {
             onChange={(e) => setMessage(e.target.value)}
             required
             placeholder="What's on your mind?"
-            className="bg-zinc-50 border-zinc-200 text-zinc-900 placeholder:text-zinc-400 min-h-[120px] resize-none text-sm focus-visible:ring-zinc-900"
+            className="bg-zinc-50 border-zinc-200 text-zinc-900 placeholder:text-zinc-400 min-h-[120px] resize-none text-sm focus-visible:ring-violet-600"
           />
         </div>
 
