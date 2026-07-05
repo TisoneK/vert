@@ -95,13 +95,15 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
   return (
     <div className="max-w-5xl mx-auto animate-vert-fade-in">
       {/* Banner */}
-      <div className="h-32 md:h-48 bg-white relative">
-        {channel.bannerUrl && (
+      <div className="h-32 md:h-48 relative overflow-hidden">
+        {channel.bannerUrl ? (
           <img
             src={channel.bannerUrl}
             alt={channel.channelName}
             className="w-full h-full object-cover"
           />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-violet-100 via-violet-50 to-zinc-100" />
         )}
       </div>
 

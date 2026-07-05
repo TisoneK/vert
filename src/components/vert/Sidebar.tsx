@@ -229,7 +229,11 @@ export function Sidebar({ collapsed }: SidebarProps) {
                   <button
                     key={ch.id}
                     onClick={() => navigate({ page: 'channel', channelId: ch.id })}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                    className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
+                      currentView.page === 'channel' && (currentView as { channelId: string }).channelId === ch.id
+                        ? 'bg-violet-50 text-violet-700 font-semibold'
+                        : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50'
+                    }`}
                   >
                     {ch.user.avatarUrl ? (
                       <img src={ch.user.avatarUrl} alt={ch.channelName} className="w-5 h-5 rounded-full object-cover" />
