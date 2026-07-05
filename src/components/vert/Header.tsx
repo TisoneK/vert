@@ -56,14 +56,14 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onToggleMobileDrawer}
-            className="md:hidden p-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+            className="md:hidden p-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
           </button>
           <button
             onClick={onToggleSidebar}
-            className="hidden md:block p-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+            className="hidden md:block p-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
             aria-label="Toggle sidebar"
           >
             <Menu className="h-5 w-5" />
@@ -96,7 +96,7 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
           {/* Mobile search toggle */}
           <button
             onClick={() => setShowMobileSearch(!showMobileSearch)}
-            className="md:hidden p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+            className="md:hidden p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
             aria-label="Search"
           >
             <Search className="h-5 w-5" />
@@ -106,7 +106,7 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
             <>
               <button
                 onClick={() => navigate({ page: 'upload' })}
-                className="p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+                className="p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
                 aria-label="Upload video"
               >
                 <Upload className="h-5 w-5" />
@@ -122,7 +122,7 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
             <div ref={profileRef} className="relative">
               <button
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center gap-2 p-1.5 hover:bg-zinc-100 rounded-lg transition-colors"
+                className="flex items-center gap-2 p-1.5 hover:bg-zinc-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
               >
                 <div className="w-7 h-7 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
                   {user.username[0]?.toUpperCase()}

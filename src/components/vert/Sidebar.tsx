@@ -116,9 +116,9 @@ export function Sidebar({ collapsed }: SidebarProps) {
               <TooltipTrigger asChild>
                 <button
                   onClick={item.action}
-                  className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
+                  className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
                     item.active
-                      ? 'bg-zinc-100 text-zinc-900'
+                      ? 'bg-violet-50 text-violet-700'
                       : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-100'
                   }`}
                 >
@@ -136,9 +136,9 @@ export function Sidebar({ collapsed }: SidebarProps) {
               <TooltipTrigger asChild>
                 <button
                   onClick={item.action}
-                  className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
+                  className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
                     item.active
-                      ? 'bg-zinc-100 text-zinc-900'
+                      ? 'bg-violet-50 text-violet-700'
                       : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-100'
                   }`}
                 >
@@ -155,7 +155,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
               <TooltipTrigger asChild>
                 <button
                   onClick={item.action}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-lg text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
                 >
                   <item.icon className="h-5 w-5" />
                 </button>
@@ -176,9 +176,9 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <button
             key={item.label}
             onClick={item.action}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
               item.active
-                ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                ? 'bg-violet-50 text-violet-700 font-semibold'
                 : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
@@ -197,9 +197,9 @@ export function Sidebar({ collapsed }: SidebarProps) {
               <button
                 key={item.label}
                 onClick={item.action}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
                   item.active
-                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    ? 'bg-violet-50 text-violet-700 font-semibold'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
@@ -218,7 +218,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <div>
             <button
               onClick={() => setChannelsExpanded(!channelsExpanded)}
-              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold outline-none text-zinc-800 uppercase tracking-wider"
+              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 text-zinc-800 uppercase tracking-wider"
             >
               Popular Channels
               {channelsExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -254,7 +254,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <div>
             <button
               onClick={() => setCategoriesExpanded(!categoriesExpanded)}
-              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold outline-none text-zinc-800 uppercase tracking-wider"
+              className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 text-zinc-800 uppercase tracking-wider"
             >
               Categories
               {categoriesExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -267,7 +267,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
                     <button
                       key={cat.id}
                       onClick={() => navigate({ page: 'category', slug: cat.slug })}
-                      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm outline-none transition-colors ${
+                      className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 transition-colors ${
                         currentView.page === 'category' && (currentView as { slug: string }).slug === cat.slug
                           ? 'bg-violet-50 text-zinc-900'
                           : 'text-zinc-800 hover:text-zinc-900 hover:bg-zinc-50'
@@ -299,9 +299,9 @@ export function Sidebar({ collapsed }: SidebarProps) {
             {user.channelId && (
               <button
                 onClick={() => navigate({ page: 'creator-studio' })}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
                   currentView.page === 'creator-studio'
-                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    ? 'bg-violet-50 text-violet-700 font-semibold'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
@@ -312,9 +312,9 @@ export function Sidebar({ collapsed }: SidebarProps) {
             {user.role === 'admin' && (
               <button
                 onClick={() => navigate({ page: 'admin' })}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
                   currentView.page === 'admin'
-                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                    ? 'bg-violet-50 text-violet-700 font-semibold'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                 }`}
               >
