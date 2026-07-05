@@ -78,7 +78,7 @@ export function ProfilePage() {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto">
-        <div className="h-32 md:h-44 bg-zinc-200 animate-pulse" />
+        <div className="h-24 md:h-36 bg-zinc-200 animate-pulse" />
         <div className="px-4 md:px-6 py-4">
           <div className="flex gap-4">
             <div className="w-20 h-20 rounded-full bg-zinc-200 animate-pulse" />
@@ -116,7 +116,7 @@ export function ProfilePage() {
   if (!channel) {
     return (
       <div className="max-w-5xl mx-auto animate-vert-fade-in">
-        <div className="h-32 md:h-44 bg-gradient-to-br from-violet-100 via-violet-50 to-zinc-100" />
+        <div className="h-24 md:h-36 bg-gradient-to-br from-violet-100 via-violet-50 to-zinc-100" />
         <div className="px-4 md:px-6 py-4">
           <div className="flex items-start gap-4">
             <div className="shrink-0 -mt-8">
@@ -147,7 +147,7 @@ export function ProfilePage() {
   return (
     <div className="max-w-5xl mx-auto animate-vert-fade-in">
       {/* Profile header */}
-      <div className="h-32 md:h-44 relative overflow-hidden">
+      <div className="h-24 md:h-36 relative overflow-hidden">
         {channel.bannerUrl ? (
           <img
             src={channel.bannerUrl}

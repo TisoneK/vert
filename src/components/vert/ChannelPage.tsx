@@ -40,7 +40,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto">
-        <div className="h-32 md:h-48 bg-zinc-200 animate-pulse" />
+        <div className="h-24 md:h-36 bg-zinc-200 animate-pulse" />
         <div className="px-4 md:px-6 py-4">
           <div className="flex gap-4">
             <div className="w-20 h-20 rounded-full bg-zinc-200 animate-pulse" />
@@ -95,7 +95,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
   return (
     <div className="max-w-5xl mx-auto animate-vert-fade-in">
       {/* Banner */}
-      <div className="h-32 md:h-48 relative overflow-hidden">
+      <div className="h-24 md:h-36 relative overflow-hidden">
         {channel.bannerUrl ? (
           <img
             src={channel.bannerUrl}
@@ -105,6 +105,13 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-violet-100 via-violet-50 to-zinc-100" />
         )}
+        <button
+          onClick={() => navigate({ page: 'home' })}
+          className="absolute top-3 left-3 flex items-center gap-1.5 text-xs font-medium text-zinc-700 bg-white/80 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white hover:text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to feed
+        </button>
       </div>
 
       {/* Channel info */}
@@ -123,25 +130,27 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
               </div>
             )}
           </div>
-          <div className="flex-1 pt-1">
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-xl md:text-2xl font-bold text-zinc-900">
-                {channel.channelName}
-              </h1>
-              <svg className="w-4 h-4 text-violet-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-              </svg>
+          <div className="flex-1 pt-1 flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <h1 className="text-xl md:text-2xl font-bold text-zinc-900">
+                  {channel.channelName}
+                </h1>
+                <svg className="w-4 h-4 text-violet-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                </svg>
+              </div>
+              <p className="text-zinc-600 text-sm mt-0.5">
+                @{channel.user.username} · {channel.videoCount} videos · {formatSubscribers(channel.subscriberCount)}
+              </p>
             </div>
-            <p className="text-zinc-600 text-sm mt-0.5">
-              @{channel.user.username} · {channel.videoCount} videos · {formatSubscribers(channel.subscriberCount)}
-            </p>
-          </div>
-          <div className="shrink-0 mt-1">
-            <SubscribeButton
-              channelId={channel.id}
-              initialSubscribed={false}
-              subscriberCount={channel.subscriberCount}
-            />
+            <div className="shrink-0">
+              <SubscribeButton
+                channelId={channel.id}
+                initialSubscribed={false}
+                subscriberCount={channel.subscriberCount}
+              />
+            </div>
           </div>
         </div>
 
@@ -154,17 +163,6 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
             <p className="text-red-600 text-sm font-medium">This channel has been suspended</p>
           </div>
         )}
-      </div>
-
-      {/* Breadcrumb */}
-      <div className="px-4 md:px-6 mb-4">
-        <button
-          onClick={() => navigate({ page: 'home' })}
-          className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-700 transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to feed
-        </button>
       </div>
 
       {/* Videos */}

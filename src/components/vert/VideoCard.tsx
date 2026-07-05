@@ -56,9 +56,12 @@ function FormatIcon({ format }: { format: string }) {
 export function VideoCard({ video, watchProgress, showContextMenu = true, onContextMenuAction }: VideoCardProps) {
   const { navigate } = useNavigation()
   const [showMenu, setShowMenu] = useState(false)
+  const [thumbnailFailed, setThumbnailFailed] = useState(false)
+  const [avatarFailed, setAvatarFailed] = useState(false)
 
   const format = video.format || 'portrait'
   const aspectClass = format === 'landscape' ? 'aspect-video' : format === 'square' ? 'aspect-square' : 'aspect-[9/16]'
+  const showThumbnail = video.thumbnailUrl && !thumbnailFailed
 
   return (
     <div
@@ -67,10 +70,11 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
     >
       {/* Thumbnail container */}
       <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200`}>
-        {video.thumbnailUrl ? (
+        {showThumbnail ? (
           <img
-            src={video.thumbnailUrl}
+            src={video.thumbnailUrl!}
             alt={video.title}
+            onError={() => setThumbnailFailed(true)}
             className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
           />
         ) : (
@@ -156,10 +160,11 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       <div className="mt-2 flex gap-2">
         {/* Channel avatar */}
         <div className="shrink-0 mt-0.5">
-          {video.channel.user.avatarUrl ? (
+          {video.channel.user.avatarUrl && !avatarFailed ? (
             <img
               src={video.channel.user.avatarUrl}
               alt={video.channel.channelName}
+              onError={() => setAvatarFailed(true)}
               className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
