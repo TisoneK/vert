@@ -145,25 +145,29 @@ export function HomeFeed() {
         <section className="mb-8">
           <h2 className="text-sm font-semibold text-zinc-900 mb-3">Featured</h2>
           <div
-            className="relative aspect-video rounded-lg overflow-hidden bg-zinc-200 cursor-pointer group"
+            className="relative aspect-video rounded-xl overflow-hidden bg-zinc-200 cursor-pointer group ring-1 ring-zinc-200/60 shadow-sm hover:shadow-md transition-shadow"
             onClick={() => navigate({ page: 'video', videoId: trendingVideos[0].id })}
           >
             {trendingVideos[0].thumbnailUrl ? (
               <img
                 src={trendingVideos[0].thumbnailUrl}
                 alt={trendingVideos[0].title}
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
               />
             ) : (
-              <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
-                <Play className="h-10 w-10 text-zinc-400" />
+              <div className="w-full h-full bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-100 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-md">
+                  <Play className="h-6 w-6 text-zinc-700 fill-zinc-700 ml-0.5" />
+                </div>
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <span className="inline-block px-2 py-0.5 bg-violet-600 text-white rounded text-[10px] font-bold uppercase mb-2">Featured</span>
-              <h3 className="text-lg font-bold text-white line-clamp-1">{trendingVideos[0].title}</h3>
-              <p className="text-sm text-zinc-300 mt-0.5">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+              <span className="inline-block px-2 py-0.5 bg-violet-600 text-white rounded-full text-[10px] font-bold uppercase tracking-wide mb-2">
+                Featured
+              </span>
+              <h3 className="text-lg md:text-xl font-bold text-white line-clamp-1 leading-tight">{trendingVideos[0].title}</h3>
+              <p className="text-sm text-zinc-200 mt-1">
                 {trendingVideos[0].channel.channelName} · {formatViews(trendingVideos[0].viewCount)} views
               </p>
             </div>
@@ -238,11 +242,13 @@ export function HomeFeed() {
       {/* Empty state */}
       {videos.length === 0 && trendingVideos.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-14 h-14 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
-            <Film className="h-6 w-6 text-zinc-400" />
+          <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
+            <Film className="h-7 w-7 text-zinc-400" />
           </div>
           <h2 className="text-base font-semibold text-zinc-900">Nothing here yet</h2>
-          <p className="text-sm text-zinc-500 mt-1">Check back later.</p>
+          <p className="text-sm text-zinc-500 mt-1.5 max-w-xs">
+            No videos have been uploaded yet. Be the first to share something!
+          </p>
         </div>
       )}
     </div>

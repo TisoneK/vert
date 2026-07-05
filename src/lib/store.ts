@@ -48,11 +48,13 @@ export function viewToPath(view: View): string {
       return '/trending'
     case 'explore':
       return '/explore'
+    case 'contact':
+      return '/contact'
     case 'home':
       return '/'
     default:
       // Account-state views (upload/profile/admin/login/signup/history/saved/
-      // playlists/creator-studio/contact) stay on the root shell.
+      // playlists/creator-studio) stay on the root shell.
       return '/'
   }
 }
@@ -68,6 +70,7 @@ export function pathToView(pathname: string): View | null {
   if (path === '/') return { page: 'home' }
   if (path === '/trending') return { page: 'trending' }
   if (path === '/explore') return { page: 'explore' }
+  if (path === '/contact') return { page: 'contact' }
 
   const watchMatch = path.match(/^\/watch\/(.+)$/)
   if (watchMatch) return { page: 'video', videoId: decodeURIComponent(watchMatch[1]) }

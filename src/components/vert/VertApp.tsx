@@ -95,10 +95,32 @@ export function VertApp() {
   // Unauthed visitors on the home page see the landing page immediately —
   // don't block on the session check. If the user turns out to be logged in,
   // the store updates and this re-renders to the app shell.
-  // Deep links (/watch/<id>, etc.) still wait for the session check so we
-  // know whether to show save/vote UI.
+  // Deep links (/watch/<id>, /contact, etc.) still wait for the session check
+  // so we know whether to show save/vote UI on watch pages.
   if (!user && currentView.page === 'home') {
     return <LandingPage />
+  }
+
+  // The contact page is the only deep link that doesn't require auth —
+  // skip the spinner and render it immediately for logged-out visitors so
+  // they don't stare at a loading state just to send us a message. The
+  // ContactPage itself includes a back-to-home link.
+  if (!user && currentView.page === 'contact') {
+    return (
+      <div className="min-h-screen bg-white">
+        <header className="border-b border-zinc-100">
+          <div className="max-w-5xl mx-auto px-4 h-14 flex items-center">
+            <button
+              onClick={() => navigate({ page: 'home' })}
+              className="flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 rounded"
+            >
+              <span className="text-lg font-bold text-zinc-900 tracking-tight">Vert</span>
+            </button>
+          </div>
+        </header>
+        <ContactPage />
+      </div>
+    )
   }
 
   // For deep-link routes, show a minimal spinner while we check the session.
