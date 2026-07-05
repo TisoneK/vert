@@ -121,7 +121,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
-            className="appearance-none bg-transparent text-xs text-zinc-600 pr-4 pl-2 py-1 cursor-pointer hover:text-zinc-800 focus:outline-none"
+            className="appearance-none bg-transparent text-xs text-zinc-600 pr-4 pl-2 py-1 rounded cursor-pointer hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
           >
             <option value="top">Top comments</option>
             <option value="newest">Newest first</option>
@@ -210,22 +210,19 @@ export function CommentSection({ videoId }: CommentSectionProps) {
                 <div className="flex items-center gap-3 mt-1.5">
                   <button
                     onClick={() => toggleCommentLike(comment.id)}
-                    className={`flex items-center gap-1 text-[11px] transition-colors ${
+                    className={`flex items-center gap-1 text-[11px] transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
                       likedComments.has(comment.id) ? 'text-violet-600' : 'text-zinc-600 hover:text-zinc-800'
                     }`}
                   >
                     <ThumbsUp className="h-3 w-3" />
                     {likedComments.has(comment.id) ? '1' : ''}
                   </button>
-                  <button className="text-[11px] text-zinc-600 hover:text-zinc-800 transition-colors font-medium">
-                    Reply
-                  </button>
                 </div>
               </div>
               {user && (user.id === comment.user.id || user.role === 'admin') && (
                 <button
                   onClick={() => handleDelete(comment.id)}
-                  className="shrink-0 text-zinc-500 hover:text-red-600 transition-colors p-1 opacity-0 group-hover:opacity-100"
+                  className="shrink-0 text-zinc-500 hover:text-red-600 transition-colors p-1 rounded opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
