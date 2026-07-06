@@ -21,6 +21,8 @@ details (file references, API routes, commit hashes), see
 - **Consistent focus indicators.** All buttons, links, inputs, selects, and textareas now show a violet focus ring when navigated to by keyboard, making the app noticeably easier to use without a mouse.
 
 ### Changed
+- **Portrait videos now fill the mobile screen like YouTube Shorts.** The video player was previously capped at 55% of viewport height, making it small and narrow with big empty margins. It now fills 100% of the screen width on mobile, with the height following from the 9:16 aspect ratio — the same behavior as Shorts, Reels, and TikTok. On desktop, portrait videos are constrained to a max width of 420px so they don't get absurdly tall.
+- **Portrait video thumbnails are no longer squished into landscape boxes.** The related-videos sidebar and watch-history list were always using 16:9 thumbnails regardless of the video's actual format, making portrait video thumbnails look stretched and weird. They now use the correct 9:16 aspect ratio for portrait videos.
 - **Homepage and trending heroes are smaller.** Capped at 42% of viewport height (was uncapped, ~675px on desktop). Users now immediately see the start of the next section below the fold instead of the hero dominating the entire first screen.
 - **Hero text is more readable.** Gradient overlay strengthened and drop-shadows added to the title and channel name so they stay legible on bright thumbnails.
 - **Featured and #1 Trending badges are smaller and semi-transparent** so they don't compete with the video title for attention.

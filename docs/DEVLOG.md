@@ -12,6 +12,27 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Portrait video fills mobile screen; thumbnails respect format
+**Commit:** `fd4f0a3`
+
+Two issues from user feedback about portrait video on mobile:
+
+**Portrait player too small.** `VideoPlayer.tsx` — the portrait player was capped at `maxHeight: 55vh` with `maxWidth: calc(55vh * 0.5625)`. On a 390×844 phone that gave a ~261×464px player centered in a 390px-wide screen, leaving ~65px empty margins on each side. YouTube Shorts / Instagram Reels / Facebook Reels fill the full screen width instead.
+
+Fix: portrait player now uses `width: 100%` with no maxHeight cap. The height follows from the `aspectRatio` CSS property (set from `videoAspectRatio` once metadata loads, or `9/16` as fallback via the `format` prop). The watch page scrolls, so title + actions + comments live below the fold — which is the expected behavior for portrait video on mobile (Shorts, Reels, TikTok all work this way).
+
+On desktop, a 9:16 video at 1024px wide (the `max-w-5xl` container) would be 1820px tall — absurdly tall. Added `md:max-w-[420px] md:mx-auto` to the outer wrapper for portrait videos, giving a ~747px-tall player on desktop (tall but reasonable). The `format === 'portrait'` check covers the case where `videoAspectRatio` isn't loaded yet.
+
+Also applied the same wrapper constraint to the error state.
+
+**Portrait thumbnails squished into landscape.** `RelatedVideos.tsx` and `HistoryPage.tsx` — both always used `aspect-video` (16:9) for thumbnails regardless of the video's actual format. Portrait video thumbnails were being object-cover'd into 16:9 boxes, cropping the sides and looking weird.
+
+Fix: both now check `video.format` and use `aspect-[9/16]` for portrait, `aspect-square` for square, `aspect-video` for landscape. The thumbnail width stays fixed (`w-32`); the height follows from the aspect ratio.
+
+`HistoryPage.tsx` — added `format?: string` to the `HistoryEntry.video` interface. The history API already returns `format` (it does `include: { video: { include: { channel } } }` without a `select`, so all video fields come back), it just wasn't typed.
+
+`VideoCard.tsx` — no change needed, it already handled this correctly via `aspectClass`.
+
 #### Account-state route 404s + explore empty state + login error UX
 **Commit:** (this commit)
 
