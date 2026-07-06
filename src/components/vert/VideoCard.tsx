@@ -3,7 +3,8 @@
 import { useNavigation } from '@/lib/store'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { CategoryBadge } from './CategoryBadge'
-import { Play, Smartphone, Monitor, Square, MoreVertical } from 'lucide-react'
+import { PlaylistPicker } from './PlaylistPicker'
+import { Play, Smartphone, Monitor, Square, MoreVertical, ListVideo } from 'lucide-react'
 import { useState } from 'react'
 
 interface VideoCardProps {
@@ -56,6 +57,7 @@ function FormatIcon({ format }: { format: string }) {
 export function VideoCard({ video, watchProgress, showContextMenu = true, onContextMenuAction }: VideoCardProps) {
   const { navigate } = useNavigation()
   const [showMenu, setShowMenu] = useState(false)
+  const [showPlaylistPicker, setShowPlaylistPicker] = useState(false)
   const [thumbnailFailed, setThumbnailFailed] = useState(false)
   const [avatarFailed, setAvatarFailed] = useState(false)
 
@@ -131,6 +133,13 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
                   className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
                 >
                   Save to Watch Later
+                </button>
+                <button
+                  onClick={() => { setShowPlaylistPicker(true); setShowMenu(false) }}
+                  className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors flex items-center gap-1.5"
+                >
+                  <ListVideo className="h-3 w-3" />
+                  Add to playlist
                 </button>
                 <button
                   onClick={() => { onContextMenuAction?.('share', video.id); setShowMenu(false) }}
@@ -215,6 +224,13 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
           )}
         </div>
       </div>
+
+      {/* Playlist picker modal */}
+      <PlaylistPicker
+        videoId={video.id}
+        open={showPlaylistPicker}
+        onOpenChange={setShowPlaylistPicker}
+      />
     </div>
   )
 }
