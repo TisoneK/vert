@@ -434,34 +434,39 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         </div>
 
-        <div className="flex items-center gap-2 px-3 pb-2 pt-1">
-          <button onClick={togglePlay} className="text-white hover:text-violet-400 transition-colors p-1">
+        <div className="flex items-center flex-nowrap gap-2 px-3 pb-2 pt-1 overflow-hidden">
+          <button onClick={togglePlay} className="shrink-0 text-white hover:text-violet-400 transition-colors p-1">
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </button>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button onClick={toggleMute} className="text-white hover:text-violet-400 transition-colors p-1">
               {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </button>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.05"
-              value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange}
-              className="w-16 h-1 bg-zinc-600 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
-            />
+            {/* Volume slider takes real width (64px) that a narrow portrait
+                player can't spare alongside play/time/settings/fullscreen —
+                drop it there and keep just the mute toggle. */}
+            {!(videoAspectRatio && videoAspectRatio < 1) && (
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={isMuted ? 0 : volume}
+                onChange={handleVolumeChange}
+                className="w-16 h-1 bg-zinc-600 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
+              />
+            )}
           </div>
 
-          <span className="text-xs text-zinc-300 font-mono">
+          <span className="shrink-0 whitespace-nowrap text-[11px] sm:text-xs text-zinc-300 font-mono">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
 
-          <div className="flex-1" />
+          <div className="flex-1 min-w-0" />
 
           {/* Settings */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="text-white hover:text-violet-400 transition-colors p-1"
@@ -514,7 +519,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             )}
           </div>
 
-          <button onClick={toggleFullscreen} className="text-white hover:text-violet-400 transition-colors p-1" aria-label="Fullscreen">
+          <button onClick={toggleFullscreen} className="shrink-0 text-white hover:text-violet-400 transition-colors p-1" aria-label="Fullscreen">
             <Maximize className="h-4 w-4" />
           </button>
         </div>
