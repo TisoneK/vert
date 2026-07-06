@@ -1,29 +1,31 @@
 import { PrismaClient } from '@prisma/client'
 
 /**
- * Lazily-instantiated Prisma client.
+ * Lazily-instantiated, globally-cached Prisma client.
  *
- * Previous implementation called `new PrismaClient()` at module top-level,
- * which meant that if `prisma generate` hadn't been run (or its native
- * query-engine binary was missing/blocked), the import itself would throw:
+ * WHY THIS MATTERS ON VERCEL
+ * --------------------------
+ * Every serverless function invocation can be a fresh Node process, and
+ * even warm Lambdas can run route handlers in isolated module instances.
+ * If each request calls `new PrismaClient()`, each one opens its own
+ * connection pool — and Postgres (especially Neon / Vercel Postgres, which
+ * cap concurrent connections) refuses new connections under burst load.
+ * That's the root cause of the intermittent 500s across every DB-touching
+ * route: a fresh page load fires 5+ concurrent fetches, each spawns a new
+ * PrismaClient, each grabs a connection, and the pool is exhausted.
  *
- *   Error: @prisma/client did not initialize yet. Please run
- *   "prisma generate" and try to import it again.
+ * THE FIX
+ * -------
+ * 1. Cache the PrismaClient on `globalThis` IN ALL ENVIRONMENTS — not just
+ *    dev. The previous code only cached in non-production, which meant
+ *    production (where it matters most) kept spawning new clients.
+ * 2. Append `&connection_limit=1&pool_timeout=10` to the connection string
+ *    at runtime so each client only holds one connection (the standard
+ *    Prisma + serverless pattern).
  *
- * Because `db.ts` is imported (transitively) by `auth.ts` → `auth-helpers.ts`
- * → nearly every API route, that single import-time crash cascaded into the
- * entire site returning 500 — including `/api/auth/session-info`, which
- * `VertApp` fetches on mount, so the UI never got past the loading skeleton.
- *
- * Fix: wrap the client in a lazy getter. Now:
- *   - Importing `db` is always safe.
- *   - The actual `PrismaClient` constructor only runs on first property
- *     access (i.e. on the first query from a route that actually uses the DB).
- *   - If `prisma generate` hasn't been run, only that one route fails — every
- *     other route (and the entire UI shell) still renders.
- *
- * The global-cache pattern is preserved so we don't spawn a new client on
- * every hot-reload in dev (which would exhaust DB connections).
+ * The lazy Proxy wrapper is preserved so that importing `db` is still safe
+ * even if `prisma generate` hasn't run — the error only surfaces on first
+ * actual query, not at import time.
  */
 
 type PrismaGlobal = typeof globalThis & {
@@ -32,19 +34,44 @@ type PrismaGlobal = typeof globalThis & {
 
 const globalForPrisma = globalThis as PrismaGlobal
 
+/**
+ * Append serverless-friendly pool params to a Postgres connection URL.
+ * Prisma accepts `connection_limit` and `pool_timeout` as query-string
+ * params on the `url` (NOT on `directUrl` — that one is for migrations
+ * and should use the full connection pool).
+ *
+ * If the URL already has these params (or isn't a postgres URL), return
+ * it unchanged.
+ */
+function withServerlessPoolParams(url: string | undefined): string | undefined {
+  if (!url) return url
+  if (!url.startsWith('postgres')) return url
+  if (url.includes('connection_limit=')) return url
+
+  const sep = url.includes('?') ? '&' : '?'
+  return `${url}${sep}connection_limit=1&pool_timeout=10&connect_timeout=10`
+}
+
 function createPrismaClient(): PrismaClient {
-  // Reuse the existing instance from the global cache if present (dev HMR)
+  // Reuse the existing instance from the global cache if present.
+  // This runs in ALL environments — production needs it most.
   if (globalForPrisma.__vertPrisma) {
     return globalForPrisma.__vertPrisma
   }
 
   const client = new PrismaClient({
     log: process.env.NODE_ENV !== 'production' ? ['query'] : ['error'],
+    datasources: {
+      db: {
+        // Override the URL at runtime so we don't have to ask the user to
+        // edit their Vercel env vars. directUrl (used by migrations) is
+        // left untouched.
+        url: withServerlessPoolParams(process.env.DATABASE_URL),
+      },
+    },
   })
 
-  if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.__vertPrisma = client
-  }
+  globalForPrisma.__vertPrisma = client
 
   return client
 }
