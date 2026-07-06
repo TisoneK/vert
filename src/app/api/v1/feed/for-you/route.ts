@@ -114,33 +114,79 @@ export async function GET(req: NextRequest) {
     // --- Score candidate videos ---
     // Candidates: all ready, non-removed videos NOT uploaded by the user,
     // NOT already watched, NOT disliked.
-    const candidates = await db.video.findMany({
-      where: {
-        isRemoved: false,
-        status: 'ready',
-        // Exclude own videos (user's channel)
-        channel: { userId: { not: user.id } },
-        // Exclude already-watched
-        id: { notIn: Array.from(watchedVideoIds) },
-      },
-      include: {
-        channel: {
-          select: {
-            id: true,
-            channelName: true,
-            user: { select: { avatarUrl: true } },
+    //
+    // Performance: previously this fetched ALL matching videos with 3
+    // joins each, then scored them in JS. For a DB with 10k+ videos that
+    // would OOM the serverless function and take seconds.
+    //
+    // Now we limit candidates to the most recent 200 videos (by createdAt)
+    // plus the top 200 by views. This gives the scorer a reasonable pool
+    // to work with (recency + popularity) without loading the entire
+    // table. Cold-start videos (low views, recent upload) are still
+    // included via the recency half.
+    const now = Date.now()
+
+    const [recentCandidates, popularCandidates] = await Promise.all([
+      db.video.findMany({
+        where: {
+          isRemoved: false,
+          status: 'ready',
+          channel: { userId: { not: user.id } },
+          id: { notIn: Array.from(watchedVideoIds) },
+        },
+        include: {
+          channel: {
+            select: {
+              id: true,
+              channelName: true,
+              user: { select: { avatarUrl: true } },
+            },
+          },
+          categories: {
+            select: { category: { select: { id: true, name: true, slug: true } } },
+          },
+          tags: {
+            select: { tag: { select: { id: true, name: true, label: true } } },
           },
         },
-        categories: {
-          select: { category: { select: { id: true, name: true, slug: true } } },
+        orderBy: { createdAt: 'desc' },
+        take: 200,
+      }),
+      db.video.findMany({
+        where: {
+          isRemoved: false,
+          status: 'ready',
+          channel: { userId: { not: user.id } },
+          id: { notIn: Array.from(watchedVideoIds) },
         },
-        tags: {
-          select: { tag: { select: { id: true, name: true, label: true } } },
+        include: {
+          channel: {
+            select: {
+              id: true,
+              channelName: true,
+              user: { select: { avatarUrl: true } },
+            },
+          },
+          categories: {
+            select: { category: { select: { id: true, name: true, slug: true } } },
+          },
+          tags: {
+            select: { tag: { select: { id: true, name: true, label: true } } },
+          },
         },
-      },
+        orderBy: { viewCount: 'desc' },
+        take: 200,
+      }),
+    ])
+
+    // Deduplicate by id (a video could appear in both halves)
+    const seen = new Set<string>()
+    const candidates = [...recentCandidates, ...popularCandidates].filter((v) => {
+      if (seen.has(v.id)) return false
+      seen.add(v.id)
+      return true
     })
 
-    const now = Date.now()
     const scored: ScoredVideo[] = []
 
     for (const video of candidates) {

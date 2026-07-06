@@ -74,6 +74,23 @@ model Video {
   playlistItems   PlaylistItem[]
   watchHistory    WatchHistory[]
   savedBy         SavedVideo[]
+
+  // Indexes for the most common query patterns.
+  // Without these, every list/feed query does a seq scan on Video.
+  //
+  // 1. Home feed + /explore + /search "latest" sort:
+  //    WHERE isRemoved=false AND status='ready' ORDER BY createdAt DESC
+  // 2. Trending + "views" sort:
+  //    WHERE isRemoved=false AND status='ready' ORDER BY viewCount DESC
+  // 3. Channel page: WHERE channelId=? AND isRemoved=false AND status='ready'
+  //
+  // The composite (isRemoved, status, createdAt) index covers #1 and
+  // also serves as a covering index for the WHERE clause in #2.
+  // (isRemoved, status, viewCount) covers #2's sort.
+  // (channelId, isRemoved, status) covers #3.
+  @@index([isRemoved, status, createdAt])
+  @@index([isRemoved, status, viewCount])
+  @@index([channelId, isRemoved, status])
 }
 
 model Comment {
@@ -86,6 +103,10 @@ model Comment {
 
   video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Index for fetching a video's comments ordered by date.
+  // Pattern: WHERE videoId=? AND isRemoved=false ORDER BY createdAt DESC
+  @@index([videoId, isRemoved, createdAt])
 }
 
 model Vote {

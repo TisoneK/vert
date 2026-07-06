@@ -8,6 +8,27 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   reactStrictMode: false,
+  // Configure next/image to allow optimization of Vercel Blob URLs.
+  // Without this, <Image> components refuse to load remote images and
+  // you get "hostname not configured" errors.
+  //
+  // The hostname pattern `*.public.blob.vercel-storage.com` matches
+  // all Vercel Blob stores in this account. We use the wildcard form
+  // because each store has a unique subdomain (e.g. 7omh3o8afcek9nbu).
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+      },
+      // Also allow common avatar/thumbnail CDNs in case users link
+      // external images (Google avatars, etc.)
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+    ],
+  },
   // Include the admin migration SQL files in the standalone server
   // output. Without this, Next.js's file tracer won't include
   // prisma/migrations/admin/ (since we read it via fs, not via import),

@@ -39,7 +39,14 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    return NextResponse.json({ tags })
+    // Cache popular tags for 2min at the edge. The landing page fetches
+    // these on every visit. Only applies when no search query is set —
+    // search queries shouldn't be cached because they're user-specific.
+    const response = NextResponse.json({ tags })
+    if (!q) {
+      response.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300')
+    }
+    return response
   } catch (error) {
     console.error('Tags list error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

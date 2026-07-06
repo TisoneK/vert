@@ -69,7 +69,13 @@ export async function GET(req: NextRequest) {
       trendingScore: v.viewCount + v.likeCount * 2,
     }))
 
-    return NextResponse.json({ videos: formattedVideos })
+    // Cache at the CDN edge for 60s, allow stale serving for 5min.
+    // Trending doesn't change fast enough to justify a cache miss on
+    // every request — the home feed, sidebar, and landing page all
+    // hit this endpoint, so caching cuts DB load significantly.
+    const response = NextResponse.json({ videos: formattedVideos })
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
+    return response
   } catch (error) {
     console.error('Trending error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -21,7 +21,12 @@ export async function GET() {
       videoCount: cat._count.videos,
     }))
 
-    return NextResponse.json({ categories: result })
+    // Cache at the CDN edge for 5min — categories rarely change.
+    // The sidebar fetches this on every page load, so caching cuts
+    // a DB query per request.
+    const response = NextResponse.json({ categories: result })
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+    return response
   } catch (error) {
     console.error('Categories list error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
