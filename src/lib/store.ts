@@ -32,8 +32,11 @@ export type View =
  *   - Browser back/forward works
  *   - SEO crawlers see distinct URLs per video/channel
  *
- * Routes not in this map (e.g. `upload`, `profile`, `admin`) stay on `/`
- * because they're account-state views, not deep-linkable content.
+ * All views now have real URLs — including account-state views like
+ * /upload, /profile, /admin, /history, /saved, /creator-studio, /login,
+ * /signup. Each has a thin Next.js route file that renders <VertApp />,
+ * which then parses the URL and shows the right view. This means
+ * bookmarks and shared links work for every page, not just content pages.
  */
 export function viewToPath(view: View): string {
   switch (view.page) {
@@ -61,18 +64,32 @@ export function viewToPath(view: View): string {
       return '/changelog'
     case 'contact':
       return '/contact'
+    case 'upload':
+      return '/upload'
+    case 'profile':
+      return '/profile'
+    case 'admin':
+      return '/admin'
+    case 'history':
+      return '/history'
+    case 'saved':
+      return '/saved'
+    case 'creator-studio':
+      return '/creator-studio'
+    case 'login':
+      return '/login'
+    case 'signup':
+      return '/signup'
     case 'home':
       return '/'
     default:
-      // Account-state views (upload/profile/admin/login/signup/history/saved/
-      // playlists/creator-studio) stay on the root shell.
       return '/'
   }
 }
 
 /**
  * Inverse of viewToPath — parse a pathname back into a View.
- * Returns `null` if the pathname doesn't correspond to a deep-linkable view.
+ * Returns `null` if the pathname doesn't correspond to a known view.
  */
 export function pathToView(pathname: string): View | null {
   // Strip trailing slash (except for root)
@@ -85,6 +102,15 @@ export function pathToView(pathname: string): View | null {
   if (path === '/settings') return { page: 'settings' }
   if (path === '/changelog') return { page: 'changelog' }
   if (path === '/contact') return { page: 'contact' }
+  // Account-state views — now have real routes so bookmarks work.
+  if (path === '/upload') return { page: 'upload' }
+  if (path === '/profile') return { page: 'profile' }
+  if (path === '/admin') return { page: 'admin' }
+  if (path === '/history') return { page: 'history' }
+  if (path === '/saved') return { page: 'saved' }
+  if (path === '/creator-studio') return { page: 'creator-studio' }
+  if (path === '/login') return { page: 'login' }
+  if (path === '/signup') return { page: 'signup' }
 
   const watchMatch = path.match(/^\/watch\/(.+)$/)
   if (watchMatch) return { page: 'video', videoId: decodeURIComponent(watchMatch[1]) }

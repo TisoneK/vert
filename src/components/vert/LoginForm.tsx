@@ -144,6 +144,17 @@ export function LoginForm() {
           {error && (
             <div className="bg-red-50 border border-red-100 rounded-lg p-3">
               <p className="text-red-600 text-sm">{error}</p>
+              <p className="text-red-400 text-xs mt-1">
+                Check your credentials or{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate({ page: 'signup' })}
+                  className="underline hover:text-red-700"
+                >
+                  create a new account
+                </button>
+                .
+              </p>
             </div>
           )}
 

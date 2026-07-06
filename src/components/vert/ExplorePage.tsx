@@ -75,28 +75,66 @@ export function ExplorePage() {
           <p className="text-sm text-zinc-500 mt-1">Check back later.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {categories.map((cat) => {
-            const Icon = categoryIconMap[cat.slug] || Film
-            return (
-              <button
-                key={cat.id}
-                onClick={() => navigate({ page: 'category', slug: cat.slug })}
-                className="group rounded-lg p-4 text-left bg-white border border-zinc-200 hover:border-zinc-300 hover:shadow-sm transition-all"
-              >
-                <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center mb-3">
-                  <Icon className="h-4 w-4 text-zinc-600" />
+        (() => {
+          // Split into categories with videos vs empty so the page doesn't
+          // look dead when most categories have no content. Categories with
+          // videos get full-color cards; empty ones get muted cards in a
+          // separate section so users can still discover them.
+          const withVideos = categories.filter((c) => c.videoCount > 0)
+          const empty = categories.filter((c) => c.videoCount === 0)
+          return (
+            <>
+              {withVideos.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {withVideos.map((cat) => {
+                    const Icon = categoryIconMap[cat.slug] || Film
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => navigate({ page: 'category', slug: cat.slug })}
+                        className="group rounded-lg p-4 text-left bg-white border border-zinc-200 hover:border-violet-300 hover:shadow-sm transition-all"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center mb-3">
+                          <Icon className="h-4 w-4 text-violet-600" />
+                        </div>
+                        <h3 className="text-sm font-semibold text-zinc-900 group-hover:text-violet-600 transition-colors">{cat.name}</h3>
+                        <p className="text-zinc-500 text-xs mt-0.5">
+                          {cat.videoCount} {cat.videoCount === 1 ? 'video' : 'videos'}
+                        </p>
+                      </button>
+                    )
+                  })}
                 </div>
-                <h3 className="text-sm font-semibold text-zinc-900 group-hover:text-zinc-600 transition-colors">{cat.name}</h3>
-                <p className="text-zinc-500 text-xs mt-0.5">
-                  {cat.videoCount === 0
-                    ? 'No videos yet'
-                    : `${cat.videoCount} ${cat.videoCount === 1 ? 'video' : 'videos'}`}
-                </p>
-              </button>
-            )
-          })}
-        </div>
+              )}
+
+              {empty.length > 0 && (
+                <>
+                  <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-8 mb-3">
+                    {withVideos.length > 0 ? 'More categories' : 'All categories'}
+                  </h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    {empty.map((cat) => {
+                      const Icon = categoryIconMap[cat.slug] || Film
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => navigate({ page: 'category', slug: cat.slug })}
+                          className="group rounded-lg p-4 text-left bg-zinc-50 border border-zinc-100 hover:border-zinc-200 hover:bg-white transition-all"
+                        >
+                          <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center mb-3">
+                            <Icon className="h-4 w-4 text-zinc-400" />
+                          </div>
+                          <h3 className="text-sm font-medium text-zinc-500 group-hover:text-zinc-700 transition-colors">{cat.name}</h3>
+                          <p className="text-zinc-300 text-xs mt-0.5">No videos yet</p>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
+            </>
+          )
+        })()
       )}
     </div>
   )
