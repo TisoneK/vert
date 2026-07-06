@@ -197,7 +197,7 @@ Both routes used `parseInt(searchParams.get('limit'))` without clamping. A reque
 
 ### Nice to Have
 
-**[N-1] `reactStrictMode: false`** — `next.config.ts` disables React StrictMode. The comment doesn't say why. Re-enabling would catch the render-time setState bug class (M-8) automatically in dev. Worth investigating — there may be a specific reason it was disabled.
+**[N-1] `reactStrictMode: false`** — ✅ **Resolved in `543ae9d`.** `next.config.ts` now sets `reactStrictMode: true`. The previous `false` had no documented reason for being disabled. Re-enabling surfaces bugs like the render-time setState pattern (M-8) automatically in development.
 
 **[N-2] No Content-Security-Policy** — see L-3. Needs a separate audit pass to enumerate all the hostnames the app loads media from.
 
@@ -227,9 +227,9 @@ Both routes used `parseInt(searchParams.get('limit'))` without clamping. A reque
 
 **[UX-6] Upload page doesn't show file size before upload.** The "max 200MB" hint is in the placeholder, but the actual file size isn't displayed after selection. A user picking a 250MB file only learns it's too big when the Blob upload fails partway through.
 
-**[UX-7] Video player has no keyboard shortcuts.** No Space-to-play, Left/Right-to-seek, M-to-mute. Standard on YouTube/Vimeo. The custom controls are mouse-only.
+**[UX-7] Video player has no keyboard shortcuts.** ✅ **Resolved in `b0fa1a3`.** The player now supports Space/K (play/pause), ←/→ (seek 5 s), J/L (seek 10 s), ↑/↓ (volume), M (mute), F (fullscreen), and 0–9 (jump to %). The player container is focusable via `tabIndex={0}` so it can receive keyboard events; shortcuts are ignored when the user is typing in an input.
 
-**[UX-8] Comment section has a fake "like" button.** The `toggleCommentLike` in `CommentSection` only updates local state (`likedComments` Set) — there's no API call, no persistence, no count from the server. The displayed "1" is hardcoded. Either remove the button or wire it up.
+**[UX-8] Comment section has a fake "like" button.** ✅ **Resolved in `d93d457`** by removal rather than wiring up. The `toggleCommentLike` in `CommentSection` only updated local state (`likedComments` Set) — there was no API call, no persistence, no count from the server. The displayed "1" was hardcoded. Rather than ship a misleading UI, the button (and its local state + handler) have been removed. A real comment-like feature would require a `CommentLike` model, an API endpoint, and a `likeCount` field on the comments API; deferred until that work is scheduled.
 
 ---
 
@@ -239,9 +239,9 @@ Both routes used `parseInt(searchParams.get('limit'))` without clamping. A reque
 - **Loading states are consistent.** Every async page uses `Skeleton` components with the same `animate-pulse` pattern.
 - **Empty states are present but minimal.** "No comments yet", "No videos", "No results for that" — all functional, none delightful. Could add illustrations or suggested next actions.
 - **Error states are bare.** A failed fetch shows nothing (the catch block just logs). Consider a retry affordance.
-- **Focus rings are present but inconsistent.** Some buttons use `focus-visible:ring-2 focus-visible:ring-violet-600`, others don't. A global `:focus-visible` style in `globals.css` would be more consistent.
+- **Focus rings are present but inconsistent.** ✅ **Resolved in `b59ce86`.** Some buttons used `focus-visible:ring-2 focus-visible:ring-violet-600`, others didn't. A global `:focus-visible` style has been added to `globals.css` covering all `button`, `a`, `[role="button"]`, `input`, `select`, and `textarea` elements with a `violet-600` ring + offset. Components can still override with their own `focus-visible:*` classes.
 - **Color contrast on zinc-500 text** (used for secondary text everywhere) is 4.6:1 against white — passes AA for normal text but fails for the 11px / 10px text used in metadata. Consider zinc-600 for those.
-- **The "Demo" overlay on the video player** (`isSampleVideo` branch in `VideoPlayer`) shows for any URL starting with `/uploads/sample-`. This is dead code — no route serves such URLs. Remove it.
+- **The "Demo" overlay on the video player** (`isSampleVideo` branch in `VideoPlayer`) shows for any URL starting with `/uploads/sample-`. ✅ **Resolved in `b0fa1a3`.** Removed as dead code — no route serves such URLs. The `Film` icon import and the `demoClicked` state were also removed in the same commit.
 
 ---
 
@@ -324,7 +324,7 @@ Both routes used `parseInt(searchParams.get('limit'))` without clamping. A reque
 - ✅ Run `prisma db push` to apply the `WatchHistory` unique constraint. *(Applied via admin UI migration `20260706000002_watchhistory_unique.sql`)*
 - ✅ Verify the signup auto-login fix end-to-end on staging.
 - ✅ Add the missing DB indexes (Section 6). *(Applied via admin UI migration `20260706000003_add_query_indexes.sql`)*
-- ⬜ Re-enable `reactStrictMode: true` and fix any fallout.
+- ✅ Re-enable `reactStrictMode: true` and fix any fallout. *(Commit `543ae9d`; no fallout observed)*
 
 ### Phase 2 — Auth & Account (2–3 weeks)
 - ⏳ Email verification on signup (send verification link, gate login on `emailVerified`) — *needs email service*
@@ -346,7 +346,7 @@ Both routes used `parseInt(searchParams.get('limit'))` without clamping. A reque
 - ⬜ Admin: channel suspension UI.
 
 ### Phase 5 — Polish & Growth (ongoing)
-- ⬜ Keyboard shortcuts in the video player.
+- ✅ Keyboard shortcuts in the video player. *(Commit `b0fa1a3`; Space/K, ←/→, J/L, ↑/↓, M, F, 0–9)*
 - ⬜ Video transcripts / captions.
 - ⬜ PWA manifest + service worker.
 - ⬜ Push notifications.
@@ -369,9 +369,19 @@ Both routes used `parseInt(searchParams.get('limit'))` without clamping. A reque
 | Performance pass (DB indexes + CDN caching + for-you refactor + next/image config) | `e9fae0f` | ✅ Done |
 | Admin DB migration system (scripts + API + UI tab) | `92a2273`–`48b4522` (6 commits) | ✅ Done |
 
+**Session 3 — Polish, accessibility & changelog page (5 commits):**
+
+| Feature | Commits | Status |
+|---|---|---|
+| Public `/changelog` page (renders CHANGELOG.md, Windsurf-style sidebar + scroll-spy) | `1085a0a`, `d80e121` | ✅ Done |
+| Video player keyboard shortcuts (Space/K, arrows, J/L, M, F, 0–9) + dead-code cleanup | `b0fa1a3` | ✅ Done |
+| Removed fake comment "like" button (no backend) | `d93d457` | ✅ Done |
+| Re-enabled `reactStrictMode: true` (resolves N-1) | `543ae9d` | ✅ Done |
+| Global `:focus-visible` ring for keyboard accessibility (resolves §5 focus-ring note) | `b59ce86` | ✅ Done |
+
 **Deferred (needs email service):** Password reset + email verification — add `RESEND_API_KEY` (or equivalent) to Vercel env vars, then this is a clean follow-up session.
 
-**Remaining roadmap items:** See Phase 5 above (keyboard shortcuts, captions, PWA, push notifications, video transcoding).
+**Remaining roadmap items:** See Phase 5 above (captions, PWA, push notifications, video transcoding). Keyboard shortcuts shipped in Session 3.
 
 ---
 

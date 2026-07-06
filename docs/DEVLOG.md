@@ -8,6 +8,91 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ---
 
+## [Unreleased]
+
+### Added
+
+#### Public changelog page
+**Commits:** `1085a0a`, `d80e121`
+
+A new `/changelog` route renders `CHANGELOG.md` to the public web — no auth required. CHANGELOG.md becomes the single source of truth: edit the file, the page updates.
+
+- `GET /api/v1/changelog` (`src/app/api/v1/changelog/route.ts`) — reads `CHANGELOG.md` from disk, parses it server-side with a small inline markdown parser (no dependency added). Handles the Keep a Changelog subset: headings, nested bullet lists, bold/italic, inline code, links (http/https only — no `javascript:`), blockquotes, horizontal rules, paragraphs. HTML-escapes all text first to prevent injection. Cached at the edge for 5 min (`s-maxage=300`).
+  - **Redesign (`d80e121`):** the endpoint now returns structured sections instead of a single HTML blob. Each section has `{ version, date, label, id (anchor), html (body) }`. The parser splits `CHANGELOG.md` on `## [version] — date` headers, handles free-form dates (not just `YYYY-MM-DD`), and skips the link-reference lines at the bottom of the file.
+- `src/components/vert/ChangelogPage.tsx` — fetches and renders the parsed sections.
+  - Sticky left sidebar (desktop, `w-44`) listing all versions with dates. `IntersectionObserver` tracks which section is in view and highlights the corresponding sidebar entry (`violet-50` bg). Clicking a sidebar entry smooth-scrolls to that section.
+  - Main content: each version is a section with a violet version badge + date at the top, separated by 12-unit vertical spacing.
+  - Mobile: sidebar hidden, version badges show inline at the top of each section.
+  - `scroll-mt-20` on sections so the sticky header doesn't cover the section title when navigating via anchor.
+  - Empty state + error state with retry.
+- `src/app/changelog/page.tsx` — Next.js route entry.
+- `src/lib/store.ts` — adds `{ page: 'changelog' }` view type, `viewToPath → /changelog`, `pathToView` regex. Deep-linkable like the other public routes.
+- Navigation wired into four surfaces: sidebar footer (ScrollText icon, between Popular Channels and Contact Us, logged-in users only), mobile drawer (same position/icon), landing-page footer (between Vert and Contact), and the public header on `/changelog` and `/contact` (cross-links + Log in / Sign up CTAs).
+
+#### Video player keyboard shortcuts
+**Commit:** `b0fa1a3`
+
+`src/components/vert/VideoPlayer.tsx` — player container is now focusable (`tabIndex={0}`) and listens for `keydown` events when focused. Shortcuts:
+
+| Key | Action |
+|---|---|
+| Space / K | Play / pause |
+| ← / → | Seek 5 s back / forward |
+| J / L | Seek 10 s back / forward (YouTube-style) |
+| ↑ / ↓ | Volume up / down 10% |
+| M | Mute / unmute |
+| F | Fullscreen toggle |
+| 0–9 | Jump to 0% / 10% / … / 90% of the video |
+
+Helpers (`seek`, `changeVolume`, `toggleFullscreen`, `jumpToPercent`) are wrapped in `useCallback` with correct deps. The keydown effect ignores events when the target is an `<input>` or `<textarea>` (so the search box still works). Default-scroll-prevention is scoped to the keys that would otherwise scroll the page (` `, `ArrowLeft`, `ArrowRight`, `ArrowUp`, `ArrowDown`).
+
+Also cleans up two pieces of dead code in the same file: the unused `Film` icon import and the `isSampleVideo` / `demoClicked` demo branch (no route serves `/uploads/sample-*` URLs).
+
+#### Global focus-visible ring
+**Commit:** `b59ce86`
+
+`src/app/globals.css` — adds a single rule:
+
+```css
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  @apply outline-none ring-2 ring-violet-600 ring-offset-2;
+}
+```
+
+Uses `:focus-visible` (not `:focus`) so the ring only shows for keyboard navigation, not mouse clicks — matches the existing pattern in `VideoCard` and `Header`. Ring color is `violet-600` to match the brand. Components can still override with their own `focus-visible:*` classes.
+
+Resolves the inconsistency flagged in `REVIEW.md` §5 ("Focus rings are present but inconsistent").
+
+### Changed
+
+#### Removed fake comment-like button
+**Commit:** `d93d457`
+
+`src/components/vert/CommentSection.tsx` — the per-comment "like" button only updated a local `Set<string>` (`likedComments`), with no API call, no persistence, and a hardcoded display count. Removed:
+
+- `ThumbsUp` import from `lucide-react`.
+- `likedComments` state (`useState<Set<string>>`).
+- `toggleCommentLike()` handler.
+- The like-button + count markup under each comment.
+
+A real comment-like feature would require: a `CommentLike` model in `prisma/schema.prisma`, a `POST /api/v1/videos/[id]/comments/[commentId]/like` endpoint (or a `vote`-style route), a `likeCount` field returned from `GET /api/v1/videos/[id]/comments`, and a denormalized `likeCount` on `Comment` for list-page performance. Deferred — flagged in `REVIEW.md` §UX-8 as resolved (removed rather than wired up).
+
+### Fixed
+
+#### Re-enabled React StrictMode
+**Commit:** `543ae9d`
+
+`next.config.ts` — `reactStrictMode: false` → `true`. Was previously disabled without a documented reason. Re-enabling double-invokes certain functions and lifecycle methods in development, which surfaces bugs like the setState-during-render pattern fixed in `e53a129` (see `REVIEW.md` M-8) automatically. No effect in production builds.
+
+Resolves `REVIEW.md` N-1 ("`reactStrictMode: false` — worth investigating").
+
+---
+
 ## [0.3.0] — 2026-07-06
 
 ### Added
