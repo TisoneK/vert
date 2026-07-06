@@ -12,6 +12,24 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Visual polish pass (screenshot-driven review)
+**Commit:** `64b4ec7`
+
+A second UI pass driven by screenshots of the live site at 390×844 (iPhone 14) and 1280×800 (desktop) viewports. The VLM (`glm-4.6v` via `z-ai vision`) was used to spot visual issues across landing, watch, trending, explore, search, changelog, and contact pages. Real issues (filtered from VLM hallucinations) addressed:
+
+**Equal video card heights.** `VideoCard.tsx` — cards in the same grid row had inconsistent heights (verified: 350px vs 370px vs 427px in the same row) because titles have varying lengths and the card root had no height constraint. Added `h-full flex flex-col` to the card root and `flex-1` to the info section. Grid items stretch by default, so `h-full` makes every card in a row match the tallest card. The thumbnail keeps its aspect ratio; the info area grows to fill the remaining height.
+
+**Scroll-fade hint utility.** `src/app/globals.css` — added a new `.scroll-fade` class that applies a `mask-image: linear-gradient(to right, black 0, black calc(100% - 16px), transparent 100%)` to create a subtle 16px fade on the right edge of horizontal scroll containers. This signals "there's more to scroll" without showing a visible scrollbar (the `shelf-scroll` class already hides the native scrollbar). Applied to:
+- `SearchResults.tsx` — sort + format + date filter row (verified: 461px content in 358px viewport, no visual hint before).
+- `TrendingPage.tsx` — category filter tabs.
+- `AdminDashboard.tsx` — top-level tab switcher (Analytics / Flags / Database / Users).
+
+**Smaller portrait video player.** `VideoPlayer.tsx` — reduced the portrait `maxHeight` from `65vh` to `55vh`. At 65vh the player took 548px of an 844px mobile screen, leaving only 296px for title + action buttons + channel info + comments — the user had to scroll immediately to see any context. At 55vh (~464px) the player is still the dominant element but the title + actions + channel row are visible without scrolling. `maxWidth` updated correspondingly to `calc(55vh * 0.5625)` to preserve the 9:16 aspect ratio.
+
+**Landing page footer balance.** `LandingPage.tsx` — the "Vert" wordmark was `text-sm text-zinc-400` (too light, looked like a placeholder). Bumped to `text-sm font-semibold text-zinc-700` so it has visual weight matching the links on the right. Links bumped from `text-zinc-400` → `text-zinc-500` with `hover:text-zinc-900` for better contrast. Hero subtitle spacing improved: `mt-2` → `mt-3 leading-relaxed`.
+
+**Channel name truncation on watch page.** `VideoDetail.tsx` — the channel info `<div>` was `shrink-0`, which meant a long channel name would push the Subscribe button off the right edge of the screen. Changed to `min-w-0` so the name truncates instead. Avatar gets `shrink-0` to preserve its shape. Channel name `max-w` bumped from `8rem/none` → `8rem/12rem` so it truncates gracefully on both mobile and desktop.
+
 #### Mobile-first UI fixes (touch-reachability + safe areas + overflow)
 **Commits:** `3e19856`, `3c1abf2`, `0cadb06`, `1848f8d`, `83f47d8`, `93bab41`
 
