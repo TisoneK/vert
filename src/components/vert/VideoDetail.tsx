@@ -146,8 +146,11 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
 
   return (
     <div className="max-w-5xl mx-auto animate-vert-fade-in">
-      {/* Video player — full width on mobile, no padding */}
-      <div className="w-full">
+      {/* Video player — full width on mobile, no padding.
+          For portrait videos the player has a maxWidth (set in VideoPlayer)
+          so it doesn't dominate the screen. Center it horizontally so the
+          empty space is balanced left/right instead of all on the right. */}
+      <div className="w-full flex justify-center">
         <VideoPlayer
           videoUrl={video.videoUrl as string}
           thumbnailUrl={video.thumbnailUrl as string | null}

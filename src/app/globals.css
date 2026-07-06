@@ -172,12 +172,12 @@
 
 /* Horizontal scroll container with a fade hint on the right edge.
    Used by search filters, trending category tabs, admin tabs, etc.
-   The mask-image creates a 12px fade on the right that signals
+   The mask-image creates a 24px fade on the right that signals
    "there's more to scroll" without showing a visible scrollbar.
    shelf-scroll (above) hides the native scrollbar. */
 .scroll-fade {
-  -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 16px), transparent 100%);
-  mask-image: linear-gradient(to right, black 0, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(to right, black 0, black calc(100% - 24px), transparent 100%);
 }
 
 /* Vert color system CSS variables */

@@ -88,7 +88,11 @@ export function LandingPage() {
                 <div
                   key={v.id}
                   onClick={() => navigate({ page: 'video', videoId: v.id })}
-                  className="cursor-pointer group"
+                  // h-full + flex flex-col so cards in the same row stretch to
+                  // equal height regardless of title length. Without this, a
+                  // card with a 1-line title is shorter than one with a 2-line
+                  // title, making the grid look ragged.
+                  className="cursor-pointer group h-full flex flex-col"
                 >
                   <div className="aspect-[9/16] rounded-lg overflow-hidden bg-zinc-100 relative">
                     {v.thumbnailUrl ? (

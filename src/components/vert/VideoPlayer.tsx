@@ -478,7 +478,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   // Error state — show a simple error message when video fails to load
   if (hasError) {
     return (
-      <div className="w-full flex justify-start rounded-lg overflow-hidden">
+      <div className="w-full flex justify-center rounded-lg overflow-hidden">
         <div
           className="relative bg-zinc-900 overflow-hidden flex items-center justify-center"
           style={{
@@ -503,7 +503,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div className="w-full flex justify-start rounded-lg overflow-hidden">
+    <div className="w-full flex justify-center rounded-lg overflow-hidden">
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
