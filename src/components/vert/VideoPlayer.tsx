@@ -1,9 +1,26 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Film } from 'lucide-react'
+import { Play, Pause, Volume2, VolumeX, Maximize, Settings } from 'lucide-react'
 import Hls from 'hls.js'
 import { put } from '@vercel/blob/client'
+
+/**
+ * Keyboard shortcuts for the video player:
+ * - Space or K: play/pause
+ * - Left arrow: seek backward 5 seconds
+ * - Right arrow: seek forward 5 seconds
+ * - M: mute/unmute
+ * - F: fullscreen
+ * - Up arrow: volume up 10%
+ * - Down arrow: volume down 10%
+ * - J: seek backward 10 seconds
+ * - L: seek forward 10 seconds
+ * - 0-9: jump to 0%, 10%, ..., 90% of the video
+ */
+const SEEK_SHORT_STEP = 5 // seconds for left/right arrow
+const SEEK_LONG_STEP = 10 // seconds for J/L keys
+const VOLUME_STEP = 0.1 // 10% volume change per up/down arrow
 
 interface VideoPlayerProps {
   videoUrl: string
@@ -56,8 +73,6 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([])
   const [currentQuality, setCurrentQuality] = useState<number>(-1) // -1 = Auto
   const [sourceLabel, setSourceLabel] = useState<string>('Auto')
-
-  const [demoClicked, setDemoClicked] = useState(false)
 
   // Reset error/quality state when the source URL changes — uses the
   // "store information from previous renders" pattern from the React docs
@@ -273,21 +288,127 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     setIsMuted(!isMuted)
   }, [isMuted])
 
+  const toggleFullscreen = useCallback(() => {
+    if (!containerRef.current) return
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    } else {
+      containerRef.current.requestFullscreen()
+    }
+  }, [])
+
+  // --- Keyboard shortcuts helper functions ---
+  const seek = useCallback((seconds: number) => {
+    if (!videoRef.current) return
+    const newTime = Math.max(0, Math.min(duration, videoRef.current.currentTime + seconds))
+    videoRef.current.currentTime = newTime
+  }, [duration])
+
+  const changeVolume = useCallback((delta: number) => {
+    if (!videoRef.current) return
+    const newVol = Math.max(0, Math.min(1, volume + delta))
+    setVolume(newVol)
+    videoRef.current.volume = newVol
+    setIsMuted(newVol === 0)
+  }, [volume])
+
+  const jumpToPercent = useCallback((percent: number) => {
+    if (!videoRef.current || !duration) return
+    videoRef.current.currentTime = (percent / 100) * duration
+  }, [duration])
+
+  // --- Keyboard shortcuts effect ---
+  // Handle keyboard events when the video container is focused.
+  // The container has tabIndex={0} so it can receive focus.
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input field
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+      // Prevent default for our shortcuts to avoid page scrolling
+      const shouldPreventDefault = [' ', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)
+      if (shouldPreventDefault) e.preventDefault()
+
+      switch (e.key) {
+        case ' ': // Space - play/pause
+        case 'k': // K - play/pause (YouTube-style)
+        case 'K':
+          togglePlay()
+          break
+        case 'ArrowLeft': // Left arrow - seek back 5s
+          seek(-SEEK_SHORT_STEP)
+          break
+        case 'ArrowRight': // Right arrow - seek forward 5s
+          seek(SEEK_SHORT_STEP)
+          break
+        case 'j': // J - seek back 10s (YouTube-style)
+        case 'J':
+          seek(-SEEK_LONG_STEP)
+          break
+        case 'l': // L - seek forward 10s (YouTube-style)
+        case 'L':
+          seek(SEEK_LONG_STEP)
+          break
+        case 'ArrowUp': // Up arrow - volume up
+          changeVolume(VOLUME_STEP)
+          break
+        case 'ArrowDown': // Down arrow - volume down
+          changeVolume(-VOLUME_STEP)
+          break
+        case 'm': // M - mute/unmute
+        case 'M':
+          toggleMute()
+          break
+        case 'f': // F - fullscreen
+        case 'F':
+          toggleFullscreen()
+          break
+        case '0': // Jump to 0%
+          jumpToPercent(0)
+          break
+        case '1': // Jump to 10%
+          jumpToPercent(10)
+          break
+        case '2': // Jump to 20%
+          jumpToPercent(20)
+          break
+        case '3': // Jump to 30%
+          jumpToPercent(30)
+          break
+        case '4': // Jump to 40%
+          jumpToPercent(40)
+          break
+        case '5': // Jump to 50%
+          jumpToPercent(50)
+          break
+        case '6': // Jump to 60%
+          jumpToPercent(60)
+          break
+        case '7': // Jump to 70%
+          jumpToPercent(70)
+          break
+        case '8': // Jump to 80%
+          jumpToPercent(80)
+          break
+        case '9': // Jump to 90%
+          jumpToPercent(90)
+          break
+      }
+    }
+
+    container.addEventListener('keydown', handleKeyDown)
+    return () => container.removeEventListener('keydown', handleKeyDown)
+  }, [togglePlay, seek, changeVolume, toggleMute, toggleFullscreen, jumpToPercent])
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const vol = parseFloat(e.target.value)
     setVolume(vol)
     if (videoRef.current) {
       videoRef.current.volume = vol
       setIsMuted(vol === 0)
-    }
-  }
-
-  const toggleFullscreen = () => {
-    if (!containerRef.current) return
-    if (document.fullscreenElement) {
-      document.exitFullscreen()
-    } else {
-      containerRef.current.requestFullscreen()
     }
   }
 
@@ -326,61 +447,27 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  // Demo placeholder for seeded sample URLs (these are intentionally fake in dev)
-  const isSampleVideo = videoUrl.startsWith('/uploads/sample-')
-
-  if (hasError || isSampleVideo) {
+  // Error state — show a simple error message when video fails to load
+  if (hasError) {
     return (
       <div className="w-full flex justify-start rounded-lg overflow-hidden">
-      <div
-        className="relative bg-zinc-900 overflow-hidden"
-        style={{
-          aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
-          ...(videoAspectRatio && videoAspectRatio < 1 ? {
-            maxHeight: 'calc(100vh - 200px)',
-            maxWidth: 'calc((100vh - 200px) * 0.5625)',
-            width: 'auto',
-          } : {
-            width: '100%',
-          }),
-        }}
-      >
-        {thumbnailUrl ? (
-          <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
-            <Play className="h-12 w-12 text-zinc-600" />
+        <div
+          className="relative bg-zinc-900 overflow-hidden flex items-center justify-center"
+          style={{
+            aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+            minHeight: '200px',
+          }}
+        >
+          {thumbnailUrl ? (
+            <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover opacity-50" />
+          ) : (
+            <div className="w-full h-full bg-zinc-800" />
+          )}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <Play className="h-10 w-10 text-zinc-500" />
+            <p className="text-zinc-400 text-sm">Video unavailable</p>
           </div>
-        )}
-        <div className="absolute inset-0 bg-zinc-900/40" />
-        <div className="absolute top-3 left-3 px-2 py-0.5 bg-violet-600/80 text-white rounded text-[10px] font-bold uppercase tracking-wider">
-          Demo
         </div>
-        {!demoClicked ? (
-          <div
-            className="absolute inset-0 flex flex-col items-center justify-center gap-3 cursor-pointer"
-            onClick={() => setDemoClicked(true)}
-          >
-            <div className="w-14 h-14 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center hover:bg-white/25 transition-colors">
-              <Play className="h-7 w-7 text-white ml-0.5" />
-            </div>
-            <p className="text-white text-sm font-medium">Play Demo</p>
-          </div>
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-zinc-900/60 animate-vert-fade-in">
-            <div className="w-12 h-12 rounded-full bg-zinc-200 flex items-center justify-center">
-              <Film className="h-6 w-6 text-zinc-600" />
-            </div>
-            <p className="text-zinc-300 text-sm font-medium text-center px-6">Video playback will be available when real content is uploaded</p>
-            <button
-              onClick={() => setDemoClicked(false)}
-              className="mt-2 px-3 py-1 text-xs text-zinc-300 hover:text-white hover:bg-white/10 rounded transition-colors"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-      </div>
       </div>
     )
   }
@@ -391,7 +478,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     <div className="w-full flex justify-start rounded-lg overflow-hidden">
     <div
       ref={containerRef}
-      className="relative bg-black overflow-hidden group rounded-lg"
+      // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
+      // The outline is hidden on focus to avoid visual clutter, but we keep
+      // focus-visible:ring for accessibility when navigating with Tab.
+      tabIndex={0}
+      className="relative bg-black overflow-hidden group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
       style={{
         aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
         // Portrait: on mobile cap at 65vh (leaves room for title + actions below),
