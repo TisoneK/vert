@@ -30,23 +30,29 @@ export function SearchResults({ query }: SearchResultsProps) {
   const [searchQuery, setSearchQuery] = useState(query)
   const [sortBy, setSortBy] = useState<'relevance' | 'date' | 'views'>('relevance')
 
+  // Re-fetch whenever the *prop* `query` or `sortBy` changes.
+  // The previous effect had a stale closure on `searchQuery` (initialized
+  // once from the prop, never updated after) and didn't run when the
+  // prop itself changed — typing in the header search box updated the
+  // URL but the results list didn't refresh.
   useEffect(() => {
-    if (searchQuery) {
-      fetchResults(searchQuery)
-    }
-  }, [])
+    if (query) fetchResults(query, sortBy)
+    // We deliberately do NOT include fetchResults in deps — it's a
+    // stable function that only closes over setVideos/setLoading.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, sortBy])
 
+  // Keep the local input box in sync with the URL prop so the user
+  // sees the current query in the search field.
   useEffect(() => {
-    if (query) {
-      fetchResults(query)
-    }
-  }, [sortBy])
+    setSearchQuery(query)
+  }, [query])
 
-  async function fetchResults(q: string) {
+  async function fetchResults(q: string, sort: 'relevance' | 'date' | 'views' = sortBy) {
     if (!q) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/v1/videos?search=${encodeURIComponent(q)}&limit=20&sort=${sortBy}`)
+      const res = await fetch(`/api/v1/videos?search=${encodeURIComponent(q)}&limit=20&sort=${sort}`)
       const data = await res.json()
       setVideos(data.videos)
     } catch (error) {
@@ -59,7 +65,9 @@ export function SearchResults({ query }: SearchResultsProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      fetchResults(searchQuery.trim())
+      // Update the URL — the prop change will trigger the effect above
+      // to fetch fresh results. This avoids duplicate fetches.
+      navigate({ page: 'search', query: searchQuery.trim() })
     }
   }
 
