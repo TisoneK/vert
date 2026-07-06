@@ -8,7 +8,11 @@ export async function GET(
   try {
     const { id } = await params
     const { searchParams } = new URL(req.url)
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const rawLimit = parseInt(searchParams.get('limit') || '10', 10)
+    const limit =
+      Number.isFinite(rawLimit) && rawLimit >= 1
+        ? Math.min(Math.floor(rawLimit), 50)
+        : 10
 
     const video = await db.video.findUnique({
       where: { id },

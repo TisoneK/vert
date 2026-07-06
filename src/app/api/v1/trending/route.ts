@@ -4,7 +4,14 @@ import { db } from '@/lib/db'
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const limit = parseInt(searchParams.get('limit') || '20')
+    // Clamp limit to a safe range. Was parseInt() with no validation —
+    // a request like ?limit=10000 would try to load 10000 videos with
+    // 4 joins each, easily OOMing the serverless function.
+    const rawLimit = parseInt(searchParams.get('limit') || '20', 10)
+    const limit =
+      Number.isFinite(rawLimit) && rawLimit >= 1
+        ? Math.min(Math.floor(rawLimit), 100)
+        : 20
     const categorySlug = searchParams.get('category')
 
     const where: Record<string, unknown> = {
@@ -19,8 +26,10 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Trending score: combination of viewCount + likeCount * 2, weighted by recency
-    // For SQLite, we just sort by a simple score
+    // Trending score: viewCount + likeCount * 2. Computed client-side in
+    // the response so the API consumer can see the score — the actual
+    // ORDER BY uses viewCount desc, likeCount desc (a stable composite
+    // sort that the DB can index).
     const videos = await db.video.findMany({
       where,
       include: {
