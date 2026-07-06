@@ -65,6 +65,17 @@ export async function POST(
       return NextResponse.json({ error: 'Comment content is required' }, { status: 400 })
     }
 
+    // 2000-char cap matches YouTube's comment limit and keeps the table
+    // from accumulating essays. Trimmed before the length check so
+    // whitespace-only padding doesn't slip through.
+    const trimmed = content.trim()
+    if (trimmed.length > 2000) {
+      return NextResponse.json(
+        { error: 'Comment is too long (max 2000 characters)' },
+        { status: 400 }
+      )
+    }
+
     const video = await db.video.findUnique({
       where: { id: videoId },
       include: { channel: { select: { userId: true } } },
@@ -77,7 +88,7 @@ export async function POST(
       data: {
         videoId,
         userId: user.id,
-        content: content.trim(),
+        content: trimmed,
       },
       include: {
         user: {
@@ -92,7 +103,7 @@ export async function POST(
         userId: video.channel.userId,
         type: 'comment',
         title: 'New comment',
-        message: `${user.username} commented on your video: "${content.trim().slice(0, 80)}${content.trim().length > 80 ? '…' : ''}"`,
+        message: `${user.username} commented on your video: "${trimmed.slice(0, 80)}${trimmed.length > 80 ? '…' : ''}"`,
         actorId: user.id,
         relatedVideoId: videoId,
       })
