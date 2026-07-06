@@ -21,6 +21,7 @@ import {
   Monitor,
   Cpu,
   Mail,
+  ListVideo,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -109,6 +110,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
   const personalNavItems = user ? [
     { icon: Clock, label: 'History', action: () => navigate({ page: 'history' }), active: isActive('history') },
     { icon: Bookmark, label: 'Saved', action: () => navigate({ page: 'saved' }), active: isActive('saved') },
+    { icon: ListVideo, label: 'Playlists', action: () => navigate({ page: 'playlists' }), active: isActive('playlists') || isActive('playlist') },
   ] : []
 
   const footerItems = [

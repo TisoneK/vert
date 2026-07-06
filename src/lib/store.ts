@@ -17,6 +17,7 @@ export type View =
   | { page: 'history' }
   | { page: 'saved' }
   | { page: 'playlists' }
+  | { page: 'playlist'; playlistId: string }
   | { page: 'creator-studio' }
   | { page: 'contact' }
 
@@ -48,6 +49,10 @@ export function viewToPath(view: View): string {
       return '/trending'
     case 'explore':
       return '/explore'
+    case 'playlists':
+      return '/playlists'
+    case 'playlist':
+      return `/playlist/${view.playlistId}`
     case 'contact':
       return '/contact'
     case 'home':
@@ -70,6 +75,7 @@ export function pathToView(pathname: string): View | null {
   if (path === '/') return { page: 'home' }
   if (path === '/trending') return { page: 'trending' }
   if (path === '/explore') return { page: 'explore' }
+  if (path === '/playlists') return { page: 'playlists' }
   if (path === '/contact') return { page: 'contact' }
 
   const watchMatch = path.match(/^\/watch\/(.+)$/)
@@ -83,6 +89,9 @@ export function pathToView(pathname: string): View | null {
 
   const tagMatch = path.match(/^\/tag\/(.+)$/)
   if (tagMatch) return { page: 'tag', slug: decodeURIComponent(tagMatch[1]) }
+
+  const playlistMatch = path.match(/^\/playlist\/(.+)$/)
+  if (playlistMatch) return { page: 'playlist', playlistId: decodeURIComponent(playlistMatch[1]) }
 
   const searchMatch = path.match(/^\/search$/)
   if (searchMatch) {
