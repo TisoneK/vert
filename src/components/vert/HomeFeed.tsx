@@ -54,7 +54,7 @@ export function HomeFeed() {
       const res = await fetchWithRetry('/api/v1/categories')
       if (res.ok) {
         const data = await res.json()
-        setCategories(data.categories)
+        setCategories(data.categories ?? [])
       }
     } catch (error) {
       console.error('Failed to fetch categories:', error)
@@ -66,7 +66,7 @@ export function HomeFeed() {
       const res = await fetch('/api/v1/trending?limit=12')
       if (res.ok) {
         const data = await res.json()
-        setTrendingVideos(data.videos)
+        setTrendingVideos(data.videos ?? [])
       }
     } catch (error) {
       console.error('Failed to fetch trending:', error)
@@ -79,7 +79,7 @@ export function HomeFeed() {
       if (res.ok) {
         const data = await res.json()
         if (data.personalized) {
-          setForYouVideos(data.videos)
+          setForYouVideos(data.videos ?? [])
         } else {
           setForYouVideos([])
         }
@@ -93,8 +93,10 @@ export function HomeFeed() {
     setLoading(true)
     try {
       const res = await fetch('/api/v1/videos?page=1&limit=24')
-      const data = await res.json()
-      setVideos(data.videos)
+      if (res.ok) {
+        const data = await res.json()
+        setVideos(data.videos ?? [])
+      }
     } catch (error) {
       console.error('Failed to fetch videos:', error)
     } finally {

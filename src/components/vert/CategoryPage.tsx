@@ -75,9 +75,9 @@ export function CategoryPage({ slug }: { slug: string }) {
         const data = await res.json()
         setCategory(data.category)
         if (reset) {
-          setVideos(data.videos)
+          setVideos(data.videos ?? [])
         } else {
-          setVideos((prev) => [...prev, ...data.videos])
+          setVideos((prev) => [...prev, ...(data.videos ?? [])])
         }
         setHasMore(pageNum < data.pagination.totalPages)
       }

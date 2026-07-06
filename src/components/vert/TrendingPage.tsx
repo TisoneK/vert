@@ -51,7 +51,7 @@ export function TrendingPage() {
       const res = await fetchWithRetry('/api/v1/categories')
       if (res.ok) {
         const data = await res.json()
-        setCategories(data.categories)
+        setCategories(data.categories ?? [])
       }
     } catch (error) {
       console.error('Failed to fetch categories:', error)
@@ -66,7 +66,7 @@ export function TrendingPage() {
       const res = await fetchWithRetry(`/api/v1/trending?${params}`)
       if (res.ok) {
         const data = await res.json()
-        setVideos(data.videos)
+        setVideos(data.videos ?? [])
       }
     } catch (error) {
       console.error('Failed to fetch trending:', error)

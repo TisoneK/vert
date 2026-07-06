@@ -45,7 +45,7 @@ export function ExplorePage() {
       const res = await fetchWithRetry('/api/v1/categories')
       if (res.ok) {
         const data = await res.json()
-        setCategories(data.categories)
+        setCategories(data.categories ?? [])
       }
     } catch (error) {
       console.error('Failed to fetch categories:', error)
