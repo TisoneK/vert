@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, withServerlessPoolParams } from '@/lib/db'
 
 /**
  * GET /api/v1/debug-db
@@ -34,13 +34,18 @@ export async function GET() {
       categoryCount: count,
       // Echo back which URL Prisma is actually using (with pool params
       // redacted) so we can confirm the datasources override took effect.
-      dbUrlShape: process.env.DATABASE_URL
-        ? {
-            protocol: new URL(process.env.DATABASE_URL).protocol,
-            host: new URL(process.env.DATABASE_URL).host,
-            hasConnectionLimit: process.env.DATABASE_URL.includes('connection_limit='),
-          }
-        : null,
+      // Uses the same transform as db.ts — the raw env var never has
+      // connection_limit since it's only added at runtime, in-memory.
+      dbUrlShape: (() => {
+        const effectiveUrl = withServerlessPoolParams(process.env.DATABASE_URL)
+        if (!effectiveUrl) return null
+        const parsed = new URL(effectiveUrl)
+        return {
+          protocol: parsed.protocol,
+          host: parsed.host,
+          hasConnectionLimit: effectiveUrl.includes('connection_limit='),
+        }
+      })(),
     })
   } catch (error) {
     const latencyMs = Date.now() - start

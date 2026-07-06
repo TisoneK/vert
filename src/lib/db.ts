@@ -42,8 +42,13 @@ const globalForPrisma = globalThis as PrismaGlobal
  *
  * If the URL already has these params (or isn't a postgres URL), return
  * it unchanged.
+ *
+ * Exported so /api/v1/debug-db can report the *actual* effective URL
+ * shape Prisma uses at runtime, instead of the raw env var (which never
+ * has these params — they're only added in-memory, not written back to
+ * Vercel's env var storage).
  */
-function withServerlessPoolParams(url: string | undefined): string | undefined {
+export function withServerlessPoolParams(url: string | undefined): string | undefined {
   if (!url) return url
   if (!url.startsWith('postgres')) return url
   if (url.includes('connection_limit=')) return url
