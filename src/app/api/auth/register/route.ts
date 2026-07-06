@@ -21,9 +21,47 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Normalize email — lowercase + trim — before any further validation.
+    const normalizedEmail = email.toString().trim().toLowerCase()
+    const normalizedUsername = username.toString().trim()
+
+    // Email format check — the DB unique constraint is on raw text, so an
+    // invalid string like "asdf" would otherwise be accepted as a valid
+    // email and lock the user out of password-reset flows forever.
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(normalizedEmail) || normalizedEmail.length > 320) {
+      return NextResponse.json(
+        { error: 'Please enter a valid email address' },
+        { status: 400 }
+      )
+    }
+
+    // Username rules: 3–20 chars, alphanumeric + underscore only.
+    // Mirrors the username normalization used by Google OAuth sign-in
+    // (lowercase + strip non-alphanumeric) so creds logins and OAuth
+    // logins produce the same shape of username.
+    if (normalizedUsername.length < 3 || normalizedUsername.length > 20) {
+      return NextResponse.json(
+        { error: 'Username must be 3–20 characters' },
+        { status: 400 }
+      )
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(normalizedUsername)) {
+      return NextResponse.json(
+        { error: 'Username can only contain letters, numbers, and underscores' },
+        { status: 400 }
+      )
+    }
+
     if (password.length < 6) {
       return NextResponse.json(
         { error: 'Password must be at least 6 characters' },
+        { status: 400 }
+      )
+    }
+    if (password.length > 200) {
+      return NextResponse.json(
+        { error: 'Password is too long (max 200 characters)' },
         { status: 400 }
       )
     }
@@ -31,12 +69,12 @@ export async function POST(req: NextRequest) {
     // Check if user already exists
     const existingUser = await db.user.findFirst({
       where: {
-        OR: [{ email }, { username }],
+        OR: [{ email: normalizedEmail }, { username: normalizedUsername }],
       },
     })
 
     if (existingUser) {
-      if (existingUser.email === email) {
+      if (existingUser.email === normalizedEmail) {
         return NextResponse.json({ error: 'Email already registered' }, { status: 409 })
       }
       return NextResponse.json({ error: 'Username already taken' }, { status: 409 })
@@ -46,14 +84,14 @@ export async function POST(req: NextRequest) {
 
     const user = await db.user.create({
       data: {
-        email,
-        username,
+        email: normalizedEmail,
+        username: normalizedUsername,
         passwordHash,
         role: 'member',
         channel: {
           create: {
-            channelName: username,
-            description: `Welcome to ${username}'s channel!`,
+            channelName: normalizedUsername,
+            description: `Welcome to ${normalizedUsername}'s channel!`,
           },
         },
       },

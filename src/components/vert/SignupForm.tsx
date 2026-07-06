@@ -36,8 +36,15 @@ export function SignupForm() {
       return
     }
 
-    if (username.length < 3) {
-      setError('Username must be at least 3 characters')
+    // Match the server-side rules in /api/auth/register/route.ts so the
+    // user gets immediate feedback without a round-trip.
+    const usernameTrim = username.trim()
+    if (usernameTrim.length < 3 || usernameTrim.length > 20) {
+      setError('Username must be 3–20 characters')
+      return
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(usernameTrim)) {
+      setError('Username can only contain letters, numbers, and underscores')
       return
     }
 
