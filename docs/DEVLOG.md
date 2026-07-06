@@ -12,6 +12,19 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Account-state route 404s + explore empty state + login error UX
+**Commit:** (this commit)
+
+Three fixes from a user-experience review where I signed up as a new user and used the site end-to-end. Real bugs found by actually clicking through flows, not by reading code.
+
+**Account-state route 404s.** `src/app/{upload,profile,admin,history,saved,creator-studio,login,signup}/page.tsx` — these 8 views only existed inside the `VertApp` SPA shell. Navigating to them directly (bookmark, shared link, refresh on a deep-linked URL) hit Next.js's `not-found.tsx` because there was no route file. Created a thin `page.tsx` for each that just renders `<VertApp />`, which parses the URL via `pathToView` and shows the right view.
+
+`src/lib/store.ts` — updated `viewToPath` to return real paths (`/upload`, `/profile`, etc.) instead of `/` for these views, and `pathToView` to parse them back. The `navigate()` store action already pushed the path to history, so browser back/forward and the URL bar now reflect the correct URL for every page. The previous comment "Account-state views stay on the root shell" is no longer true — all views are deep-linkable now.
+
+**Explore page empty categories.** `ExplorePage.tsx` — when most categories have 0 videos (the current state of the live site), the page showed a wall of "No videos yet" cards that made the app feel abandoned. Split into two sections: categories with videos get full-color cards (violet icon bg, dark text, white card bg, hover:border-violet-300) at the top; empty categories collapse into a muted "More categories" section below (gray icon, zinc-50 card bg, light text). Users still discover empty categories but the first impression shows real content.
+
+**Login error friendliness.** `LoginForm.tsx` — the bare "Invalid email/username or password" felt cold (the VLM's emotional reaction: "like a slap in the face"). Added a secondary line: "Check your credentials or create a new account." with a button linking to the signup page, so users who hit a wall have an obvious next step.
+
 #### Homepage density + hero sizing (product-design feedback)
 **Commit:** `3daa6df`
 

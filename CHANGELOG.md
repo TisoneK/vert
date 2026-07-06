@@ -36,6 +36,9 @@ details (file references, API routes, commit hashes), see
 - **Creator Studio tables now stack as cards on mobile.** The "Your Videos", "Top 5 Videos", and "Recent Uploads" tables previously required horizontal scrolling on a phone — you could only see two columns at a time. They now collapse into a stacked card layout on mobile, with the original tables preserved on desktop.
 
 ### Fixed
+- **Account-state pages no longer 404 on direct navigation.** Previously `/upload`, `/profile`, `/admin`, `/history`, `/saved`, `/creator-studio`, `/login`, and `/signup` only existed inside the app shell — bookmarking or sharing those URLs returned a 404. Each now has a real Next.js route file, so bookmarks, shared links, and browser refresh all work. The browser URL also updates correctly when you navigate to these pages in-app.
+- **Explore page no longer looks dead when categories are empty.** Categories with videos now appear as full-color cards at the top; empty categories collapse into a muted "More categories" section below. The page leads with content that exists instead of a wall of "No videos yet".
+- **Login error message is friendlier.** A failed login now shows "Check your credentials or create a new account" with a link to signup, instead of just the bare error.
 - **Video cards in the same row now have equal heights.** Previously a card with a short title was shorter than its neighbour with a longer title, making grids look ragged. Cards now stretch to match the tallest card in their row. (Applied to both the shared VideoCard component and the landing page's custom card markup.)
 - **Long channel names no longer push the Subscribe button off-screen** on the watch page. The channel name truncates gracefully instead.
 - **Landing page footer has better visual balance.** The "Vert" wordmark was too light (looked like a placeholder); it now has a heavier weight matching the links on the right.
