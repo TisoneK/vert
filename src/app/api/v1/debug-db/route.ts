@@ -39,11 +39,20 @@ export async function GET() {
       dbUrlShape: (() => {
         const effectiveUrl = withServerlessPoolParams(process.env.DATABASE_URL)
         if (!effectiveUrl) return null
-        const parsed = new URL(effectiveUrl)
-        return {
-          protocol: parsed.protocol,
-          host: parsed.host,
-          hasConnectionLimit: effectiveUrl.includes('connection_limit='),
+        try {
+          const parsed = new URL(effectiveUrl)
+          return {
+            protocol: parsed.protocol,
+            host: parsed.host,
+            hasConnectionLimit: effectiveUrl.includes('connection_limit='),
+            // Distinguish Prisma Postgres (db.prisma.io) from direct
+            // Neon/Vercel Postgres — useful for diagnosing pool issues.
+            isPrismaPostgres: parsed.host.includes('prisma.io'),
+            // Show whether directUrl is also set (used for migrations)
+            directUrlPresent: !!process.env.PRISMA_DATABASE_URL,
+          }
+        } catch {
+          return { parseError: 'DATABASE_URL is not a valid URL' }
         }
       })(),
     })
