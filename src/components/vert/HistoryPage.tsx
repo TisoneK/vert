@@ -122,7 +122,7 @@ export function HistoryPage() {
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex gap-3">
-              <div className="w-40 h-[90px] bg-zinc-200 rounded-lg animate-pulse" />
+              <div className="w-32 sm:w-40 h-[72px] sm:h-[90px] bg-zinc-200 rounded-lg animate-pulse" />
               <div className="flex-1 space-y-2 py-1">
                 <div className="h-4 bg-zinc-200 rounded w-3/4 animate-pulse" />
                 <div className="h-3 bg-zinc-200 rounded w-1/2 animate-pulse" />
@@ -143,11 +143,11 @@ export function HistoryPage() {
           {history.map((entry) => (
             <div
               key={entry.id}
-              className="flex items-center gap-3 p-2 rounded-lg group hover:bg-zinc-50 transition-colors cursor-pointer"
+              className="flex items-start gap-3 p-2 rounded-lg group hover:bg-zinc-50 transition-colors cursor-pointer"
               onClick={() => navigate({ page: 'video', videoId: entry.video.id })}
             >
-              {/* Thumbnail */}
-              <div className="relative w-40 shrink-0 rounded overflow-hidden bg-zinc-200">
+              {/* Thumbnail — narrower on mobile so the title has room to breathe */}
+              <div className="relative w-32 sm:w-40 shrink-0 rounded overflow-hidden bg-zinc-200">
                 <div className="aspect-video">
                   {entry.video.thumbnailUrl ? (
                     <img src={entry.video.thumbnailUrl} alt={entry.video.title} className="w-full h-full object-cover" />
@@ -171,7 +171,7 @@ export function HistoryPage() {
               </div>
 
               {/* Info */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 py-0.5">
                 <p className="text-sm font-semibold text-zinc-900 line-clamp-2 leading-tight">{entry.video.title}</p>
                 <p className="text-xs text-zinc-700 mt-1">
                   {entry.video.channel.channelName} · Watched {timeAgo(entry.watchedAt)}
@@ -186,7 +186,10 @@ export function HistoryPage() {
                   e.stopPropagation()
                   removeEntry(entry.video.id)
                 }}
-                className="shrink-0 p-1.5 text-zinc-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
+                // Always visible on mobile (no hover), hover-revealed on desktop.
+                // Larger touch target (p-2) so it's easy to tap on phones.
+                className="shrink-0 p-2 text-zinc-500 hover:text-red-600 md:opacity-0 md:group-hover:opacity-100 transition-all"
+                aria-label={`Remove ${entry.video.title} from history`}
               >
                 <X className="h-4 w-4" />
               </button>

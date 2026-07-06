@@ -239,16 +239,18 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
           {videos.map((video) => (
             <div key={video.id} className="relative group">
               <VideoCard video={video} showContextMenu={false} />
-              {/* Remove button overlay */}
+              {/* Remove button overlay — always visible on mobile (no hover),
+                  hover-revealed on desktop. Mobile users had no way to remove
+                  a video from a playlist without opening it. */}
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   handleRemoveVideo(video.id)
                 }}
                 disabled={removingVideoId === video.id}
-                className="absolute top-1.5 right-1.5 p-1.5 bg-zinc-900/70 text-white rounded opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-colors disabled:opacity-50 z-10"
+                className="absolute top-1.5 right-1.5 p-1.5 bg-zinc-900/70 text-white rounded md:opacity-0 md:group-hover:opacity-100 hover:bg-red-600 transition-colors disabled:opacity-50 z-10"
                 title="Remove from playlist"
-                aria-label="Remove from playlist"
+                aria-label={`Remove ${video.title} from playlist`}
               >
                 {removingVideoId === video.id ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />

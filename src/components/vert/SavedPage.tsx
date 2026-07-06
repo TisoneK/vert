@@ -111,13 +111,23 @@ export function SavedPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {saved.map((entry) => (
             <div key={entry.videoId} className="relative group">
-              <VideoCard video={entry.video} />
+              {/* Disable the VideoCard's own context menu here — the only
+                  action that makes sense on the Saved page is "unsave",
+                  which is the dedicated X button below. Showing both the
+                  card's MoreVertical button AND the X in the same
+                  top-right corner would have them overlap on tap. */}
+              <VideoCard video={entry.video} showContextMenu={false} />
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   unsaveVideo(entry.videoId)
                 }}
-                className="absolute top-1.5 right-1.5 p-1.5 bg-white/80 text-zinc-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white hover:text-red-500 shadow-sm"
+                // Always visible on mobile (no hover), hover-revealed on desktop.
+                // Without this split, mobile users could not unsave videos from
+                // this page — the only way was to open the video and toggle the
+                // bookmark in the action row.
+                className="absolute top-1.5 right-1.5 p-1.5 bg-zinc-900/70 text-white rounded md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                aria-label={`Remove ${entry.video.title} from saved`}
               >
                 <X className="h-3.5 w-3.5" />
               </button>

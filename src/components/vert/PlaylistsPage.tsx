@@ -240,16 +240,18 @@ export function PlaylistsPage() {
                   <ListVideo className="h-3 w-3" />
                   {playlist.videoCount}
                 </div>
-                {/* Delete button */}
+                {/* Delete button — always visible on mobile (no hover),
+                    hover-revealed on desktop. Mobile users otherwise had no
+                    way to delete a playlist from this page. */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
                     handleDelete(playlist.id, playlist.title)
                   }}
                   disabled={deletingId === playlist.id}
-                  className="absolute top-1.5 right-1.5 p-1.5 bg-zinc-900/70 text-white rounded opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-colors disabled:opacity-50"
+                  className="absolute top-1.5 right-1.5 p-1.5 bg-zinc-900/70 text-white rounded md:opacity-0 md:group-hover:opacity-100 hover:bg-red-600 transition-colors disabled:opacity-50"
                   title="Delete playlist"
-                  aria-label="Delete playlist"
+                  aria-label={`Delete playlist ${playlist.title}`}
                 >
                   {deletingId === playlist.id ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

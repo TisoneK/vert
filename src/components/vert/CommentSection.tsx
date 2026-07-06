@@ -197,9 +197,13 @@ export function CommentSection({ videoId }: CommentSectionProps) {
               {user && (user.id === comment.user.id || user.role === 'admin') && (
                 <button
                   onClick={() => handleDelete(comment.id)}
-                  className="shrink-0 text-zinc-500 hover:text-red-600 transition-colors p-1 rounded opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
+                  // Always visible on mobile (no hover), hover-revealed on
+                  // desktop. The opacity-0 group-hover:opacity-100 pattern
+                  // left mobile users with no way to delete their own comments.
+                  className="shrink-0 text-zinc-500 hover:text-red-600 transition-colors p-1.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+                  aria-label={`Delete comment from ${comment.user.username}`}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-4 w-4" />
                 </button>
               )}
             </div>
