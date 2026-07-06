@@ -177,8 +177,9 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
         All playlists
       </button>
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-6">
+      {/* Header — title + meta + actions. On mobile the actions stack below
+          the title (flex-col); on md+ they sit to the right (md:flex-row). */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4 mb-6">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl md:text-2xl font-bold text-zinc-900">{playlist.title}</h1>
           <p className="text-sm text-zinc-500 mt-1">
@@ -188,7 +189,7 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
             <p className="text-sm text-zinc-600 mt-2 max-w-2xl">{playlist.description}</p>
           )}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 self-start">
           {videos.length > 0 && (
             <Button
               onClick={() => navigate({ page: 'video', videoId: videos[0]!.id })}

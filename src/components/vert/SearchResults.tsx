@@ -174,57 +174,65 @@ export function SearchResults({ query }: SearchResultsProps) {
             </div>
           </div>
 
-          {/* Filters — only show on Videos tab */}
+          {/* Filters — only show on Videos tab.
+              On mobile, the sort + format + date controls are split into
+              two rows: sort+format on the first row (scrollable horizontally
+              so they don't wrap awkwardly), date on the second. On desktop
+              everything stays on one line. */}
           {tab === 'videos' && (
-            <div className="flex flex-wrap items-center gap-3 mb-4 pb-3 border-b border-zinc-100">
-              {/* Sort */}
-              <div className="flex items-center gap-1">
-                <SlidersHorizontal className="h-3.5 w-3.5 text-zinc-400 mr-1" />
-                {sortFilters.map((f) => (
-                  <button
-                    key={f.value}
-                    onClick={() => setSortBy(f.value)}
-                    className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                      sortBy === f.value
-                        ? 'bg-zinc-100 text-zinc-900'
-                        : 'text-zinc-600 hover:text-zinc-900'
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Format filter */}
-              <div className="flex items-center gap-1">
-                {formatFilters.map((f) => (
-                  <button
-                    key={f.value}
-                    onClick={() => setFormatFilter(f.value)}
-                    title={f.label}
-                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
-                      formatFilter === f.value
-                        ? 'bg-violet-100 text-violet-700'
-                        : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
-                    }`}
-                  >
-                    <f.icon className="h-3 w-3" />
-                    <span className="hidden sm:inline">{f.label}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Date filter */}
-              <div className="flex items-center gap-1 ml-auto">
-                <select
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value as DateFilter)}
-                  className="text-xs bg-transparent text-zinc-600 border border-zinc-200 rounded px-2 py-1 cursor-pointer hover:text-zinc-900 focus:outline-none focus:ring-1 focus:ring-violet-600"
-                >
-                  {dateFilters.map((d) => (
-                    <option key={d.value} value={d.value}>{d.label}</option>
+            <div className="mb-4 pb-3 border-b border-zinc-100 space-y-2">
+              <div className="flex items-center gap-2 overflow-x-auto shelf-scroll">
+                {/* Sort */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <SlidersHorizontal className="h-3.5 w-3.5 text-zinc-400 mr-1" />
+                  {sortFilters.map((f) => (
+                    <button
+                      key={f.value}
+                      onClick={() => setSortBy(f.value)}
+                      className={`px-2.5 py-1 rounded text-xs font-medium transition-colors shrink-0 ${
+                        sortBy === f.value
+                          ? 'bg-zinc-100 text-zinc-900'
+                          : 'text-zinc-600 hover:text-zinc-900'
+                      }`}
+                    >
+                      {f.label}
+                    </button>
                   ))}
-                </select>
+                </div>
+
+                {/* Format filter */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {formatFilters.map((f) => (
+                    <button
+                      key={f.value}
+                      onClick={() => setFormatFilter(f.value)}
+                      title={f.label}
+                      className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors shrink-0 ${
+                        formatFilter === f.value
+                          ? 'bg-violet-100 text-violet-700'
+                          : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                      }`}
+                    >
+                      <f.icon className="h-3 w-3" />
+                      <span className="hidden sm:inline">{f.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Date filter — pushed to the right on desktop,
+                    inline on mobile. */}
+                <div className="flex items-center gap-1 sm:ml-auto shrink-0">
+                  <select
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value as DateFilter)}
+                    className="text-xs bg-transparent text-zinc-600 border border-zinc-200 rounded px-2 py-1 cursor-pointer hover:text-zinc-900 focus:outline-none focus:ring-1 focus:ring-violet-600"
+                    aria-label="Upload date"
+                  >
+                    {dateFilters.map((d) => (
+                      <option key={d.value} value={d.value}>{d.label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           )}

@@ -127,7 +127,11 @@ export function NotificationCenter() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-zinc-200 shadow-lg rounded-lg z-50">
+        // w-80 (320px) is too wide for a 360px viewport when combined with
+        // the bell button's right offset. Use max-w-[calc(100vw-1rem)] so
+        // the dropdown never overflows the viewport, and position it so the
+        // right edge aligns with the bell button's right edge.
+        <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white border border-zinc-200 shadow-lg rounded-lg z-50">
           <div className="flex items-center justify-between p-3 border-b border-zinc-200">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold text-zinc-900">Notifications</h3>
@@ -143,12 +147,17 @@ export function NotificationCenter() {
                   onClick={markAllAsRead}
                   disabled={markingAll}
                   title="Mark all as read"
-                  className="text-zinc-600 hover:text-violet-600 p-1 rounded hover:bg-zinc-100 transition-colors disabled:opacity-50"
+                  aria-label="Mark all as read"
+                  className="text-zinc-600 hover:text-violet-600 p-1.5 rounded hover:bg-zinc-100 transition-colors disabled:opacity-50"
                 >
                   <Check className="h-3.5 w-3.5" />
                 </button>
               )}
-              <button onClick={() => setOpen(false)} className="text-zinc-600 hover:text-zinc-900 p-1 rounded hover:bg-zinc-100 transition-colors">
+              <button
+                onClick={() => setOpen(false)}
+                className="text-zinc-600 hover:text-zinc-900 p-1.5 rounded hover:bg-zinc-100 transition-colors"
+                aria-label="Close notifications"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>

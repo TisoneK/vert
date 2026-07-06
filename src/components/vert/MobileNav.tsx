@@ -40,7 +40,10 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
             className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm"
             onClick={() => onDrawerOpenChange(false)}
           />
-          <div className="absolute left-0 top-0 bottom-0 w-64 bg-white border-r border-zinc-200 animate-drawer-in overflow-y-auto">
+          {/* pt-[env(safe-area-inset-top)] + pb-[env(safe-area-inset-bottom)]
+              so the drawer content doesn't get clipped by the notch / home
+              indicator on iPhone X+ devices. */}
+          <div className="absolute left-0 top-0 bottom-0 w-64 bg-white border-r border-zinc-200 animate-drawer-in overflow-y-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
             <div className="flex items-center justify-between p-4 border-b border-zinc-200">
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold text-zinc-900">Vert</span>
@@ -48,6 +51,7 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
               <button
                 onClick={() => onDrawerOpenChange(false)}
                 className="p-1.5 text-zinc-600 hover:text-zinc-900"
+                aria-label="Close menu"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -134,14 +138,18 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
         </div>
       )}
 
-      {/* Mobile bottom bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200">
+      {/* Mobile bottom bar — uses safe-area-inset-bottom so the bar
+          doesn't get clipped by the iOS home indicator on notched phones.
+          pb-[env(safe-area-inset-bottom)] adds the OS-reported safe area
+          on top of the h-12 base height. */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-12 px-2">
           <button
             onClick={() => navigate({ page: 'home' })}
             className={`flex flex-col items-center gap-0.5 px-3 py-1 ${
-              isActive('home') ? 'text-zinc-900' : 'text-zinc-600'
+              isActive('home') ? 'text-violet-600' : 'text-zinc-600'
             }`}
+            aria-label="Home"
           >
             <Home className="h-5 w-5" />
             <span className="text-[10px]">Home</span>
@@ -149,8 +157,9 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
           <button
             onClick={() => navigate({ page: 'explore' })}
             className={`flex flex-col items-center gap-0.5 px-3 py-1 ${
-              isActive('explore') ? 'text-zinc-900' : 'text-zinc-600'
+              isActive('explore') ? 'text-violet-600' : 'text-zinc-600'
             }`}
+            aria-label="Explore"
           >
             <Compass className="h-5 w-5" />
             <span className="text-[10px]">Explore</span>
@@ -159,8 +168,9 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
             <button
               onClick={() => navigate({ page: 'upload' })}
               className="flex flex-col items-center gap-0.5 px-3 py-1"
+              aria-label="Upload video"
             >
-              <div className="w-9 h-7 rounded-md bg-violet-600 flex items-center justify-center">
+              <div className="w-9 h-7 rounded-md bg-violet-600 flex items-center justify-center active:scale-95 transition-transform">
                 <Upload className="h-4 w-4 text-white" />
               </div>
             </button>
@@ -168,8 +178,9 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
           <button
             onClick={() => navigate({ page: 'trending' })}
             className={`flex flex-col items-center gap-0.5 px-3 py-1 ${
-              isActive('trending') ? 'text-zinc-900' : 'text-zinc-600'
+              isActive('trending') ? 'text-violet-600' : 'text-zinc-600'
             }`}
+            aria-label="Trending"
           >
             <Flame className="h-5 w-5" />
             <span className="text-[10px]">Trending</span>
@@ -177,8 +188,9 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
           <button
             onClick={() => onDrawerOpenChange(true)}
             className={`flex flex-col items-center gap-0.5 px-3 py-1 ${
-              isActive('profile') || isActive('login') || isActive('contact') ? 'text-zinc-900' : 'text-zinc-600'
+              isActive('profile') || isActive('history') || isActive('saved') || isActive('playlists') || isActive('settings') || isActive('creator-studio') || isActive('admin') || isActive('login') || isActive('contact') ? 'text-violet-600' : 'text-zinc-600'
             }`}
+            aria-label="More"
           >
             <User className="h-5 w-5" />
             <span className="text-[10px]">More</span>

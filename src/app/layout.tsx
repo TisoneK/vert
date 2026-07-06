@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -25,6 +25,16 @@ export const metadata: Metadata = {
     description: "Watch and share portrait video.",
     type: "website",
   },
+};
+
+// viewport-fit=cover lets the webview extend into the notch / home-indicator
+// areas on iPhone X+, which is required for env(safe-area-inset-*) values
+// used by the mobile bottom nav and drawer to actually take effect.
+// In Next.js 13+ this must be a separate Viewport export, not inside Metadata.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
