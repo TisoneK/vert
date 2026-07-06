@@ -35,6 +35,10 @@ export function SignupForm() {
       setError('Password must be at least 6 characters')
       return
     }
+    if (password.length > 200) {
+      setError('Password is too long (max 200 characters)')
+      return
+    }
 
     // Match the server-side rules in /api/auth/register/route.ts so the
     // user gets immediate feedback without a round-trip.
