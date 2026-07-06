@@ -384,11 +384,13 @@ export function AdminDashboard() {
         <h1 className="text-xl font-bold text-zinc-900">Admin Dashboard</h1>
       </div>
 
-      {/* Top-level tab switcher: Analytics | Flags | Database */}
-      <div className="flex gap-1 mb-6 border-b border-zinc-200">
+      {/* Top-level tab switcher: Analytics | Flags | Database | Users.
+          Horizontally scrollable on mobile so all 4 tabs stay visible
+          without wrapping or pushing the page width. */}
+      <div className="flex gap-1 mb-6 border-b border-zinc-200 overflow-x-auto shelf-scroll">
         <button
           onClick={() => setTab('analytics')}
-          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px shrink-0 ${
             tab === 'analytics'
               ? 'border-violet-600 text-zinc-900'
               : 'border-transparent text-zinc-600 hover:text-zinc-900'
@@ -399,7 +401,7 @@ export function AdminDashboard() {
         </button>
         <button
           onClick={() => setTab('flags')}
-          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px shrink-0 ${
             tab === 'flags'
               ? 'border-violet-600 text-zinc-900'
               : 'border-transparent text-zinc-600 hover:text-zinc-900'
@@ -415,7 +417,7 @@ export function AdminDashboard() {
         </button>
         <button
           onClick={() => setTab('database')}
-          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px shrink-0 ${
             tab === 'database'
               ? 'border-violet-600 text-zinc-900'
               : 'border-transparent text-zinc-600 hover:text-zinc-900'
@@ -431,7 +433,7 @@ export function AdminDashboard() {
         </button>
         <button
           onClick={() => setTab('users')}
-          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px shrink-0 ${
             tab === 'users'
               ? 'border-violet-600 text-zinc-900'
               : 'border-transparent text-zinc-600 hover:text-zinc-900'
