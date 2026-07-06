@@ -1,165 +1,128 @@
 # Changelog
 
-All notable changes to the Vert project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Added
-
-- **Notifications are now wired to real events** — previously the NotificationCenter only showed seed data; now it fills up organically as users interact.
-  - New helper module `src/lib/notifications.ts` with `createNotification()` and `notifyAllAdmins()` — both best-effort (errors swallowed) so a notification failure never breaks the parent action.
-  - **Subscription created** → channel owner gets a "New subscriber" notification (`type: subscription`) with the subscriber's username and channel name.
-  - **Comment created** → video owner gets a "New comment" notification (`type: comment`) with the commenter's username and a snippet of the comment (truncated to 80 chars). Skipped if the user is commenting on their own video.
-  - **Like created** (new vote OR changed from dislike→like) → video owner gets a "Video liked" notification (`type: vote`). Dislikes do not generate notifications (would just be noise). Skipped if the user is liking their own video.
-  - **Flag created** → all admin users get a "Video flagged for review" notification (`type: flag`) with the reporter's username, video title, and reason. Uses `notifyAllAdmins()` which batches a `createMany` to all active admins in one query.
-  - Self-action guard on all three user-facing events: subscribing to / commenting on / liking your own content does not generate a notification.
-
-- **Personalized "For You" feed** — recommendation engine that ranks videos by user affinity.
-  - New API route: `GET /api/v1/feed/for-you` (authenticated; falls back to trending for unauthed users or users with no watch history).
-  - Affinity scoring algorithm:
-    - **+5 per shared tag** with the user's watch-history videos (strongest signal — uses the new Tag model)
-    - **+3 per shared category** with watch history
-    - **+4 if subscribed** to the video's channel
-    - **+2 if user has upvoted** any video from this channel
-    - **+1 recency bonus** per 7 days since upload (capped at +3)
-    - **−10 if user has disliked** this specific video (excludes it from the feed)
-  - Excludes already-watched videos and the user's own uploads to keep the feed fresh.
-  - Cold-start friendly: videos with zero affinity still appear (sorted after scored videos, ordered by viewCount).
-  - Response includes `personalized: true/false` flag so the UI can show the shelf only when there's actual personalization (avoids duplicating the trending shelf).
-  - Debug payload (`watchedCount`, `tagAffinitySize`, etc.) included for transparency — can be stripped in a future pass if needed.
-  - New "For You" shelf at the top of `HomeFeed`, with a Sparkles icon. Only renders for logged-in users with watch history.
-  - `VideoShelf` component extended with an optional `icon` prop (used for the Sparkles icon on the For You shelf).
-
-- **Hashtags on videos** — freeform tagging system for video discovery.
-  - New Prisma models: `Tag` (id, name, label, usageCount) and `VideoTag` (join table, cascade-delete on video).
-  - Distinct from `Category` — categories are curated taxonomy, tags are creator-defined and reflect how the community actually describes content.
-  - New API routes: `GET /api/v1/tags` (popular, filterable) and `GET /api/v1/tags/[slug]/videos` (paginated).
-  - `POST /api/v1/videos` accepts `tags: string[]`, normalizes, dedupes, caps at 8.
-  - New deep-link route `/tag/[slug]` + new `TagPage` component.
-  - Tag input on `UploadPage`; clickable chips on `VideoCard` (up to 3) and `VideoDetail` (all).
-  - Seed creates 20 starter tags and attaches 2-4 to each of the 21 demo videos.
-
-- **Deep-linkable routes** — videos, channels, categories, search, trending, and explore now have their own URLs.
-  - `/watch/[id]`, `/channel/[id]`, `/category/[slug]`, `/search?q=`, `/trending`, `/explore` all render the `<VertApp />` shell, which parses the URL on mount and syncs the Zustand navigation store.
-  - Browser back/forward now works (popstate listener added in `VertApp`).
-  - URLs are shareable — pasting `https://vert.app/watch/<id>` into a fresh tab lands on the right video.
-  - Account-state views (`upload`, `profile`, `admin`, `login`, `signup`, `history`, `saved`, `playlists`, `creator-studio`, `contact`) intentionally stay on `/` to match YouTube's pattern — they're not deep-linkable because they're tied to session state.
-  - New helpers in `src/lib/store.ts`: `viewToPath()` and `pathToView()`.
-
-- **Rate limiting** — in-memory, fixed-window counter per (scope, key).
-  - Applied to: signup (5/min/IP), upload (10/min/user), vote (60/min/user), comment (20/min/user).
-  - Returns HTTP 429 with `Retry-After` and `X-RateLimit-*` headers when exceeded.
-  - New module: `src/lib/rate-limit.ts` with `RATE_LIMITS` constant for consistent policy.
-  - Note: in-memory means per-instance; when we move to multi-instance deploys (see `ARCHITECTURE.md`), this needs to move to Upstash Redis or Vercel KV.
-
-- **CI pipeline** — GitHub Actions workflow at `.github/workflows/ci.yml`.
-  - Runs on every push to `main` and every PR targeting `main`.
-  - Two jobs: `build` (lint + next build) and `prisma-schema-check` (validates schema against a throwaway SQLite DB).
-  - Uses Bun for consistency with local dev.
-  - `concurrency` block cancels in-progress runs when a new commit is pushed to the same ref.
-  - **Reverted** in the next batch — Vercel handles CI/CD via auto-deploy on push, so a duplicate GitHub Actions pipeline added noise without value. The workflow file (`.github/workflows/ci.yml`) was removed; the lint + build steps now run as part of Vercel's deployment pipeline.
-
-- **`ARCHITECTURE.md`** — new file documenting the v1 architectural choices (SQLite, local-FS uploads, single-route SPA, NextAuth) and why they were chosen, alongside the originally-spec'd design (Postgres, Clerk, Cloudflare Stream, Redis) and the migration triggers that would force each deferral to be revisited.
-
-### Changed
-
-- **`src/lib/db.ts`** — Prisma client is now lazily instantiated via a `Proxy`. Previously, `new PrismaClient()` ran at module top-level, which meant a missing `prisma generate` (or blocked binary download) crashed the entire app at import time — cascading into a 500 on `/api/auth/session-info` and the UI never loading past the skeleton. With the lazy proxy, importing `db` is always safe; the constructor only runs on first property access, so only the route that actually queries the DB fails. The global-cache pattern is preserved to avoid leaking clients across dev HMR.
-- **`src/lib/store.ts`** — `navigate()` now also pushes the new view's URL to browser history (via `viewToPath()`). New `skipHistoryPush` option for the inverse `popstate` flow. `View` type extended with `'contact'` (was already used in `VertApp` but missing from the type).
-- **`src/components/vert/VertApp.tsx`** — new `useEffect` on mount parses `window.location` and syncs the Zustand store; `popstate` listener handles browser back/forward.
-- **`README.md`** — cleaned up: removed duplicated `## Overview` section, fixed stale badges (npm package name didn't match project, GitHub user was wrong), added Quickstart with demo logins, replaced `npm` commands with `bun`, added Architecture section linking to `ARCHITECTURE.md`, added demo-credentials table.
-
-### Fixed
-
-- **Site no longer crashes when `prisma generate` hasn't run.** Previously a missing Prisma client binary would crash the entire app at import time; now only the route that needs the DB fails, and the UI shell still renders.
-
-### Security
-
-- **Dependency audit pass** — closed 44 of 54 known vulnerabilities (81% reduction).
-  - Updated `next` from `16.1.3` → `16.2.9`, patching 15 Next.js CVEs (4 high, including SSRF in WebSocket upgrades, middleware/proxy bypass via dynamic route parameter injection, and DoS in Server Components).
-  - Updated 18 other direct deps to latest patch versions within their existing semver ranges (`next-auth`, `prisma`, `react`, `zod`, `zustand`, etc.).
-  - Added `overrides` to `package.json` for 11 transitive deps that had upstream fixes but were pinned by parents:
-    - `prismjs` → `^1.30.0` (DOM clobbering)
-    - `js-cookie` → `^3.0.6` (prototype hijack)
-    - `@babel/core` → `^7.29.1` (arbitrary file read)
-    - `picomatch` → `^2.3.2` (ReDoS)
-    - `brace-expansion` → `^2.0.3` (memory exhaustion)
-    - `minimatch` → `^9.0.5` (multiple ReDoS)
-    - `postcss` → `^8.5.10` (XSS via unescaped `</style>`)
-    - `flatted` → `^3.4.0` (DoS + prototype pollution)
-    - `js-yaml` → `^4.1.2` (DoS in merge key handling)
-    - `diff` → `^5.2.2` (DoS in parsePatch)
-    - `uuid` → `^11.1.1` (missing buffer bounds check)
-  - **10 vulnerabilities remain and cannot be fixed without upstream changes:**
-    - `lodash@4.17.21` + `lodash-es@4.17.21` (3 CVEs) — no patched version published; latest release is still vulnerable per the advisory.
-    - `defu@<=6.1.4` (1 high) — Prisma pins to 6.x via `@prisma/config → c12`; overriding to 7.x breaks Prisma's resolution.
-    - These will resolve when upstream maintainers publish patched versions.
+New things and fixes in Vert, newest first. Written for the people using the app — technical details are kept brief and linked from each entry.
 
 ---
 
-## [Unreleased — earlier batch]
+## July 2026 — Review pass & feature build-out
 
-### Added
+### New features
 
-- **`POST /api/v1/upload`** — multipart/form-data file upload endpoint.
-  - Authenticated (any logged-in user).
-  - Accepts field name `video`, `thumbnail`, `file`, or the first file field present.
-  - 200 MB hard size cap; MIME-type allowlist (`video/*`, `image/*`).
-  - Files stored under `public/uploads/{yyyy-mm}/<userIdShort>-<uuid>.<ext>`, served at `/uploads/...`.
-  - Returns `{ url, filename, size, mimeType, originalName }` with HTTP 201.
-  - Production note: swap local FS for S3/R2 once storage env vars are wired (see `VERT-RULES.md` §6).
+#### Playlists
+You can now organize videos into playlists.
+- Create a playlist from the new **Playlists** page (sidebar → Playlists, or `/playlists`).
+- Add a video to a playlist from any video card's `⋮` menu → **Add to playlist**. Pick an existing playlist or create a new one inline.
+- View a playlist at `/playlist/<id>` — see all its videos, remove individual videos, or delete the whole playlist (videos themselves stay).
+- "Play all" jumps to the first video in the playlist.
 
-- **`Notification` Prisma model** — in-app notifications table.
-  - Fields: `id`, `userId`, `type` (`subscription | comment | vote | flag | admin | system`), `title`, `message`, `actorId?`, `relatedVideoId?`, `relatedChannelId?`, `isRead`, `createdAt`.
-  - Indexed on `(userId, isRead, createdAt)` for fast unread lookups.
-  - Cascading delete on user removal.
+#### Admin: User management
+Admins can now manage user accounts from the dashboard.
+- Go to `/admin` → **Users** tab.
+- Search by email or username. Filter by role (All / Members / Admins).
+- Per row: promote/demote role, suspend/reactivate, or permanently delete.
+- Safety guards: you can't demote, suspend, or delete your own account. Deletes require double confirmation. All actions are logged for audit.
 
-- **Notifications API** — three new routes under `/api/v1/notifications`:
-  - `GET /` — list current user's notifications; supports `?unread=true` and `?limit=N` (max 100). Returns `{ notifications, unreadCount, totalCount }`.
-  - `PATCH /:id/read` — mark a single notification as read (ownership-checked).
-  - `POST /read-all` — mark every unread notification as read; returns `{ updated }`.
+#### Admin: Database migrations from the UI
+Admins can now apply schema migrations from the browser — no shell access needed.
+- Go to `/admin` → **Database** tab.
+- See pending migrations and apply them with a click. Each runs in a transaction and is tracked in a `_admin_migration` table.
+- CLI alternative: `./scripts/apply-admin-migrations.sh` (same tracking table, stays in sync with the UI).
+- Bundle of helper scripts added under `scripts/` for local DB operations (`db-push.sh`, `db-migrate.sh`, `db-deploy.sh`, `db-status.sh`, `db-studio.sh`).
 
-- **Real adaptive streaming in `VideoPlayer`** via `hls.js`.
-  - `.m3u8` URLs are loaded through `hls.js` (or Safari native HLS when supported).
-  - The quality menu is now populated from the actual `Hls.Levels` parsed from the manifest — `Auto` plus one entry per rendition, highest first.
-  - Selecting a level sets `hls.currentLevel`; the current label is kept in sync via the `LEVEL_SWITCHED` event.
-  - For progressive (non-HLS) videos, the menu shows the source quality derived from `videoHeight` (e.g. `720p (source)`) instead of the previous hard-coded `1080p / 720p / 480p` placeholder.
-  - `hls.js` instance is properly destroyed on URL change and unmount to avoid leaks.
+#### Account settings
+Users can now manage their own account.
+- Go to your profile menu → **Settings** (or `/settings`).
+- **Change password** — requires your current password as verification.
+- **Delete account** — multi-step confirmation. Cascade-deletes your channel, videos, comments, etc. Irreversible.
 
-- **Seed data** — `prisma/seed.ts` now creates four sample notifications for `user1@vert.com` (one read, three unread) covering subscription, vote, comment, and system types.
+#### Better search
+Search now finds more and lets you filter.
+- Search matches video title, description, **and channel name** (was title + description only).
+- New **Channels** tab in search results — see channels whose names match your query.
+- New filters: format (Portrait / Landscape / Square) and upload date (Today / This week / This month / This year).
+- Sort by Relevance, Date, or Views.
 
-- **`CHANGELOG.md`** — this file.
+### Improvements
 
-### Changed
+#### Faster page loads
+- Added database indexes for the most common queries (home feed, trending, channel pages, comment threads). Pages that scanned the whole video table now use an index.
+- Trending, categories, and popular tags are now cached at the CDN edge for 1–5 minutes. The sidebar fetches categories on every page load, so this cuts a DB query per request.
+- The "For You" feed no longer loads every unwatched video into memory — it now scores the 200 most recent + 200 most viewed, which is plenty and won't OOM on a large database.
 
-- **`NotificationCenter` component** — fully rewritten to consume live data.
-  - Fetches `/api/v1/notifications?limit=50` on mount and when the logged-in user changes; refreshes every 60 s.
-  - Unread count badge shows the actual number (capped at `9+`).
-  - Clicking a notification marks it as read (optimistic update, reverts on failure).
-  - "Mark all as read" button calls `POST /api/v1/notifications/read-all`.
-  - Outside-click closes the dropdown.
-  - Falls back gracefully when not logged in ("Sign in to see notifications").
-  - Replaced hard-coded demo notifications array entirely.
+#### Security hardening (from the code review)
+A full code review found and fixed 16 issues. The notable ones:
+- **Signup now actually logs you in.** Previously, creating an account silently failed to establish a session and bounced you to the login page. Fixed.
+- **Pagination no longer 500s on weird inputs.** Requests like `?page=-5` or `?limit=abc` now return sensible defaults instead of crashing.
+- **View counts no longer double-count.** Added a unique constraint on `(userId, videoId)` in watch history so concurrent page loads can't both record a view.
+- **Stricter input validation** on registration (email format, username length/characters), comments (2000-char cap), video/channel titles, and URLs (must be `https:`).
+- **Public debug endpoint locked down.** `/api/v1/debug-db` was publicly accessible and leaked database host info. Now admin-only.
+- **Security headers added.** HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.
+- **Timing-safe secret comparison** on the seed/cleanup endpoints to prevent timing attacks.
+- **Mobile drawer fixed.** Escape key now closes it, body scroll is locked while open, and the mislabeled "Watch Later" item is now correctly split into History and Saved.
 
-- **`VideoPlayer` quality menu** — see "Real adaptive streaming" above. The hard-coded `1080p / 720p / 480p` list is gone.
+### Under the hood
+- 25 files changed, ~800 lines added across the feature work.
+- Build passes, lint clean, all commits are descriptive and per-feature.
+- `REVIEW.md` moved to `docs/REVIEW.md` with status markers (✅ done / ⏳ partial / ⬜ not started) on every roadmap item.
+- `next/image` configured for Vercel Blob URLs — components can now be incrementally migrated to `<Image>` for responsive sizing and WebP/AVIF conversion.
 
-### Fixed
-
-- `VideoPlayer` previously called `video.src = videoUrl` directly on every render of the controls path; the new implementation isolates side effects in a `useEffect` keyed on `videoUrl`, so toggling play/pause or settings no longer restarts playback.
-
-### Security
-
-- Upload route enforces authentication, MIME-type allowlist, file-size cap, and uses `crypto.randomUUID()` for filename generation (no user-supplied filename reaches disk).
-- All notification routes are ownership-checked — a user cannot read or mark another user's notifications.
-
-### Dependencies
-
-- Added `hls.js@^1.6.16` for adaptive HLS playback.
+### Known gaps
+- **Password reset and email verification** are not yet implemented — they need an email service (Resend, SendGrid, etc.) configured in Vercel env vars. Once you add `RESEND_API_KEY`, this is a clean follow-up.
+- **Playlist reordering** is not yet implemented (drag-and-drop). Videos appear in add-order.
+- **`<img>` → `<Image>` migration** is configured but not yet applied to existing components.
+- **Notification polling** still hits the API every 60s. Should move to SSE or visibility-gated polling.
 
 ---
 
-## Earlier history
+## Earlier — Notifications, hashtags, For You feed, deep links
 
-See `git log` for changes prior to this changelog.
+### Notifications
+- The notification bell now shows real notifications instead of demo data.
+- You get notified when someone subscribes to your channel, comments on your video, or likes your video. Admins get notified when a video is flagged.
+- Notifications self-suppress for your own actions (no "you liked your own video" spam).
+- "Mark all as read" button, unread count badge, auto-refresh every 60s.
+
+### Hashtags
+- Videos can have up to 8 hashtags. Tags are separate from categories — categories are curated, tags are creator-defined.
+- New `/tag/<slug>` pages list all videos with a given tag.
+- Tags appear as clickable chips on video cards and the watch page.
+- Tag input on the upload page (type and press Enter or comma).
+
+### "For You" feed
+- Logged-in users with watch history see a personalized "For You" shelf at the top of the home page.
+- Ranking considers: shared tags with your watch history, shared categories, your subscriptions, channels you've liked, recency, and excludes videos you've disliked.
+- Falls back to trending if you're not logged in or have no history.
+
+### Shareable URLs
+- Every video, channel, category, tag, search, and the trending/explore pages now have their own URL.
+- Browser back/forward works. Pasting a URL into a fresh tab lands on the right page.
+
+### Other
+- Rate limiting added on signup, upload, voting, and commenting to prevent abuse.
+- `ARCHITECTURE.md` added documenting the v1 design choices and when each deferral should be revisited.
+- Dependency audit closed 44 of 54 known vulnerabilities (81% reduction). Remaining 10 are upstream issues with no patched version available.
+
+---
+
+## Even earlier — Uploads, video player, auth
+
+### Video uploads
+- Logged-in users can upload videos (MP4, WebM, MOV up to 200MB).
+- Thumbnails auto-generate from the first frame if you don't pick one.
+- Videos upload directly to Vercel Blob from your browser, bypassing the serverless body limit.
+
+### Video player
+- Real adaptive streaming via hls.js for `.m3u8` sources — the quality menu shows actual renditions from the manifest.
+- Progressive (non-HLS) videos show their source quality (e.g. "720p (source)") instead of a hard-coded placeholder.
+- Portrait videos cap at 65vh on mobile so the title and actions stay visible.
+
+### Authentication
+- Login with email or username + password, or Google OAuth.
+- Sessions last 30 days.
+- Admin role loaded from the database on every request (not cached in the JWT), so role changes take effect immediately.
+
+---
+
+## Pre-changelog history
+
+See `git log` for changes prior to this changelog being maintained.
