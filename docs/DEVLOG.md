@@ -12,6 +12,55 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Mobile-first UI fixes (touch-reachability + safe areas + overflow)
+**Commits:** `3e19856`, `3c1abf2`, `0cadb06`, `1848f8d`, `83f47d8`, `93bab41`
+
+A pass over every interactive surface in the app, looking for things that broke on a 360px-wide touch device. Three recurring bug patterns were addressed:
+
+**(a) Hover-only action buttons (`opacity-0 group-hover:opacity-100`).**
+On touch devices there is no hover, so these buttons were completely invisible and unreachable. The fix is a consistent pattern: visible by default, hover-reveal only at the `md:` breakpoint (`md:opacity-0 md:group-hover:opacity-100`).
+
+Applied to:
+- `VideoCard.tsx` — context menu (MoreVertical) button. Split into two siblings: an always-visible button (`md:hidden`) with larger touch targets (h-4 w-4 icon, p-1.5, w-44 menu) and a hover-revealed one (`hidden md:block`) that keeps the original compact sizing. Added outside-click + Escape handlers (`mobileMenuRef` + `desktopMenuRef`) since on mobile there's no hover-off to dismiss the menu.
+- `VideoPlayer.tsx` — controls overlay. Added a `controlsVisible` state toggled by tapping the video element (`handleContainerTap`). The overlay now shows when `controlsVisible` is true OR on hover. Auto-hide after 3s of inactivity while playing (skipped while paused or while the settings menu is open, to avoid trapping the user). All control buttons bumped from `p-1` / `h-4 w-4` to `p-1.5 sm:p-1` / `h-5 w-5 sm:h-4 sm:w-4` for ~32px minimum tap size on mobile. Added `aria-label`s to all control buttons. The big center play overlay now also reveals controls on tap, so the user can immediately reach mute / fullscreen after starting playback.
+- `CommentSection.tsx` — delete-own-comment button.
+- `HistoryPage.tsx` — remove-from-history X button. Also narrowed thumbnail from `w-40` to `w-32 sm:w-40` (160px was too wide on a 320px screen, leaving only ~96px for title text).
+- `SavedPage.tsx` — unsave X button. Also disabled the VideoCard's redundant context menu on this page (both lived in the top-right corner and would overlap on tap).
+- `PlaylistsPage.tsx` — delete-playlist trash button.
+- `PlaylistDetailPage.tsx` — remove-from-playlist X button.
+
+All buttons also got `aria-label`s that include the item title (e.g. `Remove ${video.title} from playlist` instead of just `Remove from playlist`) for screen-reader users.
+
+**(b) Header rows that overflowed on 360px viewports.**
+Avatar + channel name + action buttons all crammed into a single flex row worked on desktop but pushed buttons off-screen on phones. Fixed pattern: stack vertically on mobile (`flex-col`), collapse to row at the `sm:` or `md:` breakpoint.
+
+Applied to:
+- `VideoDetail.tsx` — channel + actions row. Now `flex-col md:flex-row`. Channel info + Subscribe on the first row, vote / save / share / flag on the second. Action buttons also `flex-wrap sm:flex-nowrap` so they wrap gracefully on very narrow screens instead of clipping. Avatar bumped from `w-8` to `w-9`. Channel name truncates with `max-w-[8rem] sm:max-w-none` so a long name doesn't push Subscribe off-screen.
+- `ProfilePage.tsx` — avatar + name + Studio/Edit buttons. Now `flex-col sm:flex-row`. `self-start` on the avatar keeps the `-mt-8` overlap with the banner looking correct in the stacked layout.
+- `ChannelPage.tsx` — avatar + name + Subscribe. Same pattern. Channel name truncates so the verified checkmark stays adjacent to it.
+- `PlaylistDetailPage.tsx` — title + Play all + Delete. Same pattern.
+
+**(c) Multi-column tables for content listings.**
+On a 360px screen, a 4–5 column table requires horizontal scrolling — the user can only see ~2 columns at a time and has to swipe back and forth to compare title vs. views vs. status. Fixed pattern: render a stacked card list on mobile (`md:hidden`), keep the table on desktop (`hidden md:block`).
+
+Applied to `CreatorStudio.tsx`:
+- "Your Videos" table — mobile version shows thumbnail + title + date + format on the first line, views / likes / status badge on the second line.
+- "Top 5 Videos" table — mobile version shows title + a single line of "X views · Y likes · Z comments".
+- "Recent Uploads" table — mobile version shows title + "X views · Y ago · status badge".
+
+#### Other UI fixes in the same pass
+
+- `TrendingPage.tsx` — ranking badge (`#2`, `#3`, ...) moved from `top-1.5 left-1.5` to `bottom-2 left-2`. The old position overlapped with the VideoCard's `FormatIcon` (also top-left for landscape/square videos). New position avoids overlap with: FormatIcon (top-left), context menu (top-right), duration badge (bottom-right), and watch-progress bar (very bottom edge). Added `pointer-events-none` so taps pass through to the card.
+- `SearchResults.tsx` — filter row was `flex-wrap`, which on mobile wrapped Sort + Format + Date into 2–3 awkward lines. Replaced with a single horizontally-scrollable row (`overflow-x-auto` + `shelf-scroll` to hide the scrollbar). Added `shrink-0` to every filter group.
+- `NotificationCenter.tsx` — dropdown was `w-80` (320px) with no max-width; on a 360px viewport it could overflow horizontally. Added `max-w-[calc(100vw-1rem)]`. Bumped the mark-all-read and close buttons from `p-1` to `p-1.5` for better tap targets. Added `aria-label`s.
+- `AdminDashboard.tsx` — 4-tab switcher (Analytics / Flags / Database / Users) overflowed horizontally on mobile because each tab needs ~80–100px. Made the row scrollable (`overflow-x-auto shelf-scroll`) and added `shrink-0` to each tab.
+
+#### iOS safe-area support
+**Commit:** `83f47d8`
+
+- `src/app/layout.tsx` — added a separate `Viewport` export with `viewportFit: "cover"`. In Next.js 13+ this must be a separate export, not inside `Metadata` (the `viewport` field on `Metadata` is deprecated). Without `viewport-fit=cover`, the webview doesn't extend into the notch / home-indicator areas on iPhone X+, so `env(safe-area-inset-*)` returns 0 and the inset padding below has no effect.
+- `src/components/vert/MobileNav.tsx` — bottom nav gets `pb-[env(safe-area-inset-bottom)]` so the bar isn't clipped by the iOS home indicator. Side drawer gets `pt-[env(safe-area-inset-top)]` + `pb-[env(safe-area-inset-bottom)]` for the same reason. Active state on bottom-nav buttons changed from `text-zinc-900` to `text-violet-600` to match the brand color used in the desktop Sidebar. The "More" button now highlights when ANY secondary view is active (history, saved, playlists, settings, creator-studio, admin) — previously it only highlighted for `profile` / `login` / `contact`, so the user had no feedback that they were in a section reachable from the drawer.
+
 #### Public changelog page
 **Commits:** `1085a0a`, `d80e121`
 

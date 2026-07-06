@@ -12,14 +12,22 @@ details (file references, API routes, commit hashes), see
 ## [Unreleased]
 
 ### Added
+- **Mobile-friendly video player controls.** Tapping the video now toggles the controls overlay on and off, so on touch devices you can finally reach the mute, settings, and fullscreen buttons (which were previously hover-only). Controls auto-hide after 3 seconds while playing, but stay visible while paused or while the settings menu is open.
+- **iOS safe-area support.** The mobile bottom nav and side drawer now respect the notch and home indicator on iPhone X and later — they're no longer clipped or covered by system UI.
 - **Public changelog page.** A new `/changelog` page renders this file in a clean, readable layout. On desktop, a sticky version sidebar lists every release with scroll-spy highlighting — click a version to jump to it. On mobile, the sidebar collapses and version badges show inline. Linked from the sidebar footer, mobile drawer, and landing-page footer. No login required.
 - **Video player keyboard shortcuts.** The player is now keyboard-accessible. Click the player (or Tab to it), then: Space or K to play/pause, Left/Right arrows to seek 5 s, J/L to seek 10 s, Up/Down arrows for volume, M to mute, F for fullscreen, and 0–9 to jump to 0%/10%/…/90% of the video.
 - **Consistent focus indicators.** All buttons, links, inputs, selects, and textareas now show a violet focus ring when navigated to by keyboard, making the app noticeably easier to use without a mouse.
 
 ### Changed
 - **Removed the non-functional "like" button on comments.** The button only updated local state — there was no API call, no persistence, and the displayed count was hardcoded. Rather than ship a misleading UI, it has been removed. A real comment-like feature would require a new database model, an API endpoint, and a `likeCount` field on the comments API; deferred until that work is scheduled.
+- **Creator Studio tables now stack as cards on mobile.** The "Your Videos", "Top 5 Videos", and "Recent Uploads" tables previously required horizontal scrolling on a phone — you could only see two columns at a time. They now collapse into a stacked card layout on mobile, with the original tables preserved on desktop.
 
 ### Fixed
+- **Mobile users can now reach every action button that was previously hidden behind hover.** Across the comment section (delete-own-comment), watch history (remove entry), saved videos (unsave), playlists (delete playlist, remove video), and the video card context menu (Save / Add to playlist / Share / Report), buttons that used `opacity-0 group-hover:opacity-100` were completely invisible and untappable on touch devices. They're now visible by default on mobile and hover-revealed only on desktop.
+- **Channel, profile, and watch pages no longer overflow on small phones.** The header rows that crammed avatar + name + action buttons into a single line were pushing the buttons off-screen on 360px-wide viewports. They now stack vertically on mobile and collapse back to a single row on larger screens.
+- **Trending ranking badge no longer overlaps the format icon.** The `#2`, `#3` badges were sitting on top of the landscape/square format indicator on video cards. Moved to a non-conflicting position.
+- **Search filters and admin tabs no longer wrap awkwardly.** Both rows are now horizontally scrollable on mobile so all options stay on one line.
+- **Notification dropdown no longer overflows tiny viewports.** Width capped to `100vw - 1rem`.
 - **Re-enabled React StrictMode in development.** StrictMode was previously disabled without a documented reason. Re-enabling it surfaces problems like setState-during-render automatically in dev, which is exactly the bug class fixed in [0.3.0] for the Profile and Creator Studio pages. No user-facing effect in production.
 
 ---
