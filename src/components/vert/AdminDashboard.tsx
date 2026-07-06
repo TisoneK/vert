@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 import {
   Shield,
   Flag,
@@ -22,6 +23,10 @@ import {
   Play,
   RefreshCw,
   Loader2,
+  Search,
+  UserCog,
+  UserX,
+  UserCheck,
 } from 'lucide-react'
 import { timeAgo, formatViews } from '@/lib/utils-vert'
 
@@ -70,7 +75,7 @@ interface AdminAnalytics {
   }
 }
 
-type Tab = 'analytics' | 'flags' | 'database'
+type Tab = 'analytics' | 'flags' | 'database' | 'users'
 
 interface DbMigration {
   id: string
@@ -78,6 +83,21 @@ interface DbMigration {
   description: string
   applied: boolean
   appliedAt?: string
+}
+
+interface AdminUser {
+  id: string
+  email: string
+  username: string
+  role: string
+  isActive: boolean
+  emailVerified: boolean
+  oauthProvider: string | null
+  avatarUrl: string | null
+  createdAt: string
+  channel: { id: string; channelName: string; isSuspended: boolean } | null
+  videoCount: number
+  commentCount: number
 }
 
 export function AdminDashboard() {
@@ -100,6 +120,14 @@ export function AdminDashboard() {
   const [migrationError, setMigrationError] = useState<string | null>(null)
   const [migrationSuccess, setMigrationSuccess] = useState<string | null>(null)
 
+  // Users state
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([])
+  const [usersLoading, setUsersLoading] = useState(true)
+  const [userSearch, setUserSearch] = useState('')
+  const [userRoleFilter, setUserRoleFilter] = useState<string>('')
+  const [userActionId, setUserActionId] = useState<string | null>(null)
+  const [userError, setUserError] = useState<string | null>(null)
+
   useEffect(() => {
     if (tab === 'flags') fetchFlags()
   }, [tab, filter])
@@ -111,6 +139,10 @@ export function AdminDashboard() {
   useEffect(() => {
     if (tab === 'database') fetchMigrations()
   }, [tab])
+
+  useEffect(() => {
+    if (tab === 'users') fetchAdminUsers()
+  }, [tab, userRoleFilter])
 
   async function fetchFlags() {
     setFlagsLoading(true)
@@ -184,6 +216,121 @@ export function AdminDashboard() {
       setMigrationError(`Network error applying: ${id}`)
     } finally {
       setApplyingId(null)
+    }
+  }
+
+  async function fetchAdminUsers(searchQuery?: string) {
+    setUsersLoading(true)
+    setUserError(null)
+    try {
+      const params = new URLSearchParams()
+      if (searchQuery && searchQuery.trim()) params.set('q', searchQuery.trim())
+      if (userRoleFilter) params.set('role', userRoleFilter)
+      params.set('limit', '50')
+      const res = await fetch(`/api/v1/admin/users?${params}`)
+      if (res.ok) {
+        const data = await res.json()
+        setAdminUsers(data.users ?? [])
+      } else {
+        setUserError('Failed to load users')
+      }
+    } catch (error) {
+      console.error('Failed to fetch users:', error)
+      setUserError('Network error loading users')
+    } finally {
+      setUsersLoading(false)
+    }
+  }
+
+  async function updateUserRole(userId: string, newRole: 'member' | 'admin') {
+    setUserActionId(userId)
+    setUserError(null)
+    try {
+      const res = await fetch(`/api/v1/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setAdminUsers((prev) =>
+          prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+        )
+      } else {
+        setUserError(data.error || 'Failed to update role')
+      }
+    } catch (error) {
+      console.error('Role update error:', error)
+      setUserError('Network error updating role')
+    } finally {
+      setUserActionId(null)
+    }
+  }
+
+  async function toggleUserActive(userId: string, currentlyActive: boolean) {
+    const action = currentlyActive ? 'deactivate' : 'activate'
+    if (!confirm(`Are you sure you want to ${action} this user?\n\n${
+      currentlyActive
+        ? 'They will be signed out and unable to log in.'
+        : 'They will be able to log in again.'
+    }`)) return
+
+    setUserActionId(userId)
+    setUserError(null)
+    try {
+      const res = await fetch(`/api/v1/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !currentlyActive }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setAdminUsers((prev) =>
+          prev.map((u) =>
+            u.id === userId ? { ...u, isActive: !currentlyActive } : u
+          )
+        )
+      } else {
+        setUserError(data.error || `Failed to ${action} user`)
+      }
+    } catch (error) {
+      console.error('Toggle active error:', error)
+      setUserError(`Network error: ${action} user`)
+    } finally {
+      setUserActionId(null)
+    }
+  }
+
+  async function deleteUser(userId: string, username: string) {
+    if (!confirm(
+      `Permanently delete user "${username}"?\n\n` +
+      `This CANNOT be undone. Their channel, videos, comments, votes, and ` +
+      `playlists will be cascade-deleted.\n\n` +
+      `Consider deactivating instead (preserves their content).`
+    )) return
+
+    // Second confirm for destructive action
+    if (!confirm('Are you absolutely sure? This is irreversible.')) return
+
+    setUserActionId(userId)
+    setUserError(null)
+    try {
+      const res = await fetch(`/api/v1/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirm: true }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setAdminUsers((prev) => prev.filter((u) => u.id !== userId))
+      } else {
+        setUserError(data.error || 'Failed to delete user')
+      }
+    } catch (error) {
+      console.error('Delete user error:', error)
+      setUserError('Network error deleting user')
+    } finally {
+      setUserActionId(null)
     }
   }
 
@@ -281,6 +428,17 @@ export function AdminDashboard() {
               {migrations.filter((m) => !m.applied).length}
             </span>
           )}
+        </button>
+        <button
+          onClick={() => setTab('users')}
+          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+            tab === 'users'
+              ? 'border-violet-600 text-zinc-900'
+              : 'border-transparent text-zinc-600 hover:text-zinc-900'
+          }`}
+        >
+          <Users className="h-4 w-4" />
+          Users
         </button>
       </div>
 
@@ -695,6 +853,217 @@ export function AdminDashboard() {
                 </div>
               )}
             </>
+          )}
+        </div>
+      )}
+
+      {/* ================= USERS TAB ================= */}
+      {tab === 'users' && (
+        <div className="space-y-4">
+          {/* Search + filter bar */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                fetchAdminUsers(userSearch)
+              }}
+              className="flex-1 relative"
+            >
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+              <Input
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                placeholder="Search by email or username…"
+                className="pl-9 bg-white border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+              />
+            </form>
+            <div className="flex gap-1">
+              {['', 'member', 'admin'].map((r) => (
+                <Button
+                  key={r || 'all'}
+                  variant={userRoleFilter === r ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setUserRoleFilter(r)}
+                  className={userRoleFilter === r ? 'bg-violet-600 text-white' : ''}
+                >
+                  {r === '' ? 'All' : r === 'member' ? 'Members' : 'Admins'}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Error */}
+          {userError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+              {userError}
+            </div>
+          )}
+
+          {/* Loading */}
+          {usersLoading ? (
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-16 bg-zinc-200 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : adminUsers.length === 0 ? (
+            <div className="text-center py-12 bg-zinc-50 rounded-lg border border-zinc-200">
+              <Users className="h-10 w-10 text-zinc-400 mx-auto mb-3" />
+              <p className="text-sm text-zinc-600">No users found</p>
+              <p className="text-xs text-zinc-400 mt-1">
+                {userSearch ? `No matches for "${userSearch}"` : 'Try adjusting your filters'}
+              </p>
+            </div>
+          ) : (
+            <div className="bg-zinc-50 rounded-lg border border-zinc-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-zinc-200 bg-white">
+                      <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">User</th>
+                      <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Role</th>
+                      <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Status</th>
+                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Videos</th>
+                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Comments</th>
+                      <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Joined</th>
+                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminUsers.map((u) => (
+                      <tr key={u.id} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-100 transition-colors">
+                        {/* User cell */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="shrink-0">
+                              {u.avatarUrl ? (
+                                <img src={u.avatarUrl} alt={u.username} className="w-8 h-8 rounded-full object-cover" />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
+                                  {u.username[0]?.toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-zinc-900 truncate">{u.username}</p>
+                              <p className="text-xs text-zinc-500 truncate">{u.email}</p>
+                              {u.oauthProvider && (
+                                <p className="text-[10px] text-zinc-400">via {u.oauthProvider}</p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        {/* Role */}
+                        <td className="px-4 py-3">
+                          <Badge
+                            variant="outline"
+                            className={u.role === 'admin'
+                              ? 'border-violet-200 text-violet-700 text-xs'
+                              : 'border-zinc-200 text-zinc-600 text-xs'}
+                          >
+                            {u.role}
+                          </Badge>
+                        </td>
+                        {/* Status */}
+                        <td className="px-4 py-3">
+                          {u.isActive ? (
+                            <Badge variant="outline" className="border-emerald-200 text-emerald-700 text-xs">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1" />
+                              active
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="border-red-200 text-red-700 text-xs">
+                              <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1" />
+                              suspended
+                            </Badge>
+                          )}
+                          {u.channel?.isSuspended && (
+                            <Badge variant="outline" className="border-orange-200 text-orange-700 text-xs ml-1">
+                              channel suspended
+                            </Badge>
+                          )}
+                        </td>
+                        {/* Video count */}
+                        <td className="text-right px-4 py-3 text-sm text-zinc-600">
+                          {u.videoCount}
+                        </td>
+                        {/* Comment count */}
+                        <td className="text-right px-4 py-3 text-sm text-zinc-600">
+                          {u.commentCount}
+                        </td>
+                        {/* Joined */}
+                        <td className="px-4 py-3 text-xs text-zinc-500">
+                          {timeAgo(u.createdAt)}
+                        </td>
+                        {/* Actions */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-1">
+                            {/* Role toggle */}
+                            <button
+                              onClick={() => updateUserRole(u.id, u.role === 'admin' ? 'member' : 'admin')}
+                              disabled={userActionId === u.id}
+                              title={u.role === 'admin' ? 'Demote to member' : 'Promote to admin'}
+                              className={`p-1.5 rounded transition-colors disabled:opacity-50 ${
+                                u.role === 'admin'
+                                  ? 'text-violet-600 hover:bg-violet-100'
+                                  : 'text-zinc-500 hover:bg-zinc-200 hover:text-violet-600'
+                              }`}
+                            >
+                              {userActionId === u.id ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <UserCog className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                            {/* Activate/deactivate toggle */}
+                            <button
+                              onClick={() => toggleUserActive(u.id, u.isActive)}
+                              disabled={userActionId === u.id}
+                              title={u.isActive ? 'Suspend user' : 'Reactivate user'}
+                              className={`p-1.5 rounded transition-colors disabled:opacity-50 ${
+                                u.isActive
+                                  ? 'text-zinc-500 hover:bg-orange-100 hover:text-orange-600'
+                                  : 'text-emerald-600 hover:bg-emerald-100'
+                              }`}
+                            >
+                              {u.isActive ? (
+                                <UserX className="h-3.5 w-3.5" />
+                              ) : (
+                                <UserCheck className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                            {/* Delete (hard) */}
+                            <button
+                              onClick={() => deleteUser(u.id, u.username)}
+                              disabled={userActionId === u.id}
+                              title="Permanently delete user"
+                              className="p-1.5 rounded text-zinc-500 hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-50"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Footer with count + legend */}
+              <div className="px-4 py-2 border-t border-zinc-200 bg-white flex items-center justify-between text-xs text-zinc-500">
+                <span>{adminUsers.length} user{adminUsers.length !== 1 ? 's' : ''} shown</span>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1">
+                    <UserCog className="h-3 w-3" /> toggle role
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <UserX className="h-3 w-3" /> suspend
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Trash2 className="h-3 w-3" /> delete
+                  </span>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       )}
