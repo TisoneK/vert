@@ -142,12 +142,15 @@ export function HomeFeed() {
         </section>
       )}
 
-      {/* Featured — one hero video, not a shelf */}
+      {/* Featured — one hero video. Height capped at ~40vh so the user
+          immediately sees the start of the next section below the fold
+          on a typical desktop viewport. aspect-video alone made it
+          ~675px tall on a 1280px viewport, dominating the entire screen. */}
       {trendingVideos.length > 0 && (
         <section className="mb-8">
           <h2 className="text-sm font-semibold text-zinc-900 mb-3">Featured</h2>
           <div
-            className="relative aspect-video rounded-lg overflow-hidden bg-zinc-200 cursor-pointer group"
+            className="relative aspect-video max-h-[42vh] rounded-lg overflow-hidden bg-zinc-200 cursor-pointer group"
             onClick={() => navigate({ page: 'video', videoId: trendingVideos[0].id })}
           >
             {trendingVideos[0].thumbnailUrl ? (
@@ -161,11 +164,15 @@ export function HomeFeed() {
                 <Play className="h-10 w-10 text-zinc-400" />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+            {/* Stronger gradient (from-black/90 via-black/40) so the title
+                and channel name stay readable on bright thumbnails. */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
-              <span className="inline-block px-2 py-0.5 bg-violet-600 text-white rounded text-[10px] font-bold uppercase mb-2">Featured</span>
-              <h3 className="text-lg font-bold text-white line-clamp-1">{trendingVideos[0].title}</h3>
-              <p className="text-sm text-zinc-300 mt-0.5">
+              {/* Smaller, more transparent badge so it doesn't compete with
+                  the title for attention. */}
+              <span className="inline-block px-1.5 py-0.5 bg-violet-600/80 backdrop-blur-sm text-white rounded text-[9px] font-bold uppercase tracking-wider mb-2">Featured</span>
+              <h3 className="text-lg font-bold text-white line-clamp-1 drop-shadow-sm">{trendingVideos[0].title}</h3>
+              <p className="text-sm text-zinc-200 mt-0.5 drop-shadow-sm">
                 {trendingVideos[0].channel.channelName} · {formatViews(trendingVideos[0].viewCount)} views
               </p>
             </div>
@@ -236,6 +243,55 @@ export function HomeFeed() {
           </div>
         </section>
       )}
+
+      {/* Popular Creators — horizontal row of channel avatars + names.
+          Derived from the channels that appear in trending + latest videos.
+          Adds social density to the homepage so it doesn't end abruptly
+          after the Latest grid. */}
+      {(() => {
+        const seen = new Set<string>()
+        const creators: Array<{ id: string; channelName: string; avatarUrl: string | null }> = []
+        for (const v of [...trendingVideos, ...videos]) {
+          if (creators.length >= 8) break
+          if (seen.has(v.channel.id)) continue
+          seen.add(v.channel.id)
+          creators.push({
+            id: v.channel.id,
+            channelName: v.channel.channelName,
+            avatarUrl: v.channel.user.avatarUrl,
+          })
+        }
+        if (creators.length === 0) return null
+        return (
+          <section className="mb-8">
+            <h2 className="text-sm font-semibold text-zinc-900 mb-3">Popular Creators</h2>
+            <div className="flex gap-4 overflow-x-auto shelf-scroll pb-2">
+              {creators.map((ch) => (
+                <button
+                  key={ch.id}
+                  onClick={() => navigate({ page: 'channel', channelId: ch.id })}
+                  className="flex flex-col items-center gap-2 shrink-0 w-20 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2 rounded-lg"
+                >
+                  {ch.avatarUrl ? (
+                    <img
+                      src={ch.avatarUrl}
+                      alt={ch.channelName}
+                      className="w-16 h-16 rounded-full object-cover ring-2 ring-zinc-100 group-hover:ring-violet-200 transition-all"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-100 to-zinc-100 flex items-center justify-center text-violet-600 text-xl font-bold ring-2 ring-zinc-100 group-hover:ring-violet-200 transition-all">
+                      {ch.channelName[0]?.toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-xs text-zinc-700 text-center line-clamp-1 w-full group-hover:text-zinc-900 transition-colors">
+                    {ch.channelName}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )
+      })()}
 
       {/* Empty state */}
       {videos.length === 0 && trendingVideos.length === 0 && (

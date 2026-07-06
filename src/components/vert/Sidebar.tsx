@@ -63,8 +63,10 @@ export function Sidebar({ collapsed }: SidebarProps) {
   const { user } = useAuth()
   const [categories, setCategories] = useState<SidebarCategory[]>([])
   const [channels, setChannels] = useState<SidebarChannel[]>([])
-  const [categoriesExpanded, setCategoriesExpanded] = useState(false)
-  const [channelsExpanded, setChannelsExpanded] = useState(false)
+  // Default both sections to expanded so users actually see the content.
+  // Collapsed sections look like empty space and users miss the links.
+  const [categoriesExpanded, setCategoriesExpanded] = useState(true)
+  const [channelsExpanded, setChannelsExpanded] = useState(true)
 
   useEffect(() => {
     let cancelled = false
@@ -307,10 +309,12 @@ export function Sidebar({ collapsed }: SidebarProps) {
         </>
       )}
 
-      {/* User section */}
-      {user && (
+      {/* User / Creator section — separated from consumer navigation with
+          a labeled divider so the hierarchy is clear (viewer vs creator/admin). */}
+      {user && (user.channelId || user.role === 'admin') && (
         <>
-          <div className="my-2 border-t border-zinc-200" />
+          <div className="my-3 border-t border-zinc-200" />
+          <p className="px-3 mb-1 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Creator</p>
           <div className="flex flex-col gap-0.5">
             {user.channelId && (
               <button

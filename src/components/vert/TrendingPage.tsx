@@ -138,13 +138,14 @@ export function TrendingPage() {
         </div>
       ) : (
         <>
-          {/* Hero section with top trending video */}
+          {/* Hero section with top trending video — height capped at 42vh
+              (same as home featured) so users see the grid below the fold. */}
           {heroVideo && (
             <div
               className="relative mb-8 rounded-lg overflow-hidden cursor-pointer group shadow-sm hover:shadow-md transition-all duration-200"
               onClick={() => navigate({ page: 'video', videoId: heroVideo.id })}
             >
-              <div className="aspect-video bg-zinc-200">
+              <div className="aspect-video max-h-[42vh] bg-zinc-200">
                 {heroVideo.thumbnailUrl ? (
                   <img src={heroVideo.thumbnailUrl} alt={heroVideo.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
                 ) : (
@@ -152,10 +153,10 @@ export function TrendingPage() {
                     <Play className="h-10 w-10 text-zinc-500" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2 py-0.5 bg-orange-500 text-white rounded text-[10px] font-bold uppercase tracking-wide">
+                    <span className="px-1.5 py-0.5 bg-orange-500/90 backdrop-blur-sm text-white rounded text-[9px] font-bold uppercase tracking-wider">
                       #1 Trending
                     </span>
                     {heroVideo.categories?.slice(0, 2).map((cat) => (
@@ -167,10 +168,10 @@ export function TrendingPage() {
                       </span>
                     ))}
                   </div>
-                  <h2 className="text-lg md:text-xl font-bold text-white mb-1 leading-tight line-clamp-2">
+                  <h2 className="text-lg md:text-xl font-bold text-white mb-1 leading-tight line-clamp-2 drop-shadow-sm">
                     {heroVideo.title}
                   </h2>
-                  <p className="text-zinc-300 text-sm">
+                  <p className="text-zinc-200 text-sm drop-shadow-sm">
                     {heroVideo.channel.channelName} · {formatViews(heroVideo.viewCount)} views
                   </p>
                 </div>
