@@ -82,11 +82,43 @@ export async function PATCH(
     }
 
     const body = await req.json()
+
+    // Validate channel name if provided.
+    const trimmedName =
+      typeof body.channelName === 'string' ? body.channelName.trim() : undefined
+    if (trimmedName !== undefined) {
+      if (trimmedName.length === 0) {
+        return NextResponse.json({ error: 'Channel name cannot be empty' }, { status: 400 })
+      }
+      if (trimmedName.length > 50) {
+        return NextResponse.json(
+          { error: 'Channel name is too long (max 50 characters)' },
+          { status: 400 }
+        )
+      }
+    }
+    // Description: max 1000 chars.
+    const trimmedDescription =
+      typeof body.description === 'string'
+        ? body.description.trim().slice(0, 1000)
+        : body.description
+    // Banner URL: must be https if provided.
+    if (body.bannerUrl) {
+      try {
+        const u = new URL(body.bannerUrl)
+        if (u.protocol !== 'https:') {
+          return NextResponse.json({ error: 'bannerUrl must be https' }, { status: 400 })
+        }
+      } catch {
+        return NextResponse.json({ error: 'bannerUrl must be a valid URL' }, { status: 400 })
+      }
+    }
+
     const updated = await db.channel.update({
       where: { id },
       data: {
-        channelName: body.channelName,
-        description: body.description,
+        channelName: trimmedName ?? body.channelName,
+        description: trimmedDescription,
         bannerUrl: body.bannerUrl,
       },
     })
