@@ -23,6 +23,14 @@ export function ProfilePage() {
   const [description, setDescription] = useState('')
   const [saving, setSaving] = useState(false)
 
+  // Redirect to login if not authenticated. Previously this was a
+  // setState-during-render call (navigate inside the render body), which
+  // is a React anti-pattern that can warn in StrictMode and cause subtle
+  // re-render bugs. Move it to an effect.
+  useEffect(() => {
+    if (!user) navigate({ page: 'login' })
+  }, [user, navigate])
+
   useEffect(() => {
     if (user?.channelId) {
       fetchChannel()
@@ -71,7 +79,8 @@ export function ProfilePage() {
   }
 
   if (!user) {
-    navigate({ page: 'login' })
+    // The effect above will redirect; render a minimal placeholder in
+    // the meantime so we don't crash trying to read user.channelId etc.
     return null
   }
 

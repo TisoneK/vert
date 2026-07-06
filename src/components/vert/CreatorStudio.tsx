@@ -143,10 +143,13 @@ export function CreatorStudio() {
     }
   }
 
-  if (!user) {
-    navigate({ page: 'login' })
-    return null
-  }
+  // Redirect to login if not authenticated. Previously this was a
+  // setState-during-render call (navigate inside the render body), which
+  // is a React anti-pattern that can warn in StrictMode and cause subtle
+  // re-render bugs. Move it to an effect.
+  useEffect(() => {
+    if (!user) navigate({ page: 'login' })
+  }, [user, navigate])
 
   if (loading && tab === 'studio') {
     return (
