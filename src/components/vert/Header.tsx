@@ -9,7 +9,8 @@ import {
   User,
   Shield,
   Menu,
-  Settings,
+  Settings as SettingsIcon,
+  Settings2,
   ChevronDown,
   X,
 } from 'lucide-react'
@@ -146,9 +147,15 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
                       onClick={() => { navigate({ page: 'creator-studio' }); setShowProfileMenu(false) }}
                       className="w-full text-left px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 flex items-center gap-2 transition-colors"
                     >
-                      <Settings className="h-4 w-4" /> Creator Studio
+                      <Settings2 className="h-4 w-4" /> Creator Studio
                     </button>
                   )}
+                  <button
+                    onClick={() => { navigate({ page: 'settings' }); setShowProfileMenu(false) }}
+                    className="w-full text-left px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 flex items-center gap-2 transition-colors"
+                  >
+                    <SettingsIcon className="h-4 w-4" /> Settings
+                  </button>
                   {user.role === 'admin' && (
                     <button
                       onClick={() => { navigate({ page: 'admin' }); setShowProfileMenu(false) }}

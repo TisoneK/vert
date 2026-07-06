@@ -19,6 +19,7 @@ export type View =
   | { page: 'playlists' }
   | { page: 'playlist'; playlistId: string }
   | { page: 'creator-studio' }
+  | { page: 'settings' }
   | { page: 'contact' }
 
 /**
@@ -53,6 +54,8 @@ export function viewToPath(view: View): string {
       return '/playlists'
     case 'playlist':
       return `/playlist/${view.playlistId}`
+    case 'settings':
+      return '/settings'
     case 'contact':
       return '/contact'
     case 'home':
@@ -76,6 +79,7 @@ export function pathToView(pathname: string): View | null {
   if (path === '/trending') return { page: 'trending' }
   if (path === '/explore') return { page: 'explore' }
   if (path === '/playlists') return { page: 'playlists' }
+  if (path === '/settings') return { page: 'settings' }
   if (path === '/contact') return { page: 'contact' }
 
   const watchMatch = path.match(/^\/watch\/(.+)$/)

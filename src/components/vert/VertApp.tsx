@@ -26,6 +26,7 @@ import { ContactPage } from './ContactPage'
 import { LandingPage } from './LandingPage'
 import { PlaylistsPage } from './PlaylistsPage'
 import { PlaylistDetailPage } from './PlaylistDetailPage'
+import { SettingsPage } from './SettingsPage'
 
 export function VertApp() {
   const { currentView, navigate } = useNavigation()
@@ -190,6 +191,8 @@ export function VertApp() {
         return user ? <PlaylistDetailPage playlistId={currentView.playlistId} /> : <LoginForm />
       case 'creator-studio':
         return user ? <CreatorStudio /> : <LoginForm />
+      case 'settings':
+        return user ? <SettingsPage /> : <LoginForm />
       case 'contact':
         return <ContactPage />
       default:
