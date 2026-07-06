@@ -26,8 +26,8 @@ details (file references, API routes, commit hashes), see
 
 ### Added
 - **Playlists.** Create, view, edit, and delete playlists. Add videos to playlists from any video card's menu. View a playlist's videos and play them in order.
-- **Admin: User management.** Admins can now search, filter, promote/demote, suspend, and delete user accounts from a new Users tab in the admin dashboard. Self-demotion and self-deletion are blocked for safety.
-- **Admin: Database migrations from the UI.** Admins can apply pending schema migrations directly from the browser via a new Database tab. Each migration runs in a transaction and is tracked for audit.
+- **Admin: User management.** Admins can now search, filter, change roles, suspend, and delete user accounts from a new Users tab in the admin dashboard. Safety guards prevent admins from locking themselves out of their own account.
+- **Admin: Database updates from the UI.** Admins can apply pending database updates directly from the browser via a new Database tab, without needing shell access. Each update is applied safely and recorded for traceability.
 - **Account settings.** Users can change their own password (requires current password verification) and delete their own account (multi-step confirmation) from a new Settings page.
 - **Search by channel name.** Search now matches video titles, descriptions, and channel names. A new Channels tab in search results shows matching channels.
 - **Search filters.** Filter video search results by format (portrait, landscape, square) and upload date (today, this week, this month, this year).
@@ -52,14 +52,14 @@ details (file references, API routes, commit hashes), see
 - **View counts could double-count.** A missing database constraint meant concurrent page loads could both record a view for the same user. Added the constraint and made the view counter handle the race gracefully.
 - **Profile and Creator Studio pages no longer trigger React warnings.** Auth redirects were happening during render instead of after, which could cause subtle re-render bugs. Fixed.
 - **Search results didn't refresh on URL change.** Typing a new search in the header updated the URL but the results list didn't update. Fixed.
-- **Public debug endpoint leaked database info.** A diagnostic endpoint was publicly accessible and returned database host details. Now admin-only.
-- **Timing-unsafe secret comparison.** The seed and cleanup endpoints compared their secret key in a way that leaked it via response-time differences. Now uses a constant-time comparison.
+- **Public diagnostic endpoint leaked database info.** A built-in health-check endpoint was publicly accessible and exposed internal database details. Now restricted to admins.
+- **Secret key comparison hardened.** Internal setup endpoints compared their secret key in a way that could leak it via response-time differences. Now uses a constant-time comparison.
 
 ### Security
 - **Input validation** added across registration, video/channel/comment creation, and URL fields to prevent storage of malformed or malicious data.
 - **Security headers** (HSTS, X-Frame-Options, etc.) added to prevent clickjacking, MIME sniffing, and downgrade attacks.
-- **Debug endpoint locked down** behind admin auth to prevent information leakage.
-- **Timing-safe secret comparison** on seed/cleanup endpoints to prevent timing attacks.
+- **Diagnostic endpoint locked down** to admin-only access to prevent information leakage.
+- **Secret key comparison hardened** on internal setup endpoints to prevent timing-based attacks.
 - **Image optimization enabled.** The app is now configured to optimize images served from cloud storage and Google avatars, paving the way for faster-loading thumbnails and automatic WebP/AVIF conversion.
 
 ---
@@ -75,7 +75,7 @@ details (file references, API routes, commit hashes), see
 - **Architecture documentation** added, explaining the v1 design choices and what would trigger revisiting each deferred decision.
 
 ### Changed
-- **Dependency audit** closed 44 of 54 known vulnerabilities (81% reduction). Updated the framework, auth, database, and UI libraries to the latest patched versions, plus pinned 11 transitive dependencies that had upstream fixes available.
+- **Dependency security audit** closed 44 of 54 known vulnerabilities (81% reduction). Updated the framework, auth, database, and UI libraries to the latest patched versions, plus pinned 11 transitive dependencies that had upstream fixes available.
 
 ### Fixed
 - **Video player no longer restarts playback** when toggling play/pause or settings. Player initialization is now properly tied to the video URL, not to control interactions.
