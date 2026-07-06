@@ -47,16 +47,17 @@ export async function GET(
 
     // Views were previously counted on every single request to this route —
     // every page load, refresh, or re-open by the same account added +1, so
-    // a creator watching their own video 5 times showed 5 views. Count at
-    // most once per logged-in account, using WatchHistory (one row per
-    // user/video, see /api/v1/history) as the "have they already been
-    // counted" check. Anonymous (logged-out) viewers can't be deduped
-    // without a session cookie, so they still count every load for now —
-    // a real fix there would need a per-visitor cookie/session id.
+    // a creator watching their own video 5 times showed 5 views. Logged-in
+    // accounts are deduped against WatchHistory (one row per user/video,
+    // see /api/v1/history). Anonymous viewers have no account to key off,
+    // so we use a per-video, per-browser cookie instead — same idea, just
+    // client-side rather than a DB row.
     const { getCurrentUser } = await import('@/lib/auth-helpers')
     const user = await getCurrentUser()
 
     let viewCountDelta = 0
+    let anonCookieToSet: string | null = null
+
     if (user) {
       const alreadyWatched = await db.watchHistory.findFirst({
         where: { userId: user.id, videoId: id },
@@ -73,7 +74,12 @@ export async function GET(
         })
       }
     } else {
-      viewCountDelta = 1
+      const cookieName = `vw_${id}`
+      const alreadyViewed = req.cookies.get(cookieName)
+      if (!alreadyViewed) {
+        viewCountDelta = 1
+        anonCookieToSet = cookieName
+      }
     }
 
     if (viewCountDelta > 0) {
@@ -90,7 +96,19 @@ export async function GET(
       tags: video.tags.map((vt) => vt.tag),
     }
 
-    return NextResponse.json({ ...formatted, viewCount: video.viewCount + viewCountDelta })
+    const response = NextResponse.json({ ...formatted, viewCount: video.viewCount + viewCountDelta })
+
+    if (anonCookieToSet) {
+      response.cookies.set(anonCookieToSet, '1', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 365, // 1 year
+        path: '/',
+      })
+    }
+
+    return response
   } catch (error) {
     console.error('Video get error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
