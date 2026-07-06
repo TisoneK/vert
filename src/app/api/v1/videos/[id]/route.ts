@@ -141,11 +141,43 @@ export async function PATCH(
     }
 
     const body = await req.json()
+
+    // Validate title if provided — same rules as POST /api/v1/videos.
+    const trimmedTitle =
+      typeof body.title === 'string' ? body.title.trim() : undefined
+    if (trimmedTitle !== undefined) {
+      if (trimmedTitle.length === 0) {
+        return NextResponse.json({ error: 'Title cannot be empty' }, { status: 400 })
+      }
+      if (trimmedTitle.length > 100) {
+        return NextResponse.json(
+          { error: 'Title is too long (max 100 characters)' },
+          { status: 400 }
+        )
+      }
+    }
+    const trimmedDescription =
+      typeof body.description === 'string'
+        ? body.description.trim().slice(0, 5000)
+        : body.description
+
+    // Validate thumbnailUrl if provided — must be https.
+    if (body.thumbnailUrl) {
+      try {
+        const u = new URL(body.thumbnailUrl)
+        if (u.protocol !== 'https:') {
+          return NextResponse.json({ error: 'thumbnailUrl must be https' }, { status: 400 })
+        }
+      } catch {
+        return NextResponse.json({ error: 'thumbnailUrl must be a valid URL' }, { status: 400 })
+      }
+    }
+
     const updated = await db.video.update({
       where: { id },
       data: {
-        title: body.title,
-        description: body.description,
+        title: trimmedTitle ?? body.title,
+        description: trimmedDescription,
         thumbnailUrl: body.thumbnailUrl,
       },
     })

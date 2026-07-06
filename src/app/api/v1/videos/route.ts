@@ -123,6 +123,44 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Title rules: 1–100 chars after trim. Matches YouTube's title limit
+    // and keeps the listing UI from breaking on huge strings.
+    const trimmedTitle = typeof title === 'string' ? title.trim() : ''
+    if (trimmedTitle.length === 0) {
+      return NextResponse.json({ error: 'Title cannot be empty' }, { status: 400 })
+    }
+    if (trimmedTitle.length > 100) {
+      return NextResponse.json(
+        { error: 'Title is too long (max 100 characters)' },
+        { status: 400 }
+      )
+    }
+
+    // Description: max 5000 chars (matches YouTube). Null/empty is fine.
+    const trimmedDescription =
+      typeof description === 'string' ? description.trim().slice(0, 5000) : null
+
+    // videoUrl + thumbnailUrl must be https — prevents storing arbitrary
+    // javascript:/data: URLs that could be exploited elsewhere.
+    try {
+      const u = new URL(videoUrl)
+      if (u.protocol !== 'https:') {
+        return NextResponse.json({ error: 'videoUrl must be https' }, { status: 400 })
+      }
+    } catch {
+      return NextResponse.json({ error: 'videoUrl must be a valid URL' }, { status: 400 })
+    }
+    if (thumbnailUrl) {
+      try {
+        const u = new URL(thumbnailUrl)
+        if (u.protocol !== 'https:') {
+          return NextResponse.json({ error: 'thumbnailUrl must be https' }, { status: 400 })
+        }
+      } catch {
+        return NextResponse.json({ error: 'thumbnailUrl must be a valid URL' }, { status: 400 })
+      }
+    }
+
     // Verify channel ownership
     const channel = await db.channel.findUnique({
       where: { id: channelId },
@@ -164,8 +202,8 @@ export async function POST(req: NextRequest) {
     const video = await db.video.create({
       data: {
         channelId,
-        title,
-        description: description || null,
+        title: trimmedTitle,
+        description: trimmedDescription,
         videoUrl,
         thumbnailUrl: thumbnailUrl || null,
         durationSeconds: durationSeconds || null,
