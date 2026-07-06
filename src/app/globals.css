@@ -119,6 +119,17 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Global focus-visible style for interactive elements.
+   * This ensures consistent focus indicators for accessibility.
+   * Components can override with custom focus-visible classes. */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply outline-none ring-2 ring-violet-600 ring-offset-2;
+  }
 }
 
 /* Custom scrollbar */
