@@ -37,9 +37,6 @@ export function SearchResults({ query }: SearchResultsProps) {
   // URL but the results list didn't refresh.
   useEffect(() => {
     if (query) fetchResults(query, sortBy)
-    // We deliberately do NOT include fetchResults in deps — it's a
-    // stable function that only closes over setVideos/setLoading.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, sortBy])
 
   // Keep the local input box in sync with the URL prop so the user
