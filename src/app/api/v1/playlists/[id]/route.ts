@@ -40,7 +40,18 @@ export async function GET(
       return NextResponse.json({ error: 'Playlist not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ playlist })
+    // Filter out removed/deleted videos — a playlist may still reference
+    // a video whose isRemoved=true. The client shouldn't see those.
+    const visibleItems = playlist.items.filter(
+      (item) => item.video && !item.video.isRemoved
+    )
+
+    return NextResponse.json({
+      playlist: {
+        ...playlist,
+        items: visibleItems,
+      },
+    })
   } catch (error) {
     console.error('Playlist get error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -85,6 +96,42 @@ export async function PATCH(
     return NextResponse.json({ playlist: updated })
   } catch (error) {
     console.error('Playlist update error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const { getCurrentUser } = await import('@/lib/auth-helpers')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
+
+    const playlist = await db.playlist.findUnique({
+      where: { id },
+      include: { channel: true },
+    })
+
+    if (!playlist) {
+      return NextResponse.json({ error: 'Playlist not found' }, { status: 404 })
+    }
+
+    if (playlist.channel.userId !== user.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+
+    // Cascade delete — PlaylistItem rows are deleted automatically via
+    // the schema's onDelete: Cascade on the playlist relation.
+    await db.playlist.delete({ where: { id } })
+
+    return NextResponse.json({ message: 'Playlist deleted' })
+  } catch (error) {
+    console.error('Playlist delete error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
