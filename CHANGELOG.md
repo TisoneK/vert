@@ -21,11 +21,13 @@ details (file references, API routes, commit hashes), see
 
 ### Changed
 - **Portrait video player is now smaller on mobile.** Capped at 55% of the viewport height (was 65%), so the title, action buttons, and channel info are visible without scrolling immediately after the page loads.
+- **Portrait videos are now centered on the watch page.** Previously a narrow portrait video sat left-aligned in a wide container, leaving all the empty space on the right. The player now centers horizontally so the whitespace is balanced.
+- **Form inputs are taller.** All text inputs (login, signup, settings, contact, upload, playlist create) bumped from 36px to 40px height for more comfortable touch targeting on mobile.
 - **Removed the non-functional "like" button on comments.** The button only updated local state — there was no API call, no persistence, and the displayed count was hardcoded. Rather than ship a misleading UI, it has been removed. A real comment-like feature would require a new database model, an API endpoint, and a `likeCount` field on the comments API; deferred until that work is scheduled.
 - **Creator Studio tables now stack as cards on mobile.** The "Your Videos", "Top 5 Videos", and "Recent Uploads" tables previously required horizontal scrolling on a phone — you could only see two columns at a time. They now collapse into a stacked card layout on mobile, with the original tables preserved on desktop.
 
 ### Fixed
-- **Video cards in the same row now have equal heights.** Previously a card with a short title was shorter than its neighbour with a longer title, making grids look ragged. Cards now stretch to match the tallest card in their row.
+- **Video cards in the same row now have equal heights.** Previously a card with a short title was shorter than its neighbour with a longer title, making grids look ragged. Cards now stretch to match the tallest card in their row. (Applied to both the shared VideoCard component and the landing page's custom card markup.)
 - **Long channel names no longer push the Subscribe button off-screen** on the watch page. The channel name truncates gracefully instead.
 - **Landing page footer has better visual balance.** The "Vert" wordmark was too light (looked like a placeholder); it now has a heavier weight matching the links on the right.
 - **Mobile users can now reach every action button that was previously hidden behind hover.** Across the comment section (delete-own-comment), watch history (remove entry), saved videos (unsave), playlists (delete playlist, remove video), and the video card context menu (Save / Add to playlist / Share / Report), buttons that used `opacity-0 group-hover:opacity-100` were completely invisible and untappable on touch devices. They're now visible by default on mobile and hover-revealed only on desktop.

@@ -12,6 +12,19 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Second visual analysis pass (screenshot-driven)
+**Commit:** `70ad72c`
+
+A second screenshot pass after the first round of fixes deployed. Captured 22 screenshots at 390×844 (iPhone 14) and 1280×800 (desktop) across landing, watch, trending, explore, search, changelog, contact, login, and signup pages. VLM (`glm-4.6v`) analysis was cross-checked against DOM measurements to filter hallucinations.
+
+**Landing page card heights.** `LandingPage.tsx` — the landing page uses its own custom card markup (not the shared `VideoCard` component), so the `h-full flex flex-col` fix from the previous pass didn't apply. Verified: cards were 350px vs 370px in the same row. Added the same `h-full flex flex-col` classes to the landing card root.
+
+**Portrait video centering.** `VideoPlayer.tsx` + `VideoDetail.tsx` — the outer player wrapper used `flex justify-start`, so a narrow portrait video (maxWidth ~261px on mobile, ~464px tall) sat left-aligned in a full-width container, leaving all the empty space on the right. Changed to `flex justify-center` in both the player component and the watch page wrapper so the portrait player sits centered horizontally. Whitespace is now balanced left/right.
+
+**Scroll-fade visibility.** `globals.css` — the `.scroll-fade` mask was 16px, too subtle to read as a hint on most screens. Widened to 24px.
+
+**Input height.** `ui/input.tsx` — the shadcn default `h-9` (36px) is below the 40px minimum touch target recommended for mobile forms. Bumped to `h-10` (40px). Affects every form in the app: login, signup, settings (change password, delete account), contact, upload (title, tags), playlist create, playlist picker create.
+
 #### Visual polish pass (screenshot-driven review)
 **Commit:** `64b4ec7`
 
