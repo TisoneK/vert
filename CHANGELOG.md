@@ -20,7 +20,7 @@ details (file references, API routes, commit hashes), see
 - **Consistent focus indicators.** All buttons, links, inputs, selects, and textareas now show a violet focus ring when navigated to by keyboard, making the app noticeably easier to use without a mouse.
 
 ### Changed
-- **Channel page has a proper default banner.** When a channel hasn't uploaded a custom banner, the top of the page now shows a branded violet gradient with a subtle dotted pattern instead of a flat lavender rectangle that looked like a placeholder.
+- **Channel and profile pages no longer show an empty banner.** When a channel hasn't uploaded a custom banner, the 96–144px tall colored box at the top of the page is now removed entirely instead of showing an empty placeholder. The "Back to feed" button becomes a normal inline link above the avatar. Channels that do have a banner image still get the full banner treatment with the floating back button.
 - **Verified badge is now a filled seal.** The checkmark next to a channel name was a bare 16px icon that was easy to mistake for a stray mark. It's now a 20px filled scalloped-circle badge with a white check, matching the convention used by Twitter and YouTube.
 - **Channel pages show join date and total views.** A new stats row below the channel description shows when the channel was created, how many total views its videos have, and the video count — filling the empty whitespace that was there before and giving the profile a more complete feel.
 - **Portrait video player is now smaller on mobile.** Capped at 55% of the viewport height (was 65%), so the title, action buttons, and channel info are visible without scrolling immediately after the page loads.

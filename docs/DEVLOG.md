@@ -12,6 +12,22 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Remove empty banner space on channel/profile pages
+**Commit:** `d0ab347`
+
+The channel and profile pages reserved 96px (mobile) / 144px (desktop) of vertical space for a banner — even when the channel had no banner image. This created a large empty colored box at the top of the page that served no purpose and pushed the actual content down.
+
+A previous fix (`23d02c2`) tried to dress up the empty space with a dotted gradient pattern. That was the wrong call — it decorated the dead space instead of removing it. This commit removes it entirely when there's no banner image.
+
+`ChannelPage.tsx`:
+- When `channel.bannerUrl` exists: render the full `h-24 md:h-36` banner with the "Back to feed" button floating on it (unchanged).
+- When no banner: skip the banner div completely. The "Back to feed" button becomes a normal inline text link (`text-zinc-500 hover:text-zinc-900`) above the avatar. The avatar sits at the top of the page with no `-mt-8` negative margin (the overlap effect is conditional on `bannerUrl` existing).
+
+`ProfilePage.tsx`:
+- Same pattern: banner only renders when `channel.bannerUrl` exists. Without a banner, the avatar sits at the top of the page.
+
+Both pages: the `-mt-8` avatar-overlap-with-banner effect is now conditional on `bannerUrl` existing, so the avatar doesn't get pulled up into nothing when there's no banner.
+
 #### Channel page polish (banner, badge, stats)
 **Commit:** `23d02c2`
 
