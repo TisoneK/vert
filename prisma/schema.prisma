@@ -191,6 +191,12 @@ model WatchHistory {
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  // One history row per (user, video). Without this, concurrent requests
+  // to /api/v1/videos/[id] (page load + history POST fired in parallel)
+  // could both pass the findFirst check and create duplicate rows,
+  // inflating view counts. Run `prisma db push` after pulling this change.
+  @@unique([userId, videoId])
 }
 
 model SavedVideo {

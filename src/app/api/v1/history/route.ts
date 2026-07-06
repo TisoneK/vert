@@ -18,22 +18,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'videoId is required' }, { status: 400 })
     }
 
-    // No compound unique constraint on (userId, videoId), so upsert manually:
-    // one history row per user/video, refreshed on each watch rather than a
-    // new row every time the same video is opened.
-    const existing = await db.watchHistory.findFirst({
-      where: { userId: user.id, videoId },
-      select: { id: true },
+    // The (userId, videoId) unique constraint on WatchHistory lets us
+    // upsert atomically — no more findFirst + create/update race window
+    // where two concurrent requests could both create a row.
+    const entry = await db.watchHistory.upsert({
+      where: { userId_videoId: { userId: user.id, videoId } },
+      update: { progress, watchedAt: new Date() },
+      create: { userId: user.id, videoId, progress },
     })
-
-    const entry = existing
-      ? await db.watchHistory.update({
-          where: { id: existing.id },
-          data: { progress, watchedAt: new Date() },
-        })
-      : await db.watchHistory.create({
-          data: { userId: user.id, videoId, progress },
-        })
 
     return NextResponse.json({ history: entry })
   } catch (error) {

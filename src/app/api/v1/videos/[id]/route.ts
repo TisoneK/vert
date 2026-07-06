@@ -59,8 +59,8 @@ export async function GET(
     let anonCookieToSet: string | null = null
 
     if (user) {
-      const alreadyWatched = await db.watchHistory.findFirst({
-        where: { userId: user.id, videoId: id },
+      const alreadyWatched = await db.watchHistory.findUnique({
+        where: { userId_videoId: { userId: user.id, videoId: id } },
         select: { id: true },
       })
       if (!alreadyWatched) {
@@ -69,9 +69,29 @@ export async function GET(
         // fast refresh before the client's separate history POST resolves)
         // sees this row and doesn't double-count. The client's own POST to
         // /api/v1/history will just update this same row afterwards.
-        await db.watchHistory.create({
-          data: { userId: user.id, videoId: id, progress: 0 },
-        })
+        //
+        // The (userId, videoId) unique constraint on WatchHistory guarantees
+        // that even if two concurrent GETs both pass the findUnique check,
+        // only one create succeeds — the other throws P2002 and we treat
+        // it as "already counted" rather than 500.
+        try {
+          await db.watchHistory.create({
+            data: { userId: user.id, videoId: id, progress: 0 },
+          })
+        } catch (err: unknown) {
+          // P2002 = unique constraint violation — the row already exists,
+          // created by a concurrent request. That's the desired state,
+          // so don't increment the view count and don't fail the request.
+          if (
+            err &&
+            typeof err === 'object' &&
+            'code' in err &&
+            err.code !== 'P2002'
+          ) {
+            throw err
+          }
+          viewCountDelta = 0
+        }
       }
     } else {
       const cookieName = `vw_${id}`
