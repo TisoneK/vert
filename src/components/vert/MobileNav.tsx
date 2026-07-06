@@ -1,7 +1,8 @@
 'use client'
 
 import { useNavigation, useAuth } from '@/lib/store'
-import { Home, Upload, User, Compass, Flame, Bookmark, X, Mail } from 'lucide-react'
+import { useEffect } from 'react'
+import { Home, Upload, User, Compass, Flame, Clock, Bookmark, X, Mail } from 'lucide-react'
 
 interface MobileNavProps {
   drawerOpen: boolean
@@ -13,6 +14,22 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
   const { user } = useAuth()
 
   const isActive = (page: string) => currentView.page === page
+
+  // Close on Escape + lock body scroll while the drawer is open.
+  // Without scroll lock, swiping inside the drawer scrolls the page behind it.
+  useEffect(() => {
+    if (!drawerOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onDrawerOpenChange(false)
+    }
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [drawerOpen, onDrawerOpenChange])
 
   return (
     <>
@@ -69,7 +86,15 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
                       isActive('history') ? 'bg-zinc-100 text-zinc-900 border-l-2 border-violet-600' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
                     }`}
                   >
-                    <Bookmark className="h-4 w-4" /> Watch Later
+                    <Clock className="h-4 w-4" /> History
+                  </button>
+                  <button
+                    onClick={() => { navigate({ page: 'saved' }); onDrawerOpenChange(false) }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                      isActive('saved') ? 'bg-zinc-100 text-zinc-900 border-l-2 border-violet-600' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                    }`}
+                  >
+                    <Bookmark className="h-4 w-4" /> Saved
                   </button>
                   <button
                     onClick={() => { navigate({ page: 'upload' }); onDrawerOpenChange(false) }}
