@@ -11,6 +11,11 @@ export async function GET(req: NextRequest) {
     const categorySlug = searchParams.get('category')
     const format = searchParams.get('format')
     const sort = searchParams.get('sort') || 'latest'
+    // New filters
+    const channelSearch = searchParams.get('channel')  // match channel name
+    const dateFilter = searchParams.get('date')  // today | week | month | year
+    const minDuration = searchParams.get('min_duration')  // seconds
+    const maxDuration = searchParams.get('max_duration')  // seconds
 
     const where: Record<string, unknown> = {
       isRemoved: false,
@@ -22,14 +27,60 @@ export async function GET(req: NextRequest) {
     }
 
     if (search) {
+      // Search video title + description, OR channel name (case-insensitive).
+      // The channel name match uses a nested relation filter — Prisma
+      // translates this to a JOIN with a LIKE clause.
       where.OR = [
-        { title: { contains: search } },
-        { description: { contains: search } },
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { channel: { channelName: { contains: search, mode: 'insensitive' } } },
       ]
+    }
+
+    if (channelSearch) {
+      // Separate channel-name-only filter (when ?channel= is set without ?search=)
+      where.channel = { channelName: { contains: channelSearch, mode: 'insensitive' } }
     }
 
     if (format) {
       where.format = format
+    }
+
+    // Date range filter
+    if (dateFilter) {
+      const now = new Date()
+      let cutoff: Date | null = null
+      switch (dateFilter) {
+        case 'today':
+          cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+          break
+        case 'week':
+          cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+          break
+        case 'month':
+          cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+          break
+        case 'year':
+          cutoff = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+          break
+      }
+      if (cutoff) where.createdAt = { gte: cutoff }
+    }
+
+    // Duration range filter
+    if (minDuration || maxDuration) {
+      const durationFilter: Record<string, number> = {}
+      if (minDuration) {
+        const min = parseInt(minDuration, 10)
+        if (Number.isFinite(min) && min >= 0) durationFilter.gte = min
+      }
+      if (maxDuration) {
+        const max = parseInt(maxDuration, 10)
+        if (Number.isFinite(max) && max >= 0) durationFilter.lte = max
+      }
+      if (Object.keys(durationFilter).length > 0) {
+        where.durationSeconds = durationFilter
+      }
     }
 
     if (categorySlug) {

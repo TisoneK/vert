@@ -4,56 +4,95 @@ import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { CardSkeleton } from './Skeleton'
-import { Button } from '@/components/ui/button'
-import { Search, SlidersHorizontal } from 'lucide-react'
-import { formatViews, timeAgo } from '@/lib/utils-vert'
+import { Search, SlidersHorizontal, Users, Film, Smartphone, Monitor, Square } from 'lucide-react'
+import { formatViews, formatSubscribers } from '@/lib/utils-vert'
 
 interface SearchResultsProps {
   query: string
 }
 
+interface VideoResult {
+  id: string
+  title: string
+  thumbnailUrl: string | null
+  durationSeconds: number | null
+  viewCount: number
+  likeCount: number
+  createdAt: string
+  format?: string
+  channel: { id: string; channelName: string; user: { avatarUrl: string | null } }
+  categories?: Array<{ name: string; slug: string }>
+}
+
+interface ChannelResult {
+  id: string
+  channelName: string
+  description: string | null
+  subscriberCount: number
+  videoCount: number
+  bannerUrl: string | null
+  user: { avatarUrl: string | null; username: string }
+}
+
+type ResultTab = 'videos' | 'channels'
+type SortOption = 'relevance' | 'date' | 'views'
+type FormatFilter = '' | 'portrait' | 'landscape' | 'square'
+type DateFilter = '' | 'today' | 'week' | 'month' | 'year'
+
 export function SearchResults({ query }: SearchResultsProps) {
   const { navigate } = useNavigation()
-  const [videos, setVideos] = useState<Array<{
-    id: string
-    title: string
-    thumbnailUrl: string | null
-    durationSeconds: number | null
-    viewCount: number
-    likeCount: number
-    createdAt: string
-    format?: string
-    channel: { id: string; channelName: string; user: { avatarUrl: string | null } }
-    categories?: Array<{ name: string; slug: string }>
-  }>>([])
+  const [videos, setVideos] = useState<VideoResult[]>([])
+  const [channels, setChannels] = useState<ChannelResult[]>([])
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState(query)
-  const [sortBy, setSortBy] = useState<'relevance' | 'date' | 'views'>('relevance')
+  const [tab, setTab] = useState<ResultTab>('videos')
+  const [sortBy, setSortBy] = useState<SortOption>('relevance')
+  const [formatFilter, setFormatFilter] = useState<FormatFilter>('')
+  const [dateFilter, setDateFilter] = useState<DateFilter>('')
 
-  // Re-fetch whenever the *prop* `query` or `sortBy` changes.
-  // The previous effect had a stale closure on `searchQuery` (initialized
-  // once from the prop, never updated after) and didn't run when the
-  // prop itself changed — typing in the header search box updated the
-  // URL but the results list didn't refresh.
+  // Re-fetch whenever query, tab, or any filter changes
   useEffect(() => {
-    if (query) fetchResults(query, sortBy)
-  }, [query, sortBy])
+    if (!query) return
+    if (tab === 'videos') {
+      fetchVideos(query)
+    } else {
+      fetchChannels(query)
+    }
+  }, [query, tab, sortBy, formatFilter, dateFilter])
 
-  // Keep the local input box in sync with the URL prop so the user
-  // sees the current query in the search field.
+  // Keep the local input box in sync with the URL prop
   useEffect(() => {
     setSearchQuery(query)
   }, [query])
 
-  async function fetchResults(q: string, sort: 'relevance' | 'date' | 'views' = sortBy) {
-    if (!q) return
+  async function fetchVideos(q: string) {
     setLoading(true)
     try {
-      const res = await fetch(`/api/v1/videos?search=${encodeURIComponent(q)}&limit=20&sort=${sort}`)
+      const params = new URLSearchParams({
+        search: q,
+        limit: '20',
+        sort: sortBy === 'relevance' ? 'latest' : sortBy,
+      })
+      if (formatFilter) params.set('format', formatFilter)
+      if (dateFilter) params.set('date', dateFilter)
+      const res = await fetch(`/api/v1/videos?${params}`)
       const data = await res.json()
-      setVideos(data.videos)
+      setVideos(data.videos ?? [])
     } catch (error) {
       console.error('Search error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function fetchChannels(q: string) {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/v1/channels/search?q=${encodeURIComponent(q)}&limit=20`)
+      const data = await res.json()
+      setChannels(data.channels ?? [])
+    } catch (error) {
+      console.error('Channel search error:', error)
     } finally {
       setLoading(false)
     }
@@ -62,16 +101,29 @@ export function SearchResults({ query }: SearchResultsProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      // Update the URL — the prop change will trigger the effect above
-      // to fetch fresh results. This avoids duplicate fetches.
       navigate({ page: 'search', query: searchQuery.trim() })
     }
   }
 
-  const sortFilters = [
-    { label: 'Relevance', value: 'relevance' as const },
-    { label: 'Date', value: 'date' as const },
-    { label: 'Views', value: 'views' as const },
+  const sortFilters: Array<{ label: string; value: SortOption }> = [
+    { label: 'Relevance', value: 'relevance' },
+    { label: 'Date', value: 'date' },
+    { label: 'Views', value: 'views' },
+  ]
+
+  const formatFilters: Array<{ label: string; value: FormatFilter; icon: React.ElementType }> = [
+    { label: 'All', value: '', icon: Film },
+    { label: 'Portrait', value: 'portrait', icon: Smartphone },
+    { label: 'Landscape', value: 'landscape', icon: Monitor },
+    { label: 'Square', value: 'square', icon: Square },
+  ]
+
+  const dateFilters: Array<{ label: string; value: DateFilter }> = [
+    { label: 'Any time', value: '' },
+    { label: 'Today', value: 'today' },
+    { label: 'This week', value: 'week' },
+    { label: 'This month', value: 'month' },
+    { label: 'This year', value: 'year' },
   ]
 
   return (
@@ -83,62 +135,193 @@ export function SearchResults({ query }: SearchResultsProps) {
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search videos..."
+            placeholder="Search videos, channels…"
             className="w-full pl-9 pr-4 py-2 bg-zinc-100 rounded-full text-sm text-zinc-600 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-violet-600 transition-colors"
           />
         </div>
       </form>
 
       {query && (
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold text-zinc-900">
-            Results for &ldquo;{query}&rdquo;
-          </h1>
-          <div className="flex items-center gap-1">
-            <SlidersHorizontal className="h-3.5 w-3.5 text-zinc-600 mr-1" />
-            {sortFilters.map((f) => (
+        <>
+          {/* Header + result tabs */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <h1 className="text-xl font-bold text-zinc-900">
+              Results for &ldquo;{query}&rdquo;
+            </h1>
+            <div className="flex gap-1 border-b border-zinc-200 -mb-px">
               <button
-                key={f.value}
-                onClick={() => setSortBy(f.value)}
-                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                  sortBy === f.value
-                    ? 'bg-zinc-100 text-zinc-900'
-                    : 'text-zinc-600 hover:text-zinc-900'
+                onClick={() => setTab('videos')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                  tab === 'videos'
+                    ? 'border-violet-600 text-zinc-900'
+                    : 'border-transparent text-zinc-600 hover:text-zinc-900'
                 }`}
               >
-                {f.label}
+                <Film className="h-3.5 w-3.5" />
+                Videos
               </button>
-            ))}
+              <button
+                onClick={() => setTab('channels')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                  tab === 'channels'
+                    ? 'border-violet-600 text-zinc-900'
+                    : 'border-transparent text-zinc-600 hover:text-zinc-900'
+                }`}
+              >
+                <Users className="h-3.5 w-3.5" />
+                Channels
+              </button>
+            </div>
           </div>
-        </div>
+
+          {/* Filters — only show on Videos tab */}
+          {tab === 'videos' && (
+            <div className="flex flex-wrap items-center gap-3 mb-4 pb-3 border-b border-zinc-100">
+              {/* Sort */}
+              <div className="flex items-center gap-1">
+                <SlidersHorizontal className="h-3.5 w-3.5 text-zinc-400 mr-1" />
+                {sortFilters.map((f) => (
+                  <button
+                    key={f.value}
+                    onClick={() => setSortBy(f.value)}
+                    className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                      sortBy === f.value
+                        ? 'bg-zinc-100 text-zinc-900'
+                        : 'text-zinc-600 hover:text-zinc-900'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Format filter */}
+              <div className="flex items-center gap-1">
+                {formatFilters.map((f) => (
+                  <button
+                    key={f.value}
+                    onClick={() => setFormatFilter(f.value)}
+                    title={f.label}
+                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+                      formatFilter === f.value
+                        ? 'bg-violet-100 text-violet-700'
+                        : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                    }`}
+                  >
+                    <f.icon className="h-3 w-3" />
+                    <span className="hidden sm:inline">{f.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Date filter */}
+              <div className="flex items-center gap-1 ml-auto">
+                <select
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value as DateFilter)}
+                  className="text-xs bg-transparent text-zinc-600 border border-zinc-200 rounded px-2 py-1 cursor-pointer hover:text-zinc-900 focus:outline-none focus:ring-1 focus:ring-violet-600"
+                >
+                  {dateFilters.map((d) => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
+      {/* Results */}
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <CardSkeleton key={i} />
-          ))}
-        </div>
-      ) : videos.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {videos.map((video) => (
-            <VideoCard key={video.id} video={video} />
-          ))}
-        </div>
-      ) : query ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-14 h-14 rounded-full bg-zinc-200 flex items-center justify-center mb-4">
-            <Search className="h-6 w-6 text-zinc-600" />
+        tab === 'videos' ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">No results for that</h2>
-          <p className="text-sm text-zinc-500 mt-1">Try different keywords.</p>
-        </div>
+        ) : (
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-20 bg-zinc-200 rounded-lg animate-pulse" />
+            ))}
+          </div>
+        )
+      ) : tab === 'videos' ? (
+        videos.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {videos.map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+        ) : query ? (
+          <EmptyState query={query} type="videos" />
+        ) : (
+          <TypeSomethingState />
+        )
       ) : (
-        <div className="flex flex-col items-center justify-center py-20">
-          <Search className="h-10 w-10 text-zinc-600 mb-4" />
-          <p className="text-zinc-600 text-sm">Type something to search</p>
-        </div>
+        // Channels tab
+        channels.length > 0 ? (
+          <div className="space-y-3">
+            {channels.map((ch) => (
+              <div
+                key={ch.id}
+                onClick={() => navigate({ page: 'channel', channelId: ch.id })}
+                className="flex items-center gap-3 p-3 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer transition-colors"
+              >
+                {/* Avatar */}
+                <div className="shrink-0">
+                  {ch.user.avatarUrl ? (
+                    <img src={ch.user.avatarUrl} alt={ch.channelName} className="w-12 h-12 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 text-lg font-bold">
+                      {ch.channelName[0]?.toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-zinc-900 truncate">{ch.channelName}</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    @{ch.user.username} · {formatSubscribers(ch.subscriberCount)} · {ch.videoCount} videos
+                  </p>
+                  {ch.description && (
+                    <p className="text-xs text-zinc-600 mt-1 line-clamp-1">{ch.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : query ? (
+          <EmptyState query={query} type="channels" />
+        ) : (
+          <TypeSomethingState />
+        )
       )}
+    </div>
+  )
+}
+
+function EmptyState({ query, type }: { query: string; type: 'videos' | 'channels' }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <div className="w-14 h-14 rounded-full bg-zinc-200 flex items-center justify-center mb-4">
+        <Search className="h-6 w-6 text-zinc-600" />
+      </div>
+      <h2 className="text-base font-semibold text-zinc-900">
+        No {type} found
+      </h2>
+      <p className="text-sm text-zinc-500 mt-1">
+        Try different keywords or adjust your filters.
+      </p>
+    </div>
+  )
+}
+
+function TypeSomethingState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <Search className="h-10 w-10 text-zinc-600 mb-4" />
+      <p className="text-zinc-600 text-sm">Type something to search</p>
     </div>
   )
 }
