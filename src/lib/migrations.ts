@@ -263,8 +263,13 @@ export async function applyMigration(id: string): Promise<{ appliedAt: Date }> {
     }
 
     // Record the migration in the same transaction.
+    // Pass appliedAt as a JS Date (not an ISO string) so Prisma binds it
+    // as a timestamp parameter — matching the TIMESTAMP column type.
+    // Passing an ISO string makes Postgres infer text type, which fails
+    // with "column applied_at is of type timestamp but expression is of
+    // type text" (code 42804).
     await tx.$executeRaw`
-      INSERT INTO "_admin_migration" (id, applied_at) VALUES (${id}, ${appliedAt.toISOString()})
+      INSERT INTO "_admin_migration" (id, applied_at) VALUES (${id}, ${appliedAt})
     `
   })
 
