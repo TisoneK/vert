@@ -169,13 +169,17 @@ export function ProfilePage() {
       </div>
 
       <div className="px-4 md:px-6 py-4">
-        <div className="flex items-start gap-4">
-          <div className="shrink-0 -mt-8">
+        {/* Avatar + info + action buttons — stack vertically on mobile
+            so the action buttons (Studio, Edit) don't push the channel
+            name off the screen on a 360px viewport. On md+ they sit
+            side-by-side as before. */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+          <div className="shrink-0 -mt-8 self-start">
             <div className="w-20 h-20 rounded-full bg-zinc-300 flex items-center justify-center text-zinc-700 text-2xl font-bold border-4 border-white">
               {user.username[0]?.toUpperCase()}
             </div>
           </div>
-          <div className="flex-1 pt-1">
+          <div className="flex-1 min-w-0 sm:pt-1">
             <h1 className="text-xl md:text-2xl font-bold text-zinc-900">
               {channel?.channelName || user.username}
             </h1>
@@ -183,7 +187,7 @@ export function ProfilePage() {
               @{user.username} · {formatSubscribers(channel?.subscriberCount || 0)} · {channel?.videoCount || 0} videos
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-start">
             <Button
               variant="outline"
               size="sm"

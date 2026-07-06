@@ -186,9 +186,11 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
             </div>
           )}
 
-          {/* Channel + actions — single row on mobile */}
-          <div className="flex items-center justify-between gap-2 mt-3">
-            {/* Channel */}
+          {/* Channel + actions — on mobile this stacks into two rows
+              (channel row, then action row) so all the buttons fit on a
+              360px-wide screen. On md+ it collapses back into one row. */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-2 mt-3">
+            {/* Channel + subscribe */}
             <div className="flex items-center gap-2 min-w-0">
               <div
                 className="flex items-center gap-2 cursor-pointer shrink-0"
@@ -198,15 +200,15 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                   <img
                     src={channel.user.avatarUrl}
                     alt={channel.channelName}
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-9 h-9 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
+                  <div className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
                     {channel.channelName[0]?.toUpperCase()}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-zinc-900 truncate">{channel.channelName}</p>
+                  <p className="text-sm font-semibold text-zinc-900 truncate max-w-[8rem] sm:max-w-none">{channel.channelName}</p>
                   <p className="text-[11px] text-zinc-500">{formatSubscribers(channel.subscriberCount)}</p>
                 </div>
               </div>
@@ -217,8 +219,9 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               />
             </div>
 
-            {/* Action buttons — compact row */}
-            <div className="flex items-center gap-1 shrink-0">
+            {/* Action buttons — wrap on mobile so they never overflow.
+                shrink-0 on each button so they keep their shape. */}
+            <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
               <VoteButtons
                 videoId={video.id as string}
                 likeCount={video.likeCount as number}
@@ -227,18 +230,20 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               />
               <button
                 onClick={toggleSave}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors shrink-0 ${
                   isSaved
                     ? 'bg-zinc-100 text-violet-600'
                     : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200'
                 }`}
+                aria-label={isSaved ? 'Remove from saved' : 'Save for later'}
               >
                 {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
               </button>
-              <div className="relative">
+              <div className="relative shrink-0">
                 <button
                   onClick={() => setShowShareMenu(!showShareMenu)}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-xs font-medium transition-colors"
+                  aria-label="Share"
                 >
                   <Share2 className="h-4 w-4" />
                 </button>

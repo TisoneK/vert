@@ -116,8 +116,11 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
 
       {/* Channel info */}
       <div className="px-4 md:px-6 py-4">
-        <div className="flex items-start gap-4">
-          <div className="shrink-0 -mt-8">
+        {/* Avatar + info + Subscribe — stack vertically on mobile so the
+            Subscribe button doesn't push the channel name off-screen on a
+            360px viewport. On md+ they sit side-by-side as before. */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+          <div className="shrink-0 -mt-8 self-start">
             {channel.user.avatarUrl ? (
               <img
                 src={channel.user.avatarUrl}
@@ -130,27 +133,25 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
               </div>
             )}
           </div>
-          <div className="flex-1 pt-1 flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h1 className="text-xl md:text-2xl font-bold text-zinc-900">
-                  {channel.channelName}
-                </h1>
-                <svg className="w-4 h-4 text-violet-600" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                </svg>
-              </div>
-              <p className="text-zinc-600 text-sm mt-0.5">
-                @{channel.user.username} · {channel.videoCount} videos · {formatSubscribers(channel.subscriberCount)}
-              </p>
+          <div className="flex-1 min-w-0 sm:pt-1">
+            <div className="flex items-center gap-1.5">
+              <h1 className="text-xl md:text-2xl font-bold text-zinc-900 truncate">
+                {channel.channelName}
+              </h1>
+              <svg className="w-4 h-4 text-violet-600 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+              </svg>
             </div>
-            <div className="shrink-0">
-              <SubscribeButton
-                channelId={channel.id}
-                initialSubscribed={false}
-                subscriberCount={channel.subscriberCount}
-              />
-            </div>
+            <p className="text-zinc-600 text-sm mt-0.5">
+              @{channel.user.username} · {channel.videoCount} videos · {formatSubscribers(channel.subscriberCount)}
+            </p>
+          </div>
+          <div className="shrink-0 self-start">
+            <SubscribeButton
+              channelId={channel.id}
+              initialSubscribed={false}
+              subscriberCount={channel.subscriberCount}
+            />
           </div>
         </div>
 
