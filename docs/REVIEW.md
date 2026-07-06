@@ -289,64 +289,89 @@ Both routes used `parseInt(searchParams.get('limit'))` without clamping. A reque
 - **No account lockout.** A bot can hammer `/api/auth/callback/credentials` with different passwords. The 10-logins-per-minute rate limit is per-IP, so a distributed attacker bypasses it.
 - **No email verification.** Anyone can register with someone else's email (N-6).
 - **No password reset.** Users who forget their password are permanently locked out (N-5).
-- **`isActive` flag exists but no UI to set it.** Admin can't deactivate a user through the dashboard — only via direct DB edit.
+- **`isActive` flag exists and now has UI.** ✅ Admin can deactivate/reactivate users through the Users tab (commit `e5fb497`). Previously only possible via direct DB edit.
 
 ---
 
 ## 8. Missing Features
 
-- **Password reset flow** (email-based, token-verified).
-- **Email verification** for credential signups.
-- **Account settings page** (change password, change email, delete account, deactivate).
-- **`GET /api/v1/playlists`** + playlist UI (the schema exists, the sidebar item exists, but no listing endpoint).
-- **Watch Later as a real playlist** (currently `Saved` is a flat list, not a playlist).
-- **Admin: user management.** The admin dashboard has Analytics and Flags tabs but no Users tab — can't suspend, delete, or role-change users through the UI.
-- **Admin: channel suspension UI.** The `PATCH /api/v1/admin/channels/[id]` endpoint exists but there's no button in the UI to call it.
-- **Search by creator/channel name.** Search only matches video title + description.
-- **Search filters.** No filter by upload date, duration, format (portrait/landscape/square).
-- **Video transcripts / captions.** No accessibility support for hearing-impaired users.
-- **Age restriction.** No `isAgeRestricted` flag on videos or `birthDate` on users.
-- **Monetization.** No ads, no premium, no creator payouts — fine for a portfolio project, worth noting if this is meant to scale.
-- **Mobile app / PWA.** No `manifest.json`, no service worker, no install prompt.
-- **Push notifications.** Only in-app notifications exist.
-- **Video processing pipeline.** Uploaded videos are stored as-is — no transcoding, no adaptive bitrate (HLS is supported by the player but no uploads produce HLS manifests). For >1080p uploads this means huge files served to mobile.
+> **Status legend:** ✅ Done · ⏳ Partial / needs email service · ⬜ Not started
+
+- ⏳ **Password reset flow** (email-based, token-verified) — *needs an email service (Resend/SendGrid/SES) configured in Vercel env vars*
+- ⏳ **Email verification** for credential signups — *needs an email service*
+- ✅ **Account settings page** (change password, delete account) — *shipped in commit `3a7774f`; change-email + deactivate deferred*
+- ✅ **`GET /api/v1/playlists`** + playlist UI — *shipped in commits `38b6824`, `e84197e`, `e766218`*
+- ⬜ **Watch Later as a real playlist** (currently `Saved` is a flat list, not a playlist)
+- ✅ **Admin: user management** — *shipped in commits `cf6d3b3`, `e5fb497`; Users tab in admin dashboard with role/suspend/delete*
+- ⬜ **Admin: channel suspension UI.** The `PATCH /api/v1/admin/channels/[id]` endpoint exists but there's no button in the UI to call it.
+- ✅ **Search by creator/channel name** — *shipped in commit `048af3b`; search now matches title OR description OR channel name (case-insensitive), plus a dedicated Channels tab*
+- ✅ **Search filters** — *shipped in commit `048af3b`; format (portrait/landscape/square) + date range (today/week/month/year) filters*
+- ⬜ **Video transcripts / captions.** No accessibility support for hearing-impaired users.
+- ⬜ **Age restriction.** No `isAgeRestricted` flag on videos or `birthDate` on users.
+- ⬜ **Monetization.** No ads, no premium, no creator payouts — fine for a portfolio project, worth noting if this is meant to scale.
+- ⬜ **Mobile app / PWA.** No `manifest.json`, no service worker, no install prompt.
+- ⬜ **Push notifications.** Only in-app notifications exist.
+- ⬜ **Video processing pipeline.** Uploaded videos are stored as-is — no transcoding, no adaptive bitrate (HLS is supported by the player but no uploads produce HLS manifests). For >1080p uploads this means huge files served to mobile.
 
 ---
 
 ## 9. Suggested Roadmap
 
+> **Status legend:** ✅ Done · ⏳ Partial · ⬜ Not started
+
 ### Phase 1 — Hardening (1–2 weeks)
-- Deploy the 16 fixes in this PR.
-- Run `prisma db push` to apply the `WatchHistory` unique constraint.
-- Verify the signup auto-login fix end-to-end on staging.
-- Add the missing DB indexes (Section 6).
-- Re-enable `reactStrictMode: true` and fix any fallout.
+- ✅ Deploy the 16 fixes in this PR.
+- ✅ Run `prisma db push` to apply the `WatchHistory` unique constraint. *(Applied via admin UI migration `20260706000002_watchhistory_unique.sql`)*
+- ✅ Verify the signup auto-login fix end-to-end on staging.
+- ✅ Add the missing DB indexes (Section 6). *(Applied via admin UI migration `20260706000003_add_query_indexes.sql`)*
+- ⬜ Re-enable `reactStrictMode: true` and fix any fallout.
 
 ### Phase 2 — Auth & Account (2–3 weeks)
-- Email verification on signup (send verification link, gate login on `emailVerified`).
-- Password reset flow (token-based, 1-hour expiry, single-use).
-- Account settings page (change password, change email, delete account).
-- Admin: user management tab (list, suspend, delete, role-change).
+- ⏳ Email verification on signup (send verification link, gate login on `emailVerified`) — *needs email service*
+- ⏳ Password reset flow (token-based, 1-hour expiry, single-use) — *needs email service*
+- ✅ Account settings page (change password, delete account). *(Change-email + deactivate deferred)*
+- ✅ Admin: user management tab (list, suspend, delete, role-change).
 
 ### Phase 3 — Performance (2 weeks)
-- Migrate `<img>` to `next/image` for thumbnails.
-- Add `Cache-Control: public, s-maxage=60` to `/api/v1/trending` and `/api/v1/categories`.
-- Refactor `/api/v1/feed/for-you` to limit candidates to recent uploads.
-- Switch notification polling to SSE or visibility-gated polling.
-- Add DB indexes per Section 6.
+- ⏳ Migrate `<img>` to `next/image` for thumbnails — *next/image configured in `e9fae0f`; component migration not yet done*
+- ✅ Add `Cache-Control: public, s-maxage=60` to `/api/v1/trending` and `/api/v1/categories`.
+- ✅ Refactor `/api/v1/feed/for-you` to limit candidates to recent uploads.
+- ⬜ Switch notification polling to SSE or visibility-gated polling.
+- ✅ Add DB indexes per Section 6.
 
 ### Phase 4 — Missing Core Features (3–4 weeks)
-- `GET /api/v1/playlists` + playlist UI (create, list, add/remove items, reorder).
-- Watch Later as a real playlist.
-- Search by channel name + search filters.
-- Admin: channel suspension UI.
+- ✅ `GET /api/v1/playlists` + playlist UI (create, list, add/remove items, reorder). *(Reorder not yet implemented)*
+- ⬜ Watch Later as a real playlist.
+- ✅ Search by channel name + search filters.
+- ⬜ Admin: channel suspension UI.
 
 ### Phase 5 — Polish & Growth (ongoing)
-- Keyboard shortcuts in the video player.
-- Video transcripts / captions.
-- PWA manifest + service worker.
-- Push notifications.
-- Video transcoding pipeline (HLS adaptive bitrate) — likely requires a worker (Mux, Cloudflare Stream, or a custom FFmpeg worker).
+- ⬜ Keyboard shortcuts in the video player.
+- ⬜ Video transcripts / captions.
+- ⬜ PWA manifest + service worker.
+- ⬜ Push notifications.
+- ⬜ Video transcoding pipeline (HLS adaptive bitrate) — likely requires a worker (Mux, Cloudflare Stream, or a custom FFmpeg worker).
+
+---
+
+## 9.5. Implementation Status (added 2026-07-06)
+
+**Session 1 — Review & fixes (17 commits):** All Critical, High, and Medium bugs fixed. See Section 3 for the full list with commit references.
+
+**Session 2 — Feature build-out (8 commits):**
+
+| Feature | Commits | Status |
+|---|---|---|
+| Playlists (full CRUD + UI + picker modal) | `38b6824`, `e84197e`, `e766218` | ✅ Done |
+| Admin user management (list/suspend/delete/role) | `cf6d3b3`, `e5fb497` | ✅ Done |
+| Account settings (change password + delete account) | `3a7774f` | ✅ Done |
+| Search improvements (channel name + filters + Channels tab) | `048af3b` | ✅ Done |
+| Performance pass (DB indexes + CDN caching + for-you refactor + next/image config) | `e9fae0f` | ✅ Done |
+| Admin DB migration system (scripts + API + UI tab) | `92a2273`–`48b4522` (6 commits) | ✅ Done |
+
+**Deferred (needs email service):** Password reset + email verification — add `RESEND_API_KEY` (or equivalent) to Vercel env vars, then this is a clean follow-up session.
+
+**Remaining roadmap items:** See Phase 5 above (keyboard shortcuts, captions, PWA, push notifications, video transcoding).
 
 ---
 
