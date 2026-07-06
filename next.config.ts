@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   reactStrictMode: false,
+  // Include the admin migration SQL files in the standalone server
+  // output. Without this, Next.js's file tracer won't include
+  // prisma/migrations/admin/ (since we read it via fs, not via import),
+  // and the migration runner would find no files in production.
+  outputFileTracingIncludes: {
+    "/api/v1/admin/db-migrations": ["./prisma/migrations/admin/*.sql"],
+    "/api/v1/admin/db-migrations/[id]/apply": ["./prisma/migrations/admin/*.sql"],
+  },
   async headers() {
     return [
       {
