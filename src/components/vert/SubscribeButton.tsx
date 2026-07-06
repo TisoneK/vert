@@ -45,49 +45,47 @@ export function SubscribeButton({ channelId, initialSubscribed, subscriberCount:
     }
   }
 
+  // This is your own channel — subscribing to yourself isn't a real action.
+  if (user?.channelId === channelId) {
+    return null
+  }
+
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-zinc-200 text-zinc-600 cursor-default text-xs"
-        >
-          {formatSubscribers(subscriberCount)}
-        </Button>
-      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="border-zinc-200 text-zinc-600 cursor-default text-xs"
+      >
+        {formatSubscribers(subscriberCount)}
+      </Button>
     )
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        onClick={handleToggle}
-        disabled={loading}
-        size="sm"
-        className={`font-medium text-sm active:scale-95 transition-transform duration-100 ${
-          animating ? 'animate-subscribe-pulse' : ''
-        } ${
-          subscribed
-            ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 border border-zinc-300'
-            : 'bg-violet-600 hover:bg-violet-700 text-white'
-        }`}
-      >
-        {subscribed ? (
-          <>
-            <BellOff className="h-3.5 w-3.5 mr-1.5" />
-            Subscribed
-          </>
-        ) : (
-          <>
-            <Bell className="h-3.5 w-3.5 mr-1.5" />
-            Subscribe
-          </>
-        )}
-      </Button>
-      <span className="text-xs text-zinc-600">
-        {formatSubscribers(subscriberCount)}
-      </span>
-    </div>
+    <Button
+      onClick={handleToggle}
+      disabled={loading}
+      size="sm"
+      className={`font-medium text-sm active:scale-95 transition-transform duration-100 ${
+        animating ? 'animate-subscribe-pulse' : ''
+      } ${
+        subscribed
+          ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 border border-zinc-300'
+          : 'bg-violet-600 hover:bg-violet-700 text-white'
+      }`}
+    >
+      {subscribed ? (
+        <>
+          <BellOff className="h-3.5 w-3.5 mr-1.5" />
+          Subscribed
+        </>
+      ) : (
+        <>
+          <Bell className="h-3.5 w-3.5 mr-1.5" />
+          Subscribe
+        </>
+      )}
+    </Button>
   )
 }

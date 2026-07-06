@@ -331,7 +331,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
   if (hasError || isSampleVideo) {
     return (
-      <div className="w-full flex justify-center rounded-lg overflow-hidden">
+      <div className="w-full flex justify-start rounded-lg overflow-hidden">
       <div
         className="relative bg-zinc-900 overflow-hidden"
         style={{
@@ -388,7 +388,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div className="w-full flex justify-center rounded-lg overflow-hidden">
+    <div className="w-full flex justify-start rounded-lg overflow-hidden">
     <div
       ref={containerRef}
       className="relative bg-black overflow-hidden group rounded-lg"
@@ -414,6 +414,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         // <canvas> without tainting it (for the auto-thumbnail backfill).
         // Vercel Blob sends Access-Control-Allow-Origin: * so this is safe.
         crossOrigin="anonymous"
+        // Chrome shows its own floating Picture-in-Picture affordance on
+        // hover even without the native `controls` attribute — disable it
+        // so it can't float on top of our custom control bar.
+        disablePictureInPicture
+        disableRemotePlayback
         onClick={togglePlay}
         onError={() => setHasError(true)}
         onPlay={() => setIsPlaying(true)}

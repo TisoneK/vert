@@ -62,11 +62,11 @@ export function FlagDialog({ videoId }: FlagDialogProps) {
     return (
       <button
         onClick={() => navigate({ page: 'login' })}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-sm font-medium transition-colors"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-xs font-medium transition-colors"
         title="Log in to report this video"
+        aria-label="Report"
       >
-        <Flag className="h-3.5 w-3.5" />
-        <span>Report</span>
+        <Flag className="h-4 w-4" />
       </button>
     )
   }
@@ -74,9 +74,12 @@ export function FlagDialog({ videoId }: FlagDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-sm font-medium transition-colors active:scale-95 duration-100">
-          <Flag className="h-3.5 w-3.5" />
-          <span>Report</span>
+        <button
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-xs font-medium transition-colors active:scale-95 duration-100"
+          title="Report this video"
+          aria-label="Report"
+        >
+          <Flag className="h-4 w-4" />
         </button>
       </DialogTrigger>
       <DialogContent className="bg-white border-zinc-200 text-zinc-900">
