@@ -12,6 +12,22 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Channel page polish (banner, badge, stats)
+**Commit:** `23d02c2`
+
+External visual review (ChatGPT analysis of a channel page screenshot) flagged three issues. Cross-checked each against the live DOM before fixing — the review also claimed "missing video metadata" and "cramped thumbnails" but both were VLM false positives (verified: card text includes title + channel + views + date, cards are 182×386px with gap-4).
+
+**Default banner.** `ChannelPage.tsx` — the fallback for channels without a `bannerUrl` was a flat `bg-gradient-to-br from-violet-100 via-violet-50 to-zinc-100`. Looked like a placeholder. Replaced with a stronger `from-violet-200 via-violet-100 to-zinc-100` gradient + an inline `radial-gradient` dotted pattern (`rgba(124,58,237,0.15)` dots on a 16px grid). The pattern is a CSS `background-image` so no asset files are needed.
+
+**Verified badge.** `ChannelPage.tsx` — was a bare 16px checkmark SVG (`<path d="M9 16.17..."/>`) in `text-violet-600`, no background. Easy to miss as a badge. Replaced with a 20px scalloped-seal SVG (filled `currentColor` body + white check stroke) matching the visual convention of Twitter/YouTube verified badges. Added `aria-label="Verified"` and `role="img"` for screen readers.
+
+**Channel stats row.** `ChannelPage.tsx` — added a `flex flex-wrap gap-4` row below the description with three stat items, each a small line-icon + label:
+- Joined date — `channel.createdAt` formatted as "Mon Year" via `toLocaleDateString(undefined, { month: 'short', year: 'numeric' })`.
+- Total views — `videos.reduce((sum, v) => sum + v.viewCount, 0)` formatted with `formatViews`.
+- Video count — `channel.videoCount` with singular/plural.
+
+Fills the empty whitespace that was below the Subscribe button on desktop and gives the profile a more complete feel.
+
 #### Second visual analysis pass (screenshot-driven)
 **Commit:** `70ad72c`
 
