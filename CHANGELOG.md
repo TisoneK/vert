@@ -1,6 +1,8 @@
 # Changelog
 
-New things and fixes in Vert, newest first. Written for the people using the app — technical details are kept brief and linked from each entry.
+New things and fixes in Vert, newest first. Written for the people using the app.
+
+For technical details (file references, API routes, architectural reasoning, commit hashes), see [`docs/DEVLOG.md`](./docs/DEVLOG.md).
 
 ---
 
@@ -61,10 +63,7 @@ A full code review found and fixed 16 issues. The notable ones:
 - **Mobile drawer fixed.** Escape key now closes it, body scroll is locked while open, and the mislabeled "Watch Later" item is now correctly split into History and Saved.
 
 ### Under the hood
-- 25 files changed, ~800 lines added across the feature work.
-- Build passes, lint clean, all commits are descriptive and per-feature.
-- `REVIEW.md` moved to `docs/REVIEW.md` with status markers (✅ done / ⏳ partial / ⬜ not started) on every roadmap item.
-- `next/image` configured for Vercel Blob URLs — components can now be incrementally migrated to `<Image>` for responsive sizing and WebP/AVIF conversion.
+See `docs/DEVLOG.md` for the technical details — file references, API routes, architectural reasoning, and commit hashes for everything in this release.
 
 ### Known gaps
 - **Password reset and email verification** are not yet implemented — they need an email service (Resend, SendGrid, etc.) configured in Vercel env vars. Once you add `RESEND_API_KEY`, this is a clean follow-up.
