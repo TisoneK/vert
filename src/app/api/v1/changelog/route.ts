@@ -5,13 +5,18 @@ import path from 'path'
 /**
  * GET /api/v1/changelog
  *
- * Returns the project's CHANGELOG.md parsed as HTML.
+ * Returns the project's CHANGELOG.md parsed into structured sections.
  *
  * Public endpoint — no auth required. The changelog is meant to be
  * visible to all users (and potential new users evaluating the project).
  *
  * The markdown is parsed by a small inline parser (no dependency) that
- * handles the subset of markdown used in CHANGELOG.md:
+ * splits the file into version sections, each with:
+ *   - version: string (e.g. "0.3.0" or "Unreleased")
+ *   - date: string | null (e.g. "2026-07-06")
+ *   - html: string (parsed HTML for the section body)
+ *
+ * The parser handles the subset of markdown used in CHANGELOG.md:
  *   - # / ## / ### / #### headings
  *   - - bullet lists (with nesting)
  *   - **bold** and *italic*
@@ -20,10 +25,18 @@ import path from 'path'
  *   - --- horizontal rules
  *   - > blockquotes
  *   - blank-line-separated paragraphs
- *
- * If the file can't be read (e.g. missing in a dev environment), returns
- * a 404 with a helpful message.
  */
+
+export interface ChangelogSection {
+  version: string
+  date: string | null
+  /** Display label, e.g. "0.3.0 — 2026-07-06" or "Unreleased" */
+  label: string
+  /** Anchor id, e.g. "030-2026-07-06" */
+  id: string
+  /** Parsed HTML for the section body (excludes the h1 heading) */
+  html: string
+}
 
 // ─── Inline markdown → HTML ───
 function escapeHtml(s: string): string {
@@ -34,24 +47,19 @@ function escapeHtml(s: string): string {
 }
 
 function parseInline(text: string): string {
-  // Escape HTML first to prevent injection from the markdown source.
   let out = escapeHtml(text)
-  // Inline code: `code` → <code>
   out = out.replace(/`([^`]+)`/g, '<code class="changelog-code">$1</code>')
-  // Links: [text](url) — only allow http/https URLs
   out = out.replace(
     /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
     '<a href="$2" target="_blank" rel="noopener noreferrer" class="changelog-link">$1</a>'
   )
-  // Bold: **text** → <strong>
   out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-  // Italic: *text* → <em> (but not ** which is bold)
   out = out.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
   return out
 }
 
 // ─── Block-level markdown → HTML ───
-function parseMarkdown(md: string): string {
+function parseBlockMarkdown(md: string): string {
   const lines = md.split('\n')
   const html: string[] = []
   let i = 0
@@ -60,8 +68,8 @@ function parseMarkdown(md: string): string {
 
   function closeList() {
     if (inList) {
-      html.push('</li>'.repeat(listDepth > 0 ? 0 : 0))
       for (let d = 0; d < listDepth; d++) html.push('</ul>')
+      html.push('</ul>')
       inList = false
       listDepth = 0
     }
@@ -74,13 +82,12 @@ function parseMarkdown(md: string): string {
     // Horizontal rule
     if (/^---+\s*$/.test(trimmed)) {
       closeList()
-      html.push('<hr class="changelog-hr" />')
       i++
-      continue
+      continue  // skip — we use spacing between sections instead
     }
 
-    // Headings
-    const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/)
+    // Headings (h2+ since h1 is the version header, handled by caller)
+    const headingMatch = trimmed.match(/^(#{2,6})\s+(.+)$/)
     if (headingMatch) {
       closeList()
       const level = headingMatch[1].length
@@ -105,7 +112,7 @@ function parseMarkdown(md: string): string {
       continue
     }
 
-    // Bullet list items (support nesting via leading spaces)
+    // Bullet list items
     const bulletMatch = line.match(/^(\s*)-\s+(.+)$/)
     if (bulletMatch) {
       const indent = bulletMatch[1].length
@@ -118,7 +125,6 @@ function parseMarkdown(md: string): string {
         listDepth = 0
       }
 
-      // Open/close <ul> for nesting
       while (listDepth < depth) {
         html.push('<ul class="changelog-list-nested">')
         listDepth++
@@ -133,14 +139,14 @@ function parseMarkdown(md: string): string {
       continue
     }
 
-    // Empty line — close any open list
+    // Empty line
     if (trimmed === '') {
       closeList()
       i++
       continue
     }
 
-    // Regular paragraph — collect contiguous non-empty, non-special lines
+    // Regular paragraph
     closeList()
     const paraLines: string[] = [trimmed]
     i++
@@ -166,21 +172,83 @@ function parseMarkdown(md: string): string {
   return html.join('\n')
 }
 
+// ─── Split CHANGELOG.md into version sections ───
+function splitIntoSections(md: string): ChangelogSection[] {
+  const sections: ChangelogSection[] = []
+  // Match: ## [version] — date  OR  ## [version]
+  // Also match the link-reference lines at the bottom ([version]: url) and skip them.
+  const lines = md.split('\n')
+  let currentVersion: string | null = null
+  let currentDate: string | null = null
+  let currentBody: string[] = []
+
+  function flush() {
+    if (currentVersion !== null) {
+      const body = currentBody.join('\n').trim()
+      if (body) {
+        // Build a URL-safe id from version + date (if present).
+        // For "0.3.0" + "2026-07-06" → "030-2026-07-06"
+        // For "Unreleased" + null → "unreleased"
+        const versionSlug = currentVersion.toLowerCase().replace(/[^\w-]/g, '')
+        const dateSlug = currentDate
+          ? currentDate.toLowerCase().replace(/[^\w-]/g, '').replace(/\s+/g, '-')
+          : ''
+        const id = dateSlug ? `${versionSlug}-${dateSlug}` : versionSlug
+        const label = currentVersion + (currentDate ? ' — ' + currentDate : '')
+        sections.push({
+          version: currentVersion,
+          date: currentDate,
+          label,
+          id,
+          html: parseBlockMarkdown(body),
+        })
+      }
+    }
+    currentBody = []
+  }
+
+  for (const line of lines) {
+    // Skip link references at the bottom: [0.3.0]: https://...
+    if (/^\[[^\]]+\]:\s*https?:\/\//.test(line)) continue
+
+    // Match version header: ## [version] — date  or  ## [version]
+    // Date can be YYYY-MM-DD or free-form text (e.g. "Earlier 2026",
+    // "Initial release"). The em-dash separator can be —, –, or -.
+    const versionMatch = line.match(/^##\s+\[([^\]]+)\](?:\s*[—–-]\s*(.+))?/)
+    if (versionMatch) {
+      flush()
+      currentVersion = versionMatch[1]
+      // Normalize: if the date looks like YYYY-MM-DD, keep it; otherwise
+      // keep the free-form text as-is.
+      const rawDate = versionMatch[2]?.trim()
+      currentDate = rawDate || null
+      continue
+    }
+
+    if (currentVersion !== null) {
+      currentBody.push(line)
+    }
+  }
+  flush()
+
+  return sections
+}
+
 export async function GET() {
   try {
     const changelogPath = path.join(process.cwd(), 'CHANGELOG.md')
     const md = await fs.readFile(changelogPath, 'utf-8')
-    const html = parseMarkdown(md)
+    const sections = splitIntoSections(md)
 
     // Cache for 5 minutes at the edge — the changelog only changes on
     // deploy, so this is safe and cuts disk reads.
-    const response = NextResponse.json({ html, raw: md })
+    const response = NextResponse.json({ sections })
     response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
     return response
   } catch (error) {
     console.error('Changelog read error:', error)
     return NextResponse.json(
-      { error: 'Changelog not found', html: '<p>Changelog could not be loaded.</p>' },
+      { error: 'Changelog not found', sections: [] },
       { status: 404 }
     )
   }
