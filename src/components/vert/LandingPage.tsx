@@ -67,7 +67,7 @@ export function LandingPage() {
         <h1 className="text-2xl md:text-4xl font-bold text-zinc-900 tracking-tight max-w-2xl">
           Watch and share portrait video.
         </h1>
-        <p className="text-zinc-500 mt-2 text-sm md:text-base">
+        <p className="text-zinc-500 mt-3 text-sm md:text-base leading-relaxed">
           A clean player, real notifications, no algorithm noise.
         </p>
 
@@ -149,20 +149,23 @@ export function LandingPage() {
         </section>
       </div>
 
-      {/* Footer */}
+      {/* Footer — Vert wordmark on the left, secondary links on the right.
+          The wordmark uses a slightly heavier weight than the links so the
+          visual weight is balanced (both were text-zinc-400 before, which
+          made the wordmark look like a placeholder). */}
       <footer className="border-t border-zinc-100">
         <div className="max-w-5xl mx-auto px-4 py-6 flex items-center justify-between">
-          <span className="text-sm text-zinc-400">Vert</span>
+          <span className="text-sm font-semibold text-zinc-700">Vert</span>
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate({ page: 'changelog' })}
-              className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
+              className="text-xs text-zinc-500 hover:text-zinc-900 transition-colors"
             >
               Changelog
             </button>
             <button
               onClick={() => navigate({ page: 'contact' })}
-              className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
+              className="text-xs text-zinc-500 hover:text-zinc-900 transition-colors"
             >
               Contact
             </button>

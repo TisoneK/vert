@@ -190,25 +190,27 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               (channel row, then action row) so all the buttons fit on a
               360px-wide screen. On md+ it collapses back into one row. */}
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-2 mt-3">
-            {/* Channel + subscribe */}
+            {/* Channel + subscribe — the channel info block is min-w-0
+                so a long channel name truncates instead of pushing the
+                Subscribe button off-screen. */}
             <div className="flex items-center gap-2 min-w-0">
               <div
-                className="flex items-center gap-2 cursor-pointer shrink-0"
+                className="flex items-center gap-2 cursor-pointer min-w-0"
                 onClick={() => navigate({ page: 'channel', channelId: channel.id })}
               >
                 {channel.user.avatarUrl ? (
                   <img
                     src={channel.user.avatarUrl}
                     alt={channel.channelName}
-                    className="w-9 h-9 rounded-full object-cover"
+                    className="w-9 h-9 rounded-full object-cover shrink-0"
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
+                  <div className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold shrink-0">
                     {channel.channelName[0]?.toUpperCase()}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-zinc-900 truncate max-w-[8rem] sm:max-w-none">{channel.channelName}</p>
+                  <p className="text-sm font-semibold text-zinc-900 truncate max-w-[8rem] sm:max-w-[12rem]">{channel.channelName}</p>
                   <p className="text-[11px] text-zinc-500">{formatSubscribers(channel.subscriberCount)}</p>
                 </div>
               </div>

@@ -513,12 +513,14 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       className="relative bg-black overflow-hidden group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
       style={{
         aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
-        // Portrait: on mobile cap at 65vh (leaves room for title + actions below),
-        // on desktop cap at calc(100vh - 200px). Width derived from height.
+        // Portrait: on mobile cap at 55vh (leaves room for title + actions
+        // + channel info below — at 65vh the player dominated the screen
+        // and the user couldn't see any context without scrolling).
+        // On desktop cap at calc(100vh - 200px). Width derived from height.
         // Landscape/square: full width.
         ...(videoAspectRatio && videoAspectRatio < 1 ? {
-          maxHeight: '65vh',
-          maxWidth: 'calc(65vh * 0.5625)',
+          maxHeight: '55vh',
+          maxWidth: 'calc(55vh * 0.5625)',
           width: 'auto',
         } : {
           width: '100%',

@@ -386,8 +386,9 @@ export function AdminDashboard() {
 
       {/* Top-level tab switcher: Analytics | Flags | Database | Users.
           Horizontally scrollable on mobile so all 4 tabs stay visible
-          without wrapping or pushing the page width. */}
-      <div className="flex gap-1 mb-6 border-b border-zinc-200 overflow-x-auto shelf-scroll">
+          without wrapping or pushing the page width. The scroll-fade
+          class adds a right-edge fade hint when there's more to scroll. */}
+      <div className="flex gap-1 mb-6 border-b border-zinc-200 overflow-x-auto shelf-scroll scroll-fade">
         <button
           onClick={() => setTab('analytics')}
           className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px shrink-0 ${

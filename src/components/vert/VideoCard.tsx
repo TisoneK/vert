@@ -94,7 +94,12 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
 
   return (
     <div
-      className="group cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+      // h-full + flex flex-col so cards in the same grid row stretch to equal
+      // height regardless of title length. Without this, a card with a 1-line
+      // title is shorter than a card with a 2-line title next to it, making
+      // the grid look ragged. The thumbnail keeps its aspect ratio; the info
+      // section grows to fill the remaining space.
+      className="group cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 h-full flex flex-col"
       onClick={() => navigate({ page: 'video', videoId: video.id })}
     >
       {/* Thumbnail container */}
@@ -252,8 +257,11 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
         )}
       </div>
 
-      {/* Video info */}
-      <div className="mt-2 flex gap-2">
+      {/* Video info — flex-1 so it grows to fill the card height
+          (the parent is h-full flex flex-col). This keeps cards in the
+          same grid row at equal height even when titles have different
+          lengths. */}
+      <div className="mt-2 flex gap-2 flex-1">
         {/* Channel avatar */}
         <div className="shrink-0 mt-0.5">
           {video.channel.user.avatarUrl && !avatarFailed ? (

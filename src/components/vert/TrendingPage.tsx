@@ -94,8 +94,9 @@ export function TrendingPage() {
         <p className="text-zinc-500 text-sm">What&apos;s hot right now on Vert</p>
       </div>
 
-      {/* Category filter tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-3 mb-6 shelf-scroll">
+      {/* Category filter tabs — horizontally scrollable on mobile with
+          a fade hint on the right edge so users know there's more to scroll. */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-6 shelf-scroll scroll-fade">
         <button
           onClick={() => handleCategoryFilter(null)}
           className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${

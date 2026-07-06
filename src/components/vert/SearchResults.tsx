@@ -181,7 +181,7 @@ export function SearchResults({ query }: SearchResultsProps) {
               everything stays on one line. */}
           {tab === 'videos' && (
             <div className="mb-4 pb-3 border-b border-zinc-100 space-y-2">
-              <div className="flex items-center gap-2 overflow-x-auto shelf-scroll">
+              <div className="flex items-center gap-2 overflow-x-auto shelf-scroll scroll-fade">
                 {/* Sort */}
                 <div className="flex items-center gap-1 shrink-0">
                   <SlidersHorizontal className="h-3.5 w-3.5 text-zinc-400 mr-1" />
