@@ -1,127 +1,101 @@
 # Changelog
 
-New things and fixes in Vert, newest first. Written for the people using the app.
+All notable changes to Vert are documented in this file, newest first.
 
-For technical details (file references, API routes, architectural reasoning, commit hashes), see [`docs/DEVLOG.md`](./docs/DEVLOG.md).
-
----
-
-## July 2026 — Review pass & feature build-out
-
-### New features
-
-#### Playlists
-You can now organize videos into playlists.
-- Create a playlist from the new **Playlists** page (sidebar → Playlists, or `/playlists`).
-- Add a video to a playlist from any video card's `⋮` menu → **Add to playlist**. Pick an existing playlist or create a new one inline.
-- View a playlist at `/playlist/<id>` — see all its videos, remove individual videos, or delete the whole playlist (videos themselves stay).
-- "Play all" jumps to the first video in the playlist.
-
-#### Admin: User management
-Admins can now manage user accounts from the dashboard.
-- Go to `/admin` → **Users** tab.
-- Search by email or username. Filter by role (All / Members / Admins).
-- Per row: promote/demote role, suspend/reactivate, or permanently delete.
-- Safety guards: you can't demote, suspend, or delete your own account. Deletes require double confirmation. All actions are logged for audit.
-
-#### Admin: Database migrations from the UI
-Admins can now apply schema migrations from the browser — no shell access needed.
-- Go to `/admin` → **Database** tab.
-- See pending migrations and apply them with a click. Each runs in a transaction and is tracked in a `_admin_migration` table.
-- CLI alternative: `./scripts/apply-admin-migrations.sh` (same tracking table, stays in sync with the UI).
-- Bundle of helper scripts added under `scripts/` for local DB operations (`db-push.sh`, `db-migrate.sh`, `db-deploy.sh`, `db-status.sh`, `db-studio.sh`).
-
-#### Account settings
-Users can now manage their own account.
-- Go to your profile menu → **Settings** (or `/settings`).
-- **Change password** — requires your current password as verification.
-- **Delete account** — multi-step confirmation. Cascade-deletes your channel, videos, comments, etc. Irreversible.
-
-#### Better search
-Search now finds more and lets you filter.
-- Search matches video title, description, **and channel name** (was title + description only).
-- New **Channels** tab in search results — see channels whose names match your query.
-- New filters: format (Portrait / Landscape / Square) and upload date (Today / This week / This month / This year).
-- Sort by Relevance, Date, or Views.
-
-### Improvements
-
-#### Faster page loads
-- Added database indexes for the most common queries (home feed, trending, channel pages, comment threads). Pages that scanned the whole video table now use an index.
-- Trending, categories, and popular tags are now cached at the CDN edge for 1–5 minutes. The sidebar fetches categories on every page load, so this cuts a DB query per request.
-- The "For You" feed no longer loads every unwatched video into memory — it now scores the 200 most recent + 200 most viewed, which is plenty and won't OOM on a large database.
-
-#### Security hardening (from the code review)
-A full code review found and fixed 16 issues. The notable ones:
-- **Signup now actually logs you in.** Previously, creating an account silently failed to establish a session and bounced you to the login page. Fixed.
-- **Pagination no longer 500s on weird inputs.** Requests like `?page=-5` or `?limit=abc` now return sensible defaults instead of crashing.
-- **View counts no longer double-count.** Added a unique constraint on `(userId, videoId)` in watch history so concurrent page loads can't both record a view.
-- **Stricter input validation** on registration (email format, username length/characters), comments (2000-char cap), video/channel titles, and URLs (must be `https:`).
-- **Public debug endpoint locked down.** `/api/v1/debug-db` was publicly accessible and leaked database host info. Now admin-only.
-- **Security headers added.** HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.
-- **Timing-safe secret comparison** on the seed/cleanup endpoints to prevent timing attacks.
-- **Mobile drawer fixed.** Escape key now closes it, body scroll is locked while open, and the mislabeled "Watch Later" item is now correctly split into History and Saved.
-
-### Under the hood
-See `docs/DEVLOG.md` for the technical details — file references, API routes, architectural reasoning, and commit hashes for everything in this release.
-
-### Known gaps
-- **Password reset and email verification** are not yet implemented — they need an email service (Resend, SendGrid, etc.) configured in Vercel env vars. Once you add `RESEND_API_KEY`, this is a clean follow-up.
-- **Playlist reordering** is not yet implemented (drag-and-drop). Videos appear in add-order.
-- **`<img>` → `<Image>` migration** is configured but not yet applied to existing components.
-- **Notification polling** still hits the API every 60s. Should move to SSE or visibility-gated polling.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project aims to adhere to its principles. For technical implementation
+details (file references, API routes, commit hashes), see
+[`docs/DEVLOG.md`](./docs/DEVLOG.md).
 
 ---
 
-## Earlier — Notifications, hashtags, For You feed, deep links
+## [Unreleased]
 
-### Notifications
-- The notification bell now shows real notifications instead of demo data.
-- You get notified when someone subscribes to your channel, comments on your video, or likes your video. Admins get notified when a video is flagged.
-- Notifications self-suppress for your own actions (no "you liked your own video" spam).
-- "Mark all as read" button, unread count badge, auto-refresh every 60s.
+### Added
+- Nothing yet.
 
-### Hashtags
-- Videos can have up to 8 hashtags. Tags are separate from categories — categories are curated, tags are creator-defined.
-- New `/tag/<slug>` pages list all videos with a given tag.
-- Tags appear as clickable chips on video cards and the watch page.
-- Tag input on the upload page (type and press Enter or comma).
+### Changed
+- Nothing yet.
 
-### "For You" feed
-- Logged-in users with watch history see a personalized "For You" shelf at the top of the home page.
-- Ranking considers: shared tags with your watch history, shared categories, your subscriptions, channels you've liked, recency, and excludes videos you've disliked.
-- Falls back to trending if you're not logged in or have no history.
-
-### Shareable URLs
-- Every video, channel, category, tag, search, and the trending/explore pages now have their own URL.
-- Browser back/forward works. Pasting a URL into a fresh tab lands on the right page.
-
-### Other
-- Rate limiting added on signup, upload, voting, and commenting to prevent abuse.
-- `ARCHITECTURE.md` added documenting the v1 design choices and when each deferral should be revisited.
-- Dependency audit closed 44 of 54 known vulnerabilities (81% reduction). Remaining 10 are upstream issues with no patched version available.
+### Fixed
+- Nothing yet.
 
 ---
 
-## Even earlier — Uploads, video player, auth
+## [0.3.0] — 2026-07-06
 
-### Video uploads
-- Logged-in users can upload videos (MP4, WebM, MOV up to 200MB).
-- Thumbnails auto-generate from the first frame if you don't pick one.
-- Videos upload directly to Vercel Blob from your browser, bypassing the serverless body limit.
+### Added
+- **Playlists.** Create, view, edit, and delete playlists. Add videos to playlists from any video card's menu. View a playlist's videos and play them in order.
+- **Admin: User management.** Admins can now search, filter, promote/demote, suspend, and delete user accounts from a new Users tab in the admin dashboard. Self-demotion and self-deletion are blocked for safety.
+- **Admin: Database migrations from the UI.** Admins can apply pending schema migrations directly from the browser via a new Database tab. Each migration runs in a transaction and is tracked for audit. CLI scripts are also available under `scripts/`.
+- **Account settings.** Users can change their own password (requires current password verification) and delete their own account (multi-step confirmation) from a new Settings page.
+- **Search by channel name.** Search now matches video titles, descriptions, and channel names. A new Channels tab in search results shows matching channels.
+- **Search filters.** Filter video search results by format (portrait, landscape, square) and upload date (today, this week, this month, this year).
+- **Security headers.** Added HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy headers to all responses.
+- **Database indexes.** Added composite indexes on Video and Comment tables for the most common query patterns, speeding up the home feed, trending, channel pages, and comment threads.
+- **CDN caching.** Trending, categories, and popular tags are now cached at the edge for 1–5 minutes, reducing database load on every page view.
+- **Admin migration SQL files.** Added `prisma/migrations/admin/` with timestamped SQL files for the WatchHistory unique constraint and the new query indexes.
 
-### Video player
-- Real adaptive streaming via hls.js for `.m3u8` sources — the quality menu shows actual renditions from the manifest.
-- Progressive (non-HLS) videos show their source quality (e.g. "720p (source)") instead of a hard-coded placeholder.
-- Portrait videos cap at 65vh on mobile so the title and actions stay visible.
+### Changed
+- **Search is now case-insensitive** across title, description, and channel name. Previously it was case-sensitive on title and description only.
+- **For You feed no longer loads every unwatched video.** It now scores the 200 most recent plus 200 most viewed, preventing out-of-memory errors on large databases.
+- **Signup form now auto-logs-in new users.** Previously, account creation succeeded but the session was never established, bouncing users to the login page.
+- **Pagination is hardened** against negative, NaN, and absurdly large page/limit values. Previously these caused 500 errors.
+- **Registration validation is stricter.** Email format is checked, usernames must be 3–20 alphanumeric characters, passwords capped at 200 characters.
+- **Video, channel, and comment fields are length-validated** server-side. URLs for video/thumbnail/banner must be `https:`.
+- **Mobile drawer behavior improved.** Escape key now closes it, body scroll is locked while open, and the mislabeled "Watch Later" item is now correctly split into History and Saved.
+- **`docs/REVIEW.md`** moved from the repo root to `docs/` with status markers on every roadmap item.
 
-### Authentication
-- Login with email or username + password, or Google OAuth.
-- Sessions last 30 days.
-- Admin role loaded from the database on every request (not cached in the JWT), so role changes take effect immediately.
+### Fixed
+- **Signup auto-login was broken.** The signup form sent `email` to the credentials provider but it expects `identifier`. New users were silently bounced to the login page after registering.
+- **Pagination 500 errors.** Nine API routes used `parseInt` on query params without validation; requests like `?page=-5` crashed with a 500. All routes now use a shared `parsePagination` helper.
+- **View counts could double-count.** A missing unique constraint on `WatchHistory(userId, videoId)` let concurrent page loads both record a view. Added the constraint and updated the view-counter code to handle the race.
+- **React anti-pattern in ProfilePage and CreatorStudio.** Auth redirects were calling `setState` during render, which can cause subtle re-render bugs. Moved to `useEffect`.
+- **Search results didn't refresh on URL change.** The `SearchResults` component had a stale-closure bug where typing a new search in the header updated the URL but the results list didn't update.
+- **Public debug endpoint leaked database info.** `/api/v1/debug-db` was publicly accessible and returned database host details. Now admin-only.
+- **Timing-unsafe secret comparison.** The seed and cleanup endpoints used `===` to compare the `SEED_KEY`, leaking it via response-time side channels. Now uses `crypto.timingSafeEqual`.
+
+### Security
+- **Input validation** added across registration, video/channel/comment creation, and URL fields to prevent storage of malformed or malicious data.
+- **Security headers** (HSTS, X-Frame-Options, etc.) added to prevent clickjacking, MIME sniffing, and downgrade attacks.
+- **Debug endpoint locked down** behind admin auth to prevent information leakage.
+- **Timing-safe secret comparison** on seed/cleanup endpoints to prevent timing attacks.
+- **`next/image` configured** for Vercel Blob and Google avatar URLs, enabling future migration from `<img>` to optimized `<Image>` components.
 
 ---
 
-## Pre-changelog history
+## [0.2.0] — Earlier 2026
 
-See `git log` for changes prior to this changelog being maintained.
+### Added
+- **Notifications.** Real in-app notifications for subscriptions, comments, likes, and flags. Unread count badge, mark-all-as-read, auto-refresh.
+- **Hashtags.** Videos can have up to 8 creator-defined tags. New `/tag/<slug>` pages list all videos with a given tag. Tags appear as clickable chips on video cards and the watch page.
+- **"For You" feed.** Personalized video recommendations on the home page for logged-in users, ranked by affinity (shared tags, categories, subscriptions, liked channels, recency).
+- **Shareable URLs.** Every video, channel, category, tag, search, and the trending/explore pages now have their own URL. Browser back/forward works.
+- **Rate limiting** on signup, upload, voting, and commenting to prevent abuse.
+- **`ARCHITECTURE.md`** documenting the v1 design choices and migration triggers.
+
+### Changed
+- **Dependency audit** closed 44 of 54 known vulnerabilities (81% reduction). Updated Next.js, NextAuth, Prisma, React, and 18 other direct dependencies. Added `overrides` for 11 transitive deps with upstream fixes.
+
+### Fixed
+- **Video player no longer restarts playback** when toggling play/pause or settings. Side effects isolated in a `useEffect` keyed on `videoUrl`.
+- **Site no longer crashes when `prisma generate` hasn't run.** Prisma client is now lazily instantiated via a Proxy, so a missing binary only fails the route that needs it, not the whole app.
+
+---
+
+## [0.1.0] — Initial release
+
+### Added
+- **Video uploads.** Logged-in users can upload videos (MP4, WebM, MOV up to 200MB) directly to Vercel Blob. Thumbnails auto-generate from the first frame.
+- **Video player** with HLS adaptive streaming via hls.js, real quality menu from the manifest, and mobile-first portrait sizing.
+- **Authentication** with email/username + password or Google OAuth. 30-day sessions. Admin role loaded from the database on every request.
+- **Core pages:** home feed, trending, explore, categories, search, watch, channel, history, saved, creator studio, admin dashboard.
+- **Voting, commenting, subscribing, flagging, and saving** videos.
+- **Admin dashboard** with analytics, flag moderation, and channel suspension.
+
+---
+
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/TisoneK/vert/releases/tag/v0.3.0
+[0.2.0]: https://github.com/TisoneK/vert/releases/tag/v0.2.0
+[0.1.0]: https://github.com/TisoneK/vert/releases/tag/v0.1.0
