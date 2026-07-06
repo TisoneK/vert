@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { db, withServerlessPoolParams } from '@/lib/db'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 /**
  * GET /api/v1/debug-db
@@ -19,11 +20,18 @@ import { db, withServerlessPoolParams } from '@/lib/db'
  * findMany on Category (small table, no joins) so it's safe to hit
  * repeatedly while debugging.
  *
- * SECURITY: This route returns no user data, only DB-connectivity info.
- * It's intentionally public so it can be hit from a browser during an
- * outage. If you want to lock it down later, gate it behind auth.
+ * SECURITY: This route returns DB connectivity info (host, pool params,
+ * error text). That's operational intel an attacker can use to plan an
+ * attack — knowing whether you're on Neon vs Prisma Postgres, whether
+ * connection_limit is set, whether the DB is reachable, etc. It's now
+ * gated behind admin auth. If you need to hit it from a browser during
+ * an outage, sign in as admin first.
  */
 export async function GET() {
+  const admin = await getCurrentUser()
+  if (!admin || admin.role !== 'admin') {
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+  }
   const start = Date.now()
   try {
     const count = await db.category.count()
