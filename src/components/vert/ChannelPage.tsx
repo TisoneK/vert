@@ -94,43 +94,46 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
 
   return (
     <div className="max-w-5xl mx-auto animate-vert-fade-in">
-      {/* Banner — when no custom banner is set, show a branded gradient
-          with a subtle dot pattern so the space doesn't look empty.
-          The pattern is an inline SVG data URI so it works without any
-          extra asset files. */}
-      <div className="h-24 md:h-36 relative overflow-hidden">
-        {channel.bannerUrl ? (
+      {/* Banner — only rendered when the channel has a custom banner image.
+          Without one, there's no point allocating 96-144px of vertical space
+          for an empty colored box. The "Back to feed" link moves to a normal
+          inline position above the avatar instead (see below). */}
+      {channel.bannerUrl ? (
+        <div className="h-24 md:h-36 relative overflow-hidden">
           <img
             src={channel.bannerUrl}
             alt={channel.channelName}
             className="w-full h-full object-cover"
           />
-        ) : (
-          <div
-            className="w-full h-full bg-gradient-to-br from-violet-200 via-violet-100 to-zinc-100"
-            style={{
-              backgroundImage:
-                'radial-gradient(circle at 1px 1px, rgba(124,58,237,0.15) 1px, transparent 0)',
-              backgroundSize: '16px 16px',
-            }}
-          />
-        )}
-        <button
-          onClick={() => navigate({ page: 'home' })}
-          className="absolute top-3 left-3 flex items-center gap-1.5 text-xs font-medium text-zinc-700 bg-white/80 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white hover:text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to feed
-        </button>
-      </div>
+          <button
+            onClick={() => navigate({ page: 'home' })}
+            className="absolute top-3 left-3 flex items-center gap-1.5 text-xs font-medium text-zinc-700 bg-white/80 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white hover:text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to feed
+          </button>
+        </div>
+      ) : (
+        <div className="px-4 md:px-6 pt-4">
+          <button
+            onClick={() => navigate({ page: 'home' })}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 rounded-full px-1.5 py-1"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to feed
+          </button>
+        </div>
+      )}
 
       {/* Channel info */}
       <div className="px-4 md:px-6 py-4">
         {/* Avatar + info + Subscribe — stack vertically on mobile so the
             Subscribe button doesn't push the channel name off-screen on a
-            360px viewport. On md+ they sit side-by-side as before. */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-          <div className="shrink-0 -mt-8 self-start">
+            360px viewport. On md+ they sit side-by-side as before.
+            When there's a banner, the avatar overlaps it via -mt-8.
+            When there's no banner, no negative margin is needed. */}
+        <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${channel.bannerUrl ? '' : 'pt-2'}`}>
+          <div className={`shrink-0 self-start ${channel.bannerUrl ? '-mt-8' : ''}`}>
             {channel.user.avatarUrl ? (
               <img
                 src={channel.user.avatarUrl}

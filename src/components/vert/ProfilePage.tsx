@@ -155,26 +155,28 @@ export function ProfilePage() {
 
   return (
     <div className="max-w-5xl mx-auto animate-vert-fade-in">
-      {/* Profile header */}
-      <div className="h-24 md:h-36 relative overflow-hidden">
-        {channel.bannerUrl ? (
+      {/* Profile header — only render the banner area when a custom banner
+          exists. Without one, skip the 96-144px of dead space entirely and
+          let the avatar sit at the top of the page. */}
+      {channel.bannerUrl ? (
+        <div className="h-24 md:h-36 relative overflow-hidden">
           <img
             src={channel.bannerUrl}
             alt={channel.channelName}
             className="w-full h-full object-cover"
           />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-violet-100 via-violet-50 to-zinc-100" />
-        )}
-      </div>
+        </div>
+      ) : null}
 
       <div className="px-4 md:px-6 py-4">
         {/* Avatar + info + action buttons — stack vertically on mobile
             so the action buttons (Studio, Edit) don't push the channel
             name off the screen on a 360px viewport. On md+ they sit
-            side-by-side as before. */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-          <div className="shrink-0 -mt-8 self-start">
+            side-by-side as before.
+            When there's a banner, the avatar overlaps it via -mt-8.
+            When there's no banner, no negative margin is needed. */}
+        <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${channel.bannerUrl ? '' : 'pt-2'}`}>
+          <div className={`shrink-0 self-start ${channel.bannerUrl ? '-mt-8' : ''}`}>
             <div className="w-20 h-20 rounded-full bg-zinc-300 flex items-center justify-center text-zinc-700 text-2xl font-bold border-4 border-white">
               {user.username[0]?.toUpperCase()}
             </div>
