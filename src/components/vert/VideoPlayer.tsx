@@ -68,6 +68,13 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [duration, setDuration] = useState(0)
   const [showSettings, setShowSettings] = useState(false)
   const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  // Whether the controls overlay is currently visible. On desktop this is
+  // driven by hover (group-hover); on mobile (no hover) we toggle it on tap
+  // so the user can actually reach mute / fullscreen / settings. The CSS at
+  // the bottom uses both `opacity-0 group-hover:opacity-100` (desktop) and
+  // this `controlsVisible` state (mobile) combined via a `forced-visible`
+  // class. Tapping the video toggles play AND the controls visibility.
+  const [controlsVisible, setControlsVisible] = useState(false)
 
   // Quality state — real values, populated from hls.js levels or the video element
   const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([])
@@ -273,6 +280,18 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   }, [thumbnailUrl, videoId, videoUrl])
 
   // --- Controls ---
+  // Auto-hide controls after 3s of inactivity while playing. Without this
+  // the controls overlay would stay visible forever on mobile after a tap.
+  // We only auto-hide while playing (paused users want to see controls).
+  useEffect(() => {
+    if (!controlsVisible || !isPlaying) return
+    const id = setTimeout(() => {
+      // Don't hide if the settings menu is open — that would trap the user.
+      if (!showSettings) setControlsVisible(false)
+    }, 3000)
+    return () => clearTimeout(id)
+  }, [controlsVisible, isPlaying, showSettings, currentTime])
+
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return
     if (isPlaying) {
@@ -281,6 +300,15 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       videoRef.current.play().catch(() => setHasError(true))
     }
   }, [isPlaying])
+
+  // Toggle controls visibility — used by the video container's onClick.
+  // Single tap: toggle controls (and let the play button do its thing).
+  // We deliberately do NOT toggle play on container tap, because the big
+  // play/pause button in the center overlay already handles that and doing
+  // both makes the UI feel jumpy.
+  const handleContainerTap = useCallback(() => {
+    setControlsVisible((v) => !v)
+  }, [])
 
   const toggleMute = useCallback(() => {
     if (!videoRef.current) return
@@ -510,14 +538,22 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         // so it can't float on top of our custom control bar.
         disablePictureInPicture
         disableRemotePlayback
-        onClick={togglePlay}
+        onClick={handleContainerTap}
         onError={() => setHasError(true)}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       />
 
-      {/* Controls overlay */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      {/* Controls overlay — visible on hover (desktop) or when
+          controlsVisible is true (mobile tap-to-toggle). The `forced-visible`
+          class is defined in globals.css and overrides opacity-0. */}
+      <div
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-200 ${
+          controlsVisible
+            ? 'opacity-100'
+            : 'opacity-0 group-hover:opacity-100'
+        }`}
+      >
         <div
           className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0"
           onClick={handleProgressClick}
@@ -531,13 +567,21 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         </div>
 
         <div className="flex items-center flex-nowrap gap-2 px-3 pb-2 pt-1 overflow-hidden">
-          <button onClick={togglePlay} className="shrink-0 text-white hover:text-violet-400 transition-colors p-1">
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          <button
+            onClick={togglePlay}
+            className="shrink-0 text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? <Pause className="h-5 w-5 sm:h-4 sm:w-4" /> : <Play className="h-5 w-5 sm:h-4 sm:w-4" />}
           </button>
 
           <div className="flex items-center gap-1.5 shrink-0">
-            <button onClick={toggleMute} className="text-white hover:text-violet-400 transition-colors p-1">
-              {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            <button
+              onClick={toggleMute}
+              className="text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
+              aria-label={isMuted ? 'Unmute' : 'Mute'}
+            >
+              {isMuted ? <VolumeX className="h-5 w-5 sm:h-4 sm:w-4" /> : <Volume2 className="h-5 w-5 sm:h-4 sm:w-4" />}
             </button>
             {/* Volume slider takes real width (64px) that a narrow portrait
                 player can't spare alongside play/time/settings/fullscreen —
@@ -551,6 +595,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
                 className="w-16 h-1 bg-zinc-600 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
+                aria-label="Volume"
               />
             )}
           </div>
@@ -565,10 +610,10 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           <div className="relative shrink-0">
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="text-white hover:text-violet-400 transition-colors p-1"
+              className="text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
               aria-label="Settings"
             >
-              <Settings className="h-4 w-4" />
+              <Settings className="h-5 w-5 sm:h-4 sm:w-4" />
             </button>
             {showSettings && (
               <div className="absolute bottom-full right-0 mb-2 w-48 bg-white border border-zinc-200 shadow-lg rounded-lg py-2 z-50">
@@ -615,17 +660,27 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             )}
           </div>
 
-          <button onClick={toggleFullscreen} className="shrink-0 text-white hover:text-violet-400 transition-colors p-1" aria-label="Fullscreen">
-            <Maximize className="h-4 w-4" />
+          <button
+            onClick={toggleFullscreen}
+            className="shrink-0 text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
+            aria-label="Fullscreen"
+          >
+            <Maximize className="h-5 w-5 sm:h-4 sm:w-4" />
           </button>
         </div>
       </div>
 
-      {/* Play button overlay when paused */}
+      {/* Play button overlay when paused — visible whenever the video is
+          paused so the user has a clear affordance to start playback. On
+          tap we both toggle play and reveal the controls for follow-up
+          actions (mute, fullscreen, etc). */}
       {!isPlaying && (
         <div
           className="absolute inset-0 flex items-center justify-center cursor-pointer"
-          onClick={togglePlay}
+          onClick={() => {
+            togglePlay()
+            setControlsVisible(true)
+          }}
         >
           <div className="w-14 h-14 rounded-full bg-zinc-900/50 flex items-center justify-center backdrop-blur-sm">
             <Play className="h-7 w-7 text-white ml-0.5" />

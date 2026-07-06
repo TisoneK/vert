@@ -5,7 +5,7 @@ import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { CategoryBadge } from './CategoryBadge'
 import { PlaylistPicker } from './PlaylistPicker'
 import { Play, Smartphone, Monitor, Square, MoreVertical, ListVideo } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface VideoCardProps {
   video: {
@@ -60,6 +60,33 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false)
   const [thumbnailFailed, setThumbnailFailed] = useState(false)
   const [avatarFailed, setAvatarFailed] = useState(false)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
+  const desktopMenuRef = useRef<HTMLDivElement>(null)
+
+  // Close the context menu on outside tap or Escape — important on mobile
+  // where the menu is always visible (no hover to toggle it off).
+  useEffect(() => {
+    if (!showMenu) return
+    function onDocClick(e: MouseEvent) {
+      const target = e.target as Node
+      if (
+        mobileMenuRef.current?.contains(target) ||
+        desktopMenuRef.current?.contains(target)
+      ) {
+        return
+      }
+      setShowMenu(false)
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setShowMenu(false)
+    }
+    document.addEventListener('mousedown', onDocClick)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDocClick)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [showMenu])
 
   const format = video.format || 'portrait'
   const aspectClass = format === 'landscape' ? 'aspect-video' : format === 'square' ? 'aspect-square' : 'aspect-[9/16]'
@@ -114,54 +141,114 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
           <Play className="h-8 w-8 text-white opacity-0 group-hover:opacity-80 transition-opacity duration-200" />
         </div>
 
-        {/* Context menu button */}
+        {/* Context menu button — always visible on touch devices (md:hidden),
+            hover-reveal on desktop (hidden md:block). The whole card is a
+            click target so without this split, mobile users have no way to
+            open the menu — tapping the card just navigates to the video. */}
         {showContextMenu && (
-          <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowMenu(!showMenu)
-              }}
-              className="p-1 bg-zinc-900/70 rounded text-white hover:bg-zinc-900/90 transition-colors"
-            >
-              <MoreVertical className="h-3.5 w-3.5" />
-            </button>
-            {showMenu && (
-              <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-zinc-200 shadow-lg rounded-lg py-1 z-50" onClick={(e) => e.stopPropagation()}>
-                <button
-                  onClick={() => { onContextMenuAction?.('save', video.id); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
+          <>
+            {/* Mobile: always visible */}
+            <div ref={mobileMenuRef} className="md:hidden absolute top-1.5 right-1.5">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowMenu(!showMenu)
+                }}
+                className="p-1.5 bg-zinc-900/70 rounded text-white hover:bg-zinc-900/90 transition-colors backdrop-blur-sm"
+                aria-label="More options"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+              {showMenu && (
+                <div
+                  className="absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 shadow-lg rounded-lg py-1 z-50"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  Save to Watch Later
-                </button>
-                <button
-                  onClick={() => { setShowPlaylistPicker(true); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors flex items-center gap-1.5"
+                  <button
+                    onClick={() => { onContextMenuAction?.('save', video.id); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 hover:bg-zinc-100 transition-colors"
+                  >
+                    Save to Watch Later
+                  </button>
+                  <button
+                    onClick={() => { setShowPlaylistPicker(true); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 hover:bg-zinc-100 transition-colors flex items-center gap-1.5"
+                  >
+                    <ListVideo className="h-3 w-3" />
+                    Add to playlist
+                  </button>
+                  <button
+                    onClick={() => { onContextMenuAction?.('share', video.id); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 hover:bg-zinc-100 transition-colors"
+                  >
+                    Share
+                  </button>
+                  <button
+                    onClick={() => { onContextMenuAction?.('not-interested', video.id); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 hover:bg-zinc-100 transition-colors"
+                  >
+                    Not interested
+                  </button>
+                  <button
+                    onClick={() => { onContextMenuAction?.('report', video.id); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    Report
+                  </button>
+                </div>
+              )}
+            </div>
+            {/* Desktop: hover-reveal */}
+            <div ref={desktopMenuRef} className="hidden md:block absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowMenu(!showMenu)
+                }}
+                className="p-1 bg-zinc-900/70 rounded text-white hover:bg-zinc-900/90 transition-colors"
+              >
+                <MoreVertical className="h-3.5 w-3.5" />
+              </button>
+              {showMenu && (
+                <div
+                  className="absolute right-0 top-full mt-1 w-36 bg-white border border-zinc-200 shadow-lg rounded-lg py-1 z-50"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <ListVideo className="h-3 w-3" />
-                  Add to playlist
-                </button>
-                <button
-                  onClick={() => { onContextMenuAction?.('share', video.id); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
-                >
-                  Share
-                </button>
-                <button
-                  onClick={() => { onContextMenuAction?.('not-interested', video.id); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
-                >
-                  Not interested
-                </button>
-                <button
-                  onClick={() => { onContextMenuAction?.('report', video.id); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-zinc-100 transition-colors"
-                >
-                  Report
-                </button>
-              </div>
-            )}
-          </div>
+                  <button
+                    onClick={() => { onContextMenuAction?.('save', video.id); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
+                  >
+                    Save to Watch Later
+                  </button>
+                  <button
+                    onClick={() => { setShowPlaylistPicker(true); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors flex items-center gap-1.5"
+                  >
+                    <ListVideo className="h-3 w-3" />
+                    Add to playlist
+                  </button>
+                  <button
+                    onClick={() => { onContextMenuAction?.('share', video.id); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
+                  >
+                    Share
+                  </button>
+                  <button
+                    onClick={() => { onContextMenuAction?.('not-interested', video.id); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
+                  >
+                    Not interested
+                  </button>
+                  <button
+                    onClick={() => { onContextMenuAction?.('report', video.id); setShowMenu(false) }}
+                    className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-zinc-100 transition-colors"
+                  >
+                    Report
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
 
