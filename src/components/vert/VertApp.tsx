@@ -27,6 +27,7 @@ import { LandingPage } from './LandingPage'
 import { PlaylistsPage } from './PlaylistsPage'
 import { PlaylistDetailPage } from './PlaylistDetailPage'
 import { SettingsPage } from './SettingsPage'
+import { ChangelogPage } from './ChangelogPage'
 
 export function VertApp() {
   const { currentView, navigate } = useNavigation()
@@ -118,16 +119,75 @@ export function VertApp() {
     return (
       <div className="min-h-screen bg-zinc-50">
         <header className="border-b border-zinc-100 bg-white">
-          <div className="max-w-5xl mx-auto px-4 h-14 flex items-center">
+          <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
             <button
               onClick={() => navigate({ page: 'home' })}
               className="flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 rounded"
             >
               <span className="text-lg font-bold text-zinc-900 tracking-tight">Vert</span>
             </button>
+            <div className="flex items-center gap-3 text-sm">
+              <button
+                onClick={() => navigate({ page: 'changelog' })}
+                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+              >
+                Changelog
+              </button>
+              <button
+                onClick={() => navigate({ page: 'login' })}
+                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+              >
+                Log in
+              </button>
+              <button
+                onClick={() => navigate({ page: 'signup' })}
+                className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-medium hover:bg-violet-700 transition-colors"
+              >
+                Sign up
+              </button>
+            </div>
           </div>
         </header>
         <ContactPage />
+      </div>
+    )
+  }
+
+  // The changelog page is a public deep link — no auth required.
+  if (!user && currentView.page === 'changelog') {
+    return (
+      <div className="min-h-screen bg-zinc-50">
+        <header className="border-b border-zinc-100 bg-white">
+          <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+            <button
+              onClick={() => navigate({ page: 'home' })}
+              className="flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 rounded"
+            >
+              <span className="text-lg font-bold text-zinc-900 tracking-tight">Vert</span>
+            </button>
+            <div className="flex items-center gap-3 text-sm">
+              <button
+                onClick={() => navigate({ page: 'contact' })}
+                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+              >
+                Contact
+              </button>
+              <button
+                onClick={() => navigate({ page: 'login' })}
+                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+              >
+                Log in
+              </button>
+              <button
+                onClick={() => navigate({ page: 'signup' })}
+                className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-medium hover:bg-violet-700 transition-colors"
+              >
+                Sign up
+              </button>
+            </div>
+          </div>
+        </header>
+        <ChangelogPage />
       </div>
     )
   }
@@ -193,6 +253,8 @@ export function VertApp() {
         return user ? <CreatorStudio /> : <LoginForm />
       case 'settings':
         return user ? <SettingsPage /> : <LoginForm />
+      case 'changelog':
+        return <ChangelogPage />
       case 'contact':
         return <ContactPage />
       default:

@@ -153,12 +153,20 @@ export function LandingPage() {
       <footer className="border-t border-zinc-100">
         <div className="max-w-5xl mx-auto px-4 py-6 flex items-center justify-between">
           <span className="text-sm text-zinc-400">Vert</span>
-          <button
-            onClick={() => navigate({ page: 'contact' })}
-            className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
-          >
-            Contact
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate({ page: 'changelog' })}
+              className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
+            >
+              Changelog
+            </button>
+            <button
+              onClick={() => navigate({ page: 'contact' })}
+              className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
+            >
+              Contact
+            </button>
+          </div>
         </div>
       </footer>
     </div>

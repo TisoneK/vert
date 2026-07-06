@@ -22,6 +22,7 @@ import {
   Cpu,
   Mail,
   ListVideo,
+  ScrollText,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -114,6 +115,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
   ] : []
 
   const footerItems = [
+    { icon: ScrollText, label: 'Changelog', action: () => navigate({ page: 'changelog' }), active: currentView.page === 'changelog' },
     { icon: Mail, label: 'Contact Us', action: () => navigate({ page: 'contact' }), active: currentView.page === 'contact' },
   ]
 

@@ -2,7 +2,7 @@
 
 import { useNavigation, useAuth } from '@/lib/store'
 import { useEffect } from 'react'
-import { Home, Upload, User, Compass, Flame, Clock, Bookmark, ListVideo, X, Mail } from 'lucide-react'
+import { Home, Upload, User, Compass, Flame, Clock, Bookmark, ListVideo, ScrollText, X, Mail } from 'lucide-react'
 
 interface MobileNavProps {
   drawerOpen: boolean
@@ -113,6 +113,14 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
                 </>
               )}
               <div className="my-2 border-t border-zinc-200" />
+              <button
+                onClick={() => { navigate({ page: 'changelog' }); onDrawerOpenChange(false) }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  isActive('changelog') ? 'bg-zinc-100 text-zinc-900 border-l-2 border-violet-600' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                }`}
+              >
+                <ScrollText className="h-4 w-4" /> Changelog
+              </button>
               <button
                 onClick={() => { navigate({ page: 'contact' }); onDrawerOpenChange(false) }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
