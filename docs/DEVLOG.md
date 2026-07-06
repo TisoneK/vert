@@ -12,6 +12,23 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Homepage density + hero sizing (product-design feedback)
+**Commit:** `3daa6df`
+
+External product-design review noted the homepage felt empty despite having a large featured hero — the hero dominated the first screen so users didn't know more content existed below, and the page ended abruptly after the Latest grid.
+
+**Hero height.** `HomeFeed.tsx` + `TrendingPage.tsx` — the hero used bare `aspect-video`, making it ~675px tall on a 1280px viewport (the entire above-the-fold area). Added `max-h-[42vh]` so the hero takes at most 42% of viewport height; the next section's heading is now visible below the fold on typical desktop (800px) and mobile (844px) viewports.
+
+**Hero gradient + text readability.** Strengthened from `from-black/75 via-black/25` to `from-black/90 via-black/40`. Added `drop-shadow-sm` to the title and channel-name text. On bright thumbnails the title was previously hard to read.
+
+**Hero badge.** `bg-violet-600` → `bg-violet-600/80 backdrop-blur-sm`, `text-[10px]` → `text-[9px]`, added `tracking-wider`. The badge now reads as a small label rather than competing with the title for attention. Same treatment applied to the TrendingPage `#1 Trending` badge (`bg-orange-500` → `bg-orange-500/90 backdrop-blur-sm`).
+
+**Popular Creators section.** `HomeFeed.tsx` — new section after Latest. Derives up to 8 unique channels from `[...trendingVideos, ...videos]`, renders each as a 64px circular avatar + name in a horizontally-scrollable row (`overflow-x-auto shelf-scroll`). Avatars get a `ring-2 ring-zinc-100` that transitions to `ring-violet-200` on hover. Fills the dead space that was below the Latest grid and gives the page a more social, alive feel.
+
+**Sidebar defaults.** `Sidebar.tsx` — `categoriesExpanded` and `channelsExpanded` changed from `useState(false)` to `useState(true)`. Collapsed sections looked like empty space and users missed the links.
+
+**Sidebar Creator section.** `Sidebar.tsx` — Creator Studio + Admin Panel moved into a labeled section with a `border-t` divider and a `CREATOR` uppercase heading (`text-[10px] font-semibold text-zinc-400 uppercase tracking-wider`). The hierarchy is now: viewer nav (Home/Explore/Trending/History/Saved/Playlists) → Popular Channels → Categories → CREATOR (Studio/Admin) → footer. Only renders if the user has a channel or is an admin.
+
 #### Remove empty banner space on channel/profile pages
 **Commit:** `d0ab347`
 
