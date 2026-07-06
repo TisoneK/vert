@@ -183,7 +183,14 @@ export function TrendingPage() {
               {gridVideos.map((video, index) => (
                 <div key={video.id} className="relative">
                   <VideoCard video={video} />
-                  <div className="absolute top-1.5 left-1.5 bg-zinc-900/75 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                  {/* Ranking badge — bottom-LEFT of the thumbnail. Avoids
+                      overlap with:
+                        - VideoCard's FormatIcon (top-left when not portrait)
+                        - VideoCard's context menu (top-right, hover-revealed)
+                        - VideoCard's duration badge (bottom-right)
+                        - VideoCard's watch-progress bar (very bottom edge)
+                      pointer-events-none so taps go through to the card. */}
+                  <div className="absolute bottom-2 left-2 z-20 bg-zinc-900/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded backdrop-blur-sm pointer-events-none">
                     #{index + 2}
                   </div>
                 </div>

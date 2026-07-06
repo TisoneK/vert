@@ -236,7 +236,10 @@ export function CreatorStudio() {
             ))}
           </div>
 
-          {/* Videos table */}
+          {/* Videos table — table on desktop, stacked cards on mobile.
+              Tables are unreadable on a 360px screen because the user has
+              to scroll horizontally past 5 columns to see the data; a
+              stacked card layout shows everything at once. */}
           <div className="bg-zinc-50 rounded-lg border border-zinc-200 overflow-hidden">
             <div className="p-4 border-b border-zinc-200">
               <h2 className="text-base font-semibold text-zinc-900">Your Videos</h2>
@@ -246,56 +249,95 @@ export function CreatorStudio() {
                 <p className="text-zinc-500">You haven&apos;t uploaded any videos yet.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-zinc-100">
-                      <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Video</th>
-                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Views</th>
-                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Likes</th>
-                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Status</th>
-                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Format</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {videos.map((video) => (
-                      <tr
-                        key={video.id}
-                        className="border-b border-zinc-100 hover:bg-zinc-100 cursor-pointer transition-colors"
-                        onClick={() => navigate({ page: 'video', videoId: video.id })}
-                      >
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-14 rounded bg-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
-                              {video.thumbnailUrl ? (
-                                <img src={video.thumbnailUrl} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <Film className="h-4 w-4 text-zinc-600" />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm text-zinc-900 font-medium line-clamp-1">{video.title}</p>
-                              <p className="text-xs text-zinc-700">{new Date(video.createdAt).toLocaleDateString()}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="text-right px-4 py-3 text-sm text-zinc-600">{video.viewCount.toLocaleString()}</td>
-                        <td className="text-right px-4 py-3 text-sm text-zinc-600">{video.likeCount.toLocaleString()}</td>
-                        <td className="text-right px-4 py-3">
-                          <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+              <>
+                {/* Mobile: stacked cards */}
+                <div className="md:hidden divide-y divide-zinc-100">
+                  {videos.map((video) => (
+                    <button
+                      key={video.id}
+                      onClick={() => navigate({ page: 'video', videoId: video.id })}
+                      className="w-full flex items-center gap-3 p-3 text-left hover:bg-zinc-100 transition-colors"
+                    >
+                      <div className="w-10 h-14 rounded bg-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
+                        {video.thumbnailUrl ? (
+                          <img src={video.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <Film className="h-4 w-4 text-zinc-600" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-zinc-900 font-medium line-clamp-1">{video.title}</p>
+                        <p className="text-xs text-zinc-700 mt-0.5">
+                          {new Date(video.createdAt).toLocaleDateString()} · {video.format}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-zinc-600">
+                          <span>{video.viewCount.toLocaleString()} views</span>
+                          <span>·</span>
+                          <span>{video.likeCount.toLocaleString()} likes</span>
+                          <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${
                             video.status === 'ready'
                               ? 'bg-emerald-100 text-emerald-600'
                               : 'bg-yellow-100 text-yellow-600'
                           }`}>
                             {video.status}
                           </span>
-                        </td>
-                        <td className="text-right px-4 py-3 text-xs text-zinc-700 capitalize">{video.format}</td>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                {/* Desktop: table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-zinc-100">
+                        <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Video</th>
+                        <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Views</th>
+                        <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Likes</th>
+                        <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Status</th>
+                        <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Format</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {videos.map((video) => (
+                        <tr
+                          key={video.id}
+                          className="border-b border-zinc-100 hover:bg-zinc-100 cursor-pointer transition-colors"
+                          onClick={() => navigate({ page: 'video', videoId: video.id })}
+                        >
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-14 rounded bg-zinc-200 flex items-center justify-center shrink-0 overflow-hidden">
+                                {video.thumbnailUrl ? (
+                                  <img src={video.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <Film className="h-4 w-4 text-zinc-600" />
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm text-zinc-900 font-medium line-clamp-1">{video.title}</p>
+                                <p className="text-xs text-zinc-700">{new Date(video.createdAt).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="text-right px-4 py-3 text-sm text-zinc-600">{video.viewCount.toLocaleString()}</td>
+                          <td className="text-right px-4 py-3 text-sm text-zinc-600">{video.likeCount.toLocaleString()}</td>
+                          <td className="text-right px-4 py-3">
+                            <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+                              video.status === 'ready'
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : 'bg-yellow-100 text-yellow-600'
+                            }`}>
+                              {video.status}
+                            </span>
+                          </td>
+                          <td className="text-right px-4 py-3 text-xs text-zinc-700 capitalize">{video.format}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </>
@@ -360,7 +402,7 @@ export function CreatorStudio() {
                 </div>
               </div>
 
-              {/* Top 5 Videos */}
+              {/* Top 5 Videos — table on desktop, stacked cards on mobile */}
               <div className="bg-zinc-50 rounded-lg border border-zinc-200 overflow-hidden">
                 <div className="p-4 border-b border-zinc-200">
                   <h3 className="text-sm font-semibold text-zinc-900">Top 5 Videos</h3>
@@ -368,36 +410,58 @@ export function CreatorStudio() {
                 {analytics.topVideos.length === 0 ? (
                   <div className="p-6 text-center text-zinc-500 text-sm">No videos yet.</div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-zinc-100">
-                          <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Title</th>
-                          <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Views</th>
-                          <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Likes</th>
-                          <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Comments</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {analytics.topVideos.map((v) => (
-                          <tr
-                            key={v.id}
-                            className="border-b border-zinc-100 hover:bg-zinc-100 cursor-pointer transition-colors"
-                            onClick={() => navigate({ page: 'video', videoId: v.id })}
-                          >
-                            <td className="px-4 py-3 text-sm text-zinc-900 font-medium line-clamp-1 max-w-xs">{v.title}</td>
-                            <td className="text-right px-4 py-3 text-sm text-zinc-600">{formatViews(v.viewCount)}</td>
-                            <td className="text-right px-4 py-3 text-sm text-zinc-600">{formatViews(v.likeCount)}</td>
-                            <td className="text-right px-4 py-3 text-sm text-zinc-600">{v.commentCount.toLocaleString()}</td>
+                  <>
+                    {/* Mobile: stacked cards */}
+                    <div className="md:hidden divide-y divide-zinc-100">
+                      {analytics.topVideos.map((v) => (
+                        <button
+                          key={v.id}
+                          onClick={() => navigate({ page: 'video', videoId: v.id })}
+                          className="w-full flex flex-col gap-1 p-3 text-left hover:bg-zinc-100 transition-colors"
+                        >
+                          <p className="text-sm text-zinc-900 font-medium line-clamp-2">{v.title}</p>
+                          <div className="flex items-center gap-2 text-xs text-zinc-600">
+                            <span>{formatViews(v.viewCount)} views</span>
+                            <span>·</span>
+                            <span>{formatViews(v.likeCount)} likes</span>
+                            <span>·</span>
+                            <span>{v.commentCount.toLocaleString()} comments</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    {/* Desktop: table */}
+                    <div className="hidden md:block overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-zinc-100">
+                            <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Title</th>
+                            <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Views</th>
+                            <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Likes</th>
+                            <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Comments</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {analytics.topVideos.map((v) => (
+                            <tr
+                              key={v.id}
+                              className="border-b border-zinc-100 hover:bg-zinc-100 cursor-pointer transition-colors"
+                              onClick={() => navigate({ page: 'video', videoId: v.id })}
+                            >
+                              <td className="px-4 py-3 text-sm text-zinc-900 font-medium line-clamp-1 max-w-xs">{v.title}</td>
+                              <td className="text-right px-4 py-3 text-sm text-zinc-600">{formatViews(v.viewCount)}</td>
+                              <td className="text-right px-4 py-3 text-sm text-zinc-600">{formatViews(v.likeCount)}</td>
+                              <td className="text-right px-4 py-3 text-sm text-zinc-600">{v.commentCount.toLocaleString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </div>
 
-              {/* Recent Videos */}
+              {/* Recent Videos — table on desktop, stacked cards on mobile */}
               <div className="bg-zinc-50 rounded-lg border border-zinc-200 overflow-hidden">
                 <div className="p-4 border-b border-zinc-200">
                   <h3 className="text-sm font-semibold text-zinc-900">Recent Uploads</h3>
@@ -405,40 +469,67 @@ export function CreatorStudio() {
                 {analytics.recentVideos.length === 0 ? (
                   <div className="p-6 text-center text-zinc-500 text-sm">No videos yet.</div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-zinc-100">
-                          <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Title</th>
-                          <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Status</th>
-                          <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Views</th>
-                          <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Uploaded</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {analytics.recentVideos.map((v) => (
-                          <tr
-                            key={v.id}
-                            className="border-b border-zinc-100 hover:bg-zinc-100 cursor-pointer transition-colors"
-                            onClick={() => navigate({ page: 'video', videoId: v.id })}
-                          >
-                            <td className="px-4 py-3 text-sm text-zinc-900 font-medium line-clamp-1 max-w-xs">{v.title}</td>
-                            <td className="px-4 py-3">
-                              <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
-                                v.status === 'ready'
-                                  ? 'bg-emerald-100 text-emerald-600'
-                                  : 'bg-yellow-100 text-yellow-600'
-                              }`}>
-                                {v.status}
-                              </span>
-                            </td>
-                            <td className="text-right px-4 py-3 text-sm text-zinc-600">{formatViews(v.viewCount)}</td>
-                            <td className="text-right px-4 py-3 text-xs text-zinc-700">{timeAgo(v.createdAt)}</td>
+                  <>
+                    {/* Mobile: stacked cards */}
+                    <div className="md:hidden divide-y divide-zinc-100">
+                      {analytics.recentVideos.map((v) => (
+                        <button
+                          key={v.id}
+                          onClick={() => navigate({ page: 'video', videoId: v.id })}
+                          className="w-full flex flex-col gap-1 p-3 text-left hover:bg-zinc-100 transition-colors"
+                        >
+                          <p className="text-sm text-zinc-900 font-medium line-clamp-2">{v.title}</p>
+                          <div className="flex items-center gap-2 text-xs text-zinc-600">
+                            <span>{formatViews(v.viewCount)} views</span>
+                            <span>·</span>
+                            <span>{timeAgo(v.createdAt)}</span>
+                            <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                              v.status === 'ready'
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : 'bg-yellow-100 text-yellow-600'
+                            }`}>
+                              {v.status}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    {/* Desktop: table */}
+                    <div className="hidden md:block overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-zinc-100">
+                            <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Title</th>
+                            <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Status</th>
+                            <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Views</th>
+                            <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Uploaded</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {analytics.recentVideos.map((v) => (
+                            <tr
+                              key={v.id}
+                              className="border-b border-zinc-100 hover:bg-zinc-100 cursor-pointer transition-colors"
+                              onClick={() => navigate({ page: 'video', videoId: v.id })}
+                            >
+                              <td className="px-4 py-3 text-sm text-zinc-900 font-medium line-clamp-1 max-w-xs">{v.title}</td>
+                              <td className="px-4 py-3">
+                                <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+                                  v.status === 'ready'
+                                    ? 'bg-emerald-100 text-emerald-600'
+                                    : 'bg-yellow-100 text-yellow-600'
+                                }`}>
+                                  {v.status}
+                                </span>
+                              </td>
+                              <td className="text-right px-4 py-3 text-sm text-zinc-600">{formatViews(v.viewCount)}</td>
+                              <td className="text-right px-4 py-3 text-xs text-zinc-700">{timeAgo(v.createdAt)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
