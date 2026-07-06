@@ -53,8 +53,11 @@ export function SignupForm() {
       const data = await res.json()
 
       if (res.ok) {
+        // The Credentials provider in auth.ts reads `identifier` (not `email`),
+        // and accepts either an email or a username. Use email — it's what the
+        // user just typed and what we registered against.
         const result = await signIn('credentials', {
-          email,
+          identifier: email,
           password,
           redirect: false,
         })
