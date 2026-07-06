@@ -45,11 +45,43 @@ export async function GET(
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
 
-    // Increment view count
-    await db.video.update({
-      where: { id },
-      data: { viewCount: { increment: 1 } },
-    })
+    // Views were previously counted on every single request to this route —
+    // every page load, refresh, or re-open by the same account added +1, so
+    // a creator watching their own video 5 times showed 5 views. Count at
+    // most once per logged-in account, using WatchHistory (one row per
+    // user/video, see /api/v1/history) as the "have they already been
+    // counted" check. Anonymous (logged-out) viewers can't be deduped
+    // without a session cookie, so they still count every load for now —
+    // a real fix there would need a per-visitor cookie/session id.
+    const { getCurrentUser } = await import('@/lib/auth-helpers')
+    const user = await getCurrentUser()
+
+    let viewCountDelta = 0
+    if (user) {
+      const alreadyWatched = await db.watchHistory.findFirst({
+        where: { userId: user.id, videoId: id },
+        select: { id: true },
+      })
+      if (!alreadyWatched) {
+        viewCountDelta = 1
+        // Record the watch now so a concurrent/duplicate request (e.g. a
+        // fast refresh before the client's separate history POST resolves)
+        // sees this row and doesn't double-count. The client's own POST to
+        // /api/v1/history will just update this same row afterwards.
+        await db.watchHistory.create({
+          data: { userId: user.id, videoId: id, progress: 0 },
+        })
+      }
+    } else {
+      viewCountDelta = 1
+    }
+
+    if (viewCountDelta > 0) {
+      await db.video.update({
+        where: { id },
+        data: { viewCount: { increment: viewCountDelta } },
+      })
+    }
 
     // Flatten join tables for the response (same shape as /api/v1/videos)
     const formatted = {
@@ -58,7 +90,7 @@ export async function GET(
       tags: video.tags.map((vt) => vt.tag),
     }
 
-    return NextResponse.json({ ...formatted, viewCount: video.viewCount + 1 })
+    return NextResponse.json({ ...formatted, viewCount: video.viewCount + viewCountDelta })
   } catch (error) {
     console.error('Video get error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
