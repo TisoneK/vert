@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/store'
 import { timeAgo } from '@/lib/utils-vert'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Send, Trash2, ThumbsUp, ChevronDown } from 'lucide-react'
+import { Send, Trash2, ChevronDown } from 'lucide-react'
 import { CommentSkeleton } from './Skeleton'
 
 interface Comment {
@@ -37,7 +37,6 @@ export function CommentSection({ videoId }: CommentSectionProps) {
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
   const [sort, setSort] = useState<SortOption>('top')
-  const [likedComments, setLikedComments] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchComments(1, true)
@@ -91,18 +90,6 @@ export function CommentSection({ videoId }: CommentSectionProps) {
     } catch (error) {
       console.error('Delete comment error:', error)
     }
-  }
-
-  const toggleCommentLike = (commentId: string) => {
-    setLikedComments((prev) => {
-      const next = new Set(prev)
-      if (next.has(commentId)) {
-        next.delete(commentId)
-      } else {
-        next.add(commentId)
-      }
-      return next
-    })
   }
 
   const sortedComments = [...comments].sort((a, b) => {
@@ -206,18 +193,6 @@ export function CommentSection({ videoId }: CommentSectionProps) {
                   </span>
                 </div>
                 <p className="text-sm text-zinc-600 mt-0.5">{comment.content}</p>
-                {/* Like & Reply */}
-                <div className="flex items-center gap-3 mt-1.5">
-                  <button
-                    onClick={() => toggleCommentLike(comment.id)}
-                    className={`flex items-center gap-1 text-[11px] transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
-                      likedComments.has(comment.id) ? 'text-violet-600' : 'text-zinc-600 hover:text-zinc-800'
-                    }`}
-                  >
-                    <ThumbsUp className="h-3 w-3" />
-                    {likedComments.has(comment.id) ? '1' : ''}
-                  </button>
-                </div>
               </div>
               {user && (user.id === comment.user.id || user.role === 'admin') && (
                 <button
