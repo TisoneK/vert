@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { timingSafeEqual } from 'crypto'
 
 /**
  * GET /api/cleanup-demo?key=<SEED_KEY>
@@ -28,11 +29,21 @@ const DEMO_EMAILS = [
 
 const PLACEHOLDER_URL = 'commondatastorage.googleapis.com'
 
+function keyMatches(candidate: string | null, expected: string | undefined): boolean {
+  if (!candidate || !expected) return false
+  if (candidate.length !== expected.length) return false
+  try {
+    return timingSafeEqual(Buffer.from(candidate), Buffer.from(expected))
+  } catch {
+    return false
+  }
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const key = searchParams.get('key')
 
-  if (!key || key !== process.env.SEED_KEY) {
+  if (!keyMatches(key, process.env.SEED_KEY)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

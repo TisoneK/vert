@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcryptjs'
+import { timingSafeEqual } from 'crypto'
 
 /**
  * GET /api/seed?key=<SECRET>
@@ -16,11 +17,23 @@ import { hash } from 'bcryptjs'
  * users or videos — only adds demo data if the DB is empty.
  */
 
+function keyMatches(candidate: string | null, expected: string | undefined): boolean {
+  if (!candidate || !expected) return false
+  if (candidate.length !== expected.length) return false
+  // timingSafeEqual needs equal-length Buffers; the length check above
+  // means we're safe, but still wrap in try/catch in case of weird input.
+  try {
+    return timingSafeEqual(Buffer.from(candidate), Buffer.from(expected))
+  } catch {
+    return false
+  }
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const key = searchParams.get('key')
 
-  if (!key || key !== process.env.SEED_KEY) {
+  if (!keyMatches(key, process.env.SEED_KEY)) {
     return NextResponse.json({ error: 'Unauthorized. Add ?key=YOUR_SEED_KEY' }, { status: 401 })
   }
 
