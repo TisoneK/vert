@@ -7,7 +7,11 @@ const nextConfig: NextConfig = {
     // and surface as runtime bugs instead.
     ignoreBuildErrors: false,
   },
-  reactStrictMode: false,
+  // React StrictMode helps catch potential issues during development
+  // by double-invoking certain functions and lifecycle methods.
+  // It was previously disabled without documented reason; re-enabled
+  // to catch bugs like setState during render (see REVIEW.md M-8).
+  reactStrictMode: true,
   // Configure next/image to allow optimization of Vercel Blob URLs.
   // Without this, <Image> components refuse to load remote images and
   // you get "hostname not configured" errors.
