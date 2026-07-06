@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
 /**
- * GET /api/v1/_debug/db
+ * GET /api/v1/debug-db
  *
  * Diagnostic endpoint that runs a trivial DB query and returns either:
  *   - { ok: true, latencyMs, categories } on success
