@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination } from '@/lib/pagination'
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,10 +50,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const skip = (page - 1) * limit
+    const { page, limit, skip } = parsePagination(req, { defaultLimit: 20 })
 
     const [history, total] = await Promise.all([
       db.watchHistory.findMany({

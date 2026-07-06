@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination } from '@/lib/pagination'
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,9 +12,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url)
     const status = searchParams.get('status')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const skip = (page - 1) * limit
+    const { page, limit, skip } = parsePagination(req, { defaultLimit: 20 })
 
     const where: Record<string, unknown> = {}
     if (status) {

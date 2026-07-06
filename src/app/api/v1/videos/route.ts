@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination } from '@/lib/pagination'
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '12')
+    const { page, limit, skip } = parsePagination(req, { defaultLimit: 12 })
     const channelId = searchParams.get('channel_id')
     const search = searchParams.get('search')
     const categorySlug = searchParams.get('category')
     const format = searchParams.get('format')
     const sort = searchParams.get('sort') || 'latest'
-
-    const skip = (page - 1) * limit
 
     const where: Record<string, unknown> = {
       isRemoved: false,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination } from '@/lib/pagination'
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,10 +18,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'No channel found' }, { status: 404 })
     }
 
-    const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const skip = (page - 1) * limit
+    const { page, limit, skip } = parsePagination(req, { defaultLimit: 20 })
 
     const [videos, total] = await Promise.all([
       db.video.findMany({

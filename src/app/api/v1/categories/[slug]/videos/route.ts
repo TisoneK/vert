@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination } from '@/lib/pagination'
 
 export async function GET(
   req: NextRequest,
@@ -8,8 +9,7 @@ export async function GET(
   try {
     const { slug } = await params
     const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '12')
+    const { page, limit, skip } = parsePagination(req, { defaultLimit: 12 })
     const sort = searchParams.get('sort') || 'latest'
 
     const category = await db.category.findUnique({
@@ -19,8 +19,6 @@ export async function GET(
     if (!category) {
       return NextResponse.json({ error: 'Category not found' }, { status: 404 })
     }
-
-    const skip = (page - 1) * limit
 
     const orderBy: Record<string, string> = sort === 'trending'
       ? { viewCount: 'desc' }

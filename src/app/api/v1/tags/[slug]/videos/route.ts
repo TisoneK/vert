@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination } from '@/lib/pagination'
 
 /**
  * GET /api/v1/tags/[slug]/videos
@@ -27,10 +28,8 @@ export async function GET(
     }
 
     const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1', 10)
-    const limit = parseInt(searchParams.get('limit') || '12', 10)
+    const { page, limit, skip } = parsePagination(req, { defaultLimit: 12 })
     const sort = searchParams.get('sort') || 'latest'
-    const skip = (page - 1) * limit
 
     const orderBy: Record<string, string> =
       sort === 'trending' ? { viewCount: 'desc' }

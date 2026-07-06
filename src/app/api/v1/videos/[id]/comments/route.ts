@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 import { createNotification } from '@/lib/notifications'
+import { parsePagination } from '@/lib/pagination'
 
 export async function GET(
   req: NextRequest,
@@ -9,10 +10,7 @@ export async function GET(
 ) {
   try {
     const { id: videoId } = await params
-    const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const skip = (page - 1) * limit
+    const { page, limit, skip } = parsePagination(req, { defaultLimit: 20 })
 
     const video = await db.video.findUnique({ where: { id: videoId } })
     if (!video || video.isRemoved) {

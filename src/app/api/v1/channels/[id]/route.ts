@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { parsePagination } from '@/lib/pagination'
 
 export async function GET(
   req: NextRequest,
@@ -7,10 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '12')
-    const skip = (page - 1) * limit
+    const { page, limit, skip } = parsePagination(req, { defaultLimit: 12 })
 
     const channel = await db.channel.findUnique({
       where: { id },
