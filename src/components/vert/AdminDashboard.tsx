@@ -18,6 +18,10 @@ import {
   UserCircle,
   TrendingUp,
   AlertTriangle,
+  Database,
+  Play,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react'
 import { timeAgo, formatViews } from '@/lib/utils-vert'
 
@@ -66,7 +70,15 @@ interface AdminAnalytics {
   }
 }
 
-type Tab = 'analytics' | 'flags'
+type Tab = 'analytics' | 'flags' | 'database'
+
+interface DbMigration {
+  id: string
+  filename: string
+  description: string
+  applied: boolean
+  appliedAt?: string
+}
 
 export function AdminDashboard() {
   const { navigate } = useNavigation()
@@ -81,12 +93,23 @@ export function AdminDashboard() {
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null)
   const [analyticsLoading, setAnalyticsLoading] = useState(true)
 
+  // Database migrations state
+  const [migrations, setMigrations] = useState<DbMigration[]>([])
+  const [migrationsLoading, setMigrationsLoading] = useState(true)
+  const [applyingId, setApplyingId] = useState<string | null>(null)
+  const [migrationError, setMigrationError] = useState<string | null>(null)
+  const [migrationSuccess, setMigrationSuccess] = useState<string | null>(null)
+
   useEffect(() => {
     if (tab === 'flags') fetchFlags()
   }, [tab, filter])
 
   useEffect(() => {
     if (tab === 'analytics') fetchAnalytics()
+  }, [tab])
+
+  useEffect(() => {
+    if (tab === 'database') fetchMigrations()
   }, [tab])
 
   async function fetchFlags() {
@@ -111,6 +134,56 @@ export function AdminDashboard() {
       console.error('Failed to fetch analytics:', error)
     } finally {
       setAnalyticsLoading(false)
+    }
+  }
+
+  async function fetchMigrations() {
+    setMigrationsLoading(true)
+    setMigrationError(null)
+    setMigrationSuccess(null)
+    try {
+      const res = await fetch('/api/v1/admin/db-migrations')
+      if (res.ok) {
+        const data = await res.json()
+        setMigrations(data.migrations ?? [])
+      } else {
+        setMigrationError('Failed to load migrations')
+      }
+    } catch (error) {
+      console.error('Failed to fetch migrations:', error)
+      setMigrationError('Network error loading migrations')
+    } finally {
+      setMigrationsLoading(false)
+    }
+  }
+
+  async function applyMigrationById(id: string) {
+    // Confirm before running — migrations are irreversible.
+    if (!confirm(
+      `Apply migration "${id}"?\n\n` +
+      `This will run SQL against the production database and cannot be undone.`
+    )) return
+
+    setApplyingId(id)
+    setMigrationError(null)
+    setMigrationSuccess(null)
+    try {
+      const res = await fetch(`/api/v1/admin/db-migrations/${id}/apply`, {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setMigrationSuccess(`✓ Applied: ${id}`)
+        // Refresh the list to reflect the new state
+        await fetchMigrations()
+      } else {
+        setMigrationError(data.error || `Failed to apply: ${id}`)
+      }
+    } catch (error) {
+      console.error('Migration apply error:', error)
+      setMigrationError(`Network error applying: ${id}`)
+    } finally {
+      setApplyingId(null)
     }
   }
 
@@ -164,7 +237,7 @@ export function AdminDashboard() {
         <h1 className="text-xl font-bold text-zinc-900">Admin Dashboard</h1>
       </div>
 
-      {/* Top-level tab switcher: Analytics | Flags */}
+      {/* Top-level tab switcher: Analytics | Flags | Database */}
       <div className="flex gap-1 mb-6 border-b border-zinc-200">
         <button
           onClick={() => setTab('analytics')}
@@ -190,6 +263,22 @@ export function AdminDashboard() {
           {analytics && analytics.flagBreakdown.pending > 0 && (
             <span className="ml-1 px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-[10px] font-semibold">
               {analytics.flagBreakdown.pending}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setTab('database')}
+          className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+            tab === 'database'
+              ? 'border-violet-600 text-zinc-900'
+              : 'border-transparent text-zinc-600 hover:text-zinc-900'
+          }`}
+        >
+          <Database className="h-4 w-4" />
+          Database
+          {migrations.some((m) => !m.applied) && (
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-semibold">
+              {migrations.filter((m) => !m.applied).length}
             </span>
           )}
         </button>
@@ -456,6 +545,158 @@ export function AdminDashboard() {
             </div>
           )}
         </>
+      )}
+
+      {/* ================= DATABASE TAB ================= */}
+      {tab === 'database' && (
+        <div className="space-y-4">
+          {/* Warning banner */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-900">
+                Schema migrations run SQL against the production database.
+              </p>
+              <p className="text-xs text-amber-700 mt-1">
+                Each migration is wrapped in a transaction and tracked in
+                the <code className="px-1 py-0.5 bg-amber-100 rounded">_admin_migration</code> table.
+                Applied migrations cannot be undone from the UI — review the SQL before applying.
+                CLI alternative: <code className="px-1 py-0.5 bg-amber-100 rounded">./scripts/apply-admin-migrations.sh</code>
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={fetchMigrations}
+              disabled={migrationsLoading}
+              className="text-amber-700 hover:text-amber-900 hover:bg-amber-100 shrink-0"
+            >
+              <RefreshCw className={`h-4 w-4 ${migrationsLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+
+          {/* Status messages */}
+          {migrationError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+              {migrationError}
+            </div>
+          )}
+          {migrationSuccess && (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-700">
+              {migrationSuccess}
+            </div>
+          )}
+
+          {/* Loading state */}
+          {migrationsLoading ? (
+            <div className="space-y-3">
+              {[1, 2].map((i) => (
+                <div key={i} className="h-20 bg-zinc-200 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : migrations.length === 0 ? (
+            <div className="text-center py-12 bg-zinc-50 rounded-lg border border-zinc-200">
+              <Database className="h-10 w-10 text-zinc-400 mx-auto mb-3" />
+              <p className="text-sm text-zinc-600">No migrations found</p>
+              <p className="text-xs text-zinc-400 mt-1">
+                Add SQL files to <code className="px-1 py-0.5 bg-zinc-100 rounded">prisma/migrations/admin/</code>
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Pending migrations */}
+              {migrations.filter((m) => !m.applied).length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-zinc-900 mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-orange-500" />
+                    Pending ({migrations.filter((m) => !m.applied).length})
+                  </h3>
+                  <div className="space-y-2">
+                    {migrations.filter((m) => !m.applied).map((m) => (
+                      <div
+                        key={m.id}
+                        className="bg-white border border-orange-200 rounded-lg p-4 flex items-center justify-between gap-4"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <code className="text-xs text-zinc-500 font-mono">{m.id}</code>
+                            <Badge variant="outline" className="border-orange-200 text-orange-700 text-[10px]">
+                              pending
+                            </Badge>
+                          </div>
+                          <p className="text-sm font-medium text-zinc-900 mt-1">{m.description}</p>
+                          <p className="text-xs text-zinc-400 mt-0.5 font-mono">
+                            prisma/migrations/admin/{m.filename}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => applyMigrationById(m.id)}
+                          disabled={applyingId !== null}
+                          className="bg-violet-600 hover:bg-violet-700 text-white shrink-0"
+                        >
+                          {applyingId === m.id ? (
+                            <>
+                              <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                              Applying…
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-3.5 w-3.5 mr-1.5" />
+                              Apply
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Applied migrations */}
+              {migrations.filter((m) => m.applied).length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-zinc-900 mb-3 flex items-center gap-2 mt-6">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    Applied ({migrations.filter((m) => m.applied).length})
+                  </h3>
+                  <div className="space-y-2">
+                    {migrations.filter((m) => m.applied).map((m) => (
+                      <div
+                        key={m.id}
+                        className="bg-zinc-50 border border-zinc-200 rounded-lg p-3 flex items-center justify-between gap-4"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <code className="text-xs text-zinc-500 font-mono">{m.id}</code>
+                            <Badge variant="outline" className="border-emerald-200 text-emerald-700 text-[10px]">
+                              <CheckCircle className="h-3 w-3 mr-0.5" />
+                              applied
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-zinc-700 mt-0.5">{m.description}</p>
+                        </div>
+                        <span className="text-xs text-zinc-400 shrink-0">
+                          {m.appliedAt ? new Date(m.appliedAt).toLocaleString() : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* All caught up */}
+              {migrations.every((m) => m.applied) && (
+                <div className="text-center py-8 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <CheckCircle className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-emerald-900">All migrations applied</p>
+                  <p className="text-xs text-emerald-700 mt-1">Database schema is up to date.</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       )}
     </div>
   )
