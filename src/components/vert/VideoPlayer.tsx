@@ -478,9 +478,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   // Error state — show a simple error message when video fails to load
   if (hasError) {
     return (
-      <div className="w-full flex justify-center rounded-lg overflow-hidden">
+      <div className={`w-full flex justify-center rounded-lg overflow-hidden ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[420px] md:mx-auto' : ''}`}>
         <div
-          className="relative bg-zinc-900 overflow-hidden flex items-center justify-center"
+          className="relative bg-zinc-900 overflow-hidden flex items-center justify-center w-full"
           style={{
             aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
             minHeight: '200px',
@@ -503,7 +503,13 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div className="w-full flex justify-center rounded-lg overflow-hidden">
+    // Outer wrapper: full-width on mobile so portrait video fills the screen
+    // like Shorts/Reels. On desktop, constrain portrait videos to a max
+    // width so they don't get absurdly tall (a 9:16 video at 1024px wide
+    // would be 1820px tall). The max-w-[420px] gives a ~747px-tall player
+    // on desktop, which is tall but not ridiculous. Landscape/square videos
+    // stay full-width.
+    <div className={`w-full flex justify-center rounded-lg overflow-hidden ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[420px] md:mx-auto' : ''}`}>
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
@@ -512,19 +518,15 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       tabIndex={0}
       className="relative bg-black overflow-hidden group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
       style={{
+        // Portrait video sizing — matches YouTube Shorts / Reels behavior.
+        // We set aspectRatio from the actual video dimensions once metadata
+        // loads (videoAspectRatio). The width/height strategy differs by
+        // screen size and is handled via Tailwind classes on the parent
+        // wrapper (see the className on the outer div below) rather than
+        // inline styles, because CSS aspect-ratio + max-height + width:100%
+        // interact in confusing ways when set inline.
         aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
-        // Portrait: on mobile cap at 55vh (leaves room for title + actions
-        // + channel info below — at 65vh the player dominated the screen
-        // and the user couldn't see any context without scrolling).
-        // On desktop cap at calc(100vh - 200px). Width derived from height.
-        // Landscape/square: full width.
-        ...(videoAspectRatio && videoAspectRatio < 1 ? {
-          maxHeight: '55vh',
-          maxWidth: 'calc(55vh * 0.5625)',
-          width: 'auto',
-        } : {
-          width: '100%',
-        }),
+        width: '100%',
       }}
     >
       <video

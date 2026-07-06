@@ -20,6 +20,7 @@ interface HistoryEntry {
     viewCount: number
     likeCount: number
     createdAt: string
+    format?: string
     channel: {
       id: string
       channelName: string
@@ -146,9 +147,10 @@ export function HistoryPage() {
               className="flex items-start gap-3 p-2 rounded-lg group hover:bg-zinc-50 transition-colors cursor-pointer"
               onClick={() => navigate({ page: 'video', videoId: entry.video.id })}
             >
-              {/* Thumbnail — narrower on mobile so the title has room to breathe */}
+              {/* Thumbnail — aspect ratio follows the video's format so
+                  portrait videos show as portrait, not squished into 16:9. */}
               <div className="relative w-32 sm:w-40 shrink-0 rounded overflow-hidden bg-zinc-200">
-                <div className="aspect-video">
+                <div className={entry.video.format === 'portrait' ? 'aspect-[9/16]' : entry.video.format === 'square' ? 'aspect-square' : 'aspect-video'}>
                   {entry.video.thumbnailUrl ? (
                     <img src={entry.video.thumbnailUrl} alt={entry.video.title} className="w-full h-full object-cover" />
                   ) : (

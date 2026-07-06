@@ -84,9 +84,12 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
             className="flex gap-2 cursor-pointer group p-1.5 rounded-lg hover:bg-zinc-100 transition-colors"
             onClick={() => navigate({ page: 'video', videoId: video.id })}
           >
-            {/* Thumbnail - horizontal layout */}
+            {/* Thumbnail — aspect ratio follows the video's format so
+                portrait videos show as portrait, not squished into 16:9.
+                The thumbnail width stays fixed at w-32; the height follows
+                from the aspect ratio. */}
             <div className="relative w-32 shrink-0 rounded overflow-hidden bg-zinc-200">
-              <div className="aspect-video">
+              <div className={video.format === 'portrait' ? 'aspect-[9/16]' : video.format === 'square' ? 'aspect-square' : 'aspect-video'}>
                 {video.thumbnailUrl ? (
                   <img
                     src={video.thumbnailUrl}
