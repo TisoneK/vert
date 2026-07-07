@@ -12,6 +12,17 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Admin Users tab action buttons invisible (table overflow)
+**Commit:** `f9181e3`
+
+The admin Users tab had 7 columns (User with avatar, Role, Status, Videos, Comments, Joined, Actions). Verified on the live site: the table's `scrollWidth` was 3205px while the container's `clientWidth` was only 974px. The Actions column (last of 7) was scrolled off-screen to the right. The buttons were in the DOM and visible (26×26px, opacity 1) but physically beyond the viewport — admins literally couldn't see the suspend, promote, or delete buttons without horizontally scrolling the table, and there was no visual hint that they needed to.
+
+Fix: `AdminDashboard.tsx` —
+- Dropped the Comments column (comment counts are available in analytics; not critical for user management).
+- Removed the avatar from the User cell (was taking ~40px+ including the gap; username + email as text is enough for admin identification).
+- Switched from `table-auto` to `table-fixed` with an explicit `<colgroup>`: User 28%, Role 10%, Status 14%, Videos 8%, Joined 12%, Actions 28%.
+- The Actions column is now always visible. The three buttons (UserCog for role toggle, UserX/UserCheck for suspend/reactivate, Trash2 for delete) are immediately reachable.
+
 #### Portrait video fills mobile screen; thumbnails respect format
 **Commit:** `fd4f0a3`
 
