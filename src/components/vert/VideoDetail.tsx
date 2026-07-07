@@ -11,7 +11,7 @@ import { FlagDialog } from './FlagDialog'
 import { RelatedVideos } from './RelatedVideos'
 import { CategoryBadge } from './CategoryBadge'
 import { formatViews, formatSubscribers, timeAgo } from '@/lib/utils-vert'
-import { ArrowLeft, Share2, Eye, Bookmark, BookmarkCheck, Copy, Check } from 'lucide-react'
+import { Share2, Bookmark, BookmarkCheck, Copy, Check, ChevronUp, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface VideoDetailProps {
@@ -146,10 +146,13 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
 
   return (
     <div className="max-w-5xl mx-auto animate-vert-fade-in">
-      {/* Video player — full width on mobile, no padding.
-          For portrait videos the player has a maxWidth (set in VideoPlayer)
-          so it doesn't dominate the screen. Center it horizontally so the
-          empty space is balanced left/right instead of all on the right. */}
+      {/* ============================================================
+          BLOCK 1: VIDEO
+          On mobile: full screen width (like Shorts/Reels).
+          On desktop: portrait videos are constrained to ~380px so they
+          don't get absurdly tall. The freed-up right space is used for
+          the "Up Next" queue instead of being empty canvas.
+          ============================================================ */}
       <div className="w-full flex justify-center">
         <VideoPlayer
           videoUrl={video.videoUrl as string}
@@ -160,42 +163,55 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
         />
       </div>
 
-      {/* Two-column on desktop, stacked on mobile */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 p-4 md:p-6">
-        {/* Left column: info + comments */}
-        <div>
-          {/* Title + views — compact like Dailymotion mobile */}
-          <h1 className="text-base md:text-lg font-bold text-zinc-900 mt-3">
-            {video.title as string}
-          </h1>
-          <div className="flex items-center gap-2 text-xs text-zinc-500 mt-1">
+      {/* Two-column on desktop: video info (left) + Up Next queue (right).
+          On mobile/tablet the queue collapses below everything. */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 p-4 md:p-6">
+        {/* ============== LEFT COLUMN: video info + comments ============== */}
+        <div className="min-w-0">
+          {/* ----------------------------------------------------------
+              BLOCK 2: TITLE + TAGS (same semantic group — both
+              describe what the video is)
+              ---------------------------------------------------------- */}
+          <div className="mt-3">
+            <h1 className="text-base md:text-lg font-bold text-zinc-900 leading-tight">
+              {video.title as string}
+            </h1>
+            {/* Tags sit directly under the title as chips — they're part of
+                the "what is this video" semantic group, not floating alone. */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {tags.map((tag) => (
+                  <button
+                    key={tag.name}
+                    onClick={() => navigate({ page: 'tag', slug: tag.name })}
+                    className="px-2 py-0.5 bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-900 rounded-md text-xs font-medium transition-colors"
+                  >
+                    {tag.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ----------------------------------------------------------
+              BLOCK 3: STATS (views/time) — quiet supporting metadata,
+              smaller and muted so it doesn't compete with the title.
+              ---------------------------------------------------------- */}
+          <div className="flex items-center gap-2 text-xs text-zinc-400 mt-1.5">
             <span>{formatViews(video.viewCount as number)} views</span>
             <span>·</span>
             <span>{timeAgo(video.createdAt as string)}</span>
           </div>
 
-          {/* Tags */}
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {tags.map((tag) => (
-                <button
-                  key={tag.name}
-                  onClick={() => navigate({ page: 'tag', slug: tag.name })}
-                  className="px-2 py-1 bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-900 rounded-md text-xs font-medium transition-colors"
-                >
-                  {tag.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Channel + actions — on mobile this stacks into two rows
-              (channel row, then action row) so all the buttons fit on a
-              360px-wide screen. On md+ it collapses back into one row. */}
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-2 mt-3">
-            {/* Channel + subscribe — the channel info block is min-w-0
-                so a long channel name truncates instead of pushing the
-                Subscribe button off-screen. */}
+          {/* ----------------------------------------------------------
+              BLOCKS 4 + 5: CHANNEL IDENTITY + ACTIONS
+              Single divided row with top+bottom borders so it reads as a
+              distinct section rather than bleeding into the title above
+              and description below. Channel (who) on the left, actions
+              (what I can do) on the right.
+              ---------------------------------------------------------- */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-2 mt-4 py-3 border-y border-zinc-200">
+            {/* Channel + subscribe */}
             <div className="flex items-center gap-2 min-w-0">
               <div
                 className="flex items-center gap-2 cursor-pointer min-w-0"
@@ -224,8 +240,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               />
             </div>
 
-            {/* Action buttons — wrap on mobile so they never overflow.
-                shrink-0 on each button so they keep their shape. */}
+            {/* Action buttons */}
             <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
               <VoteButtons
                 videoId={video.id as string}
@@ -268,40 +283,57 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
             </div>
           </div>
 
-          {/* Description */}
-          {description && (
-            <div className="mt-3 p-3 bg-zinc-50 rounded-lg">
-              <p className={`text-sm text-zinc-600 whitespace-pre-wrap ${!descriptionExpanded && 'line-clamp-2'}`}>
-                {description}
-              </p>
-              {description.length > 100 && (
-                <button
-                  onClick={() => setDescriptionExpanded(!descriptionExpanded)}
-                  className="text-xs text-zinc-500 font-medium mt-1 hover:text-zinc-900"
-                >
-                  {descriptionExpanded ? 'Show less' : 'Show more'}
-                </button>
+          {/* ----------------------------------------------------------
+              BLOCK 6: DESCRIPTION — its own contained card with a real
+              expand affordance (chevron icon + label) instead of a
+              dangling "..." truncation. Categories live here too since
+              they're part of the "about this video" semantic group.
+              ---------------------------------------------------------- */}
+          {(description || categories.length > 0) && (
+            <div className="mt-4 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+              {description && (
+                <>
+                  <p className={`text-sm text-zinc-700 whitespace-pre-wrap ${!descriptionExpanded && description.length > 100 ? 'line-clamp-2' : ''}`}>
+                    {description}
+                  </p>
+                  {description.length > 100 && (
+                    <button
+                      onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                      className="flex items-center gap-1 text-xs font-medium text-zinc-600 hover:text-zinc-900 mt-2 transition-colors"
+                    >
+                      {descriptionExpanded ? (
+                        <>
+                          <ChevronUp className="h-3.5 w-3.5" />
+                          Show less
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-3.5 w-3.5" />
+                          Show more
+                        </>
+                      )}
+                    </button>
+                  )}
+                </>
               )}
-            </div>
-          )}
-
-          {/* Categories */}
-          {categories.length > 0 && (
-            <div className="mt-3">
-              <CategoryBadge categories={categories} max={5} />
+              {categories.length > 0 && (
+                <div className={description ? 'mt-3 pt-3 border-t border-zinc-200' : ''}>
+                  <CategoryBadge categories={categories} max={5} />
+                </div>
+              )}
             </div>
           )}
 
           {/* Comments */}
           <CommentSection videoId={video.id as string} />
 
-          {/* Related videos — below comments on mobile, right rail on desktop */}
+          {/* Related videos — below comments on mobile/tablet */}
           <div className="lg:hidden mt-6">
             <RelatedVideos videoId={videoId} />
           </div>
         </div>
 
-        {/* Right column: related videos — desktop only */}
+        {/* ============== RIGHT COLUMN: Up Next queue (desktop) ============== */}
         <div className="hidden lg:block">
           <RelatedVideos videoId={videoId} />
         </div>

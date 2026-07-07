@@ -478,7 +478,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   // Error state — show a simple error message when video fails to load
   if (hasError) {
     return (
-      <div className={`w-full flex justify-center rounded-lg overflow-hidden ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[420px] md:mx-auto' : ''}`}>
+      <div className={`w-full flex justify-center rounded-lg overflow-hidden ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
         <div
           className="relative bg-zinc-900 overflow-hidden flex items-center justify-center w-full"
           style={{
@@ -504,12 +504,12 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
   return (
     // Outer wrapper: full-width on mobile so portrait video fills the screen
-    // like Shorts/Reels. On desktop, constrain portrait videos to a max
-    // width so they don't get absurdly tall (a 9:16 video at 1024px wide
-    // would be 1820px tall). The max-w-[420px] gives a ~747px-tall player
-    // on desktop, which is tall but not ridiculous. Landscape/square videos
-    // stay full-width.
-    <div className={`w-full flex justify-center rounded-lg overflow-hidden ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[420px] md:mx-auto' : ''}`}>
+    // like Shorts/Reels. On desktop, constrain portrait videos to ~380px so
+    // they don't get absurdly tall (a 9:16 video at 1024px wide would be
+    // 1820px tall). 380px gives a ~676px-tall player on desktop — tall but
+    // reasonable, and the freed-up right space is used for the Up Next queue
+    // on the watch page. Landscape/square videos stay full-width.
+    <div className={`w-full flex justify-center rounded-lg overflow-hidden ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
