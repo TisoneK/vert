@@ -336,7 +336,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
                   currentView.page === 'admin'
                     ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 font-semibold'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800'
-                }`
+                }`}
               >
                 <Shield className="h-4 w-4 shrink-0" />
                 Admin Panel
