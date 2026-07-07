@@ -15,6 +15,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.5.4] — 2026-07-07
+
+### Changed
+- **Category cards on the Explore page redesigned to a horizontal layout.** Previously icon-on-top, title/count stacked below, left-aligned within a mostly-empty card. Now icon (bigger, 48px) sits on the left with title + video count to its right, vertically centered as a row — matches the requested "icon left, text right" layout and reads better on narrow cards. Applies to both populated and "No videos yet" category cards.
+
+---
+
 ## [0.5.3] — 2026-07-07
 
 ### Fixed

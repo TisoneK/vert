@@ -14,6 +14,21 @@ _Nothing yet._
 
 ---
 
+## [0.5.4] — 2026-07-07
+
+### Changed
+
+#### Category card layout: icon-left, text-right instead of icon-top, text-below
+**Commit:** `094d999`
+
+Follow-up to the mobile centering work (0.5.2). Once the grid itself was confirmed centered (pixel-verified: 28px margin both sides on a real device screenshot), the remaining complaint was about the card content itself — icon stacked above title/count, left-aligned, leaving a lot of unused whitespace to the right of the (usually short) text.
+
+**Change:** `ExplorePage.tsx` — both the "with videos" and "No videos yet" category card variants changed from a vertical stack (`<div icon> mb-3` then `<h3>` then `<p>`) to a horizontal flex row (`flex items-center gap-3`): a bigger 48px icon box (`w-12 h-12`, up from `w-9 h-9`; icon itself `h-6 w-6`, up from `h-4 w-4`) on the left, `shrink-0` so it doesn't compress; a `min-w-0` text column to its right containing the title (`truncate` added, since it's no longer full-card-width) and video count/status, vertically centered against the icon via the parent's `items-center`.
+
+Only file using this exact tile pattern (`w-9 h-9 rounded-lg bg-violet-50` / `bg-zinc-100`) — verified via grep before making the change, so no other page needed the same update.
+
+---
+
 ## [0.5.3] — 2026-07-07
 
 ### Fixed
