@@ -14,6 +14,70 @@ _Nothing yet._
 
 ---
 
+## [0.4.1] — 2026-07-07
+
+### Changed
+
+#### ESLint config: invalid rules removed, useful rules re-enabled
+**Commit:** `b0240a5`
+
+`eslint.config.mjs` — two rule names in the existing config didn't exist in any installed plugin and were silently ignored:
+- `@typescript-eslint/no-unused-disable-directive` — this was never a real rule name. The correct name is `@typescript-eslint/no-unused-vars`. ESLint ignores unknown rule names with a warning; `noUnusedDisableDirectives` is a top-level config option, not a rule.
+- `react-hooks/purity` — this rule does not exist in `eslint-plugin-react-hooks`. Possibly confused with `react/no-direct-mutation-state` or a linting ideal. ESLint ignored it silently.
+
+Also re-enabled 4 rules that were explicitly set to `"off"`:
+
+1. **`react-hooks/exhaustive-deps: "warn"`** (was `"off"`). Missing deps in `useEffect`/`useMemo`/`useCallback` are a common source of stale-closure bugs. This rule catches them at build time. Set to `warn` so CI doesn't block on missing deps during active development, but contributors see the warning.
+
+2. **`react/display-name: "warn"`** (was `"off"`). Components without display names show as `Anonymous` in React DevTools, making debugging harder. Warn-level so it's non-blocking.
+
+3. **`prefer-const: "warn"`** (was `"off"`). Variables that are assigned once but declared with `let` should be `const` — catches unintended reassignment. Warn-level.
+
+4. **`@typescript-eslint/no-unused-vars: ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }]`** (was `"off"`). Unused variables and parameters are dead code and should be removed. The `_` prefix pattern lets you keep destructured params you don't use (common in React event handlers and callback props) by naming them `_event` or `_props`.
+
+Two other rules already at `"off"` were intentionally left unchanged: `no-console` and `no-debugger` — `console.log` is used extensively for debugging in dev, and `debugger` statements are a legitimate workflow. These can be tightened later with a pre-commit hook that strips them from staged files.
+
+#### tsconfig.json: `noImplicitAny` override removed
+**Commit:** `b0240a5`
+
+`tsconfig.json` — `strict: true` was set but immediately followed by `noImplicitAny: false`, which overrode the strict-mode default. This meant TypeScript allowed implicit `any` types throughout the codebase, defeating one of the primary benefits of strict mode. Removed the override file-wide.
+
+No type errors were introduced (the project compiled fine before and after), but new code will now require explicit type annotations where TS can't infer them. Over time this raises the type coverage of the codebase.
+
+#### `ARCHITECTURE.md` updated to reflect current state
+**Commit:** `68fed94`
+
+`ARCHITECTURE.md` had three stale claims and one misleading description:
+
+- **Database** table said "SQLite (via Prisma)" and described the SQLite prototype. The schema and `prisma/schema.prisma` have used `provider = "postgresql"` since v0.3.0. Updated to reflect PostgreSQL/Neon.
+- **Video storage** said "local-filesystem (dev-only)" with the old `public/uploads/` path. The actual implementation uses Vercel Blob for both dev and production since v0.3.0. Updated to match.
+- **Routing** trade-off listed "no deep-linkable URLs for videos/channels" with a note "being addressed — see §3". Deep-linkable URLs were already implemented in v0.4.0 with real route files for all views. Updated to describe the actual SPA-on-Next.js architecture where `VertApp.tsx` owns navigation but URLs are synchronized via `viewToPath`/`pathToView`.
+- **Known limitations** section mentioned SQLite-specific constraints that no longer apply. Cleaned up.
+- **File map** — updated entry for `prisma/schema.prisma` to say PostgreSQL instead of SQLite. Updated `prisma/seed.ts` description. Removed the `public/uploads/` note.
+
+All changes are documentation-only; no logic was modified.
+
+### Added
+
+#### `.env.example` for new contributors
+**Commit:** `3edeb27`
+
+`.env.example` — new file at project root documenting every environment variable required or optionally used by the app:
+
+- **`DATABASE_URL`** (required) — Prisma connection string. Documented that serverless pool params are appended automatically by `src/lib/db.ts`, so contributors don't need to add them manually.
+- **`PRISMA_DATABASE_URL`** (optional) — direct connection for migrations, needed only when using a pooled URL as `DATABASE_URL`.
+- **`NEXTAUTH_SECRET`** (required) — NextAuth JWT signing secret. Included `openssl rand -hex 32` as the recommended generation command.
+- **`NEXTAUTH_URL`** (required) — canonical URL for auth callbacks.
+- **`GOOGLE_CLIENT_ID`** / **`GOOGLE_CLIENT_SECRET`** (optional) — only needed if Google sign-in should work in local dev.
+- **`VERT_BLOB_READ_WRITE_TOKEN`** / **`BLOB_READ_WRITE_TOKEN`** (optional) — Blob store tokens; documented the fallback chain.
+- **`SEED_KEY`** (optional) — shared secret for internal endpoints.
+
+The file is ignored by `.gitignore`'s `.env*` pattern. Force-added with `git add -f`. Contributors should copy it to `.env.local` and fill in values.
+
+The `no-console` and `no-debugger` rules remain intentionally disabled — documented in the entry.
+
+---
+
 ## [0.4.0] — 2026-07-07
 
 ### Added

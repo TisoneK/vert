@@ -15,6 +15,20 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.4.1] — 2026-07-07
+
+### Added
+
+- **`.env.example` for new contributors.** All required environment variables are now documented in one place — `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, optional Google OAuth and Blob tokens, and admin/internal keys. Covers next steps (generating a secret, creating Google credentials, local Postgres setup). See [`docs/DEVLOG.md`](./docs/DEVLOG.md#041--2026-07-07) for the rationale on which vars are required vs. optional.
+
+### Changed
+
+- **ESLint config: invalid rules removed, useful rules re-enabled.** Two non-existent rule names (`@typescript-eslint/no-unused-disable-directive`, `react-hooks/purity`) were silently ignored — removed both. Re-enabled `react-hooks/exhaustive-deps` (warn), `react/display-name` (warn), `prefer-const` (warn), and `@typescript-eslint/no-unused-vars` (warn with `_` prefix ignore). These catch real bugs (missing deps, unused code, unintended reassignment) and are standard for production TypeScript projects.
+- **`tsconfig.json`: removed explicit `noImplicitAny: false`.** The `strict: true` flag already implies `noImplicitAny: true`, but the explicit `false` override was undermining it. Removed the override so strict mode applies fully.
+- **`ARCHITECTURE.md` updated to reflect current state.** The document still said SQLite (migrated to PostgreSQL in v0.3.0), local-FS uploads (migrated to Vercel Blob in v0.3.0), and listed non-deep-linkable URLs as a trade-off (resolved in v0.4.0 with real route files). All three are now accurate. The routing description now correctly describes the SPA-on-Next.js pattern with URL sync via `viewToPath`/`pathToView`.
+
+---
+
 ## [0.4.0] — 2026-07-07
 
 ### Added
