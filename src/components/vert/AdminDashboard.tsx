@@ -919,15 +919,28 @@ export function AdminDashboard() {
             </div>
           ) : (
             <div className="bg-zinc-50 rounded-lg border border-zinc-200 overflow-hidden">
+              {/* table-fixed + explicit col widths so the Actions column is
+                  always visible without horizontal scrolling. Previously
+                  the table was 3205px wide in a 974px container, and the
+                  Actions column (last of 7) was scrolled off-screen — admins
+                  couldn't see the suspend/promote/delete buttons. Dropped the
+                  avatar and the Comments column to save space. */}
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full table-fixed">
+                  <colgroup>
+                    <col className="w-[28%]" />
+                    <col className="w-[10%]" />
+                    <col className="w-[14%]" />
+                    <col className="w-[8%]" />
+                    <col className="w-[12%]" />
+                    <col className="w-[28%]" />
+                  </colgroup>
                   <thead>
                     <tr className="border-b border-zinc-200 bg-white">
                       <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">User</th>
                       <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Role</th>
                       <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Status</th>
                       <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Videos</th>
-                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Comments</th>
                       <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Joined</th>
                       <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Actions</th>
                     </tr>
@@ -935,26 +948,15 @@ export function AdminDashboard() {
                   <tbody>
                     {adminUsers.map((u) => (
                       <tr key={u.id} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-100 transition-colors">
-                        {/* User cell */}
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2.5">
-                            <div className="shrink-0">
-                              {u.avatarUrl ? (
-                                <img src={u.avatarUrl} alt={u.username} className="w-8 h-8 rounded-full object-cover" />
-                              ) : (
-                                <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
-                                  {u.username[0]?.toUpperCase()}
-                                </div>
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-zinc-900 truncate">{u.username}</p>
-                              <p className="text-xs text-zinc-500 truncate">{u.email}</p>
-                              {u.oauthProvider && (
-                                <p className="text-[10px] text-zinc-400">via {u.oauthProvider}</p>
-                              )}
-                            </div>
-                          </div>
+                        {/* User cell — no avatar, just username + email
+                            (avatar was taking 40px+ that made the table
+                            too wide). Email truncates with ellipsis. */}
+                        <td className="px-4 py-3 min-w-0">
+                          <p className="text-sm font-medium text-zinc-900 truncate">{u.username}</p>
+                          <p className="text-xs text-zinc-500 truncate">{u.email}</p>
+                          {u.oauthProvider && (
+                            <p className="text-[10px] text-zinc-400">via {u.oauthProvider}</p>
+                          )}
                         </td>
                         {/* Role */}
                         <td className="px-4 py-3">
@@ -990,15 +992,11 @@ export function AdminDashboard() {
                         <td className="text-right px-4 py-3 text-sm text-zinc-600">
                           {u.videoCount}
                         </td>
-                        {/* Comment count */}
-                        <td className="text-right px-4 py-3 text-sm text-zinc-600">
-                          {u.commentCount}
-                        </td>
                         {/* Joined */}
-                        <td className="px-4 py-3 text-xs text-zinc-500">
+                        <td className="px-4 py-3 text-xs text-zinc-500 whitespace-nowrap">
                           {timeAgo(u.createdAt)}
                         </td>
-                        {/* Actions */}
+                        {/* Actions — always visible now that the table fits. */}
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1">
                             {/* Role toggle */}
