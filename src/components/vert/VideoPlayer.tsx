@@ -481,7 +481,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   // Error state — show a simple error message when video fails to load
   if (hasError) {
     return (
-      <div className={`w-full flex justify-center rounded-lg overflow-hidden ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
+      <div className={`w-full flex justify-center rounded-lg overflow-hidden p-0.5 ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
         <div
           className="relative bg-zinc-900 overflow-hidden flex items-center justify-center w-full"
           style={{
@@ -515,7 +515,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     // NOTE: rounded-lg but NO overflow-hidden — the video has its own
     // clipping wrapper, and the settings dropdown (bottom-full) must not
     // be clipped on small players.
-    <div className={`w-full flex justify-center rounded-lg ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
+    // p-0.5 adds 2px breathing room all around so the black player has a
+    // subtle gap from the surrounding page background.
+    <div className={`w-full flex justify-center rounded-lg p-0.5 ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
