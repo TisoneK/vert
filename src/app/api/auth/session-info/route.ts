@@ -28,6 +28,16 @@ export async function GET() {
       return NextResponse.json({ user: null })
     }
 
+    // Heartbeat: update lastSeenAt so the admin dashboard can show who's
+    // online right now. Fire-and-forget (not awaited) so it doesn't slow
+    // down the session check. Throttled to once per 60s per user via a
+    // conditional update — only writes if the last update was >60s ago,
+    // to avoid hammering the DB on every single page navigation.
+    db.user.updateMany({
+      where: { id: dbUser.id, OR: [{ lastSeenAt: null }, { lastSeenAt: { lt: new Date(Date.now() - 60_000) } }] },
+      data: { lastSeenAt: new Date() },
+    }).catch(() => { /* silent — presence is best-effort */ })
+
     return NextResponse.json({
       user: {
         id: dbUser.id,

@@ -95,6 +95,7 @@ interface AdminUser {
   oauthProvider: string | null
   avatarUrl: string | null
   createdAt: string
+  lastSeenAt: string | null
   channel: { id: string; channelName: string; isSuspended: boolean } | null
   videoCount: number
   commentCount: number
@@ -928,20 +929,22 @@ export function AdminDashboard() {
               <div className="overflow-x-auto">
                 <table className="w-full table-fixed">
                   <colgroup>
-                    <col className="w-[28%]" />
+                    <col className="w-[26%]" />
+                    <col className="w-[9%]" />
                     <col className="w-[10%]" />
-                    <col className="w-[14%]" />
-                    <col className="w-[8%]" />
-                    <col className="w-[12%]" />
+                    <col className="w-[9%]" />
+                    <col className="w-[7%]" />
+                    <col className="w-[11%]" />
                     <col className="w-[28%]" />
                   </colgroup>
                   <thead>
                     <tr className="border-b border-zinc-200 bg-white">
                       <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">User</th>
                       <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Role</th>
-                      <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Status</th>
-                      <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Videos</th>
-                      <th className="text-left text-xs font-medium text-zinc-700 px-4 py-3">Joined</th>
+                      <th className="text-center text-xs font-medium text-zinc-700 px-2 py-3">Online</th>
+                      <th className="text-left text-xs font-medium text-zinc-700 px-3 py-3">Account</th>
+                      <th className="text-right text-xs font-medium text-zinc-700 px-3 py-3">Videos</th>
+                      <th className="text-left text-xs font-medium text-zinc-700 px-3 py-3">Joined</th>
                       <th className="text-right text-xs font-medium text-zinc-700 px-4 py-3">Actions</th>
                     </tr>
                   </thead>
@@ -969,8 +972,26 @@ export function AdminDashboard() {
                             {u.role}
                           </Badge>
                         </td>
-                        {/* Status */}
-                        <td className="px-4 py-3">
+                        {/* Online — green dot if lastSeenAt is within 5 min,
+                            gray dot otherwise. Tooltip shows last-seen time. */}
+                        <td className="px-2 py-3 text-center">
+                          {(() => {
+                            const isOnline = u.lastSeenAt && (Date.now() - new Date(u.lastSeenAt).getTime()) < 5 * 60 * 1000
+                            const title = u.lastSeenAt
+                              ? `Last seen ${timeAgo(u.lastSeenAt)}`
+                              : 'Never seen'
+                            return (
+                              <span
+                                title={title}
+                                className={`inline-block w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-zinc-300'}`}
+                              />
+                            )
+                          })()}
+                        </td>
+                        {/* Account — active/suspended state (renamed from
+                            "Status" which was ambiguous — users thought
+                            "active" meant "online right now"). */}
+                        <td className="px-3 py-3">
                           {u.isActive ? (
                             <Badge variant="outline" className="border-emerald-200 text-emerald-700 text-xs">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1" />
@@ -1051,7 +1072,7 @@ export function AdminDashboard() {
               </div>
               {/* Footer with count + legend */}
               <div className="px-4 py-2 border-t border-zinc-200 bg-white flex items-center justify-between text-xs text-zinc-500">
-                <span>{adminUsers.length} user{adminUsers.length !== 1 ? 's' : ''} shown</span>
+                <span>{adminUsers.length} user{adminUsers.length !== 1 ? 's' : ''} shown · <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 align-middle" /> online = active in last 5 min</span>
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1">
                     <UserCog className="h-3 w-3" /> toggle role

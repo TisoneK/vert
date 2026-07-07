@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
           oauthProvider: true,
           avatarUrl: true,
           createdAt: true,
+          lastSeenAt: true,
           channel: {
             select: { id: true, channelName: true, isSuspended: true },
           },

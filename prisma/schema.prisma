@@ -19,6 +19,7 @@ model User {
   isActive       Boolean  @default(true)
   emailVerified  Boolean  @default(false)
   createdAt      DateTime @default(now())
+  lastSeenAt     DateTime? // updated on every authenticated request — used for online presence
 
   channel        Channel?
   comments       Comment[]
