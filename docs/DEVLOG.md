@@ -14,6 +14,36 @@ _Nothing yet._
 
 ---
 
+## [0.5.0] — 2026-07-07
+
+### Added
+
+#### Dark mode support
+
+**Core setup:**
+- `src/app/globals.css` — Added `.dark` block with dark OKLCH values. Background: `oklch(0.145 0 0)`, foreground: `oklch(0.95 0 0)`, card: `oklch(0.175 0 0)`, popover: `oklch(0.175 0 0)`, secondary: `oklch(0.25 0 0)`, muted: `oklch(0.25 0 0)`, muted-foreground: `oklch(0.65 0 0)`, border: `oklch(1 1 1 / 10%)`, input: `oklch(1 1 1 / 15%)`, sidebar: `oklch(0.175 0 0)`. Primary, destructive, chart, and ring colors kept same as light for brand consistency. Dark scrollbar thumb added (`oklch(0.3 0 0)`). Sets `--vert-bg-*` and `--vert-text-*` custom vars for non-shadcn elements. The `@custom-variant dark (&:is(.dark *))` was already present before this change.
+- `src/app/layout.tsx` — Added `ThemeProvider` from `next-themes` wrapping children (`attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange`). Added flash-prevention inline `<script>` in `<head>` that reads `localStorage.getItem("theme")` before React hydrates, so the correct class is set immediately on page load.
+- `src/components/vert/Header.tsx` — Added theme toggle button with Sun icon (`hidden dark:block`) and Moon icon (`block dark:hidden`). Uses `setTheme`/`theme` from `next-themes`. All color classes updated with `dark:` variants.
+
+**Files updated (37 total):**
+
+Shell: `Header.tsx`, `Sidebar.tsx`, `MobileNav.tsx`, `VertApp.tsx`, `Skeleton.tsx`
+Auth: `LoginForm.tsx`, `SignupForm.tsx`
+Video: `VideoCard.tsx`, `VideoDetail.tsx`, `VideoPlayer.tsx`, `VideoContextMenu.tsx`, `VideoShelf.tsx`
+Interaction: `VoteButtons.tsx`, `SubscribeButton.tsx`, `CommentSection.tsx`, `FlagDialog.tsx`, `CategoryBadge.tsx`, `RelatedVideos.tsx`
+Pages: `HomeFeed.tsx`, `LandingPage.tsx`, `SearchResults.tsx`, `ChannelPage.tsx`, `ProfilePage.tsx`, `SettingsPage.tsx`, `HistoryPage.tsx`, `SavedPage.tsx`, `TrendingPage.tsx`, `ExplorePage.tsx`, `PlaylistsPage.tsx`, `PlaylistDetailPage.tsx`, `ContactPage.tsx`, `ChangelogPage.tsx`, `TagPage.tsx`, `CategoryPage.tsx`, `NotificationCenter.tsx`, `SearchSuggestions.tsx`, `PlaylistPicker.tsx`
+
+**Design decisions:**
+- Used Tailwind `dark:` variant system exclusively (no CSS `@media (prefers-color-scheme: dark)` overrides) for consistency with the class-based theme toggle.
+- Active states use `dark:bg-violet-900/30 dark:text-violet-400` — matches the light-mode pattern exactly with inverted backgrounds.
+- Dark backgrounds follow a hierarchy: `dark:bg-zinc-950` (page), `dark:bg-zinc-900` (cards/panels), `dark:bg-zinc-800` (hover/secondary), `dark:bg-zinc-700` (avatars/skeletons).
+- Text follows a hierarchy: `dark:text-zinc-100` (headings), `dark:text-zinc-200`/`300` (body), `dark:text-zinc-400` (secondary/muted), `dark:text-zinc-500` (placeholders).
+- Brand violet kept at same OKLCH values — `oklch(0.546 0.245 262.881)` for `--primary` — ensuring brand colors stay consistent regardless of theme.
+- shadcn/ui CSS variable-based components auto-adapt; only hardcoded `zinc-*` classes needed manual `dark:` variants.
+- Flash-prevention script runs before React hydrates to avoid a flash of light mode on SSR pages.
+
+---
+
 ## [0.4.1] — 2026-07-07
 
 ### Changed

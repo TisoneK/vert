@@ -87,13 +87,13 @@ export function ProfilePage() {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto">
-        <div className="h-24 md:h-36 bg-zinc-200 animate-pulse" />
+        <div className="h-24 md:h-36 bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
         <div className="px-4 md:px-6 py-4">
           <div className="flex gap-4">
-            <div className="w-20 h-20 rounded-full bg-zinc-200 animate-pulse" />
+            <div className="w-20 h-20 rounded-full bg-zinc-200 dark:bg-zinc-700 animate-pulse" />
             <div className="space-y-2 pt-4">
-              <div className="h-5 bg-zinc-200 rounded w-32 animate-pulse" />
-              <div className="h-3 bg-zinc-200 rounded w-24 animate-pulse" />
+              <div className="h-5 bg-zinc-200 dark:bg-zinc-700 rounded w-32 animate-pulse" />
+              <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-24 animate-pulse" />
             </div>
           </div>
         </div>
@@ -129,19 +129,19 @@ export function ProfilePage() {
         <div className="px-4 md:px-6 py-4">
           <div className="flex items-start gap-4">
             <div className="shrink-0 -mt-8">
-              <div className="w-20 h-20 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-2xl font-bold border-4 border-white">
+              <div className="w-20 h-20 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-2xl font-bold border-4 border-white dark:border-zinc-900">
                 {user.username[0]?.toUpperCase()}
               </div>
             </div>
             <div className="flex-1 pt-1">
-              <h1 className="text-xl md:text-2xl font-bold text-zinc-900">{user.username}</h1>
-              <p className="text-zinc-600 text-sm mt-0.5">@{user.username}</p>
+              <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-100">{user.username}</h1>
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-0.5">@{user.username}</p>
             </div>
           </div>
         </div>
         <div className="text-center py-12 px-4">
-          <p className="text-zinc-600 mb-2">You don&apos;t have a channel yet</p>
-          <p className="text-zinc-700 text-sm mb-4">Upload your first video to create your channel</p>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-2">You don&apos;t have a channel yet</p>
+          <p className="text-zinc-700 dark:text-zinc-300 text-sm mb-4">Upload your first video to create your channel</p>
           <Button
             onClick={() => navigate({ page: 'upload' })}
             className="bg-violet-600 hover:bg-violet-700 text-white active:scale-95 transition-transform duration-100"
@@ -177,15 +177,15 @@ export function ProfilePage() {
             When there's no banner, no negative margin is needed. */}
         <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${channel.bannerUrl ? '' : 'pt-2'}`}>
           <div className={`shrink-0 self-start ${channel.bannerUrl ? '-mt-8' : ''}`}>
-            <div className="w-20 h-20 rounded-full bg-zinc-300 flex items-center justify-center text-zinc-700 text-2xl font-bold border-4 border-white">
+            <div className="w-20 h-20 rounded-full bg-zinc-300 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-2xl font-bold border-4 border-white dark:border-zinc-900">
               {user.username[0]?.toUpperCase()}
             </div>
           </div>
           <div className="flex-1 min-w-0 sm:pt-1">
-            <h1 className="text-xl md:text-2xl font-bold text-zinc-900">
+            <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-100">
               {channel?.channelName || user.username}
             </h1>
-            <p className="text-zinc-600 text-sm mt-0.5">
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-0.5">
               @{user.username} · {formatSubscribers(channel?.subscriberCount || 0)} · {channel?.videoCount || 0} videos
             </p>
           </div>
@@ -194,7 +194,7 @@ export function ProfilePage() {
               variant="outline"
               size="sm"
               onClick={() => navigate({ page: 'creator-studio' })}
-              className="border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+              className="border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
             >
               <BarChart3 className="h-4 w-4 mr-1" />
               Studio
@@ -203,7 +203,7 @@ export function ProfilePage() {
               variant="outline"
               size="sm"
               onClick={() => setEditing(!editing)}
-              className="border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+              className="border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
             >
               <Settings className="h-4 w-4 mr-1" />
               {editing ? 'Cancel' : 'Edit'}
@@ -213,21 +213,21 @@ export function ProfilePage() {
 
         {/* Edit form */}
         {editing && (
-          <div className="mt-6 p-4 bg-zinc-50 rounded-lg border border-zinc-200 space-y-4">
+          <div className="mt-6 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700 space-y-4">
             <div>
-              <Label className="text-zinc-600 mb-2 block text-sm">Channel Name</Label>
+              <Label className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">Channel Name</Label>
               <Input
                 value={channelName}
                 onChange={(e) => setChannelName(e.target.value)}
-                className="bg-zinc-100 border-zinc-300 text-zinc-800 focus-visible:ring-violet-600"
+                className="bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus-visible:ring-violet-600"
               />
             </div>
             <div>
-              <Label className="text-zinc-600 mb-2 block text-sm">Description</Label>
+              <Label className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">Description</Label>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="bg-zinc-100 border-zinc-300 text-zinc-800 min-h-[80px] resize-none focus-visible:ring-violet-600"
+                className="bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 min-h-[80px] resize-none focus-visible:ring-violet-600"
               />
             </div>
             <Button
@@ -248,13 +248,13 @@ export function ProfilePage() {
         )}
 
         {!editing && channel?.description && (
-          <p className="text-zinc-600 text-sm mt-3 max-w-2xl">{channel.description}</p>
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-3 max-w-2xl">{channel.description}</p>
         )}
       </div>
 
       {/* Videos */}
       <div className="px-4 md:px-6 pb-6">
-        <h2 className="text-base font-semibold text-zinc-900 mb-4">My Videos</h2>
+        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-4">My Videos</h2>
         {videos.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {videos.map((video) => (
@@ -263,11 +263,11 @@ export function ProfilePage() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-zinc-700">You haven&apos;t uploaded any videos yet</p>
+            <p className="text-zinc-700 dark:text-zinc-300">You haven&apos;t uploaded any videos yet</p>
             <Button
               variant="outline"
               onClick={() => navigate({ page: 'upload' })}
-              className="mt-4 border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+              className="mt-4 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
             >
               Upload Your First Video
             </Button>

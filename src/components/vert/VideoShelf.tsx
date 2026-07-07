@@ -35,7 +35,7 @@ export function VideoShelf({ title, children, onSeeAll, icon }: VideoShelfProps)
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-3 px-1">
-        <h2 className="text-base font-semibold text-zinc-900 flex items-center gap-1.5">
+        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
           {icon}
           {title}
         </h2>
@@ -53,11 +53,11 @@ export function VideoShelf({ title, children, onSeeAll, icon }: VideoShelfProps)
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className="absolute left-0 top-0 bottom-8 z-10 w-10 bg-gradient-to-r from-white to-transparent flex items-center justify-start pl-1 opacity-0 group-hover/shelf:opacity-100 transition-opacity"
+            className="absolute left-0 top-0 bottom-8 z-10 w-10 bg-gradient-to-r from-white dark:from-zinc-950 to-transparent flex items-center justify-start pl-1 opacity-0 group-hover/shelf:opacity-100 transition-opacity"
             aria-label="Scroll left"
           >
-            <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center hover:bg-zinc-300 transition-colors">
-              <ChevronLeft className="h-4 w-4 text-zinc-700" />
+              className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center hover:bg-zinc-300 dark:hover:bg-zinc-600 transition-colors">
+              <ChevronLeft className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />
             </div>
           </button>
         )}
@@ -75,11 +75,11 @@ export function VideoShelf({ title, children, onSeeAll, icon }: VideoShelfProps)
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className="absolute right-0 top-0 bottom-8 z-10 w-10 bg-gradient-to-l from-white to-transparent flex items-center justify-end pr-1 opacity-0 group-hover/shelf:opacity-100 transition-opacity"
+            className="absolute right-0 top-0 bottom-8 z-10 w-10 bg-gradient-to-l from-white dark:from-zinc-950 to-transparent flex items-center justify-end pr-1 opacity-0 group-hover/shelf:opacity-100 transition-opacity"
             aria-label="Scroll right"
           >
-            <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center hover:bg-zinc-300 transition-colors">
-              <ChevronRight className="h-4 w-4 text-zinc-700" />
+              className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center hover:bg-zinc-300 dark:hover:bg-zinc-600 transition-colors">
+              <ChevronRight className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />
             </div>
           </button>
         )}

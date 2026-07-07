@@ -62,7 +62,7 @@ export function FlagDialog({ videoId }: FlagDialogProps) {
     return (
       <button
         onClick={() => navigate({ page: 'login' })}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-xs font-medium transition-colors"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors"
         title="Log in to report this video"
         aria-label="Report"
       >
@@ -75,17 +75,17 @@ export function FlagDialog({ videoId }: FlagDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-xs font-medium transition-colors active:scale-95 duration-100"
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors active:scale-95 duration-100"
           title="Report this video"
           aria-label="Report"
         >
           <Flag className="h-4 w-4" />
         </button>
       </DialogTrigger>
-      <DialogContent className="bg-white border-zinc-200 text-zinc-900">
+      <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
         <DialogHeader>
           <DialogTitle>Report Video</DialogTitle>
-          <DialogDescription className="text-zinc-700">
+          <DialogDescription className="text-zinc-700 dark:text-zinc-300">
             Select a reason for reporting this video
           </DialogDescription>
         </DialogHeader>
@@ -101,8 +101,8 @@ export function FlagDialog({ videoId }: FlagDialogProps) {
                 onClick={() => setSelectedReason(reason.value)}
                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors ${
                   selectedReason === reason.value
-                    ? 'bg-violet-100 text-violet-600 border border-violet-200'
-                    : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 border border-transparent'
+                    ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-800'
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-transparent'
                 }`}
               >
                 {reason.label}

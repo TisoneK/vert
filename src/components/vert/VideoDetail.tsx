@@ -107,10 +107,10 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   if (loading) {
     return (
       <div className="p-4 md:p-6 max-w-7xl mx-auto animate-vert-fade-in">
-        <div className="aspect-video bg-zinc-200 rounded-lg animate-pulse" />
+        <div className="aspect-video bg-zinc-200 dark:bg-zinc-700 rounded-lg animate-pulse" />
         <div className="mt-4 space-y-3">
-          <div className="h-6 bg-zinc-200 rounded w-3/4 animate-pulse" />
-          <div className="h-4 bg-zinc-200 rounded w-1/2 animate-pulse" />
+          <div className="h-6 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4 animate-pulse" />
+          <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2 animate-pulse" />
         </div>
       </div>
     )
@@ -119,7 +119,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   if (!video) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-zinc-700">Video not found</p>
+        <p className="text-zinc-700 dark:text-zinc-300">Video not found</p>
         <Button
           variant="ghost"
           onClick={() => navigate({ page: 'home' })}
@@ -173,7 +173,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               describe what the video is)
               ---------------------------------------------------------- */}
           <div className="mt-3">
-            <h1 className="text-base md:text-lg font-bold text-zinc-900 leading-tight">
+            <h1 className="text-base md:text-lg font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
               {video.title as string}
             </h1>
             {/* Tags sit directly under the title as chips — they're part of
@@ -197,7 +197,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               BLOCK 3: STATS (views/time) — quiet supporting metadata,
               smaller and muted so it doesn't compete with the title.
               ---------------------------------------------------------- */}
-          <div className="flex items-center gap-2 text-xs text-zinc-400 mt-1.5">
+          <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500 mt-1.5">
             <span>{formatViews(video.viewCount as number)} views</span>
             <span>·</span>
             <span>{timeAgo(video.createdAt as string)}</span>
@@ -210,7 +210,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               and description below. Channel (who) on the left, actions
               (what I can do) on the right.
               ---------------------------------------------------------- */}
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-2 mt-4 py-3 border-y border-zinc-200">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-2 mt-4 py-3 border-y border-zinc-200 dark:border-zinc-700">
             {/* Channel + subscribe */}
             <div className="flex items-center gap-2 min-w-0">
               <div
@@ -224,13 +224,13 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                     className="w-9 h-9 rounded-full object-cover shrink-0"
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-xs font-bold shrink-0">
                     {channel.channelName[0]?.toUpperCase()}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-zinc-900 truncate max-w-[8rem] sm:max-w-[12rem]">{channel.channelName}</p>
-                  <p className="text-[11px] text-zinc-500">{formatSubscribers(channel.subscriberCount)}</p>
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate max-w-[8rem] sm:max-w-[12rem]">{channel.channelName}</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">{formatSubscribers(channel.subscriberCount)}</p>
                 </div>
               </div>
               <SubscribeButton
@@ -252,8 +252,8 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                 onClick={toggleSave}
                 className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors shrink-0 ${
                   isSaved
-                    ? 'bg-zinc-100 text-violet-600'
-                    : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200'
+                    ? 'bg-zinc-100 dark:bg-zinc-800 text-violet-600'
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                 }`}
                 aria-label={isSaved ? 'Remove from saved' : 'Save for later'}
               >
@@ -262,16 +262,16 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               <div className="relative shrink-0">
                 <button
                   onClick={() => setShowShareMenu(!showShareMenu)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 text-xs font-medium transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors"
                   aria-label="Share"
                 >
                   <Share2 className="h-4 w-4" />
                 </button>
                 {showShareMenu && (
-                  <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-zinc-200 shadow-lg rounded-lg py-1 z-50">
+                  <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-1 z-50">
                     <button
                       onClick={() => { handleCopyLink(); setShowShareMenu(false) }}
-                      className="w-full text-left px-3 py-2 text-xs text-zinc-600 hover:bg-zinc-100 flex items-center gap-2"
+                      className="w-full text-left px-3 py-2 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2"
                     >
                       {copiedLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
                       {copiedLink ? 'Copied!' : 'Copy link'}
@@ -290,16 +290,16 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               they're part of the "about this video" semantic group.
               ---------------------------------------------------------- */}
           {(description || categories.length > 0) && (
-            <div className="mt-4 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+            <div className="mt-4 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-700">
               {description && (
                 <>
-                  <p className={`text-sm text-zinc-700 whitespace-pre-wrap ${!descriptionExpanded && description.length > 100 ? 'line-clamp-2' : ''}`}>
+                  <p className={`text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap ${!descriptionExpanded && description.length > 100 ? 'line-clamp-2' : ''}`}>
                     {description}
                   </p>
                   {description.length > 100 && (
                     <button
                       onClick={() => setDescriptionExpanded(!descriptionExpanded)}
-                      className="flex items-center gap-1 text-xs font-medium text-zinc-600 hover:text-zinc-900 mt-2 transition-colors"
+                      className="flex items-center gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 mt-2 transition-colors"
                     >
                       {descriptionExpanded ? (
                         <>
@@ -317,7 +317,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                 </>
               )}
               {categories.length > 0 && (
-                <div className={description ? 'mt-3 pt-3 border-t border-zinc-200' : ''}>
+                <div className={description ? 'mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700' : ''}>
                   <CategoryBadge categories={categories} max={5} />
                 </div>
               )}

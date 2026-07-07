@@ -83,8 +83,8 @@ export function HistoryPage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <Clock className="h-10 w-10 text-zinc-600 mb-4" />
-        <h2 className="text-base font-semibold text-zinc-900">Sign in to see your history</h2>
+        <Clock className="h-10 w-10 text-zinc-600 dark:text-zinc-400 mb-4" />
+        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Sign in to see your history</h2>
         <Button
           onClick={() => navigate({ page: 'login' })}
           className="mt-4 bg-violet-600 hover:bg-violet-700 text-white"
@@ -101,17 +101,17 @@ export function HistoryPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Clock className="h-5 w-5 text-zinc-600" />
-            <h1 className="text-xl font-bold text-zinc-900">Watch History</h1>
+            <Clock className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+            <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Watch History</h1>
           </div>
-          <p className="text-zinc-700 text-sm">Videos you&apos;ve recently watched</p>
+          <p className="text-zinc-700 dark:text-zinc-300 text-sm">Videos you&apos;ve recently watched</p>
         </div>
         {history.length > 0 && (
           <Button
             variant="outline"
             size="sm"
             onClick={clearAllHistory}
-            className="border-zinc-200 text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="border-zinc-200 dark:border-zinc-700 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
           >
             <Trash2 className="h-4 w-4 mr-1" />
             Clear All
@@ -123,39 +123,39 @@ export function HistoryPage() {
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex gap-3">
-              <div className="w-32 sm:w-40 h-[72px] sm:h-[90px] bg-zinc-200 rounded-lg animate-pulse" />
+              <div className="w-32 sm:w-40 h-[72px] sm:h-[90px] bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
               <div className="flex-1 space-y-2 py-1">
-                <div className="h-4 bg-zinc-200 rounded w-3/4 animate-pulse" />
-                <div className="h-3 bg-zinc-200 rounded w-1/2 animate-pulse" />
+                <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4 animate-pulse" />
+                <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2 animate-pulse" />
               </div>
             </div>
           ))}
         </div>
       ) : history.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-14 h-14 rounded-full bg-zinc-200 flex items-center justify-center mb-4">
-            <Clock className="h-6 w-6 text-zinc-600" />
+          <div className="w-14 h-14 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
+            <Clock className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">No watch history</h2>
-          <p className="text-sm text-zinc-500 mt-1">Videos you watch will show up here.</p>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">No watch history</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Videos you watch will show up here.</p>
         </div>
       ) : (
         <div className="space-y-2">
           {history.map((entry) => (
             <div
               key={entry.id}
-              className="flex items-start gap-3 p-2 rounded-lg group hover:bg-zinc-50 transition-colors cursor-pointer"
+              className="flex items-start gap-3 p-2 rounded-lg group hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               onClick={() => navigate({ page: 'video', videoId: entry.video.id })}
             >
               {/* Thumbnail — aspect ratio follows the video's format so
                   portrait videos show as portrait, not squished into 16:9. */}
-              <div className="relative w-32 sm:w-40 shrink-0 rounded overflow-hidden bg-zinc-200">
+              <div className="relative w-32 sm:w-40 shrink-0 rounded overflow-hidden bg-zinc-200 dark:bg-zinc-800">
                 <div className={entry.video.format === 'portrait' ? 'aspect-[9/16]' : entry.video.format === 'square' ? 'aspect-square' : 'aspect-video'}>
                   {entry.video.thumbnailUrl ? (
                     <img src={entry.video.thumbnailUrl} alt={entry.video.title} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
-                      <Play className="h-5 w-5 text-zinc-600" />
+                    <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+                      <Play className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
                     </div>
                   )}
                 </div>
@@ -166,7 +166,7 @@ export function HistoryPage() {
                 )}
                 {/* Watch progress bar */}
                 {entry.progress > 0 && entry.progress < 1 && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-200">
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-200 dark:bg-zinc-700">
                     <div className="h-full bg-violet-600" style={{ width: `${entry.progress * 100}%` }} />
                   </div>
                 )}
@@ -174,11 +174,11 @@ export function HistoryPage() {
 
               {/* Info */}
               <div className="flex-1 min-w-0 py-0.5">
-                <p className="text-sm font-semibold text-zinc-900 line-clamp-2 leading-tight">{entry.video.title}</p>
-                <p className="text-xs text-zinc-700 mt-1">
+                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight">{entry.video.title}</p>
+                <p className="text-xs text-zinc-700 dark:text-zinc-300 mt-1">
                   {entry.video.channel.channelName} · Watched {timeAgo(entry.watchedAt)}
                 </p>
-                <p className="text-xs text-zinc-600 mt-0.5">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
                   {formatViews(entry.video.viewCount)} views
                 </p>
               </div>
@@ -190,7 +190,7 @@ export function HistoryPage() {
                 }}
                 // Always visible on mobile (no hover), hover-revealed on desktop.
                 // Larger touch target (p-2) so it's easy to tap on phones.
-                className="shrink-0 p-2 text-zinc-500 hover:text-red-600 md:opacity-0 md:group-hover:opacity-100 transition-all"
+                className="shrink-0 p-2 text-zinc-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 md:opacity-0 md:group-hover:opacity-100 transition-all"
                 aria-label={`Remove ${entry.video.title} from history`}
               >
                 <X className="h-4 w-4" />

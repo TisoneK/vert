@@ -89,9 +89,9 @@ export function TrendingPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <Flame className="h-5 w-5 text-orange-500" />
-          <h1 className="text-xl font-bold text-zinc-900">Trending</h1>
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Trending</h1>
         </div>
-        <p className="text-zinc-500 text-sm">What&apos;s hot right now on Vert</p>
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm">What&apos;s hot right now on Vert</p>
       </div>
 
       {/* Category filter tabs — horizontally scrollable on mobile with
@@ -102,7 +102,7 @@ export function TrendingPage() {
           className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 ${
             !activeCategory
               ? 'bg-violet-600 text-white'
-              : 'bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
+              : 'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-700'
           }`}
         >
           All
@@ -130,11 +130,11 @@ export function TrendingPage() {
         </div>
       ) : videos.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-14 h-14 rounded-full bg-zinc-200 flex items-center justify-center mb-4">
-            <Flame className="h-6 w-6 text-zinc-600" />
+          <div className="w-14 h-14 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
+            <Flame className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">No trending videos</h2>
-          <p className="text-sm text-zinc-700 mt-1">Check back later for trending content</p>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">No trending videos</h2>
+          <p className="text-sm text-zinc-700 dark:text-zinc-300 mt-1">Check back later for trending content</p>
         </div>
       ) : (
         <>
@@ -145,12 +145,12 @@ export function TrendingPage() {
               className="relative mb-8 rounded-lg overflow-hidden cursor-pointer group shadow-sm hover:shadow-md transition-all duration-200"
               onClick={() => navigate({ page: 'video', videoId: heroVideo.id })}
             >
-              <div className="aspect-video max-h-[42vh] bg-zinc-200">
+              <div className="aspect-video max-h-[42vh] bg-zinc-200 dark:bg-zinc-800">
                 {heroVideo.thumbnailUrl ? (
                   <img src={heroVideo.thumbnailUrl} alt={heroVideo.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
                 ) : (
-                  <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
-                    <Play className="h-10 w-10 text-zinc-500" />
+                  <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+                    <Play className="h-10 w-10 text-zinc-500 dark:text-zinc-400" />
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />

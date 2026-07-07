@@ -11,13 +11,13 @@ export function CategoryBadge({ categories, max = 2 }: { categories: Array<{ nam
       {visible.map((cat) => (
         <span
           key={cat.slug}
-          className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600"
+          className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
         >
           {cat.name}
         </span>
       ))}
       {remaining > 0 && (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-50 text-zinc-600">
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
           +{remaining}
         </span>
       )}

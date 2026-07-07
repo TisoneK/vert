@@ -114,9 +114,9 @@ export function PlaylistsPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="aspect-video rounded-lg bg-zinc-200" />
-              <div className="mt-2 h-4 w-3/4 rounded bg-zinc-200" />
-              <div className="mt-1 h-3 w-1/2 rounded bg-zinc-200" />
+                <div className="aspect-video rounded-lg bg-zinc-200 dark:bg-zinc-800" />
+              <div className="mt-2 h-4 w-3/4 rounded bg-zinc-200 dark:bg-zinc-700" />
+              <div className="mt-1 h-3 w-1/2 rounded bg-zinc-200 dark:bg-zinc-700" />
             </div>
           ))}
         </div>
@@ -129,10 +129,10 @@ export function PlaylistsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <ListVideo className="h-5 w-5 text-zinc-600" />
-          <h1 className="text-xl font-bold text-zinc-900">My Playlists</h1>
+          <ListVideo className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">My Playlists</h1>
           {playlists.length > 0 && (
-            <span className="text-sm text-zinc-500">({playlists.length})</span>
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">({playlists.length})</span>
           )}
         </div>
         <Button
@@ -146,32 +146,32 @@ export function PlaylistsPage() {
 
       {/* Create form */}
       {showCreate && (
-        <div className="mb-6 p-4 bg-zinc-50 rounded-lg border border-zinc-200 space-y-3 animate-vert-fade-in">
+        <div className="mb-6 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700 space-y-3 animate-vert-fade-in">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-900">Create new playlist</h2>
-            <button onClick={() => setShowCreate(false)} className="text-zinc-400 hover:text-zinc-600">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Create new playlist</h2>
+            <button onClick={() => setShowCreate(false)} className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300">
               <X className="h-4 w-4" />
             </button>
           </div>
           <div>
-            <Label className="text-zinc-600 mb-1.5 block text-sm">Title *</Label>
+            <Label className="text-zinc-600 dark:text-zinc-400 mb-1.5 block text-sm">Title *</Label>
             <Input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="My favorite videos"
-              className="bg-white border-zinc-300 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+              className="bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600"
               maxLength={100}
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && !creating && handleCreate()}
             />
           </div>
           <div>
-            <Label className="text-zinc-600 mb-1.5 block text-sm">Description</Label>
+            <Label className="text-zinc-600 dark:text-zinc-400 mb-1.5 block text-sm">Description</Label>
             <Textarea
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
               placeholder="What's this playlist about?"
-              className="bg-white border-zinc-300 text-zinc-800 placeholder:text-zinc-400 min-h-[60px] resize-none focus-visible:ring-violet-600"
+              className="bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 min-h-[60px] resize-none focus-visible:ring-violet-600"
               maxLength={1000}
             />
           </div>
@@ -198,11 +198,11 @@ export function PlaylistsPage() {
       {/* Playlists grid */}
       {playlists.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4 mx-auto">
-            <ListVideo className="h-7 w-7 text-zinc-400" />
+          <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 mx-auto">
+            <ListVideo className="h-7 w-7 text-zinc-400 dark:text-zinc-500" />
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">No playlists yet</h2>
-          <p className="text-sm text-zinc-500 mt-1.5 max-w-xs mx-auto">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">No playlists yet</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 max-w-xs mx-auto">
             Create a playlist to organize your favorite videos, then add videos
             from any video card's menu.
           </p>
@@ -223,7 +223,7 @@ export function PlaylistsPage() {
               onClick={() => navigate({ page: 'playlist', playlistId: playlist.id })}
             >
               {/* Thumbnail */}
-              <div className="relative aspect-video rounded-lg overflow-hidden bg-zinc-200">
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800">
                 {playlist.thumbnailUrl ? (
                   <img
                     src={playlist.thumbnailUrl}
@@ -232,7 +232,7 @@ export function PlaylistsPage() {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <Film className="h-8 w-8 text-zinc-400" />
+                    <Film className="h-8 w-8 text-zinc-400 dark:text-zinc-500" />
                   </div>
                 )}
                 {/* Video count badge */}
@@ -261,14 +261,14 @@ export function PlaylistsPage() {
                 </button>
               </div>
               {/* Title + meta */}
-              <h3 className="text-sm font-semibold text-zinc-900 mt-2 line-clamp-2 leading-tight">
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-2 line-clamp-2 leading-tight">
                 {playlist.title}
               </h3>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                 {playlist.videoCount} video{playlist.videoCount !== 1 ? 's' : ''} · {timeAgo(playlist.createdAt)}
               </p>
               {playlist.description && (
-                <p className="text-xs text-zinc-600 mt-1 line-clamp-1">{playlist.description}</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 line-clamp-1">{playlist.description}</p>
               )}
             </div>
           ))}

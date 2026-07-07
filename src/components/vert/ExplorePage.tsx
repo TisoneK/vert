@@ -64,15 +64,15 @@ export function ExplorePage() {
 
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto animate-vert-fade-in">
-      <h1 className="text-xl font-bold text-zinc-900 mb-6">Categories</h1>
+      <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Categories</h1>
 
       {categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-14 h-14 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
-            <Compass className="h-6 w-6 text-zinc-400" />
+          <div className="w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4">
+            <Compass className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">No categories yet</h2>
-          <p className="text-sm text-zinc-500 mt-1">Check back later.</p>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">No categories yet</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Check back later.</p>
         </div>
       ) : (
         (() => {
@@ -92,13 +92,13 @@ export function ExplorePage() {
                       <button
                         key={cat.id}
                         onClick={() => navigate({ page: 'category', slug: cat.slug })}
-                        className="group rounded-lg p-4 text-left bg-white border border-zinc-200 hover:border-violet-300 hover:shadow-sm transition-all"
+                        className="group rounded-lg p-4 text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-sm transition-all"
                       >
                         <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center mb-3">
                           <Icon className="h-4 w-4 text-violet-600" />
                         </div>
-                        <h3 className="text-sm font-semibold text-zinc-900 group-hover:text-violet-600 transition-colors">{cat.name}</h3>
-                        <p className="text-zinc-500 text-xs mt-0.5">
+                        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-violet-600 transition-colors">{cat.name}</h3>
+                        <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">
                           {cat.videoCount} {cat.videoCount === 1 ? 'video' : 'videos'}
                         </p>
                       </button>
@@ -109,7 +109,7 @@ export function ExplorePage() {
 
               {empty.length > 0 && (
                 <>
-                  <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-8 mb-3">
+                  <h2 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mt-8 mb-3">
                     {withVideos.length > 0 ? 'More categories' : 'All categories'}
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -119,13 +119,13 @@ export function ExplorePage() {
                         <button
                           key={cat.id}
                           onClick={() => navigate({ page: 'category', slug: cat.slug })}
-                          className="group rounded-lg p-4 text-left bg-zinc-50 border border-zinc-100 hover:border-zinc-200 hover:bg-white transition-all"
+                          className="group rounded-lg p-4 text-left bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-600 hover:bg-white dark:hover:bg-zinc-800 transition-all"
                         >
-                          <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center mb-3">
-                            <Icon className="h-4 w-4 text-zinc-400" />
+                          <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center mb-3">
+                            <Icon className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                           </div>
-                          <h3 className="text-sm font-medium text-zinc-500 group-hover:text-zinc-700 transition-colors">{cat.name}</h3>
-                          <p className="text-zinc-300 text-xs mt-0.5">No videos yet</p>
+                          <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">{cat.name}</h3>
+                          <p className="text-zinc-300 dark:text-zinc-600 text-xs mt-0.5">No videos yet</p>
                         </button>
                       )
                     })}

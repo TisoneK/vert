@@ -23,23 +23,23 @@ export function SearchSuggestions({ query, onSelect, recentSearches = [] }: Sear
     : trendingSuggestions
 
   return (
-    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-zinc-200 rounded-lg shadow-xl py-2 z-50">
+    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-xl py-2 z-50">
       {recentSearches.length > 0 && (
         <>
-          <p className="px-4 py-1.5 text-xs font-medium text-zinc-700 uppercase tracking-wider flex items-center gap-1.5">
+          <p className="px-4 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
             <Clock className="h-3 w-3" /> Recent
           </p>
           {recentSearches.map((s) => (
             <button
               key={`recent-${s}`}
               onClick={() => onSelect(s)}
-              className="w-full text-left px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-100 transition-colors flex items-center gap-2"
+              className="w-full text-left px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2"
             >
-              <Clock className="h-3.5 w-3.5 text-zinc-600" />
+              <Clock className="h-3.5 w-3.5 text-zinc-600 dark:text-zinc-400" />
               {s}
             </button>
           ))}
-          <div className="border-t border-zinc-200 my-1" />
+          <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
         </>
       )}
       <p className="px-4 py-1.5 text-xs font-medium text-zinc-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -49,9 +49,9 @@ export function SearchSuggestions({ query, onSelect, recentSearches = [] }: Sear
         <button
           key={`trending-${s}`}
           onClick={() => onSelect(s)}
-          className="w-full text-left px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-100 transition-colors flex items-center gap-2"
+          className="w-full text-left px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2"
         >
-          <Search className="h-3.5 w-3.5 text-zinc-600" />
+          <Search className="h-3.5 w-3.5 text-zinc-600 dark:text-zinc-400" />
           {s}
         </button>
       ))}

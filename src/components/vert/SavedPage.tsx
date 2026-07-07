@@ -70,8 +70,8 @@ export function SavedPage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <Bookmark className="h-10 w-10 text-zinc-600 mb-4" />
-        <h2 className="text-base font-semibold text-zinc-900">Sign in to see your saved videos</h2>
+        <Bookmark className="h-10 w-10 text-zinc-600 dark:text-zinc-400 mb-4" />
+        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Sign in to see your saved videos</h2>
         <Button
           onClick={() => navigate({ page: 'login' })}
           className="mt-4 bg-violet-600 hover:bg-violet-700 text-white"
@@ -87,10 +87,10 @@ export function SavedPage() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Bookmark className="h-5 w-5 text-zinc-600" />
-          <h1 className="text-xl font-bold text-zinc-900">Watch Later</h1>
+          <Bookmark className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Watch Later</h1>
         </div>
-        <p className="text-zinc-700 text-sm">Videos you&apos;ve saved for later</p>
+        <p className="text-zinc-700 dark:text-zinc-300 text-sm">Videos you&apos;ve saved for later</p>
       </div>
 
       {loading ? (
@@ -101,11 +101,11 @@ export function SavedPage() {
         </div>
       ) : saved.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-14 h-14 rounded-full bg-zinc-200 flex items-center justify-center mb-4">
-            <Bookmark className="h-6 w-6 text-zinc-600" />
+          <div className="w-14 h-14 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
+            <Bookmark className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">Nothing saved yet</h2>
-          <p className="text-sm text-zinc-500 mt-1">Tap the bookmark on any video to save it for later.</p>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Nothing saved yet</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Tap the bookmark on any video to save it for later.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">

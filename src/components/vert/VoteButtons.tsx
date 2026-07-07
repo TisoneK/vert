@@ -67,8 +67,8 @@ export function VoteButtons({ videoId, likeCount: initialLikes, dislikeCount: in
           animatingVote === 'like' ? 'animate-vote-pulse' : ''
         } ${
           userVote === 'like'
-            ? 'bg-violet-100 text-violet-600'
-            : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200'
+            ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400'
+            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700'
         } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <ThumbsUp className="h-3.5 w-3.5" />
@@ -81,8 +81,8 @@ export function VoteButtons({ videoId, likeCount: initialLikes, dislikeCount: in
           animatingVote === 'dislike' ? 'animate-vote-pulse' : ''
         } ${
           userVote === 'dislike'
-            ? 'bg-red-100 text-red-600'
-            : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200'
+            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700'
         } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <ThumbsDown className="h-3.5 w-3.5" />

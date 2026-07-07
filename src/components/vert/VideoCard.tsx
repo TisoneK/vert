@@ -35,20 +35,20 @@ interface VideoCardProps {
 function FormatIcon({ format }: { format: string }) {
   if (format === 'landscape') {
     return (
-      <div className="flex items-center gap-0.5 bg-zinc-200/80 text-zinc-600 px-1 py-0.5 rounded" title="Landscape">
+      <div className="flex items-center gap-0.5 bg-zinc-200/80 dark:bg-zinc-700/80 text-zinc-600 dark:text-zinc-300 px-1 py-0.5 rounded" title="Landscape">
         <Monitor className="h-2.5 w-2.5" />
       </div>
     )
   }
   if (format === 'square') {
     return (
-      <div className="flex items-center gap-0.5 bg-zinc-200/80 text-zinc-600 px-1 py-0.5 rounded" title="Square">
+      <div className="flex items-center gap-0.5 bg-zinc-200/80 dark:bg-zinc-700/80 text-zinc-600 dark:text-zinc-300 px-1 py-0.5 rounded" title="Square">
         <Square className="h-2.5 w-2.5" />
       </div>
     )
   }
   return (
-    <div className="flex items-center gap-0.5 bg-zinc-200/80 text-zinc-600 px-1 py-0.5 rounded" title="Portrait">
+      <div className="flex items-center gap-0.5 bg-zinc-200/80 dark:bg-zinc-700/80 text-zinc-600 dark:text-zinc-300 px-1 py-0.5 rounded" title="Portrait">
       <Smartphone className="h-2.5 w-2.5" />
     </div>
   )
@@ -103,7 +103,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       onClick={() => navigate({ page: 'video', videoId: video.id })}
     >
       {/* Thumbnail container */}
-      <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200`}>
+      <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800`}>
         {showThumbnail ? (
           <img
             src={video.thumbnailUrl!}
@@ -112,8 +112,8 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
             className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
           />
         ) : (
-          <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
-            <Play className="h-8 w-8 text-zinc-500" />
+          <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+            <Play className="h-8 w-8 text-zinc-500 dark:text-zinc-400" />
           </div>
         )}
 
@@ -133,7 +133,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
 
         {/* Watch progress bar */}
         {watchProgress !== undefined && watchProgress > 0 && watchProgress < 1 && (
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-200">
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-200 dark:bg-zinc-700">
             <div
               className="h-full bg-violet-600"
               style={{ width: `${watchProgress * 100}%` }}
@@ -166,37 +166,37 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
               </button>
               {showMenu && (
                 <div
-                  className="absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 shadow-lg rounded-lg py-1 z-50"
+                  className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-1 z-50"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     onClick={() => { onContextMenuAction?.('save', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 hover:bg-zinc-100 transition-colors"
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                   >
                     Save to Watch Later
                   </button>
                   <button
                     onClick={() => { setShowPlaylistPicker(true); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 hover:bg-zinc-100 transition-colors flex items-center gap-1.5"
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5"
                   >
                     <ListVideo className="h-3 w-3" />
                     Add to playlist
                   </button>
                   <button
                     onClick={() => { onContextMenuAction?.('share', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 hover:bg-zinc-100 transition-colors"
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                   >
                     Share
                   </button>
                   <button
                     onClick={() => { onContextMenuAction?.('not-interested', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 hover:bg-zinc-100 transition-colors"
+                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                   >
                     Not interested
                   </button>
                   <button
                     onClick={() => { onContextMenuAction?.('report', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors"
+                    className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                   >
                     Report
                   </button>
@@ -216,37 +216,37 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
               </button>
               {showMenu && (
                 <div
-                  className="absolute right-0 top-full mt-1 w-36 bg-white border border-zinc-200 shadow-lg rounded-lg py-1 z-50"
+                  className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-1 z-50"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     onClick={() => { onContextMenuAction?.('save', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
+                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                   >
                     Save to Watch Later
                   </button>
                   <button
                     onClick={() => { setShowPlaylistPicker(true); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors flex items-center gap-1.5"
+                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5"
                   >
                     <ListVideo className="h-3 w-3" />
                     Add to playlist
                   </button>
                   <button
                     onClick={() => { onContextMenuAction?.('share', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
+                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                   >
                     Share
                   </button>
                   <button
                     onClick={() => { onContextMenuAction?.('not-interested', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 transition-colors"
+                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                   >
                     Not interested
                   </button>
                   <button
                     onClick={() => { onContextMenuAction?.('report', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-zinc-100 transition-colors"
+                    className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                   >
                     Report
                   </button>
@@ -272,14 +272,14 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
               className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
-            <div className="w-6 h-6 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-[10px] font-bold">
+            <div className="w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-[10px] font-bold">
               {video.channel.channelName[0]?.toUpperCase()}
             </div>
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-zinc-900 line-clamp-2 leading-tight">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight">
             {video.title}
           </h3>
           <button
@@ -287,11 +287,11 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
               e.stopPropagation()
               navigate({ page: 'channel', channelId: video.channel.id })
             }}
-            className="text-xs text-zinc-600 hover:text-zinc-800 transition-colors mt-0.5 block"
+            className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors mt-0.5 block"
           >
             {video.channel.channelName}
           </button>
-          <p className="text-xs text-zinc-600 mt-0.5">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
             {formatViews(video.viewCount)} views · {timeAgo(video.createdAt)}
           </p>
           {video.categories && video.categories.length > 0 && (

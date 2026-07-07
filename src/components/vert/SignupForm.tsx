@@ -104,22 +104,22 @@ export function SignupForm() {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
-      <div className="w-full max-w-md bg-white border border-zinc-200 shadow-sm rounded-2xl p-8">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-sm rounded-2xl p-8">
         <div className="text-center mb-8">
           <button
             onClick={() => navigate({ page: 'home' })}
-            className="text-2xl font-bold text-zinc-900 tracking-tight"
+            className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight"
           >
             Vert
           </button>
-          <h1 className="text-xl font-bold text-zinc-900 mt-4">Create your channel</h1>
-          <p className="text-zinc-500 text-sm mt-1">Join Vert and start sharing portrait video</p>
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mt-4">Create your channel</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Join Vert and start sharing portrait video</p>
         </div>
 
         {/* Google sign-in */}
         <button
           onClick={() => signIn('google', { callbackUrl: '/' })}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-300 rounded-lg text-sm font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-colors active:scale-95 duration-100"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors active:scale-95 duration-100"
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -132,40 +132,40 @@ export function SignupForm() {
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-6">
-          <div className="flex-1 h-px bg-zinc-200" />
+          <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-700" />
           <span className="text-xs text-zinc-400">or</span>
-          <div className="flex-1 h-px bg-zinc-200" />
+          <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-700" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email" className="text-zinc-600 mb-2 block text-sm">Email</Label>
+            <Label htmlFor="email" className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">Email</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="bg-zinc-50 border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+              className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="username" className="text-zinc-600 mb-2 block text-sm">Username</Label>
+            <Label htmlFor="username" className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">Username</Label>
             <Input
               id="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Choose a username"
-              className="bg-zinc-50 border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+              className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="password" className="text-zinc-600 mb-2 block text-sm">Password</Label>
+            <Label htmlFor="password" className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">Password</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -173,13 +173,13 @@ export function SignupForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="bg-zinc-50 border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600 pr-10"
+                className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600 pr-10"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 hover:text-zinc-700 transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -188,14 +188,14 @@ export function SignupForm() {
           </div>
 
           <div>
-            <Label htmlFor="confirm-password" className="text-zinc-600 mb-2 block text-sm">Confirm Password</Label>
+            <Label htmlFor="confirm-password" className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">Confirm Password</Label>
             <Input
               id="confirm-password"
               type={showPassword ? 'text' : 'password'}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm your password"
-              className="bg-zinc-50 border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+              className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600"
               required
             />
           </div>
@@ -223,7 +223,7 @@ export function SignupForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-zinc-500 text-sm">
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm">
             Already have an account?{' '}
             <button
               onClick={() => navigate({ page: 'login' })}

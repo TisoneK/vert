@@ -122,20 +122,20 @@ export function SettingsPage() {
     <div className="p-4 md:p-6 max-w-2xl mx-auto animate-vert-fade-in">
       {/* Header */}
       <div className="flex items-center gap-2 mb-6">
-        <SettingsIcon className="h-5 w-5 text-zinc-600" />
-        <h1 className="text-xl font-bold text-zinc-900">Account Settings</h1>
+        <SettingsIcon className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+        <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Account Settings</h1>
       </div>
 
       {/* Account info */}
-      <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 mb-6">
+      <div className="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 text-lg font-bold shrink-0">
+          <div className="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400 text-lg font-bold shrink-0">
             {user.username[0]?.toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-zinc-900">{user.username}</p>
-            <p className="text-sm text-zinc-500 truncate">{user.email}</p>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="font-semibold text-zinc-900 dark:text-zinc-100">{user.username}</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate">{user.email}</p>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
               Role: <span className="font-medium">{user.role}</span>
               {user.channelId && ' · Has channel'}
             </p>
@@ -144,16 +144,16 @@ export function SettingsPage() {
       </div>
 
       {/* Change password section */}
-      <div className="bg-white border border-zinc-200 rounded-lg p-5 mb-6">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg p-5 mb-6">
         <div className="flex items-center gap-2 mb-4">
-          <Lock className="h-4 w-4 text-zinc-600" />
-          <h2 className="text-sm font-semibold text-zinc-900">Change Password</h2>
+          <Lock className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Change Password</h2>
         </div>
 
         <form onSubmit={handleChangePassword} className="space-y-4">
           {/* Current password */}
           <div>
-            <Label htmlFor="current-password" className="text-zinc-600 mb-1.5 block text-sm">
+            <Label htmlFor="current-password" className="text-zinc-600 dark:text-zinc-400 mb-1.5 block text-sm">
               Current Password
             </Label>
             <div className="relative">
@@ -163,14 +163,14 @@ export function SettingsPage() {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Enter your current password"
-                className="bg-zinc-50 border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600 pr-10"
+                className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600 pr-10"
                 required
                 autoComplete="current-password"
               />
               <button
                 type="button"
                 onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 hover:text-zinc-700 transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                 aria-label={showCurrent ? 'Hide password' : 'Show password'}
               >
                 {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -180,7 +180,7 @@ export function SettingsPage() {
 
           {/* New password */}
           <div>
-            <Label htmlFor="new-password" className="text-zinc-600 mb-1.5 block text-sm">
+            <Label htmlFor="new-password" className="text-zinc-600 dark:text-zinc-400 mb-1.5 block text-sm">
               New Password
             </Label>
             <div className="relative">
@@ -190,7 +190,7 @@ export function SettingsPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="bg-zinc-50 border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600 pr-10"
+                className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600 pr-10"
                 required
                 minLength={6}
                 maxLength={200}
@@ -199,7 +199,7 @@ export function SettingsPage() {
               <button
                 type="button"
                 onClick={() => setShowNew(!showNew)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 hover:text-zinc-700 transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                 aria-label={showNew ? 'Hide password' : 'Show password'}
               >
                 {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -209,7 +209,7 @@ export function SettingsPage() {
 
           {/* Confirm new password */}
           <div>
-            <Label htmlFor="confirm-new-password" className="text-zinc-600 mb-1.5 block text-sm">
+            <Label htmlFor="confirm-new-password" className="text-zinc-600 dark:text-zinc-400 mb-1.5 block text-sm">
               Confirm New Password
             </Label>
             <Input
@@ -218,7 +218,7 @@ export function SettingsPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Re-enter your new password"
-              className="bg-zinc-50 border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+              className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600"
               required
               autoComplete="new-password"
             />
@@ -245,12 +245,12 @@ export function SettingsPage() {
       </div>
 
       {/* Danger zone */}
-      <div className="bg-red-50 border border-red-200 rounded-lg p-5">
+      <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-5">
         <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle className="h-4 w-4 text-red-600" />
-          <h2 className="text-sm font-semibold text-red-900">Danger Zone</h2>
+          <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+          <h2 className="text-sm font-semibold text-red-900 dark:text-red-400">Danger Zone</h2>
         </div>
-        <p className="text-xs text-red-700 mb-4">
+        <p className="text-xs text-red-700 dark:text-red-300 mb-4">
           Deleting your account is permanent and cannot be undone. Your channel, videos,
           comments, votes, and playlists will all be removed.
         </p>
@@ -259,14 +259,14 @@ export function SettingsPage() {
           <Button
             variant="outline"
             onClick={() => setDeleteStage('confirm')}
-            className="border-red-300 text-red-600 hover:bg-red-100 hover:text-red-700"
+            className="border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-300"
           >
             <Trash2 className="h-4 w-4 mr-1.5" />
             Delete my account
           </Button>
         ) : (
-          <div className="space-y-3 bg-white border border-red-200 rounded-lg p-4">
-            <p className="text-sm font-medium text-zinc-900">
+          <div className="space-y-3 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900 rounded-lg p-4">
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
               {deleteStage === 'deleting'
                 ? 'Deleting your account…'
                 : 'Confirm account deletion'}
@@ -274,7 +274,7 @@ export function SettingsPage() {
 
             {/* Password verification (skip for OAuth users — they have no password) */}
             <div>
-              <Label htmlFor="delete-password" className="text-zinc-600 mb-1.5 block text-sm">
+              <Label htmlFor="delete-password" className="text-zinc-600 dark:text-zinc-400 mb-1.5 block text-sm">
                 Enter your password to confirm
               </Label>
               <Input
@@ -283,17 +283,17 @@ export function SettingsPage() {
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
                 placeholder="Your account password"
-                className="bg-zinc-50 border-zinc-200 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-red-600"
+                className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-red-600"
                 disabled={deleteStage === 'deleting'}
                 autoComplete="current-password"
               />
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
                 Leave blank if you sign in with Google.
               </p>
             </div>
 
             {/* Confirm checkbox */}
-            <label className="flex items-start gap-2 text-sm text-zinc-700 cursor-pointer">
+            <label className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={deleteConfirm}

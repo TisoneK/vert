@@ -55,7 +55,7 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
   if (loading) {
     return (
       <div>
-        <p className="text-sm font-medium text-zinc-600 mb-3">Up Next</p>
+        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-3">Up Next</p>
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <RelatedVideoSkeleton key={i} />
@@ -68,27 +68,27 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
   if (videos.length === 0) {
     return (
       <div>
-        <p className="text-sm font-medium text-zinc-600 mb-3">Up Next</p>
-        <p className="text-xs text-zinc-400">No more videos yet.</p>
+        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-3">Up Next</p>
+        <p className="text-xs text-zinc-400 dark:text-zinc-500">No more videos yet.</p>
       </div>
     )
   }
 
   return (
     <div>
-      <p className="text-sm font-medium text-zinc-600 mb-3">Up Next</p>
+      <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-3">Up Next</p>
       <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar pr-1">
         {videos.map((video, index) => (
           <div
             key={video.id}
-            className="flex gap-2 cursor-pointer group p-1.5 rounded-lg hover:bg-zinc-100 transition-colors"
+            className="flex gap-2 cursor-pointer group p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             onClick={() => navigate({ page: 'video', videoId: video.id })}
           >
             {/* Thumbnail — aspect ratio follows the video's format so
                 portrait videos show as portrait, not squished into 16:9.
                 The thumbnail width stays fixed at w-32; the height follows
                 from the aspect ratio. */}
-            <div className="relative w-32 shrink-0 rounded overflow-hidden bg-zinc-200">
+            <div className="relative w-32 shrink-0 rounded overflow-hidden bg-zinc-200 dark:bg-zinc-800">
               <div className={video.format === 'portrait' ? 'aspect-[9/16]' : video.format === 'square' ? 'aspect-square' : 'aspect-video'}>
                 {video.thumbnailUrl ? (
                   <img
@@ -97,8 +97,8 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
                     className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
                   />
                 ) : (
-                  <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
-                    <Play className="h-5 w-5 text-zinc-600" />
+                  <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+                    <Play className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
                   </div>
                 )}
               </div>
@@ -111,13 +111,13 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
 
             {/* Info */}
             <div className="flex-1 min-w-0 py-0.5">
-              <h4 className="text-xs font-semibold text-zinc-900 line-clamp-2 leading-tight group-hover:text-violet-600 transition-colors">
+              <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight group-hover:text-violet-600 transition-colors">
                 {video.title}
               </h4>
-              <p className="text-[11px] text-zinc-600 mt-1">
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-1">
                 {video.channel.channelName}
               </p>
-              <p className="text-[11px] text-zinc-600">
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
                 {formatViews(video.viewCount)} views · {timeAgo(video.createdAt)}
               </p>
             </div>

@@ -115,9 +115,9 @@ export function HomeFeed() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="aspect-video rounded-lg bg-zinc-200" />
-              <div className="mt-2 h-3.5 w-3/4 rounded bg-zinc-200" />
-              <div className="mt-1.5 h-3 w-1/2 rounded bg-zinc-200" />
+              <div className="aspect-video rounded-lg bg-zinc-200 dark:bg-zinc-700" />
+              <div className="mt-2 h-3.5 w-3/4 rounded bg-zinc-200 dark:bg-zinc-700" />
+              <div className="mt-1.5 h-3 w-1/2 rounded bg-zinc-200 dark:bg-zinc-700" />
             </div>
           ))}
         </div>
@@ -132,7 +132,7 @@ export function HomeFeed() {
         <section className="mb-8">
           <div className="flex items-center gap-1.5 mb-3">
             <Sparkles className="h-4 w-4 text-violet-600" />
-            <h2 className="text-sm font-semibold text-zinc-900">For You</h2>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">For You</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {forYouVideos.slice(0, 10).map((video) => (
@@ -148,9 +148,9 @@ export function HomeFeed() {
           ~675px tall on a 1280px viewport, dominating the entire screen. */}
       {trendingVideos.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-sm font-semibold text-zinc-900 mb-3">Featured</h2>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Featured</h2>
           <div
-            className="relative aspect-video max-h-[42vh] rounded-lg overflow-hidden bg-zinc-200 cursor-pointer group"
+            className="relative aspect-video max-h-[42vh] rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 cursor-pointer group"
             onClick={() => navigate({ page: 'video', videoId: trendingVideos[0].id })}
           >
             {trendingVideos[0].thumbnailUrl ? (
@@ -160,8 +160,8 @@ export function HomeFeed() {
                 className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
               />
             ) : (
-              <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
-                <Play className="h-10 w-10 text-zinc-400" />
+              <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+                <Play className="h-10 w-10 text-zinc-400 dark:text-zinc-500" />
               </div>
             )}
             {/* Stronger gradient (from-black/90 via-black/40) so the title
@@ -184,7 +184,7 @@ export function HomeFeed() {
       {trendingVideos.length > 1 && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-zinc-900">Trending</h2>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Trending</h2>
             <button
               onClick={() => navigate({ page: 'trending' })}
               className="text-xs text-violet-600 hover:text-violet-700 font-medium"
@@ -207,7 +207,7 @@ export function HomeFeed() {
         return (
           <section key={cat.id} className="mb-8">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-zinc-900">{cat.name}</h2>
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{cat.name}</h2>
               <button
                 onClick={() => navigate({ page: 'category', slug: cat.slug })}
                 className="text-xs text-violet-600 hover:text-violet-700 font-medium"
@@ -228,7 +228,7 @@ export function HomeFeed() {
       {videos.length > 0 && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-zinc-900">Latest</h2>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Latest</h2>
             <button
               onClick={() => navigate({ page: 'explore' })}
               className="text-xs text-violet-600 hover:text-violet-700 font-medium"
@@ -264,7 +264,7 @@ export function HomeFeed() {
         if (creators.length === 0) return null
         return (
           <section className="mb-8">
-            <h2 className="text-sm font-semibold text-zinc-900 mb-3">Popular Creators</h2>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Popular Creators</h2>
             <div className="flex gap-4 overflow-x-auto shelf-scroll pb-2">
               {creators.map((ch) => (
                 <button
@@ -276,14 +276,14 @@ export function HomeFeed() {
                     <img
                       src={ch.avatarUrl}
                       alt={ch.channelName}
-                      className="w-16 h-16 rounded-full object-cover ring-2 ring-zinc-100 group-hover:ring-violet-200 transition-all"
+                      className="w-16 h-16 rounded-full object-cover ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 transition-all"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-100 to-zinc-100 flex items-center justify-center text-violet-600 text-xl font-bold ring-2 ring-zinc-100 group-hover:ring-violet-200 transition-all">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-100 to-zinc-100 flex items-center justify-center text-violet-600 text-xl font-bold ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 transition-all">
                       {ch.channelName[0]?.toUpperCase()}
                     </div>
                   )}
-                  <span className="text-xs text-zinc-700 text-center line-clamp-1 w-full group-hover:text-zinc-900 transition-colors">
+                  <span className="text-xs text-zinc-700 dark:text-zinc-300 text-center line-clamp-1 w-full group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
                     {ch.channelName}
                   </span>
                 </button>
@@ -296,11 +296,11 @@ export function HomeFeed() {
       {/* Empty state */}
       {videos.length === 0 && trendingVideos.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
-            <Film className="h-7 w-7 text-zinc-400" />
+          <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4">
+            <Film className="h-7 w-7 text-zinc-400 dark:text-zinc-500" />
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">Nothing here yet</h2>
-          <p className="text-sm text-zinc-500 mt-1.5 max-w-xs">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Nothing here yet</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 max-w-xs">
             No videos have been uploaded yet. Be the first to share something!
           </p>
         </div>

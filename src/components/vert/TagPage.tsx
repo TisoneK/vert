@@ -92,7 +92,7 @@ export function TagPage({ slug }: { slug: string }) {
       {/* Breadcrumb */}
       <button
         onClick={() => navigate({ page: 'explore' })}
-        className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-700 transition-colors mb-4"
+        className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-100 transition-colors mb-4"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Back to Explore
@@ -102,12 +102,12 @@ export function TagPage({ slug }: { slug: string }) {
       {tag ? (
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center">
-              <Hash className="h-5 w-5 text-violet-600" />
+            <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+              <Hash className="h-5 w-5 text-violet-600 dark:text-violet-400" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-zinc-900">{tag.label}</h1>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{tag.label}</h1>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                 {tag.usageCount} {tag.usageCount === 1 ? 'video' : 'videos'}
               </p>
             </div>
@@ -116,12 +116,12 @@ export function TagPage({ slug }: { slug: string }) {
       ) : !loading ? (
         <div className="mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-zinc-200 flex items-center justify-center">
-              <Hash className="h-5 w-5 text-zinc-500" />
+            <div className="w-10 h-10 rounded-lg bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+              <Hash className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-zinc-900">#{slug}</h1>
-              <p className="text-xs text-zinc-500 mt-0.5">Tag not found</p>
+              <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">#{slug}</h1>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Tag not found</p>
             </div>
           </div>
         </div>
@@ -135,8 +135,8 @@ export function TagPage({ slug }: { slug: string }) {
             onClick={() => handleSortChange(s)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors active:scale-95 duration-100 ${
               sort === s
-                ? 'bg-zinc-100 text-zinc-900'
-                : 'bg-white text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
             {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -159,7 +159,7 @@ export function TagPage({ slug }: { slug: string }) {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-zinc-500">No videos with this tag yet.</p>
+          <p className="text-zinc-500 dark:text-zinc-400">No videos with this tag yet.</p>
         </div>
       )}
 
@@ -168,7 +168,7 @@ export function TagPage({ slug }: { slug: string }) {
           <Button
             onClick={loadMore}
             variant="outline"
-            className="border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+            className="border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
             Load More
           </Button>

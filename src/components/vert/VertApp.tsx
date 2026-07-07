@@ -108,7 +108,7 @@ export function VertApp() {
   // the distracting app shell visible behind the auth modal.
   if (!user && (currentView.page === 'login' || currentView.page === 'signup')) {
     return (
-      <div className="min-h-screen bg-zinc-50">
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         {currentView.page === 'login' ? <LoginForm /> : <SignupForm />}
       </div>
     )
@@ -117,25 +117,25 @@ export function VertApp() {
   // The contact page is another deep link that doesn't require auth.
   if (!user && currentView.page === 'contact') {
     return (
-      <div className="min-h-screen bg-zinc-50">
-        <header className="border-b border-zinc-100 bg-white">
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <header className="border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
           <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
             <button
               onClick={() => navigate({ page: 'home' })}
               className="flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 rounded"
             >
-              <span className="text-lg font-bold text-zinc-900 tracking-tight">Vert</span>
+              <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Vert</span>
             </button>
             <div className="flex items-center gap-3 text-sm">
               <button
                 onClick={() => navigate({ page: 'changelog' })}
-                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+                className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
               >
                 Changelog
               </button>
               <button
                 onClick={() => navigate({ page: 'login' })}
-                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+                className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
               >
                 Log in
               </button>
@@ -156,25 +156,25 @@ export function VertApp() {
   // The changelog page is a public deep link — no auth required.
   if (!user && currentView.page === 'changelog') {
     return (
-      <div className="min-h-screen bg-zinc-50">
-        <header className="border-b border-zinc-100 bg-white">
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <header className="border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
           <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
             <button
               onClick={() => navigate({ page: 'home' })}
               className="flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 rounded"
             >
-              <span className="text-lg font-bold text-zinc-900 tracking-tight">Vert</span>
+              <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Vert</span>
             </button>
             <div className="flex items-center gap-3 text-sm">
               <button
                 onClick={() => navigate({ page: 'contact' })}
-                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+                className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
               >
                 Contact
               </button>
               <button
                 onClick={() => navigate({ page: 'login' })}
-                className="text-zinc-600 hover:text-zinc-900 transition-colors"
+                className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
               >
                 Log in
               </button>
@@ -196,8 +196,8 @@ export function VertApp() {
   // The 3-second timeout on the fetch (above) guarantees this never hangs.
   if (isLoading) {
     return (
-      <div className="h-screen bg-white flex items-center justify-center">
-        <div className="h-8 w-8 border-2 border-zinc-200 border-t-violet-600 rounded-full animate-spin" />
+      <div className="h-screen bg-white dark:bg-zinc-950 flex items-center justify-center">
+        <div className="h-8 w-8 border-2 border-zinc-200 dark:border-zinc-700 border-t-violet-600 rounded-full animate-spin" />
       </div>
     )
   }
@@ -217,8 +217,8 @@ export function VertApp() {
       case 'admin':
         return user?.role === 'admin' ? <AdminDashboard /> : (
           <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
-            <p className="text-6xl font-bold text-zinc-900 tracking-tight">403</p>
-            <p className="text-zinc-500 mt-2 text-sm">You don&apos;t have access to this page.</p>
+            <p className="text-6xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">403</p>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-sm">You don&apos;t have access to this page.</p>
             <button
               onClick={() => navigate({ page: 'home' })}
               className="mt-6 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-colors"
@@ -263,7 +263,7 @@ export function VertApp() {
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-zinc-50 text-zinc-800 flex flex-col">
+    <div className="h-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 flex flex-col">
       <Header onLogout={handleLogout} onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} onToggleMobileDrawer={() => setMobileDrawerOpen(!mobileDrawerOpen)} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar collapsed={sidebarCollapsed} />

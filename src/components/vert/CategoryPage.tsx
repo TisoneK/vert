@@ -106,7 +106,7 @@ export function CategoryPage({ slug }: { slug: string }) {
       {/* Breadcrumb */}
       <button
         onClick={() => navigate({ page: 'explore' })}
-        className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-700 transition-colors mb-4"
+        className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-100 transition-colors mb-4"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Back to Explore
@@ -116,13 +116,13 @@ export function CategoryPage({ slug }: { slug: string }) {
       {category && (
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-zinc-200 flex items-center justify-center">
-              <Icon className="h-5 w-5 text-zinc-600" />
+            <div className="w-10 h-10 rounded-lg bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+              <Icon className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
             </div>
-            <h1 className="text-xl font-bold text-zinc-900">{category.name}</h1>
+            <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{category.name}</h1>
           </div>
           {category.description && (
-            <p className="text-zinc-600 text-sm">{category.description}</p>
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm">{category.description}</p>
           )}
         </div>
       )}
@@ -135,8 +135,8 @@ export function CategoryPage({ slug }: { slug: string }) {
             onClick={() => handleSortChange(s)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors active:scale-95 duration-100 ${
               sort === s
-                ? 'bg-zinc-100 text-zinc-900'
-                : 'bg-white text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
             {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -159,7 +159,7 @@ export function CategoryPage({ slug }: { slug: string }) {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-zinc-500">No videos in this category yet — be the first to add one.</p>
+          <p className="text-zinc-500 dark:text-zinc-400">No videos in this category yet — be the first to add one.</p>
         </div>
       )}
 
@@ -168,7 +168,7 @@ export function CategoryPage({ slug }: { slug: string }) {
           <Button
             onClick={loadMore}
             variant="outline"
-            className="border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+            className="border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
             Load More
           </Button>

@@ -101,19 +101,19 @@ export function CommentSection({ videoId }: CommentSectionProps) {
     <div className="mt-6">
       {/* Header with count and sort */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-zinc-900">
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
           {comments.length} Comment{comments.length !== 1 ? 's' : ''}
         </h3>
         <div className="relative">
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
-            className="appearance-none bg-transparent text-xs text-zinc-600 pr-4 pl-2 py-1 rounded cursor-pointer hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
+            className="appearance-none bg-transparent text-xs text-zinc-600 dark:text-zinc-400 pr-4 pl-2 py-1 rounded cursor-pointer hover:text-zinc-800 dark:hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
           >
             <option value="top">Top comments</option>
             <option value="newest">Newest first</option>
           </select>
-          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-600 pointer-events-none" />
+          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-600 dark:text-zinc-400 pointer-events-none" />
         </div>
       </div>
 
@@ -130,7 +130,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="bg-zinc-50 border-zinc-200 text-zinc-700 placeholder:text-zinc-400 min-h-[60px] resize-none text-sm focus-visible:ring-violet-600"
+              className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 min-h-[60px] resize-none text-sm focus-visible:ring-violet-600"
             />
             <div className="flex justify-end mt-2">
               <Button
@@ -152,7 +152,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
           </div>
         </div>
       ) : (
-        <p className="text-sm text-zinc-500 mb-6">Log in to add a comment.</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Log in to add a comment.</p>
       )}
 
       {/* Comments list */}
@@ -163,7 +163,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
           ))}
         </div>
       ) : sortedComments.length === 0 ? (
-        <p className="text-sm text-zinc-500 py-4">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 py-4">
           No comments yet. Be the first to say something.
         </p>
       ) : (
@@ -178,21 +178,21 @@ export function CommentSection({ videoId }: CommentSectionProps) {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-xs font-bold">
                     {comment.user.username[0]?.toUpperCase()}
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-zinc-600">
+                  <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                     {comment.user.username}
                   </span>
-                  <span className="text-[11px] text-zinc-600">
+                  <span className="text-[11px] text-zinc-600 dark:text-zinc-400">
                     {timeAgo(comment.createdAt)}
                   </span>
                 </div>
-                <p className="text-sm text-zinc-600 mt-0.5">{comment.content}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-0.5">{comment.content}</p>
               </div>
               {user && (user.id === comment.user.id || user.role === 'admin') && (
                 <button
@@ -200,7 +200,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
                   // Always visible on mobile (no hover), hover-revealed on
                   // desktop. The opacity-0 group-hover:opacity-100 pattern
                   // left mobile users with no way to delete their own comments.
-                  className="shrink-0 text-zinc-500 hover:text-red-600 transition-colors p-1.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+                  className="shrink-0 text-zinc-500 dark:text-zinc-400 hover:text-red-600 transition-colors p-1.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
                   aria-label={`Delete comment from ${comment.user.username}`}
                 >
                   <Trash2 className="h-4 w-4" />

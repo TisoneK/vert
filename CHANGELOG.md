@@ -15,6 +15,22 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.5.0] — 2026-07-07
+
+### Added
+
+- **Dark mode support.** The entire UI now adapts to the system's color scheme (or a manual toggle). A theme toggle button in the header switches between light, dark, and system-follow modes. Dark mode uses next-themes with `attribute="class"` and a flash-prevention inline script in `<head>`. CSS variables in `globals.css` define dark OKLCH values — `--background: oklch(0.145 0 0)`, `--foreground: oklch(0.95 0 0)`, `--card: oklch(0.175 0 0)`, `--secondary: oklch(0.25 0 0)`, `--muted: oklch(0.25 0 0)`, etc. Brand colors (violet primary, destructive red) kept at same OKLCH values for consistency. All ~37 component files updated with Tailwind `dark:` variant classes.
+
+### Changed
+
+- **Shell components (Header, Sidebar, MobileNav):** Header background, borders, search input, profile dropdown, and theme toggle all use `dark:bg-zinc-900` / `dark:border-zinc-700`. Sidebar and MobileNav similarly updated — active states use `dark:bg-violet-900/30 dark:text-violet-400`, inactive use `dark:text-zinc-400 dark:hover:bg-zinc-800`.
+- **Shared content components (VideoCard, VideoShelf, CommentSection, FlagDialog, VoteButtons, SubscribeButton, CategoryBadge, Skeleton, RelatedVideos):** All hardcoded zinc color classes supplemented with `dark:` variants. Thumbnails, avatars, borders, text hierarchy, and hover states all adapt to dark mode.
+- **Auth forms (LoginForm, SignupForm):** Card backgrounds, all input fields, show/hide password toggles, Google button, divider lines, and footer text updated with dark variants.
+- **Page components (HomeFeed, LandingPage, VideoDetail, SearchResults, ChannelPage, ProfilePage, TrendingPage, ExplorePage, HistoryPage, SavedPage, SettingsPage, PlaylistsPage, ContactPage, ChangelogPage, TagPage, CategoryPage):** All content pages updated with consistent dark styling. Channel/profiles pages respect `dark:border-zinc-900` on avatar rings. Settings danger zone uses `dark:bg-red-950/30 dark:border-red-900`.
+- **Overlay components (VideoContextMenu, SearchSuggestions):** Dropdown menus and suggestion panels use `dark:bg-zinc-900 dark:border-zinc-700` with matched text and hover states.
+
+---
+
 ## [0.4.1] — 2026-07-07
 
 ### Added

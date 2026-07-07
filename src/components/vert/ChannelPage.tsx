@@ -40,13 +40,13 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto">
-        <div className="h-24 md:h-36 bg-zinc-200 animate-pulse" />
+        <div className="h-24 md:h-36 bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
         <div className="px-4 md:px-6 py-4">
           <div className="flex gap-4">
-            <div className="w-20 h-20 rounded-full bg-zinc-200 animate-pulse" />
+            <div className="w-20 h-20 rounded-full bg-zinc-200 dark:bg-zinc-700 animate-pulse" />
             <div className="space-y-2 pt-4">
-              <div className="h-5 bg-zinc-200 rounded w-32 animate-pulse" />
-              <div className="h-3 bg-zinc-200 rounded w-24 animate-pulse" />
+              <div className="h-5 bg-zinc-200 dark:bg-zinc-700 rounded w-32 animate-pulse" />
+              <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-24 animate-pulse" />
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
   if (!channelData) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-zinc-700">Channel not found</p>
+        <p className="text-zinc-700 dark:text-zinc-300">Channel not found</p>
         <Button
           variant="ghost"
           onClick={() => navigate({ page: 'home' })}
@@ -107,7 +107,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
           />
           <button
             onClick={() => navigate({ page: 'home' })}
-            className="absolute top-3 left-3 flex items-center gap-1.5 text-xs font-medium text-zinc-700 bg-white/80 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white hover:text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
+            className="absolute top-3 left-3 flex items-center gap-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to feed
@@ -117,7 +117,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
         <div className="px-4 md:px-6 pt-4">
           <button
             onClick={() => navigate({ page: 'home' })}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 rounded-full px-1.5 py-1"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1 rounded-full px-1.5 py-1"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to feed
@@ -138,17 +138,17 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
               <img
                 src={channel.user.avatarUrl}
                 alt={channel.channelName}
-                className="w-20 h-20 rounded-full object-cover border-4 border-white"
+                className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-zinc-900"
               />
             ) : (
-              <div className="w-20 h-20 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-2xl font-bold border-4 border-white">
+              <div className="w-20 h-20 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-2xl font-bold border-4 border-white dark:border-zinc-900">
                 {channel.channelName[0]?.toUpperCase()}
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0 sm:pt-1">
             <div className="flex items-center gap-1.5">
-              <h1 className="text-xl md:text-2xl font-bold text-zinc-900 truncate">
+              <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-100 truncate">
                 {channel.channelName}
               </h1>
               {/* Verified badge — filled circular background like Twitter/YouTube
@@ -172,7 +172,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
                 />
               </svg>
             </div>
-            <p className="text-zinc-600 text-sm mt-0.5">
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-0.5">
               @{channel.user.username} · {channel.videoCount} videos · {formatSubscribers(channel.subscriberCount)}
             </p>
           </div>
@@ -186,13 +186,13 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
         </div>
 
         {channel.description && (
-          <p className="text-zinc-600 text-sm mt-3 max-w-2xl">{channel.description}</p>
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-3 max-w-2xl">{channel.description}</p>
         )}
 
         {/* Channel stats — join date + total views. Fills the otherwise
             empty space below the Subscribe button and gives the channel
             page a more complete profile feel. */}
-        <div className="flex flex-wrap items-center gap-4 mt-4 text-xs text-zinc-500">
+        <div className="flex flex-wrap items-center gap-4 mt-4 text-xs text-zinc-500 dark:text-zinc-400">
           <span className="flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -216,15 +216,15 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
         </div>
 
         {channel.isSuspended && (
-          <div className="mt-3 px-3 py-2 bg-red-50 border border-red-100 rounded-lg">
-            <p className="text-red-600 text-sm font-medium">This channel has been suspended</p>
+          <div className="mt-3 px-3 py-2 bg-red-50 dark:bg-red-950/50 border border-red-100 dark:border-red-900 rounded-lg">
+            <p className="text-red-600 dark:text-red-400 text-sm font-medium">This channel has been suspended</p>
           </div>
         )}
       </div>
 
       {/* Videos */}
       <div className="px-4 md:px-6 pb-6">
-        <h2 className="text-base font-semibold text-zinc-900 mb-4">Videos</h2>
+        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Videos</h2>
         {videos.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {videos.map((video) => (
@@ -232,7 +232,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
             ))}
           </div>
         ) : (
-          <p className="text-zinc-500 text-sm">No videos uploaded yet.</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm">No videos uploaded yet.</p>
         )}
       </div>
     </div>
