@@ -12,6 +12,26 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Watch page reorganized by info hierarchy
+**Commit:** `881be10`
+
+External Claude product-design review identified the core problem: "the data's all there but nothing's organized by importance — it just cascades top to bottom in the order it was probably added, not the order a viewer actually needs it."
+
+Previous structure: Video → Title → Views/time → Tags (orphan row) → Channel row → Actions → Description (with "..." truncation)
+
+New structure — 6 semantic blocks:
+- **Block 1: Video** — constrained to `md:max-w-[380px]` on desktop (was 420px), per review: "keep at native 9:16, capped around 340-380px wide — don't stretch a portrait video wider just because there's room, it'll just look worse."
+- **Block 2: Title + tags** — grouped together because both describe what the video IS. Tags previously floated as an orphan row between stats and channel; now sit directly under the title as chips.
+- **Block 3: Stats (views/time)** — muted to `text-zinc-400` (was `text-zinc-500`) so they read as quiet supporting metadata, not competing with the title.
+- **Block 4+5: Channel + actions** — single row with `border-y border-zinc-200` (top+bottom borders) so it reads as a distinct section. Review: "make sure it reads as one block instead of two floating rows." The borders give it visual containment.
+- **Block 6: Description** — own card (`bg-zinc-50 rounded-lg border border-zinc-100`) with a chevron-up/down expand affordance instead of the previous bare "Show more" text link. Categories moved INTO this card (separated by a top border when description exists) since they're part of the "about this video" semantic group.
+
+Desktop layout: right column widened from 300px to 320px for the Up Next queue. Review: "The freed-up space on the right isn't wasted, it's a job the page hasn't given itself yet — an up next queue." The `RelatedVideos` component already serves this role; it's now more prominent as the right rail next to the constrained video.
+
+Mobile: all 6 blocks stack vertically with the new grouping preserved. Video still fills full screen width (Shorts/Reels behavior).
+
+Also removed unused `ArrowLeft` and `Eye` icon imports that were left over from an earlier iteration.
+
 #### Admin Users tab action buttons invisible (table overflow)
 **Commit:** `f9181e3`
 
