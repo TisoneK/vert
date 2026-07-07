@@ -5,14 +5,16 @@ import { useAuth, useNavigation } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Lock, Trash2, AlertTriangle, Loader2, Check, Eye, EyeOff, Settings as SettingsIcon } from 'lucide-react'
+import { Lock, Trash2, AlertTriangle, Loader2, Check, Eye, EyeOff, Settings as SettingsIcon, Sun, Moon } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { signOut } from 'next-auth/react'
+import { useTheme } from 'next-themes'
 
 export function SettingsPage() {
   const { user } = useAuth()
   const { navigate } = useNavigation()
   const { toast } = useToast()
+  const { theme, setTheme } = useTheme()
 
   // Change password state
   const [currentPassword, setCurrentPassword] = useState('')
@@ -139,6 +141,61 @@ export function SettingsPage() {
               Role: <span className="font-medium">{user.role}</span>
               {user.channelId && ' · Has channel'}
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Appearance — dark mode toggle */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg p-5 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          {theme === 'dark' ? (
+            <Moon className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+          ) : (
+            <Sun className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+          )}
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Appearance</h2>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-zinc-700 dark:text-zinc-300">Theme</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              {theme === 'dark' ? 'Dark mode is active' : theme === 'light' ? 'Light mode is active' : 'System theme'}
+            </p>
+          </div>
+          <div className="flex gap-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg p-1">
+            <button
+              onClick={() => setTheme('light')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                theme === 'light'
+                  ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
+              }`}
+            >
+              <Sun className="h-4 w-4" />
+              Light
+            </button>
+            <button
+              onClick={() => setTheme('dark')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                theme === 'dark'
+                  ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
+              }`}
+            >
+              <Moon className="h-4 w-4" />
+              Dark
+            </button>
+            <button
+              onClick={() => setTheme('system')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                theme === 'system'
+                  ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
+              }`}
+            >
+              System
+            </button>
           </div>
         </div>
       </div>

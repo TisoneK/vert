@@ -184,13 +184,13 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white border-zinc-200 text-zinc-900 max-w-md">
+      <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ListVideo className="h-5 w-5 text-violet-600" />
             Add to playlist
           </DialogTitle>
-          <DialogDescription className="text-zinc-700">
+          <DialogDescription className="text-zinc-700 dark:text-zinc-300">
             Select a playlist to add this video to, or create a new one.
           </DialogDescription>
         </DialogHeader>
@@ -203,7 +203,7 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="Playlist name"
-              className="bg-zinc-50 border-zinc-300 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+              className="bg-zinc-50 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-600 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600"
               maxLength={100}
               onKeyDown={(e) => e.key === 'Enter' && !creating && handleCreate()}
             />
@@ -224,7 +224,7 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
         ) : (
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-violet-600 hover:bg-violet-50 rounded-lg transition-colors border border-dashed border-violet-200"
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/30 rounded-lg transition-colors border border-dashed border-violet-200 dark:border-violet-800"
           >
             <Plus className="h-4 w-4" />
             Create new playlist
@@ -234,11 +234,11 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
         {/* Playlists list */}
         {loading ? (
           <div className="py-8 text-center">
-            <Loader2 className="h-6 w-6 animate-spin text-zinc-400 mx-auto" />
-            <p className="text-xs text-zinc-400 mt-2">Loading your playlists…</p>
+            <Loader2 className="h-6 w-6 animate-spin text-zinc-400 dark:text-zinc-500 mx-auto" />
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-2">Loading your playlists…</p>
           </div>
         ) : playlists.length === 0 ? (
-          <div className="py-8 text-center text-sm text-zinc-500">
+          <div className="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
             No playlists yet. Create one above to get started.
           </div>
         ) : (
@@ -253,13 +253,13 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
                   disabled={isToggling}
                   className={`flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-colors text-left ${
                     isContained
-                      ? 'bg-violet-50 text-violet-900'
-                      : 'text-zinc-700 hover:bg-zinc-100'
+                      ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-900 dark:text-violet-400'
+                      : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   } disabled:opacity-50`}
                 >
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{pl.title}</p>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500">
                       {pl.videoCount} video{pl.videoCount !== 1 ? 's' : ''}
                     </p>
                   </div>

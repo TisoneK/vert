@@ -493,7 +493,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           )}
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
             <Play className="h-10 w-10 text-zinc-500" />
-            <p className="text-zinc-400 text-sm">Video unavailable</p>
+            <p className="text-zinc-400 dark:text-zinc-500 text-sm">Video unavailable</p>
           </div>
         </div>
       </div>
@@ -620,11 +620,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
               <Settings className="h-5 w-5 sm:h-4 sm:w-4" />
             </button>
             {showSettings && (
-              <div className="absolute bottom-full right-0 mb-2 w-48 bg-white border border-zinc-200 shadow-lg rounded-lg py-2 z-50">
+              <div className="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-2 z-50">
                 {/* Quality section — only shown when HLS levels are available */}
                 {qualityLevels.length > 0 ? (
                   <>
-                    <p className="px-3 py-1 text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                    <p className="px-3 py-1 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       Quality {currentQuality === -1 && sourceLabel !== 'Auto' && `· ${sourceLabel}`}
                     </p>
                     {qualityLevels.map((q) => (
@@ -632,29 +632,29 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
                         key={`${q.label}-${q.level}`}
                         onClick={() => handleQualityChange(q.level)}
                         className={`w-full text-left px-3 py-1.5 text-sm transition-colors ${
-                          currentQuality === q.level ? 'text-violet-600 bg-violet-50' : 'text-zinc-700 hover:bg-zinc-100'
+                          currentQuality === q.level ? 'text-violet-600 dark:text-violet-400 dark:bg-violet-900/30 bg-violet-50' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                         }`}
                       >
                         {q.label}
                       </button>
                     ))}
-                    <div className="border-t border-zinc-200 my-1" />
+                    <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
                   </>
                 ) : (
                   // Progressive download — single source, just show its label
                   <>
-                    <p className="px-3 py-1 text-xs font-medium text-zinc-500 uppercase tracking-wider">Quality</p>
-                    <div className="px-3 py-1.5 text-sm text-zinc-700">{sourceLabel}</div>
-                    <div className="border-t border-zinc-200 my-1" />
+                    <p className="px-3 py-1 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Quality</p>
+                    <div className="px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300">{sourceLabel}</div>
+                    <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
                   </>
                 )}
-                <p className="px-3 py-1 text-xs font-medium text-zinc-500 uppercase tracking-wider">Speed</p>
+                <p className="px-3 py-1 text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Speed</p>
                 {[0.5, 1, 1.5, 2].map((speed) => (
                   <button
                     key={speed}
                     onClick={() => handleSpeedChange(speed)}
                     className={`w-full text-left px-3 py-1.5 text-sm transition-colors ${
-                      playbackSpeed === speed ? 'text-violet-600 bg-violet-50' : 'text-zinc-700 hover:bg-zinc-100'
+                      playbackSpeed === speed ? 'text-violet-600 dark:text-violet-400 dark:bg-violet-900/30 bg-violet-50' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                     }`}
                   >
                     {speed}x{speed === 1 ? ' (Normal)' : ''}

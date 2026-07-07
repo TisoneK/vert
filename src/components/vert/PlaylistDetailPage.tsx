@@ -132,12 +132,12 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
   if (loading) {
     return (
       <div className="p-4 md:p-6 max-w-5xl mx-auto">
-        <div className="h-8 w-48 bg-zinc-200 rounded animate-pulse mb-4" />
+        <div className="h-8 w-48 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse mb-4" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="aspect-video rounded-lg bg-zinc-200" />
-              <div className="mt-2 h-4 w-3/4 rounded bg-zinc-200" />
+              <div className="aspect-video rounded-lg bg-zinc-200 dark:bg-zinc-700" />
+              <div className="mt-2 h-4 w-3/4 rounded bg-zinc-200 dark:bg-zinc-700" />
             </div>
           ))}
         </div>
@@ -148,8 +148,8 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
   if (!playlist) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <ListVideo className="h-10 w-10 text-zinc-400 mb-3" />
-        <p className="text-zinc-700">Playlist not found</p>
+        <ListVideo className="h-10 w-10 text-zinc-400 dark:text-zinc-500 mb-3" />
+        <p className="text-zinc-700 dark:text-zinc-300">Playlist not found</p>
         <Button
           variant="ghost"
           onClick={() => navigate({ page: 'playlists' })}
@@ -171,7 +171,7 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
       {/* Back button */}
       <button
         onClick={() => navigate({ page: 'playlists' })}
-        className="flex items-center gap-1 text-sm text-zinc-600 hover:text-zinc-900 mb-4 transition-colors"
+        className="flex items-center gap-1 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 mb-4 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         All playlists
@@ -181,12 +181,12 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
           the title (flex-col); on md+ they sit to the right (md:flex-row). */}
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4 mb-6">
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl md:text-2xl font-bold text-zinc-900">{playlist.title}</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-100">{playlist.title}</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             {videos.length} video{videos.length !== 1 ? 's' : ''} · Created {timeAgo(playlist.createdAt)}
           </p>
           {playlist.description && (
-            <p className="text-sm text-zinc-600 mt-2 max-w-2xl">{playlist.description}</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 max-w-2xl">{playlist.description}</p>
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0 self-start">
@@ -204,7 +204,7 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
             size="sm"
             onClick={handleDeletePlaylist}
             disabled={deleting}
-            className="border-zinc-200 text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="border-zinc-200 dark:border-zinc-700 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
           >
             {deleting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -221,11 +221,11 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
       {/* Videos */}
       {videos.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4 mx-auto">
-            <Play className="h-7 w-7 text-zinc-400" />
+          <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 mx-auto">
+            <Play className="h-7 w-7 text-zinc-400 dark:text-zinc-500" />
           </div>
-          <h2 className="text-base font-semibold text-zinc-900">This playlist is empty</h2>
-          <p className="text-sm text-zinc-500 mt-1.5 max-w-xs mx-auto">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">This playlist is empty</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 max-w-xs mx-auto">
             Add videos to this playlist from any video card's menu.
           </p>
           <Button

@@ -85,8 +85,8 @@ export function ChangelogPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-        <AlertCircle className="h-10 w-10 text-zinc-400 mb-3" />
-        <p className="text-sm text-zinc-600">{error}</p>
+        <AlertCircle className="h-10 w-10 text-zinc-400 dark:text-zinc-500 mb-3" />
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">{error}</p>
         <button
           onClick={fetchChangelog}
           className="mt-3 text-sm text-violet-600 hover:text-violet-700 font-medium"
@@ -100,8 +100,8 @@ export function ChangelogPage() {
   if (sections.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-        <ScrollText className="h-10 w-10 text-zinc-400 mb-3" />
-        <p className="text-sm text-zinc-600">No changelog entries yet.</p>
+        <ScrollText className="h-10 w-10 text-zinc-400 dark:text-zinc-500 mb-3" />
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">No changelog entries yet.</p>
       </div>
     )
   }
@@ -110,29 +110,29 @@ export function ChangelogPage() {
     <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-10 animate-vert-fade-in">
       {/* Page header */}
       <div className="flex items-center gap-2 mb-8">
-        <ScrollText className="h-5 w-5 text-zinc-600" />
-        <h1 className="text-xl font-bold text-zinc-900">Changelog</h1>
-        <span className="text-sm text-zinc-400 ml-2">New things and fixes in Vert</span>
+        <ScrollText className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+        <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Changelog</h1>
+        <span className="text-sm text-zinc-400 dark:text-zinc-500 ml-2">New things and fixes in Vert</span>
       </div>
 
       <div className="flex gap-8">
         {/* Sticky version sidebar — desktop only */}
         <aside className="hidden md:block w-44 shrink-0">
           <div className="sticky top-20 space-y-1">
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3 px-3">Versions</p>
+            <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3 px-3">Versions</p>
             {sections.map((section) => (
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
                 className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
                   activeId === section.id
-                    ? 'bg-violet-50 text-violet-700 font-medium'
-                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                    ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 font-medium'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <span className="block">{section.version}</span>
                 {section.date && (
-                  <span className="block text-xs text-zinc-400 mt-0.5">{section.date}</span>
+                  <span className="block text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{section.date}</span>
                 )}
               </button>
             ))}
@@ -148,12 +148,12 @@ export function ChangelogPage() {
               className="scroll-mt-20"
             >
               {/* Version header — mobile shows badge inline, desktop shows it as a card top */}
-              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-zinc-200">
-                <span className="inline-flex items-center px-3 py-1 rounded-md bg-violet-100 text-violet-700 text-sm font-semibold font-mono">
+              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-zinc-200 dark:border-zinc-700">
+                <span className="inline-flex items-center px-3 py-1 rounded-md bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 text-sm font-semibold font-mono">
                   {section.version}
                 </span>
                 {section.date && (
-                  <span className="text-sm text-zinc-500">{section.date}</span>
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400">{section.date}</span>
                 )}
               </div>
 
@@ -258,6 +258,31 @@ export function ChangelogPage() {
         }
         .changelog-content em {
           font-style: italic;
+        }
+        /* Dark mode overrides */
+        .dark .changelog-content .changelog-h3 {
+          color: #a1a1aa;
+        }
+        .dark .changelog-content .changelog-paragraph,
+        .dark .changelog-content .changelog-list-item {
+          color: #a1a1aa;
+        }
+        .dark .changelog-content .changelog-list-nested {
+          border-left-color: #27272a;
+        }
+        .dark .changelog-content .changelog-code {
+          background: #27272a;
+          color: #a78bfa;
+        }
+        .dark .changelog-content .changelog-link:hover {
+          color: #7c3aed;
+        }
+        .dark .changelog-content .changelog-quote {
+          background: #1c1c1f;
+          color: #a1a1aa;
+        }
+        .dark .changelog-content strong {
+          color: #f4f4f5;
         }
       `}</style>
     </div>

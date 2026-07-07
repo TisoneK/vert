@@ -114,7 +114,7 @@ export function NotificationCenter() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="p-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors relative"
+        className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors relative"
         aria-label="Notifications"
         aria-expanded={open}
       >
@@ -131,12 +131,12 @@ export function NotificationCenter() {
         // the bell button's right offset. Use max-w-[calc(100vw-1rem)] so
         // the dropdown never overflows the viewport, and position it so the
         // right edge aligns with the bell button's right edge.
-        <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white border border-zinc-200 shadow-lg rounded-lg z-50">
-          <div className="flex items-center justify-between p-3 border-b border-zinc-200">
+        <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg z-50">
+          <div className="flex items-center justify-between p-3 border-b border-zinc-200 dark:border-zinc-700">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-zinc-900">Notifications</h3>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Notifications</h3>
               {unreadCount > 0 && (
-                <span className="text-[10px] font-medium px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-full">
+                <span className="text-[10px] font-medium px-1.5 py-0.5 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 rounded-full">
                   {unreadCount} new
                 </span>
               )}
@@ -148,14 +148,14 @@ export function NotificationCenter() {
                   disabled={markingAll}
                   title="Mark all as read"
                   aria-label="Mark all as read"
-                  className="text-zinc-600 hover:text-violet-600 p-1.5 rounded hover:bg-zinc-100 transition-colors disabled:opacity-50"
+                  className="text-zinc-600 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
                 >
                   <Check className="h-3.5 w-3.5" />
                 </button>
               )}
               <button
                 onClick={() => setOpen(false)}
-                className="text-zinc-600 hover:text-zinc-900 p-1.5 rounded hover:bg-zinc-100 transition-colors"
+                className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 aria-label="Close notifications"
               >
                 <X className="h-4 w-4" />
@@ -164,9 +164,9 @@ export function NotificationCenter() {
           </div>
           <div className="max-h-72 overflow-y-auto custom-scrollbar">
             {loading ? (
-              <div className="p-6 text-center text-zinc-400 text-sm">Loading…</div>
+              <div className="p-6 text-center text-zinc-400 dark:text-zinc-500 text-sm">Loading…</div>
             ) : notifications.length === 0 ? (
-              <div className="p-6 text-center text-zinc-500 text-sm">
+              <div className="p-6 text-center text-zinc-500 dark:text-zinc-400 text-sm">
                 {user ? 'No notifications yet' : 'Sign in to see notifications'}
               </div>
             ) : (
@@ -176,8 +176,8 @@ export function NotificationCenter() {
                   onClick={() => {
                     if (!notification.isRead) markAsRead(notification.id)
                   }}
-                  className={`w-full text-left p-3 hover:bg-zinc-50 transition-colors border-b border-zinc-100 last:border-0 ${
-                    !notification.isRead ? 'bg-violet-50' : ''
+                  className={`w-full text-left p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors border-b border-zinc-100 dark:border-zinc-800 last:border-0 ${
+                    !notification.isRead ? 'bg-violet-50 dark:bg-violet-900/20' : ''
                   }`}
                 >
                   <div className="flex items-start gap-2">
@@ -185,9 +185,9 @@ export function NotificationCenter() {
                       <div className="w-1.5 h-1.5 rounded-full bg-violet-500 mt-1.5 shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-zinc-900">{notification.title}</p>
-                      <p className="text-[11px] text-zinc-600 mt-0.5 break-words">{notification.message}</p>
-                      <p className="text-[10px] text-zinc-400 mt-1">{formatRelative(notification.createdAt)}</p>
+                      <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{notification.title}</p>
+                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-0.5 break-words">{notification.message}</p>
+                      <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">{formatRelative(notification.createdAt)}</p>
                     </div>
                   </div>
                 </button>
