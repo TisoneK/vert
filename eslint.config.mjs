@@ -8,28 +8,28 @@ const __dirname = dirname(__filename);
 
 const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
   rules: {
-    // TypeScript rules
+    // TypeScript rules — allow explicit any for pragmatic reasons,
+    // but catch unused variables (prefix with _ to ignore).
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/prefer-as-const": "off",
-    "@typescript-eslint/no-unused-disable-directive": "off",
-    
-    // React rules
-    "react-hooks/exhaustive-deps": "off",
-    "react-hooks/purity": "off",
+
+    // React rules — exhaustive-deps catches stale-closure bugs, keep it.
+    // display-name helps with React DevTools readability.
+    "react-hooks/exhaustive-deps": "warn",
+    "react/display-name": "warn",
     "react/no-unescaped-entities": "off",
-    "react/display-name": "off",
     "react/prop-types": "off",
     "react-compiler/react-compiler": "off",
-    
+
     // Next.js rules
     "@next/next/no-img-element": "off",
     "@next/next/no-html-link-for-pages": "off",
-    
-    // General JavaScript rules
-    "prefer-const": "off",
+
+    // General JavaScript rules — prefer-const catches accidental reassigns.
+    "prefer-const": "warn",
     "no-unused-vars": "off",
     "no-console": "off",
     "no-debugger": "off",
