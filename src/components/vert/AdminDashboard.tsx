@@ -27,6 +27,8 @@ import {
   UserCog,
   UserX,
   UserCheck,
+  UserPlus,
+  X,
 } from 'lucide-react'
 import { timeAgo, formatViews } from '@/lib/utils-vert'
 
@@ -128,6 +130,12 @@ export function AdminDashboard() {
   const [userRoleFilter, setUserRoleFilter] = useState<string>('')
   const [userActionId, setUserActionId] = useState<string | null>(null)
   const [userError, setUserError] = useState<string | null>(null)
+
+  // Test account creation state
+  const [showCreateTest, setShowCreateTest] = useState(false)
+  const [testCount, setTestCount] = useState(3)
+  const [creatingTest, setCreatingTest] = useState(false)
+  const [testResult, setTestResult] = useState<{ created: number; users: Array<{ email: string; username: string; password: string; channelName: string }>; note: string } | null>(null)
 
   useEffect(() => {
     if (tab === 'flags') fetchFlags()
@@ -332,6 +340,32 @@ export function AdminDashboard() {
       setUserError('Network error deleting user')
     } finally {
       setUserActionId(null)
+    }
+  }
+
+  async function handleCreateTestUsers() {
+    setCreatingTest(true)
+    setUserError(null)
+    try {
+      const res = await fetch('/api/v1/admin/create-test-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ count: testCount }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setTestResult(data)
+        setShowCreateTest(false)
+        // Refresh the user list so the new accounts show up
+        fetchAdminUsers(userSearch)
+      } else {
+        setUserError(data.error || 'Failed to create test users')
+      }
+    } catch (error) {
+      console.error('Create test users error:', error)
+      setUserError('Network error creating test users')
+    } finally {
+      setCreatingTest(false)
     }
   }
 
@@ -894,7 +928,113 @@ export function AdminDashboard() {
                 </Button>
               ))}
             </div>
+            {/* Create test accounts button — generates N test users with
+                channels for QA/demo purposes. Opens a small inline form. */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => { setShowCreateTest(!showCreateTest); setTestResult(null) }}
+              className="border-violet-200 text-violet-700 hover:bg-violet-50 shrink-0"
+              title="Generate test accounts with channels for QA"
+            >
+              <UserPlus className="h-4 w-4 mr-1" />
+              Create test accounts
+            </Button>
           </div>
+
+          {/* Create test accounts form */}
+          {showCreateTest && (
+            <div className="bg-violet-50 border border-violet-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-zinc-900">Create test accounts</h3>
+                <button
+                  onClick={() => setShowCreateTest(false)}
+                  className="text-zinc-400 hover:text-zinc-600 p-1"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <p className="text-xs text-zinc-600">
+                Generates test users with channels. Each gets the member role, a channel,
+                and the password <code className="px-1 py-0.5 bg-violet-100 rounded text-violet-700">testpass123</code>.
+                Emails follow the pattern <code className="px-1 py-0.5 bg-violet-100 rounded text-violet-700">testuser_&lt;batch&gt;_N@test.vert.com</code>.
+              </p>
+              <div className="flex items-center gap-3">
+                <label className="text-sm text-zinc-700 shrink-0">How many?</label>
+                <select
+                  value={testCount}
+                  onChange={(e) => setTestCount(parseInt(e.target.value, 10))}
+                  className="text-sm bg-white border border-zinc-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-violet-600"
+                >
+                  {[1, 2, 3, 5, 10, 20].map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+                <Button
+                  onClick={handleCreateTestUsers}
+                  disabled={creatingTest}
+                  size="sm"
+                  className="bg-violet-600 hover:bg-violet-700 text-white ml-auto"
+                >
+                  {creatingTest ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      Creating…
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="h-4 w-4 mr-1" />
+                      Create {testCount} account{testCount !== 1 ? 's' : ''}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Test account creation result — shows generated credentials
+              so the admin can copy them for testing. */}
+          {testResult && (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-emerald-900 flex items-center gap-1.5">
+                  <CheckCircle className="h-4 w-4" />
+                  Created {testResult.created} test account{testResult.created !== 1 ? 's' : ''}
+                </h3>
+                <button
+                  onClick={() => setTestResult(null)}
+                  className="text-emerald-400 hover:text-emerald-700 p-1"
+                  aria-label="Dismiss"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="bg-white border border-emerald-100 rounded-lg overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-emerald-100 bg-emerald-50/50">
+                      <th className="text-left font-medium text-zinc-600 px-3 py-2">Username</th>
+                      <th className="text-left font-medium text-zinc-600 px-3 py-2">Email</th>
+                      <th className="text-left font-medium text-zinc-600 px-3 py-2">Password</th>
+                      <th className="text-left font-medium text-zinc-600 px-3 py-2">Channel</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {testResult.users.map((u) => (
+                      <tr key={u.email} className="border-b border-emerald-50 last:border-0">
+                        <td className="px-3 py-2 text-zinc-900 font-medium">{u.username}</td>
+                        <td className="px-3 py-2 text-zinc-600">{u.email}</td>
+                        <td className="px-3 py-2 text-zinc-600 font-mono">{u.password}</td>
+                        <td className="px-3 py-2 text-zinc-600">{u.channelName}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-emerald-700">{testResult.note}</p>
+            </div>
+          )}
 
           {/* Error */}
           {userError && (
