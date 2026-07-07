@@ -69,11 +69,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [showSettings, setShowSettings] = useState(false)
   const [playbackSpeed, setPlaybackSpeed] = useState(1)
   // Whether the controls overlay is currently visible. On desktop this is
-  // driven by hover (group-hover); on mobile (no hover) we toggle it on tap
-  // so the user can actually reach mute / fullscreen / settings. The CSS at
-  // the bottom uses both `opacity-0 group-hover:opacity-100` (desktop) and
-  // this `controlsVisible` state (mobile) combined via a `forced-visible`
-  // class. Tapping the video toggles play AND the controls visibility.
+  // driven by hover (group-hover:opacity-100); on mobile (no hover) we
+  // toggle it on tap so the user can actually reach mute / fullscreen /
+  // settings. The CSS combines both mechanisms: `opacity-0 group-hover:
+  // opacity-100` for desktop and `controlsVisible ? 'opacity-100' : ...`
+  // for mobile. The controls auto-hide after 3s of playback inactivity.
   const [controlsVisible, setControlsVisible] = useState(false)
 
   // Quality state — real values, populated from hls.js levels or the video element
@@ -283,6 +283,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   // Auto-hide controls after 3s of inactivity while playing. Without this
   // the controls overlay would stay visible forever on mobile after a tap.
   // We only auto-hide while playing (paused users want to see controls).
+  // NOTE: currentTime is intentionally NOT in the dependency array — if it
+  // were, the 3-second timer would reset on every video timeupdate (~4 Hz),
+  // which would make controls stay visible forever.
   useEffect(() => {
     if (!controlsVisible || !isPlaying) return
     const id = setTimeout(() => {
@@ -290,7 +293,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       if (!showSettings) setControlsVisible(false)
     }, 3000)
     return () => clearTimeout(id)
-  }, [controlsVisible, isPlaying, showSettings, currentTime])
+  }, [controlsVisible, isPlaying, showSettings])
 
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return
@@ -509,14 +512,17 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     // 1820px tall). 380px gives a ~676px-tall player on desktop — tall but
     // reasonable, and the freed-up right space is used for the Up Next queue
     // on the watch page. Landscape/square videos stay full-width.
-    <div className={`w-full flex justify-center rounded-lg overflow-hidden ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
+    // NOTE: rounded-lg but NO overflow-hidden — the video has its own
+    // clipping wrapper, and the settings dropdown (bottom-full) must not
+    // be clipped on small players.
+    <div className={`w-full flex justify-center rounded-lg ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
       // The outline is hidden on focus to avoid visual clutter, but we keep
       // focus-visible:ring for accessibility when navigating with Tab.
       tabIndex={0}
-      className="relative bg-black overflow-hidden group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
+      className="relative bg-black group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
       style={{
         // Portrait video sizing — matches YouTube Shorts / Reels behavior.
         // We set aspectRatio from the actual video dimensions once metadata
@@ -529,28 +535,38 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         width: '100%',
       }}
     >
-      <video
-        ref={videoRef}
-        poster={thumbnailUrl || undefined}
-        className="w-full h-full object-contain"
-        // crossOrigin='anonymous' is required so we can capture frames to a
-        // <canvas> without tainting it (for the auto-thumbnail backfill).
-        // Vercel Blob sends Access-Control-Allow-Origin: * so this is safe.
-        crossOrigin="anonymous"
-        // Chrome shows its own floating Picture-in-Picture affordance on
-        // hover even without the native `controls` attribute — disable it
-        // so it can't float on top of our custom control bar.
-        disablePictureInPicture
-        disableRemotePlayback
-        onClick={handleContainerTap}
-        onError={() => setHasError(true)}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-      />
+      {/* Video clipping wrapper — overflow-hidden here clips the video
+          corners to match the container's rounded-lg. We deliberately do
+          NOT set overflow-hidden on the parent container so that the
+          settings dropdown (positioned bottom-full) isn't clipped on
+          small landscape players. */}
+      <div className="absolute inset-0 overflow-hidden rounded-lg">
+        <video
+          ref={videoRef}
+          poster={thumbnailUrl || undefined}
+          className="w-full h-full object-contain"
+          // crossOrigin='anonymous' is required so we can capture frames to a
+          // <canvas> without tainting it (for the auto-thumbnail backfill).
+          // Vercel Blob sends Access-Control-Allow-Origin: * so this is safe.
+          crossOrigin="anonymous"
+          // Chrome shows its own floating Picture-in-Picture affordance on
+          // hover even without the native `controls` attribute — disable it
+          // so it can't float on top of our custom control bar.
+          disablePictureInPicture
+          disableRemotePlayback
+          onClick={handleContainerTap}
+          onError={() => setHasError(true)}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+        />
+      </div>
 
       {/* Controls overlay — visible on hover (desktop) or when
-          controlsVisible is true (mobile tap-to-toggle). The `forced-visible`
-          class is defined in globals.css and overrides opacity-0. */}
+          controlsVisible is true (mobile tap-to-toggle). On desktop the
+          group-hover:opacity-100 class handles the hover reveal. On mobile
+          there is no hover, so we rely on the controlsVisible state, which
+          is toggled by tapping the video and auto-hidden after 3s of
+          inactivity while the video is playing. */}
       <div
         className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-200 ${
           controlsVisible
@@ -674,20 +690,38 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         </div>
       </div>
 
-      {/* Play button overlay when paused — visible whenever the video is
-          paused so the user has a clear affordance to start playback. On
-          tap we both toggle play and reveal the controls for follow-up
-          actions (mute, fullscreen, etc). */}
+      {/* Play/pause button overlays — centered buttons that appear in
+          two scenarios:
+          1. Paused: a Play button so the user can start playback. Tapping
+             it plays + reveals controls for follow-up actions.
+          2. Playing + controls visible: a Pause button so mobile users
+             can pause without having to find the small button in the
+             bottom bar. Tapping it pauses; the controls auto-hide 3s
+             after the last interaction. */}
       {!isPlaying && (
         <div
           className="absolute inset-0 flex items-center justify-center cursor-pointer"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation()
             togglePlay()
             setControlsVisible(true)
           }}
         >
           <div className="w-14 h-14 rounded-full bg-zinc-900/50 flex items-center justify-center backdrop-blur-sm">
             <Play className="h-7 w-7 text-white ml-0.5" />
+          </div>
+        </div>
+      )}
+      {isPlaying && controlsVisible && (
+        <div
+          className="absolute inset-0 flex items-center justify-center cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation()
+            togglePlay()
+          }}
+        >
+          <div className="w-14 h-14 rounded-full bg-zinc-900/50 flex items-center justify-center backdrop-blur-sm">
+            <Pause className="h-7 w-7 text-white" />
           </div>
         </div>
       )}
