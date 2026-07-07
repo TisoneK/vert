@@ -15,6 +15,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.5.3] — 2026-07-07
+
+### Fixed
+- **Tapping search, contact, or tag inputs on iPhone zoomed the whole page.** Several raw `<input>` elements (header search bar, mobile search overlay, search results bar, contact form, upload tag input) used `text-sm` (14px) unconditionally. iOS Safari auto-zooms the viewport when focusing any input with computed font-size under 16px. Changed to `text-base md:text-sm` — 16px on mobile (no zoom), 14px on desktop — matching the pattern already used correctly by the shared shadcn `Input` component.
+
+---
+
 ## [0.5.2] — 2026-07-07
 
 ### Fixed

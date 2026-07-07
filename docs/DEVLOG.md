@@ -14,6 +14,25 @@ _Nothing yet._
 
 ---
 
+## [0.5.3] — 2026-07-07
+
+### Fixed
+
+#### iOS Safari auto-zoom on input focus (search, contact, tag inputs)
+**Commit:** `1350e2d`
+
+Continuation of the mobile-optimization pass (0.5.2 fixed centering; this fixes a second mobile-only bug).
+
+**Root cause:** iOS Safari automatically zooms the viewport in when a focused form field's computed font-size is under 16px, as an accessibility measure for readability. Several raw `<input>` elements hardcoded `text-sm` (14px, Tailwind) with no responsive variant: the desktop search bar (`Header.tsx` line 93 — not mobile-visible, but inconsistent), the mobile search overlay input (`Header.tsx` line 224 — **this one is the worst offender, since it also has `autoFocus`, so the zoom fires the instant you tap the search icon**), the `SearchResults.tsx` search bar, both `ContactPage.tsx` name/email fields, and the `UploadPage.tsx` tag-entry input.
+
+Notably, `src/components/ui/input.tsx` (the shared shadcn `Input` component used by `LoginForm`/`SignupForm`) already has the correct fix baked in: `text-base ... md:text-sm` — 16px by default, shrinking to 14px only at the `md` breakpoint and above. Login/signup were never affected. The bug was isolated to components that used a raw `<input>` instead of the shared component.
+
+**Fix:** changed each affected `text-sm` to `text-base md:text-sm`, matching the existing shadcn convention exactly rather than introducing a new pattern. No visual change on desktop; on mobile, inputs are very slightly larger (16px vs 14px) but no longer trigger the zoom.
+
+**Files:** `Header.tsx` (both search inputs), `SearchResults.tsx`, `ContactPage.tsx` (name + email), `UploadPage.tsx` (tag input).
+
+---
+
 ## [0.5.2] — 2026-07-07
 
 ### Fixed

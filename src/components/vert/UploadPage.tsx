@@ -461,7 +461,7 @@ export function UploadPage() {
                       }
                     }}
                     placeholder={tags.length === 0 ? "tutorial, diy, satisfying…" : "Add another…"}
-                    className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400"
+                    className="flex-1 min-w-[120px] bg-transparent outline-none text-base md:text-sm text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400"
                   />
                 )}
               </div>
