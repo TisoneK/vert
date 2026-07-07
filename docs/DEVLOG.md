@@ -12,6 +12,33 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Create test accounts from the admin UI
+**Commit:** `adef476`
+
+Admins can now generate test accounts directly from the Users tab without needing shell access to run `prisma/seed.ts`.
+
+**API:** `POST /api/v1/admin/create-test-users` (`src/app/api/v1/admin/create-test-users/route.ts`)
+- Admin-only via `requireAdmin()`
+- Body: `{ count: number }` — clamped to 1–20, default 3
+- Creates N users with:
+  - Email: `testuser_<batch>_N@test.vert.com` where `<batch>` is a 5-char base36 timestamp suffix (prevents collisions across repeated calls)
+  - Password: `testpass123` (bcrypt-hashed at cost 12)
+  - Role: `member` (never admin)
+  - `isActive: true`, `emailVerified: true`
+  - A channel with a name cycled from a pool of 20 variations ("Test Creator", "Demo Channel", "QA Tester", etc.) and a description noting the batch
+- Skips any email that already exists (safety net, shouldn't happen with the timestamp suffix)
+- Audit-logged to `AdminAction` with `targetType: 'user'`, `targetId: 'batch'`
+- Returns `{ created, users: [{email, username, password, channelName}], note }`
+
+**UI:** `AdminDashboard.tsx` Users tab
+- "Create test accounts" button (violet outline, `UserPlus` icon) added next to the role filter
+- Clicking opens an inline violet form: a count selector (1, 2, 3, 5, 10, 20) + a Create button
+- Explains the password and email pattern up front
+- After creation, an emerald result panel shows a table with username / email / password / channel name for each account so the admin can copy them
+- The user list auto-refreshes (`fetchAdminUsers(userSearch)`) so the new accounts appear immediately
+
+Use case: QA testing, demo setups, populating the site for screenshots/reviews — without database access.
+
 #### Online presence indicator + Account column rename
 **Commit:** `de8786b`
 
