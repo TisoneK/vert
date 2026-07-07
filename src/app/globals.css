@@ -172,6 +172,21 @@
   scrollbar-width: none;
 }
 
+/* Main content viewport scrollbar. The default (non-overlay) browser
+   scrollbar reserves ~15-17px on the right of `main`, but `Header` above it
+   spans the full width unaffected. Since page content is centered with
+   `mx-auto` *inside main's own box*, that reserved space made every page
+   (Categories, Explore, etc.) look shifted left relative to the header on
+   any browser/viewport that doesn't use overlay scrollbars (common in
+   desktop Chrome/Firefox mobile-emulation and some Android WebViews).
+   Hiding the track removes the asymmetry; scrolling itself is unaffected. */
+.app-main-scroll::-webkit-scrollbar {
+  width: 0px;
+}
+.app-main-scroll {
+  scrollbar-width: none;
+}
+
 /* Vert line clamp */
 .line-clamp-2 {
   display: -webkit-box;

@@ -269,7 +269,7 @@ export function VertApp() {
         <Sidebar collapsed={sidebarCollapsed} />
         {/* pb-16 on mobile clears the bottom MobileNav bar (h-12 + safe-area).
             md:pb-0 removes it on desktop where there's no bottom bar. */}
-        <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
+        <main className="flex-1 overflow-y-auto pb-16 md:pb-0 app-main-scroll">
           {renderView()}
         </main>
       </div>
