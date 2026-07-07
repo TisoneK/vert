@@ -1,6 +1,6 @@
 # Vert — Architecture Decision Record
 
-_Last updated: 2026-06-21_
+_Last updated: 2026-07-07_
 
 This document captures the **intentional** architectural choices in the current
 codebase, where they diverge from the originally-spec'd design, and what would
@@ -13,11 +13,11 @@ and stakeholders reviewing the project.
 
 | Layer | Choice | Why this was chosen for v1 |
 |---|---|---|
-| Database | **SQLite** (via Prisma) | Zero-infra; lets the app boot in any environment without provisioning a database server. Sufficient for a single-instance demo and small-scale testing. |
+| Database | **PostgreSQL** (via Prisma) | Production-grade relational store, hosted on Neon (Vercel Postgres). The original SQLite prototype was migrated to Postgres in v0.3.0 — see §2. |
 | Auth | **NextAuth v4** (Credentials provider, bcrypt + JWT, 30-day sessions) | Self-contained — no third-party identity service dependency. Works offline. Easier to reason about than Clerk for a small team. |
-| Video storage | **Local filesystem** under `public/uploads/{yyyy-mm}/` | Same reasoning as SQLite: zero infra. Files served directly by Next.js static handler. Explicitly flagged as a dev fallback in the upload route. |
+| Video storage | **Vercel Blob** (S3-compatible) | Direct-to-Blob client uploads bypass serverless 4.5 MB body limit. Was local-filesystem in the prototype; migrated to Blob in v0.3.0. See upload route for dev fallback. |
 | Cache / queue | **None** | Not needed at current scale. Adding Redis now would be premature infrastructure. |
-| Routing | **Single-route SPA** at `/` driven by a Zustand `currentView` store in `VertApp.tsx` | Lets the team iterate on UX without fighting the Next.js App Router for every state change. **Trade-off:** no deep-linkable URLs for videos/channels (being addressed — see §3). |
+| Routing | **SPA shell** on Next.js App Router — `VertApp.tsx` owns navigation in Zustand, URL synced via `pathToView`/`viewToPath` | Best of both worlds: smooth in-app navigation (no full reloads) + deep-linkable URLs for every page (see v0.4.0). All routes have real Next.js route files. |
 | Deployment | **Vercel** (auto-redeploy on push to `main`) | Zero-config CI/CD; matches the Next.js happy path. |
 
 ---
@@ -28,9 +28,9 @@ The original product spec called for:
 
 | Layer | Spec'd choice | Why deferred |
 |---|---|---|
-| Database | PostgreSQL | SQLite handles our read-heavy workload fine at current volume; Postgres is a migration we'll do when write contention or multi-instance deploys force it. |
+| Database | PostgreSQL (Neon) | ✅ **Completed** — migrated from SQLite in v0.3.0. The schema now uses `provider = "postgresql"`. Neon's serverless Postgres handles connection pooling and scales to zero. |
 | Auth | Clerk | Adds a third-party dependency and per-seat cost; NextAuth is doing the job. |
-| Video storage | Cloudflare Stream | Stream handles transcoding, HLS generation, and CDN — all of which we'd otherwise build ourselves. Migration is planned once we have real video volume and a budget. |
+| Video storage | Cloudflare Stream | Stream handles transcoding, HLS generation, and CDN — all of which we'd otherwise build ourselves. Local FS was replaced with Vercel Blob in v0.3.0; Stream is the next step once we have real video volume and a budget. |
 | Cache / queue | Redis | No features currently need it. Will revisit when we add: email sending, background transcoding, real-time notifications. |
 
 These are **deferred, not cancelled**. Each one is a known migration path
@@ -44,8 +44,8 @@ We will revisit each deferral when one of these triggers fires:
 
 | Trigger | Migrations it forces |
 |---|---|
-| > 1 concurrent writer hitting SQLite's write lock with measurable latency | SQLite → Postgres |
-| Multi-instance deploy (≥ 2 web servers) | SQLite → Postgres + uploads → S3/R2 (local FS doesn't survive server replacement) |
+| > 1 concurrent writer hitting Postgres write contention | Add PgBouncer connection pooling or move to Neon's pooled mode |
+| Multi-instance deploy (≥ 2 web servers) | Uploads → S3/R2 (Blob already works cross-instance; local-filesystem fallback removed in v0.3.0) |
 | Real user-uploaded video volume > a few GB total | Uploads → S3/R2 + add transcoding pipeline |
 | Need for real-time notifications, background jobs, or email sending | Add Redis (queues) + worker process |
 | SOC 2 / SSO / enterprise auth requirements | NextAuth → Clerk (or Auth.js v5 with an OIDC provider) |
@@ -58,10 +58,9 @@ being validated.
 
 ## 4. Known v1 limitations (acceptable for now)
 
-- **No deep-linkable URLs.** Sharing `https://vert.app/watch/<id>` doesn't work; the URL is always `https://vert.app/`. Being fixed in this release — see the new `/watch/[id]` and `/channel/[id]` routes.
-- **No horizontal scaling.** Local-FS uploads and SQLite both pin us to one instance. Fine for Vercel's free tier; not fine for production scale.
 - **No background transcoding.** Uploaded videos are served as-is. The `hls.js` player works but has no renditions to switch between unless the source is already HLS.
-- **No CI pipeline.** Lint + build only run locally. A GitHub Actions workflow is being added in this release.
+- **No CI pipeline.** Lint + build only run locally. A GitHub Actions workflow would automate testing on PRs.
+- **No test suite.** No test runner is configured yet. Recommended: Vitest for unit tests, Playwright for E2E.
 
 ---
 
@@ -70,7 +69,7 @@ being validated.
 For new contributors orienting themselves:
 
 ```
-prisma/schema.prisma        # SQLite schema + all models
+prisma/schema.prisma        # PostgreSQL schema + all models
 prisma/seed.ts              # Demo data (admin + 5 users + 21 videos + notifications)
 src/app/api/v1/             # REST API (36 route handlers, all auth-checked)
 src/app/api/auth/           # NextAuth route + register + session-info
