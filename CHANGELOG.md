@@ -15,7 +15,12 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-## [0.5.0] — 2026-07-07
+## [0.5.1] — 2026-07-07
+
+### Fixed
+- **Build broken by dark mode release.** The v0.5.0 dark mode commit dropped the opening `<div` tag on both scroll-arrow buttons in `VideoShelf.tsx`, leaving bare `className="...">` that caused a JSX parse error. The build failed completely until this was restored.
+- **Upload page had no dark mode.** The upload form was missed entirely by the dark mode pass — 30 hardcoded light-mode classes with zero `dark:` variants. The form was unreadable in dark mode (white boxes on dark background, dark text on dark background). Added `dark:` variants to every surface: page heading, labels, inputs, textareas, category chips, tag input, file drop zones, thumbnail preview buttons.
+- **Anti-flash script didn't handle `theme='system'`.** The pre-hydration script that prevents a flash of light mode only checked for `theme === 'dark'` or `theme === null`, but next-themes stores `'system'` when the user picks the system option. If the user had `theme = 'system'` and their OS was in dark mode, the script wouldn't add the `dark` class until React hydrated — causing a flash of light mode on every page load. Fixed to also check `theme === 'system'` against `prefers-color-scheme: dark`.
 
 ### Added
 
@@ -167,7 +172,9 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/TisoneK/vert/releases/tag/v0.5.1
+[0.5.0]: https://github.com/TisoneK/vert/releases/tag/v0.5.0
 [0.4.0]: https://github.com/TisoneK/vert/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TisoneK/vert/releases/tag/v0.3.0
 [0.2.0]: https://github.com/TisoneK/vert/releases/tag/v0.2.0
