@@ -11,6 +11,12 @@ details (file references, API routes, commit hashes), see
 
 ## [Unreleased]
 
+_Nothing yet — changes pushed to main are immediately deployed, so this section only contains work-in-progress that hasn't been committed yet._
+
+---
+
+## [0.4.0] — 2026-07-07
+
 ### Added
 - **Create test accounts from the admin UI.** Admins can now generate test users with channels directly from the Users tab — no shell access needed. A "Create test accounts" button opens a form where you pick how many (1–20), and it creates accounts with predictable emails (`testuser_<batch>_N@test.vert.com`), a shared password (`testpass123`), the member role, and a channel. The generated credentials are shown in a table so you can copy them for testing.
 - **Online presence indicator in the admin Users tab.** A new "Online" column shows a green dot for users who have been active in the last 5 minutes, and a gray dot for offline users. Hovering shows "Last seen X ago" or "Never seen." Presence is tracked via a heartbeat — the session-info endpoint (called on every page load) writes `lastSeenAt` to the database, throttled to once per 60 seconds per user to avoid DB load.
@@ -131,7 +137,8 @@ details (file references, API routes, commit hashes), see
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/TisoneK/vert/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TisoneK/vert/releases/tag/v0.3.0
 [0.2.0]: https://github.com/TisoneK/vert/releases/tag/v0.2.0
 [0.1.0]: https://github.com/TisoneK/vert/releases/tag/v0.1.0

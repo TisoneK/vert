@@ -10,6 +10,12 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ## [Unreleased]
 
+_Nothing yet._
+
+---
+
+## [0.4.0] — 2026-07-07
+
 ### Added
 
 #### Create test accounts from the admin UI
@@ -502,7 +508,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/TisoneK/vert/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TisoneK/vert/releases/tag/v0.3.0
 [0.2.0]: https://github.com/TisoneK/vert/releases/tag/v0.2.0
 [0.1.0]: https://github.com/TisoneK/vert/releases/tag/v0.1.0
