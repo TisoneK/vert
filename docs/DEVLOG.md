@@ -14,6 +14,21 @@ _Nothing yet._
 
 ---
 
+## [0.5.5] — 2026-07-07
+
+### Fixed
+
+#### Featured hero cropped portrait videos into a fixed 16:9 box
+**Commit:** `f6fd79b`
+
+Reported via a comparison screenshot against Dailymotion: the Featured hero on the homepage looked "squeezed" — a portrait video (two people, full-body shot) rendered with heads and feet both cut off.
+
+**Root cause:** `HomeFeed.tsx`'s Featured section hardcoded `aspect-video` (16:9) on the hero container, with a comment explaining this was chosen to cap the hero's height on desktop (an unconstrained `aspect-video` alone made it ~675px tall on a 1280px viewport). But `VideoCard.tsx` — used everywhere else (Trending grid, shelves) — already picks aspect ratio per-video: `format === 'landscape' ? 'aspect-video' : format === 'square' ? 'aspect-square' : 'aspect-[9/16]'`. The Featured hero was the one place that didn't follow this, and since Vert is portrait-first, most hero videos are portrait — `object-cover` inside a 16:9 box on a 9:16 source crops away most of the vertical frame.
+
+**Fix:** Featured hero now computes `heroAspect` with the same per-format logic as `VideoCard`. Sizing also changed to match: landscape videos stay width-driven (`w-full max-h-[42vh]`, unchanged behavior); portrait/square videos are now height-driven (`h-[42vh] mx-auto` — height fixed, width follows from the aspect ratio, centered) instead of being stretched to full container width. This preserves the original "don't dominate the screen" height cap for every format while showing the correct crop.
+
+---
+
 ## [0.5.4] — 2026-07-07
 
 ### Changed

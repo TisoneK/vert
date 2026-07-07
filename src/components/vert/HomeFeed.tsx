@@ -142,21 +142,38 @@ export function HomeFeed() {
         </section>
       )}
 
-      {/* Featured — one hero video. Height capped at ~40vh so the user
+      {/* Featured — one hero video. Height capped at ~42vh so the user
           immediately sees the start of the next section below the fold
           on a typical desktop viewport. aspect-video alone made it
-          ~675px tall on a 1280px viewport, dominating the entire screen. */}
-      {trendingVideos.length > 0 && (
+          ~675px tall on a 1280px viewport, dominating the entire screen.
+
+          Aspect ratio now matches the video's actual format (same logic
+          as VideoCard) instead of always forcing aspect-video: Vert is a
+          portrait-first platform, so most Featured videos are portrait,
+          and object-cover-ing a 9:16 source into a fixed 16:9 box cropped
+          away most of the frame (heads/feet cut off). Portrait/square
+          videos are now height-driven (h-[42vh], width follows from the
+          aspect ratio, centered) instead of width-driven. */}
+      {trendingVideos.length > 0 && (() => {
+        const hero = trendingVideos[0]
+        const heroAspect =
+          hero.format === 'landscape' ? 'aspect-video' :
+          hero.format === 'square' ? 'aspect-square' :
+          'aspect-[9/16]'
+        const heroSizing = hero.format === 'landscape'
+          ? 'w-full max-h-[42vh]'
+          : 'h-[42vh] mx-auto'
+        return (
         <section className="mb-8">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Featured</h2>
           <div
-            className="relative aspect-video max-h-[42vh] rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 cursor-pointer group"
-            onClick={() => navigate({ page: 'video', videoId: trendingVideos[0].id })}
+            className={`relative ${heroAspect} ${heroSizing} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 cursor-pointer group`}
+            onClick={() => navigate({ page: 'video', videoId: hero.id })}
           >
-            {trendingVideos[0].thumbnailUrl ? (
+            {hero.thumbnailUrl ? (
               <img
-                src={trendingVideos[0].thumbnailUrl}
-                alt={trendingVideos[0].title}
+                src={hero.thumbnailUrl}
+                alt={hero.title}
                 className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
               />
             ) : (
@@ -171,14 +188,15 @@ export function HomeFeed() {
               {/* Smaller, more transparent badge so it doesn't compete with
                   the title for attention. */}
               <span className="inline-block px-1.5 py-0.5 bg-violet-600/80 backdrop-blur-sm text-white rounded text-[9px] font-bold uppercase tracking-wider mb-2">Featured</span>
-              <h3 className="text-lg font-bold text-white line-clamp-1 drop-shadow-sm">{trendingVideos[0].title}</h3>
+              <h3 className="text-lg font-bold text-white line-clamp-1 drop-shadow-sm">{hero.title}</h3>
               <p className="text-sm text-zinc-200 mt-0.5 drop-shadow-sm">
-                {trendingVideos[0].channel.channelName} · {formatViews(trendingVideos[0].viewCount)} views
+                {hero.channel.channelName} · {formatViews(hero.viewCount)} views
               </p>
             </div>
           </div>
         </section>
-      )}
+        )
+      })()}
 
       {/* Trending — grid, not a shelf */}
       {trendingVideos.length > 1 && (

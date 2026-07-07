@@ -15,6 +15,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.5.5] — 2026-07-07
+
+### Fixed
+- **Featured hero video looked cropped/"squeezed" on the homepage.** The hero card hardcoded a 16:9 (`aspect-video`) box regardless of the video's actual format. Since Vert is a portrait-first platform, most Featured videos are portrait (9:16) — cropping them into a fixed landscape box with `object-cover` cut off most of the frame (heads/feet missing). The Featured hero now picks its aspect ratio from the video's format, same as every other video card, while keeping the existing height cap so it doesn't dominate the screen on desktop.
+
+---
+
 ## [0.5.4] — 2026-07-07
 
 ### Changed
