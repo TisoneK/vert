@@ -12,6 +12,24 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Online presence indicator + Account column rename
+**Commit:** `de8786b`
+
+The admin Users tab had a "Status" column showing "active" for every user, which was ambiguous — "active" reads as "online right now" to anyone who isn't the developer. Two changes:
+
+**Renamed "Status" to "Account".** The existing column now has a clearer label — it shows account state (active/suspended badge), not online presence.
+
+**Added "Online" column with live presence dot.** Green dot if `lastSeenAt` is within 5 minutes, gray dot otherwise. Tooltip shows "Last seen X ago" or "Never seen".
+
+Presence tracking implementation:
+- `prisma/schema.prisma` — added `lastSeenAt DateTime?` to the User model (nullable so existing rows work without a backfill).
+- `prisma/migrations/admin/20260707000001_add_last_seen_at.sql` — `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "lastSeenAt" TIMESTAMP(3)`. Needs to be applied via the admin Database tab or `prisma db push`.
+- `src/app/api/auth/session-info/route.ts` — fire-and-forget `db.user.updateMany` that writes `lastSeenAt = now()`. Throttled via a conditional `where` clause: only writes if `lastSeenAt` is null OR older than 60 seconds. This avoids a DB write on every single page navigation — at most one write per user per minute.
+- `src/app/api/v1/admin/users/route.ts` — added `lastSeenAt: true` to the Prisma `select`.
+- `src/components/vert/AdminDashboard.tsx` — added `lastSeenAt: string | null` to the `AdminUser` interface, added the Online column with an IIFE that checks `(Date.now() - new Date(u.lastSeenAt).getTime()) < 5 * 60 * 1000`. Updated the `<colgroup>` to accommodate 7 columns (was 6). Footer legend updated to explain the dot.
+
+The 5-minute window for "online" is a pragmatic choice — short enough to be meaningful, long enough that a user reading a video page for 4 minutes still shows green. The 60-second heartbeat throttle means at most 1 DB write per user per minute, regardless of how many pages they navigate to.
+
 #### Watch page reorganized by info hierarchy
 **Commit:** `881be10`
 
