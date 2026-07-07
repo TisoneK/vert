@@ -290,7 +290,7 @@ export function UploadPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 animate-vert-fade-in">
-      <h1 className="text-xl font-bold text-zinc-900 mb-6">Upload Video</h1>
+      <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">Upload Video</h1>
 
       <form onSubmit={handleSubmit}>
         {/* Two-column layout on desktop: preview on left, details on right */}
@@ -300,7 +300,7 @@ export function UploadPage() {
           <div className="space-y-4">
             {/* Video upload / preview */}
             <div>
-              <Label className="text-zinc-600 mb-2 block text-sm">
+              <Label className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">
                 Video *
                 {videoFile && (
                   <span className="ml-2 text-xs text-zinc-400 font-normal">
@@ -321,15 +321,15 @@ export function UploadPage() {
                   <button
                     type="button"
                     onClick={() => { setVideoFile(null); setVideoPreview(null); setVideoAspectRatio(null) }}
-                    className="absolute top-2 right-2 bg-white/80 text-zinc-600 rounded-full p-1 hover:bg-white transition-colors shadow-sm"
+                    className="absolute top-2 right-2 bg-white/80 dark:bg-zinc-900/80 text-zinc-600 dark:text-zinc-300 rounded-full p-1 hover:bg-white dark:hover:bg-zinc-800 transition-colors shadow-sm"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               ) : (
-                <label className={`flex flex-col items-center justify-center ${fallbackAspect} w-full max-w-[280px] bg-white rounded-lg border-2 border-dashed border-zinc-300 hover:border-violet-400 cursor-pointer transition-colors`}>
+                <label className={`flex flex-col items-center justify-center ${fallbackAspect} w-full max-w-[280px] bg-white dark:bg-zinc-900 rounded-lg border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-violet-400 dark:hover:border-violet-500 cursor-pointer transition-colors`}>
                   <Film className="h-8 w-8 text-zinc-400 mb-2" />
-                  <p className="text-zinc-700 text-sm font-medium">Select video</p>
+                  <p className="text-zinc-700 dark:text-zinc-300 text-sm font-medium">Select video</p>
                   <p className="text-zinc-400 text-xs mt-1">MP4, WebM, MOV · max 200MB</p>
                   <input
                     type="file"
@@ -343,7 +343,7 @@ export function UploadPage() {
 
             {/* Thumbnail */}
             <div>
-              <Label className="text-zinc-600 mb-2 block text-sm">
+              <Label className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">
                 Thumbnail <span className="text-zinc-400 font-normal">(auto-generated — replace if you want)</span>
               </Label>
               {thumbnailPreview ? (
@@ -356,15 +356,15 @@ export function UploadPage() {
                   <button
                     type="button"
                     onClick={() => { setThumbnailFile(null); setThumbnailPreview(null) }}
-                    className="absolute top-2 right-2 bg-white/80 text-zinc-600 rounded-full p-1 hover:bg-white transition-colors shadow-sm"
+                    className="absolute top-2 right-2 bg-white/80 dark:bg-zinc-900/80 text-zinc-600 dark:text-zinc-300 rounded-full p-1 hover:bg-white dark:hover:bg-zinc-800 transition-colors shadow-sm"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               ) : (
-                <label className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-zinc-200 hover:border-violet-400 cursor-pointer transition-colors w-fit">
-                  <ImagePlus className="h-4 w-4 text-zinc-600" />
-                  <span className="text-zinc-600 text-sm">Add thumbnail</span>
+                <label className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-violet-400 dark:hover:border-violet-500 cursor-pointer transition-colors w-fit">
+                  <ImagePlus className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+                  <span className="text-zinc-600 dark:text-zinc-300 text-sm">Add thumbnail</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -380,32 +380,32 @@ export function UploadPage() {
           <div className="space-y-5">
             {/* Title */}
             <div>
-              <Label htmlFor="title" className="text-zinc-600 mb-2 block text-sm">Title *</Label>
+              <Label htmlFor="title" className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">Title *</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Give your video a title"
-                className="bg-zinc-100 border-zinc-300 text-zinc-800 placeholder:text-zinc-400 focus-visible:ring-violet-600"
+                className="bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 focus-visible:ring-violet-600"
                 required
               />
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor="description" className="text-zinc-600 mb-2 block text-sm">Description</Label>
+              <Label htmlFor="description" className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">Description</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Tell viewers about your video"
-                className="bg-zinc-100 border-zinc-300 text-zinc-800 placeholder:text-zinc-400 min-h-[100px] resize-none focus-visible:ring-violet-600"
+                className="bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 min-h-[100px] resize-none focus-visible:ring-violet-600"
               />
             </div>
 
             {/* Categories */}
             <div>
-              <Label className="text-zinc-600 mb-2 block text-sm">
+              <Label className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">
                 Categories <span className="text-zinc-400 font-normal">(up to 3)</span>
               </Label>
               <div className="flex flex-wrap gap-2">
@@ -417,7 +417,7 @@ export function UploadPage() {
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                       selectedCategories.includes(cat.id)
                         ? 'bg-violet-600 text-white'
-                        : 'bg-white text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 border border-zinc-200'
+                        : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-700'
                     }`}
                   >
                     {cat.name}
@@ -428,14 +428,14 @@ export function UploadPage() {
 
             {/* Tags */}
             <div>
-              <Label className="text-zinc-600 mb-2 block text-sm">
+              <Label className="text-zinc-600 dark:text-zinc-400 mb-2 block text-sm">
                 Tags <span className="text-zinc-400 font-normal">(up to 8)</span>
               </Label>
-              <div className="flex flex-wrap items-center gap-2 p-2 bg-zinc-100 border border-zinc-300 rounded-lg focus-within:ring-2 focus-within:ring-violet-600 focus-within:border-violet-600 transition-colors">
+              <div className="flex flex-wrap items-center gap-2 p-2 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg focus-within:ring-2 focus-within:ring-violet-600 focus-within:border-violet-600 transition-colors">
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-violet-100 text-violet-700 rounded-md text-xs font-medium"
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 rounded-md text-xs font-medium"
                   >
                     #{tag}
                     <button
@@ -461,12 +461,12 @@ export function UploadPage() {
                       }
                     }}
                     placeholder={tags.length === 0 ? "tutorial, diy, satisfying…" : "Add another…"}
-                    className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-zinc-800 placeholder:text-zinc-400"
+                    className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400"
                   />
                 )}
               </div>
               {tags.length === 8 && (
-                <p className="text-xs text-zinc-500 mt-1">Tag limit reached</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Tag limit reached</p>
               )}
             </div>
 

@@ -14,9 +14,24 @@ _Nothing yet._
 
 ---
 
-## [0.5.0] — 2026-07-07
+## [0.5.1] — 2026-07-07
 
-### Added
+### Fixed
+
+#### Dark mode build fix + UploadPage + anti-flash script
+**Commit:** `e769a59`
+
+Post-release audit of the v0.5.0 dark mode work found three issues:
+
+**VideoShelf.tsx — broken JSX (build blocker).** The dark mode commit edited the scroll-arrow button classNames and accidentally dropped the opening `<div` tag on both buttons (lines 59 and 81). What remained was `className="...">` without the element name — a JSX parse error. The build failed with `Type error: Unexpected token. Did you mean {'>'}`. Restored both `<div className="...">` wrappers around the chevron icons.
+
+**UploadPage.tsx — completely missed by dark mode pass.** Audit script found 30 hardcoded light-mode classes (`bg-white`, `text-zinc-900`, `bg-zinc-100`, `border-zinc-200`, etc.) with zero `dark:` variants. The upload form was unreadable in dark mode. Added `dark:` variants to every surface: page heading (`dark:text-zinc-100`), labels (`dark:text-zinc-400`), inputs/textareas (`dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100`), category chips (`dark:bg-zinc-900 dark:text-zinc-300 dark:border-zinc-700`), tag input container (`dark:bg-zinc-800 dark:border-zinc-700`), tag chips (`dark:bg-violet-900/40 dark:text-violet-300`), file drop zone (`dark:bg-zinc-900 dark:border-zinc-700`), thumbnail preview close buttons (`dark:bg-zinc-900/80 dark:text-zinc-300`).
+
+**layout.tsx — anti-flash script didn't handle `theme='system'`.** The pre-hydration inline script reads `localStorage.getItem('theme')` and adds the `dark` class to `<html>` before React hydrates, preventing a flash of light mode. The original logic: `if (theme === 'dark' || (!theme && matchMedia('(prefers-color-scheme: dark)').matches))`. This handled explicit 'dark' and null (first visit with system dark). But next-themes stores `'system'` when the user picks the system option — and `theme === 'system'` didn't match either condition. If a user had `theme = 'system'` and their OS was dark, they'd see a flash of light mode on every page load until React hydrated. Fixed: `if (theme === 'dark' || ((!theme || theme === 'system') && systemDark))` where `systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches`.
+
+**Audit methodology:** ran a script that counted light-mode classes vs `dark:` variants per component file. Found 1 file with zero dark variants (UploadPage) and 2 with partial coverage (SearchSuggestions, TrendingPage — both at ~90% ratio, acceptable). The remaining 38 files all had proper dark: coverage from the v0.5.0 pass.
+
+#### v0.5.0 dark mode release
 
 #### Dark mode support
 
@@ -602,7 +617,9 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/TisoneK/vert/releases/tag/v0.5.1
+[0.5.0]: https://github.com/TisoneK/vert/releases/tag/v0.5.0
 [0.4.0]: https://github.com/TisoneK/vert/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TisoneK/vert/releases/tag/v0.3.0
 [0.2.0]: https://github.com/TisoneK/vert/releases/tag/v0.2.0

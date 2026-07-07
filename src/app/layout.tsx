@@ -48,14 +48,17 @@ export default function RootLayout({
       <head>
         {/* Prevent flash of light mode on page load: read stored theme
             before React hydrates. next-themes relies on this class being
-            present on the <html> element from the start. */}
+            present on the <html> element from the start. The script handles
+            three cases: explicit 'dark', explicit 'light' (do nothing), and
+            'system'/null (check prefers-color-scheme). */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
                   var theme = localStorage.getItem('theme');
-                  if (theme === 'dark' || (!theme && matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (theme === 'dark' || ((!theme || theme === 'system') && systemDark)) {
                     document.documentElement.classList.add('dark');
                   }
                 } catch(e) {}
