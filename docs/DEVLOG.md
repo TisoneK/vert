@@ -14,6 +14,23 @@ _Nothing yet._
 
 ---
 
+## [0.5.2] — 2026-07-07
+
+### Fixed
+
+#### Off-center page content vs header on mobile/narrow viewports
+**Commit:** `f3bb555`
+
+Reported via screenshots: the Categories grid (and other pages) appeared shifted left, with more whitespace on the right than the left, on mobile-width viewports.
+
+**Root cause:** `VertApp.tsx`'s app shell renders `<Header>` full-width, outside the scrollable region, then a row containing `<Sidebar>` + `<main className="flex-1 overflow-y-auto ...">`. Page content inside `main` is centered with `max-w-* mx-auto`. On any browser/viewport using a classic (non-overlay) scrollbar — desktop Chrome/Firefox in mobile-emulation mode, some Android WebViews — the scrollbar reserves ~15-17px on the right edge of `main`'s content box. Since `mx-auto` centers content *inside that box*, not inside the full viewport, the visible content shifted left relative to the full-width `Header` above it. Real touch devices with overlay scrollbars (no reserved space) were unaffected, which is why this wasn't caught in earlier manual testing.
+
+**Fix:** `src/app/globals.css` — added `.app-main-scroll` utility (same technique as the existing `.shelf-scroll` class used for horizontal shelves): `scrollbar-width: none` + `::-webkit-scrollbar { width: 0px }`. Applied to `<main>` in `VertApp.tsx`. Scrolling behavior is unchanged; only the always-reserved track space is removed, so centered content now aligns with the header at every viewport width and in every browser.
+
+**Verification:** confirmed against the `ExplorePage.tsx` categories grid (`grid grid-cols-2 sm:grid-cols-3 ... max-w-5xl mx-auto`), which was the component in the reported screenshots. Also separately confirmed the "faded" categories seen in the same screenshots are an intentional empty-state style (muted `bg-zinc-50`/`text-zinc-400` for categories with `videoCount === 0`), not a bug.
+
+---
+
 ## [0.5.1] — 2026-07-07
 
 ### Fixed

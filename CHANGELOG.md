@@ -15,6 +15,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.5.2] — 2026-07-07
+
+### Fixed
+- **Page content appeared shifted left on mobile/narrow viewports.** Categories, Explore, and other pages under `main` looked off-center relative to the header — more whitespace on the right than the left. Caused by the default browser scrollbar reserving space only inside `main`, while `Header` above it spans the full width unaffected. Hid the native scrollbar track on `main` (scrolling still works); see [`docs/DEVLOG.md`](./docs/DEVLOG.md) for details.
+
+---
+
 ## [0.5.1] — 2026-07-07
 
 ### Fixed
