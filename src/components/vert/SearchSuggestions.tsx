@@ -42,7 +42,7 @@ export function SearchSuggestions({ query, onSelect, recentSearches = [] }: Sear
           <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
         </>
       )}
-      <p className="px-4 py-1.5 text-xs font-medium text-zinc-700 uppercase tracking-wider flex items-center gap-1.5">
+      <p className="px-4 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
         <TrendingUp className="h-3 w-3" /> Trending
       </p>
       {filteredTrending.map((s) => (

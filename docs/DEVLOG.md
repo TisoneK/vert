@@ -21,6 +21,44 @@ _Nothing yet._
 
 ---
 
+## [0.6.7] — 2026-07-08
+
+### Fixed
+
+#### Dark mode gaps found via deep scan (9 surfaces across 6 files)
+
+**Files:** `AdminDashboard.tsx`, `CreatorStudio.tsx`, `TrendingPage.tsx`, `CommentSection.tsx`, `SearchSuggestions.tsx`, `SubscribeButton.tsx`
+
+Followed up the v0.6.6 admin-panel fix with a deep scan across all `src/components/vert/*.tsx` files for light-mode class strings (`bg-white`, `bg-zinc-50/100/200`, `border-zinc-200/300`, `text-zinc-900/700`, `hover:bg-zinc-50/100`) where no `dark:` variant appears anywhere on the same line. Found 9 real gaps (excluding false positives like `bg-white/15` translucent overlays on video heroes and `bg-white` on slider thumbs, which are intentional and theme-agnostic).
+
+**AdminDashboard.tsx (3 gaps):**
+- Users table header `<tr>` — `bg-white` → `dark:bg-zinc-800` (the `<th>` text already had `dark:text-zinc-300`, but the row background was missing)
+- User search `<Input>` — `bg-white` → `dark:bg-zinc-800` (border and text already had dark variants, background was missed)
+- Test-account count `<select>` — `bg-white` → `dark:bg-zinc-800`
+
+**CreatorStudio.tsx (2 gaps):**
+- Channel summary card container — `bg-white` → `dark:bg-zinc-800` (border already had `dark:border-zinc-700`)
+- Channel avatar circle — `bg-violet-100 text-violet-600` → `dark:bg-violet-900/40 dark:text-violet-400`
+
+**TrendingPage.tsx (1 gap):**
+- Category filter button (inactive state) — `bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50` → added full `dark:` set (`dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700`). The "All" button next to it already had dark variants; this one was missed.
+
+**CommentSection.tsx (2 gaps):**
+- Comment composer avatar fallback (when user has no avatar image) — `bg-zinc-200 text-zinc-700` → `dark:bg-zinc-700 dark:text-zinc-300`
+- "Load More Comments" button — `text-zinc-600 hover:text-zinc-900` → `dark:text-zinc-400 dark:hover:text-zinc-100`
+
+**SearchSuggestions.tsx (1 gap):**
+- "Trending" section label — `text-zinc-700` → `dark:text-zinc-400`
+
+**SubscribeButton.tsx (1 gap):**
+- Subscribed state — `bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 border-zinc-300` → added full `dark:` set
+
+**Not changed (intentional, theme-agnostic):**
+- `TrendingPage.tsx` line 176: `bg-white/15` — translucent overlay on a video hero thumbnail with `text-white`; the white tint + white text works on both themes since it sits on top of an image
+- `VideoPlayer.tsx` line 619: `bg-white` on the volume slider thumb (`[&::-webkit-slider-thumb]:bg-white`) — the thumb is a white dot on a dark track in both themes; changing it would make it invisible
+
+---
+
 ## [0.6.6] — 2026-07-08
 
 ### Fixed
@@ -842,7 +880,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.6...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.7...HEAD
+[0.6.7]: https://github.com/TisoneK/vert/releases/tag/v0.6.7
 [0.6.6]: https://github.com/TisoneK/vert/releases/tag/v0.6.6
 [0.6.5]: https://github.com/TisoneK/vert/releases/tag/v0.6.5
 [0.6.4]: https://github.com/TisoneK/vert/releases/tag/v0.6.4

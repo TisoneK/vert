@@ -37,6 +37,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.7] — 2026-07-08
+
+### Fixed
+- **More dark mode gaps in the admin panel, creator studio, and elsewhere.** The users table header row, the search input, the test-account count dropdown, the creator studio channel summary card and its avatar, the trending page category filter buttons, the comment composer avatar, the load-more-comments button, the search suggestions section label, and the subscribe button (subscribed state) all stayed light-colored in dark mode. All now follow the dark theme.
+
+---
+
 ## [0.6.6] — 2026-07-08
 
 ### Fixed
@@ -249,7 +256,8 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.6...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.7...HEAD
+[0.6.7]: https://github.com/TisoneK/vert/releases/tag/v0.6.7
 [0.6.6]: https://github.com/TisoneK/vert/releases/tag/v0.6.6
 [0.6.5]: https://github.com/TisoneK/vert/releases/tag/v0.6.5
 [0.6.4]: https://github.com/TisoneK/vert/releases/tag/v0.6.4

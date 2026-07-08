@@ -360,9 +360,9 @@ export function CreatorStudio() {
           ) : analytics ? (
             <div className="space-y-6">
               {/* Channel summary card */}
-              <div className="bg-white border border-zinc-200 dark:border-zinc-700 rounded-lg p-5">
+              <div className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 font-bold">
+                  <div className="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center text-violet-600 dark:text-violet-400 font-bold">
                     {analytics.channel.channelName[0]?.toUpperCase()}
                   </div>
                   <div className="flex-1">

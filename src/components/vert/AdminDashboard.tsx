@@ -912,7 +912,7 @@ export function AdminDashboard() {
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
                 placeholder="Search by email or username…"
-                className="pl-9 bg-white border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:text-zinc-500 focus-visible:ring-violet-600"
+                className="pl-9 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-violet-600"
               />
             </form>
             <div className="flex gap-1">
@@ -965,7 +965,7 @@ export function AdminDashboard() {
                 <select
                   value={testCount}
                   onChange={(e) => setTestCount(parseInt(e.target.value, 10))}
-                  className="text-sm bg-white border border-zinc-200 dark:border-zinc-700 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-violet-600"
+                  className="text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-violet-600"
                 >
                   {[1, 2, 3, 5, 10, 20].map((n) => (
                     <option key={n} value={n}>{n}</option>
@@ -1078,7 +1078,7 @@ export function AdminDashboard() {
                     <col className="w-[28%]" />
                   </colgroup>
                   <thead>
-                    <tr className="border-b border-zinc-200 dark:border-zinc-700 bg-white">
+                    <tr className="border-b border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
                       <th className="text-left text-xs font-medium text-zinc-700 dark:text-zinc-300 px-4 py-3">User</th>
                       <th className="text-left text-xs font-medium text-zinc-700 dark:text-zinc-300 px-4 py-3">Role</th>
                       <th className="text-center text-xs font-medium text-zinc-700 dark:text-zinc-300 px-2 py-3">Online</th>

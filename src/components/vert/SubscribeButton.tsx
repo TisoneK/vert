@@ -71,7 +71,7 @@ export function SubscribeButton({ channelId, initialSubscribed, subscriberCount:
         animating ? 'animate-subscribe-pulse' : ''
       } ${
         subscribed
-          ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 border border-zinc-300'
+          ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-300 dark:border-zinc-600'
           : 'bg-violet-600 hover:bg-violet-700 text-white'
       }`}
     >

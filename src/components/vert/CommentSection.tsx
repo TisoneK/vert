@@ -121,7 +121,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
       {user ? (
         <div className="flex gap-3 mb-6">
           <div className="shrink-0">
-            <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-700 text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-xs font-bold">
               {user.username[0]?.toUpperCase()}
             </div>
           </div>
@@ -221,7 +221,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
               setPage(nextPage)
               fetchComments(nextPage)
             }}
-            className="text-zinc-600 hover:text-zinc-900 text-sm"
+            className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-sm"
           >
             Load More Comments
           </Button>
