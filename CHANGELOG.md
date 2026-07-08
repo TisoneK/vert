@@ -37,6 +37,16 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.8] — 2026-07-08
+
+### Added
+- **The video player now shows a loading spinner when the video is buffering.** Previously, if playback stalled waiting for data to download, the video just froze with no indication that anything was happening. A spinning indicator now appears in the center whenever the video is waiting — during the initial load, when re-buffering after a stall, and when seeking ahead of what's been downloaded.
+
+### Changed
+- **The progress bar now shows how much of the video has been downloaded.** A lighter bar behind the violet progress indicator fills up as data loads, so you can see whether skipping ahead will stall or play smoothly.
+
+---
+
 ## [0.6.7] — 2026-07-08
 
 ### Fixed
@@ -256,7 +266,8 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.7...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.8...HEAD
+[0.6.8]: https://github.com/TisoneK/vert/releases/tag/v0.6.8
 [0.6.7]: https://github.com/TisoneK/vert/releases/tag/v0.6.7
 [0.6.6]: https://github.com/TisoneK/vert/releases/tag/v0.6.6
 [0.6.5]: https://github.com/TisoneK/vert/releases/tag/v0.6.5

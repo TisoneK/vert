@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings } from 'lucide-react'
+import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Loader2 } from 'lucide-react'
 import Hls from 'hls.js'
 import { put } from '@vercel/blob/client'
 
@@ -68,6 +68,14 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [duration, setDuration] = useState(0)
   const [showSettings, setShowSettings] = useState(false)
   const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  // Buffering state — true when the video is waiting for data to download
+  // before it can continue playing (the `waiting` event fires when playback
+  // stalls, `playing` fires when it resumes). Also shown during initial load
+  // before the first frame is ready.
+  const [isBuffering, setIsBuffering] = useState(true)
+  // How much of the video has been downloaded, as a percentage (0–100).
+  // Updated from the `progress` event reading video.buffered.
+  const [bufferedPercent, setBufferedPercent] = useState(0)
   // Whether the controls overlay is currently visible. On desktop this is
   // driven by hover (group-hover:opacity-100); on mobile (no hover) we
   // toggle it on tap so the user can actually reach mute / fullscreen /
@@ -92,6 +100,10 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     setQualityLevels([])
     setCurrentQuality(-1)
     setSourceLabel('Auto')
+    // Reset buffering state for the new source — starts as "buffering" until
+    // the first frame is ready.
+    setIsBuffering(true)
+    setBufferedPercent(0)
   }
 
   // --- Wire up the video element + hls.js when src changes ---
@@ -115,8 +127,34 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       }
     }
     const onTimeUpdate = () => setCurrentTime(video.currentTime)
+
+    // Buffering events — `waiting` fires when playback stalls waiting for
+    // data, `playing` and `canplay` fire when enough data is available to
+    // resume. `canplay` also covers the initial load (first frame ready).
+    const onWaiting = () => setIsBuffering(true)
+    const onCanPlay = () => setIsBuffering(false)
+    const onPlaying = () => setIsBuffering(false)
+
+    // Buffer progress — the `progress` event fires periodically as the browser
+    // downloads data. We read video.buffered (a TimeRanges object) and compute
+    // how far ahead of the playhead we've buffered, as a percentage of total
+    // duration. This drives the lighter bar behind the violet progress bar.
+    const onProgress = () => {
+      if (video.buffered.length > 0 && video.duration > 0) {
+        // Find the buffered range that contains (or is closest ahead of) the
+        // current time — usually the last range for a progressive download,
+        // but for HLS the ranges can be more fragmented.
+        const lastBufferedEnd = video.buffered.end(video.buffered.length - 1)
+        setBufferedPercent(Math.min(100, (lastBufferedEnd / video.duration) * 100))
+      }
+    }
+
     video.addEventListener('loadedmetadata', onLoadedMeta)
     video.addEventListener('timeupdate', onTimeUpdate)
+    video.addEventListener('waiting', onWaiting)
+    video.addEventListener('canplay', onCanPlay)
+    video.addEventListener('playing', onPlaying)
+    video.addEventListener('progress', onProgress)
 
     if (isHlsUrl(videoUrl)) {
       // Adaptive streaming path — use hls.js
@@ -186,6 +224,10 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       disposed = true
       video.removeEventListener('loadedmetadata', onLoadedMeta)
       video.removeEventListener('timeupdate', onTimeUpdate)
+      video.removeEventListener('waiting', onWaiting)
+      video.removeEventListener('canplay', onCanPlay)
+      video.removeEventListener('playing', onPlaying)
+      video.removeEventListener('progress', onProgress)
       if (hlsRef.current) {
         hlsRef.current.destroy()
         hlsRef.current = null
@@ -577,9 +619,18 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         }`}
       >
         <div
-          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0"
+          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0 relative"
           onClick={handleProgressClick}
         >
+          {/* Buffer bar — lighter zinc bar behind the violet progress bar
+              showing how much of the video has been downloaded. Helps users
+              see whether seeking ahead will stall. */}
+          {bufferedPercent > 0 && (
+            <div
+              className="absolute inset-y-0 left-0 bg-zinc-500 rounded-full pointer-events-none"
+              style={{ width: `${bufferedPercent}%` }}
+            />
+          )}
           <div
             className="h-full bg-violet-600 relative"
             style={{ width: `${progress}%` }}
@@ -699,8 +750,10 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           2. Playing + controls visible: a Pause button so mobile users
              can pause without having to find the small button in the
              bottom bar. Tapping it pauses; the controls auto-hide 3s
-             after the last interaction. */}
-      {!isPlaying && (
+             after the last interaction.
+          The play button is hidden while buffering (the spinner takes its
+          place) so the user doesn't see a play button they can't use. */}
+      {!isPlaying && !isBuffering && (
         <div
           className="absolute inset-0 flex items-center justify-center cursor-pointer"
           onClick={(e) => {
@@ -714,7 +767,17 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         </div>
       )}
-      {isPlaying && controlsVisible && (
+      {/* Buffering spinner — shown when the video is waiting for data
+          (initial load, re-buffering after a stall, or seeking ahead of
+          what's downloaded). Replaces the play button so the user sees
+          something is happening. pointer-events-none so taps pass through
+          to the container (which toggles controls on mobile). */}
+      {isBuffering && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <Loader2 className="h-10 w-10 text-white/80 animate-spin" />
+        </div>
+      )}
+      {isPlaying && !isBuffering && controlsVisible && (
         <div
           className="absolute inset-0 flex items-center justify-center cursor-pointer"
           onClick={(e) => {

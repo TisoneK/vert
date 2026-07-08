@@ -21,6 +21,40 @@ _Nothing yet._
 
 ---
 
+## [0.6.8] — 2026-07-08
+
+### Added
+
+#### Video player buffering support
+
+**File:** `src/components/vert/VideoPlayer.tsx`
+
+The video player had no buffering feedback at all — when playback stalled waiting for data, the video froze with no spinner, no "loading" indicator, nothing. Users had no way to tell whether the video was broken or just loading. Added two buffering affordances:
+
+**1. Buffering spinner (centered overlay)**
+
+New `isBuffering` state (defaults to `true` on mount — covers the initial load before the first frame is ready). Driven by four `<video>` events:
+- `waiting` → `setIsBuffering(true)` — fires when playback stops because the next frame isn't available
+- `canplay` → `setIsBuffering(false)` — fires when enough data is available to start playing (covers initial load)
+- `playing` → `setIsBuffering(false)` — fires when playback resumes after a stall
+- (cleanup removes all three on unmount/URL change)
+
+Rendered as a centered `Loader2` icon from lucide-react with `animate-spin`, `text-white/80`, `h-10 w-10`. Uses `pointer-events-none` so taps pass through to the container (mobile users can still toggle controls while buffering).
+
+The spinner **replaces** the play button overlay when buffering — the play button now has `&& !isBuffering` in its condition, so the user never sees a play button they can't use. The pause overlay (shown when playing + controls visible) also has `&& !isBuffering` so it doesn't appear during a re-buffer.
+
+State is reset in the `prevUrl` block (alongside `setHasError`, `setQualityLevels`, etc.) so a new video starts in the buffering state until `canplay` fires.
+
+**2. Buffer progress bar**
+
+New `bufferedPercent` state (0–100). Updated from the `progress` event on the `<video>` element, which fires periodically as the browser downloads data. The handler reads `video.buffered` (a `TimeRanges` object) and computes `(lastBufferedEnd / duration) * 100` — the last range's end is the furthest point downloaded, which for progressive downloads is the total buffered amount. For HLS, ranges can be more fragmented, but the last range end is still the right value to show.
+
+Rendered as a lighter `bg-zinc-500` bar inside the existing progress bar container (`absolute inset-y-0 left-0`, behind the violet `bg-violet-600` progress div). Only shown when `bufferedPercent > 0`. Uses `pointer-events-none` so clicks still go to the seek handler.
+
+The container div got `relative` added to its className so the absolute-positioned buffer bar positions correctly against it.
+
+---
+
 ## [0.6.7] — 2026-07-08
 
 ### Fixed
@@ -880,7 +914,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.7...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.8...HEAD
+[0.6.8]: https://github.com/TisoneK/vert/releases/tag/v0.6.8
 [0.6.7]: https://github.com/TisoneK/vert/releases/tag/v0.6.7
 [0.6.6]: https://github.com/TisoneK/vert/releases/tag/v0.6.6
 [0.6.5]: https://github.com/TisoneK/vert/releases/tag/v0.6.5
