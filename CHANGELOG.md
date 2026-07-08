@@ -15,6 +15,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.3] — 2026-07-08
+
+### Fixed
+- **Channel video count drifted when videos were deleted.** Two related bugs in the delete paths. First: the user-facing delete route (`DELETE /api/v1/videos/[id]`) didn't guard against the video already being soft-deleted, so calling it twice decremented `channel.videoCount` by 2 — over time the count could go negative. Added an `isRemoved` guard that returns 404 for already-removed videos, matching the GET route. Second: the admin delete route (`DELETE /api/v1/admin/videos/[id]`) soft-deleted the video but never decremented `channel.videoCount` at all, so every admin removal left the channel's count inflated by one. The admin route now decrements the count and also guards against double-deletion.
+
+---
+
 ## [0.6.2] — 2026-07-08
 
 ### Fixed
@@ -221,7 +228,8 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.3...HEAD
+[0.6.3]: https://github.com/TisoneK/vert/releases/tag/v0.6.3
 [0.6.2]: https://github.com/TisoneK/vert/releases/tag/v0.6.2
 [0.6.1]: https://github.com/TisoneK/vert/releases/tag/v0.6.1
 [0.6.0]: https://github.com/TisoneK/vert/releases/tag/v0.6.0

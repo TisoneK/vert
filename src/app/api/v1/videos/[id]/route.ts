@@ -226,7 +226,7 @@ export async function DELETE(
       include: { channel: true },
     })
 
-    if (!video) {
+    if (!video || video.isRemoved) {
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
 

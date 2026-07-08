@@ -14,6 +14,22 @@ _Nothing yet._
 
 ---
 
+## [0.6.3] — 2026-07-08
+
+### Fixed
+
+#### Channel videoCount drift on video deletion (two bugs)
+
+**Files:** `src/app/api/v1/videos/[id]/route.ts`, `src/app/api/v1/admin/videos/[id]/route.ts`
+
+**Bug 1 — user DELETE double-decremented videoCount.** `DELETE /api/v1/videos/[id]` did a `findUnique` (which returns soft-deleted videos), then unconditionally decremented `channel.videoCount`. If the same video was DELETEd twice — e.g. the owner deletes it, then a stale client tab re-issues the request — the count went down by 2 for one video. Over time this could drive `videoCount` negative. Fix: added `video.isRemoved` to the 404 guard (matching the GET route's existing check on line 44), so the second DELETE returns 404 before reaching the decrement.
+
+**Bug 2 — admin DELETE never decremented videoCount.** `DELETE /api/v1/admin/videos/[id]` soft-deleted the video and logged an `AdminAction`, but did not touch `channel.videoCount`. Every admin removal left the channel's count inflated by one (the video is gone from listings but still counted). Fix: the admin route now decrements `channel.videoCount` (guarded by `video.channelId`), and also gets the same `isRemoved` guard to prevent double-decrement if an admin removes a video the owner already deleted.
+
+Both routes now have symmetric behavior: one decrement per actual removal, idempotent on repeated calls.
+
+---
+
 ## [0.6.2] — 2026-07-08
 
 ### Fixed
@@ -736,7 +752,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.3...HEAD
+[0.6.3]: https://github.com/TisoneK/vert/releases/tag/v0.6.3
 [0.6.2]: https://github.com/TisoneK/vert/releases/tag/v0.6.2
 [0.6.1]: https://github.com/TisoneK/vert/releases/tag/v0.6.1
 [0.6.0]: https://github.com/TisoneK/vert/releases/tag/v0.6.0

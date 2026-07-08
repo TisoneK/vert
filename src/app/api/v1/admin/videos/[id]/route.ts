@@ -14,7 +14,7 @@ export async function DELETE(
     }
 
     const video = await db.video.findUnique({ where: { id } })
-    if (!video) {
+    if (!video || video.isRemoved) {
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
 
@@ -22,6 +22,16 @@ export async function DELETE(
       where: { id },
       data: { isRemoved: true },
     })
+
+    // Decrement channel video count — the user-facing DELETE route does this
+    // but the admin route was missing it, causing videoCount to drift upward
+    // (counting removed videos) whenever an admin removed a video.
+    if (video.channelId) {
+      await db.channel.update({
+        where: { id: video.channelId },
+        data: { videoCount: { decrement: 1 } },
+      })
+    }
 
     await db.adminAction.create({
       data: {
