@@ -14,6 +14,21 @@ _Nothing yet._
 
 ---
 
+## [0.6.0] — 2026-07-07
+
+### Changed
+
+#### Header decluttered: theme toggle moved into profile menu
+**Commit:** `2985665`
+
+First of a set of polish fixes following a detailed side-by-side comparison against Dailymotion (screenshots from a real device), which surfaced several concrete "messy" issues: an overcrowded header, no creator identity on feed cards, static-only thumbnails, hidden/unlabeled engagement actions, and cramped spacing.
+
+**This fix:** the header had 7 elements on mobile for logged-in users (hamburger, wordmark, search, theme toggle, upload, bell, avatar) vs. ~4 on Dailymotion. Theme is a low-frequency setting, not something that needs permanent top-level real estate. Moved it from a standalone icon button into a new menu item inside the profile dropdown (`Header.tsx`), right below "My Channel" — same toggle behavior (`setTheme`), now also closes the dropdown on click for consistency with the other menu items. Logged-out users still get the standalone icon since they have no profile menu to hold it.
+
+**Remaining items from the comparison** (tracked for follow-up, not yet done): creator identity/follow affordance on feed cards, visible Like/Bookmark/Share actions instead of a hidden "⋮" menu, autoplay/live thumbnail previews, spacing rhythm across sections.
+
+---
+
 ## [0.5.5] — 2026-07-07
 
 ### Fixed

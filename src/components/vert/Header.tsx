@@ -107,15 +107,22 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
             <Search className="h-5 w-5" />
           </button>
 
-          {/* Theme toggle */}
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            <Sun className="h-5 w-5 hidden dark:block" />
-            <Moon className="h-5 w-5 block dark:hidden" />
-          </button>
+          {/* Theme toggle — only shown standalone for logged-out users
+              (no profile menu to tuck it into). For logged-in users it
+              moves into the profile dropdown below, since it's a
+              low-frequency setting that doesn't need permanent header
+              real estate — reduces the header from 5 icons to 4 on
+              mobile (search, upload, bell, avatar). */}
+          {!user && (
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              <Sun className="h-5 w-5 hidden dark:block" />
+              <Moon className="h-5 w-5 block dark:hidden" />
+            </button>
+          )}
 
           {user && (
             <>
@@ -155,6 +162,14 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
                     className="w-full text-left px-3 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors"
                   >
                     <User className="h-4 w-4" /> My Channel
+                  </button>
+                  <button
+                    onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setShowProfileMenu(false) }}
+                    className="w-full text-left px-3 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors"
+                  >
+                    <Sun className="h-4 w-4 hidden dark:block" />
+                    <Moon className="h-4 w-4 block dark:hidden" />
+                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                   </button>
                   {user.channelId && (
                     <button

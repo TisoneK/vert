@@ -15,6 +15,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.0] — 2026-07-07
+
+### Changed
+- **Decluttered the header for logged-in users.** The header had 7 elements crammed into one bar on mobile (hamburger, wordmark, search, theme toggle, upload, bell, avatar), noticeably busier than comparable apps. Moved the theme toggle (a low-frequency setting) into the profile dropdown menu instead of a permanent header icon — logged-in users now see 4 icons (search, upload, bell, avatar) instead of 5, with theme still one tap away via the profile menu. Logged-out users (who have no profile menu) keep the standalone toggle.
+
+---
+
 ## [0.5.5] — 2026-07-07
 
 ### Fixed
