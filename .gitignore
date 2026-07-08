@@ -10,6 +10,11 @@ node_modules
 !.yarn/releases
 !.yarn/versions
 
+# This project uses bun (bun.lock is the authoritative lockfile).
+# package-lock.json is ignored so a stray `npm install` doesn't recreate
+# a stale npm lockfile and trigger false-positive Dependabot alerts.
+package-lock.json
+
 # testing
 /coverage
 

@@ -1,0 +1,25 @@
+# Dependabot configuration
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# This project uses bun as its package manager (bun.lock is the authoritative
+# lockfile). The "npm" package-ecosystem setting covers bun.lock too —
+# Dependabot will read it and flag vulnerable resolved versions.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    # Group patch/minor updates together to reduce PR noise; major versions
+    # get their own PRs so breaking changes are reviewed individually.
+    groups:
+      patch-and-minor:
+        update-types:
+          - "patch"
+          - "minor"
+  # Keep GitHub Actions workflows current
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
