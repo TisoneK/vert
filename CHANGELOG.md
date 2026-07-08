@@ -37,6 +37,14 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.4] — 2026-07-08
+
+### Fixed
+- **On phones, videos were cramped into two narrow columns instead of filling the screen width.** Every video grid (home, trending, explore, search, channel, saved, playlists, etc.) now shows one video per row on mobile, so each thumbnail fills the full screen width — the same way competing video apps display their feeds. Landscape videos in particular were too small to see comfortably; they now fill the screen edge-to-edge. Larger screens keep their existing multi-column layouts.
+- **The featured video on the home page and the #1 trending video looked too small on phones.** Both now take up more of the screen on mobile before capping at a smaller height on desktop, so the next section is still visible without scrolling.
+
+---
+
 ## [0.6.3] — 2026-07-08
 
 ### Fixed
@@ -227,7 +235,8 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.3...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.4...HEAD
+[0.6.4]: https://github.com/TisoneK/vert/releases/tag/v0.6.4
 [0.6.3]: https://github.com/TisoneK/vert/releases/tag/v0.6.3
 [0.6.2]: https://github.com/TisoneK/vert/releases/tag/v0.6.2
 [0.6.1]: https://github.com/TisoneK/vert/releases/tag/v0.6.1

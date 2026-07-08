@@ -21,6 +21,32 @@ _Nothing yet._
 
 ---
 
+## [0.6.4] — 2026-07-08
+
+### Fixed
+
+#### Mobile video grids: 2 columns → 1 column (full-width cards)
+
+**Files:** `HomeFeed.tsx`, `TrendingPage.tsx`, `ExplorePage.tsx`, `ChannelPage.tsx`, `CategoryPage.tsx`, `TagPage.tsx`, `PlaylistsPage.tsx`, `PlaylistDetailPage.tsx`, `ProfilePage.tsx`, `SavedPage.tsx`, `SearchResults.tsx` (23 grid instances total)
+
+Reported via a side-by-side screenshot comparison against Dailymotion's mobile feed: Vert's video grids used `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5` — 2 columns on mobile. Each card was ~48% of the viewport width, so landscape videos (which rely on width to be legible) were too small, and the overall feed felt cramped compared to Dailymotion's single-column full-width cards.
+
+**Fix:** replaced the mobile breakpoint from `grid-cols-2` to `grid-cols-1` across all 23 video grid instances. The full progression is now `grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5` (PlaylistsPage: `grid-cols-1 sm:grid-cols-2 md:grid-cols-4`). Mobile gets full-width cards; `sm` (640px+) gets 2 columns; `md` and `lg` keep their previous density (4 and 5 columns respectively). Applied via `sed` across all 11 component files in one pass; the loading skeleton in `HomeFeed.tsx` was updated too so it matches the actual grid during fetch.
+
+Did NOT touch: `AdminDashboard.tsx`, `CreatorStudio.tsx`, `LandingPage.tsx` — those use `grid-cols-2` for stat cards / small UI cards, not video thumbnails, and the user didn't report issues with them.
+
+#### Featured and Trending heroes: taller on mobile
+
+**Files:** `HomeFeed.tsx`, `TrendingPage.tsx`
+
+The featured hero on the home page and the #1 trending hero both capped at `42vh` on all viewports. On mobile, a portrait video at `h-[42vh]` (e.g. 336px tall on an 800px viewport) with a 9:16 aspect ratio renders only ~189px wide — centered in a ~400px screen with empty space on both sides, looking "shrunked". The 42vh cap was originally chosen for desktop (to keep the next section visible below the fold on a 1280px viewport), but applying it to mobile too made the hero unnecessarily small.
+
+**Fix:** both heroes now use `h-[60vh] md:h-[42vh]` (portrait/square) and `max-h-[60vh] md:max-h-[42vh]` (landscape). Mobile gets a taller hero; desktop keeps the original 42vh cap. On a typical 800px-tall phone, 60vh = 480px — a portrait video at that height is 270px wide, still narrower than the screen but noticeably larger than before, and a landscape video fills the full width up to 480px tall.
+
+**TrendingPage bonus fix:** the trending hero was still hardcoding `aspect-video` (16:9) regardless of the video's actual format — the same bug v0.5.5 fixed for `HomeFeed.tsx`. A portrait #1 trending video was being `object-cover`-cropped into a 16:9 box, cutting off most of the frame. Refactored to use the same per-format aspect-ratio logic as HomeFeed's Featured hero (`aspect-video` / `aspect-square` / `aspect-[9/16]`) via an IIFE, matching the existing HomeFeed pattern.
+
+---
+
 ## Maintenance note — 2026-07-08
 
 **CHANGELOG.md rewritten to remove technical/security detail.** Flagged by Ti: the public, unauthenticated `/changelog` page (added in 0.4.0) had been accumulating implementation-level detail across multiple sessions/agents — API route paths (`DELETE /api/v1/admin/videos/[id]`), ORM/library internals (Prisma match modes, DB constraint types), env var names, and worse, a description of a since-fixed timing-attack vulnerability and a since-fixed public diagnostic endpoint leak. That's a real information-disclosure risk on a page anyone can view without logging in — even for fixed bugs, describing the exact mechanism tells a reader what to go looking for elsewhere in the app.
@@ -769,7 +795,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.3...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.4...HEAD
+[0.6.4]: https://github.com/TisoneK/vert/releases/tag/v0.6.4
 [0.6.3]: https://github.com/TisoneK/vert/releases/tag/v0.6.3
 [0.6.2]: https://github.com/TisoneK/vert/releases/tag/v0.6.2
 [0.6.1]: https://github.com/TisoneK/vert/releases/tag/v0.6.1

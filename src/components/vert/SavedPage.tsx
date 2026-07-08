@@ -94,7 +94,7 @@ export function SavedPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
@@ -108,7 +108,7 @@ export function SavedPage() {
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Tap the bookmark on any video to save it for later.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {saved.map((entry) => (
             <div key={entry.videoId} className="relative group">
               {/* Disable the VideoCard's own context menu here — the only

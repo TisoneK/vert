@@ -112,7 +112,7 @@ export function HomeFeed() {
   if (loading) {
     return (
       <div className="p-4 md:p-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="aspect-video rounded-lg bg-zinc-200 dark:bg-zinc-700" />
@@ -134,7 +134,7 @@ export function HomeFeed() {
             <Sparkles className="h-4 w-4 text-violet-600" />
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">For You</h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {forYouVideos.slice(0, 10).map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
@@ -142,18 +142,12 @@ export function HomeFeed() {
         </section>
       )}
 
-      {/* Featured — one hero video. Height capped at ~42vh so the user
-          immediately sees the start of the next section below the fold
-          on a typical desktop viewport. aspect-video alone made it
-          ~675px tall on a 1280px viewport, dominating the entire screen.
-
-          Aspect ratio now matches the video's actual format (same logic
-          as VideoCard) instead of always forcing aspect-video: Vert is a
-          portrait-first platform, so most Featured videos are portrait,
-          and object-cover-ing a 9:16 source into a fixed 16:9 box cropped
-          away most of the frame (heads/feet cut off). Portrait/square
-          videos are now height-driven (h-[42vh], width follows from the
-          aspect ratio, centered) instead of width-driven. */}
+      {/* Featured — one hero video. On mobile the hero is tall (60vh) so a
+          portrait video doesn't look shrunked in the middle of a wide screen;
+          on desktop it's capped at 42vh so the next section peeks below the
+          fold. Aspect ratio matches the video's actual format (same logic as
+          VideoCard) — portrait/square videos are height-driven (width follows
+          from the aspect ratio, centered), landscape is width-driven. */}
       {trendingVideos.length > 0 && (() => {
         const hero = trendingVideos[0]
         const heroAspect =
@@ -161,8 +155,8 @@ export function HomeFeed() {
           hero.format === 'square' ? 'aspect-square' :
           'aspect-[9/16]'
         const heroSizing = hero.format === 'landscape'
-          ? 'w-full max-h-[42vh]'
-          : 'h-[42vh] mx-auto'
+          ? 'w-full max-h-[60vh] md:max-h-[42vh]'
+          : 'h-[60vh] md:h-[42vh] mx-auto'
         return (
         <section className="mb-8">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Featured</h2>
@@ -210,7 +204,7 @@ export function HomeFeed() {
               See all
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {trendingVideos.slice(1, 11).map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
@@ -233,7 +227,7 @@ export function HomeFeed() {
                 See all
               </button>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
               {catVideos.map((video) => (
                 <VideoCard key={video.id} video={video} />
               ))}
@@ -254,7 +248,7 @@ export function HomeFeed() {
               See all
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {videos.slice(0, 15).map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}

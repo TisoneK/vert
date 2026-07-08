@@ -123,7 +123,7 @@ export function TrendingPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
@@ -138,14 +138,25 @@ export function TrendingPage() {
         </div>
       ) : (
         <>
-          {/* Hero section with top trending video — height capped at 42vh
-              (same as home featured) so users see the grid below the fold. */}
-          {heroVideo && (
+          {/* Hero section with top trending video. Aspect ratio matches the
+              video's actual format (same logic as HomeFeed's Featured and
+              VideoCard) — hardcoding aspect-video cropped portrait videos.
+              Height cap is taller on mobile (60vh) so the hero doesn't look
+              shrunked, and 42vh on desktop so the grid peeks below the fold. */}
+          {heroVideo && (() => {
+            const heroAspect =
+              heroVideo.format === 'landscape' ? 'aspect-video' :
+              heroVideo.format === 'square' ? 'aspect-square' :
+              'aspect-[9/16]'
+            const heroSizing = heroVideo.format === 'landscape'
+              ? 'w-full max-h-[60vh] md:max-h-[42vh]'
+              : 'h-[60vh] md:h-[42vh] mx-auto'
+            return (
             <div
               className="relative mb-8 rounded-lg overflow-hidden cursor-pointer group shadow-sm hover:shadow-md transition-all duration-200"
               onClick={() => navigate({ page: 'video', videoId: heroVideo.id })}
             >
-              <div className="aspect-video max-h-[42vh] bg-zinc-200 dark:bg-zinc-800">
+              <div className={`${heroAspect} ${heroSizing} bg-zinc-200 dark:bg-zinc-800`}>
                 {heroVideo.thumbnailUrl ? (
                   <img src={heroVideo.thumbnailUrl} alt={heroVideo.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
                 ) : (
@@ -177,11 +188,12 @@ export function TrendingPage() {
                 </div>
               </div>
             </div>
-          )}
+            )
+          })()}
 
           {/* Trending grid */}
           {gridVideos.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {gridVideos.map((video, index) => (
                 <div key={video.id} className="relative">
                   <VideoCard video={video} />

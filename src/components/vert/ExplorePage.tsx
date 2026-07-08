@@ -85,7 +85,7 @@ export function ExplorePage() {
           return (
             <>
               {withVideos.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                   {withVideos.map((cat) => {
                     const Icon = categoryIconMap[cat.slug] || Film
                     return (
@@ -114,7 +114,7 @@ export function ExplorePage() {
                   <h2 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mt-8 mb-3">
                     {withVideos.length > 0 ? 'More categories' : 'All categories'}
                   </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {empty.map((cat) => {
                       const Icon = categoryIconMap[cat.slug] || Film
                       return (

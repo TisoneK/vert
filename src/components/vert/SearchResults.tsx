@@ -242,7 +242,7 @@ export function SearchResults({ query }: SearchResultsProps) {
       {/* Results */}
       {loading ? (
         tab === 'videos' ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <CardSkeleton key={i} />
             ))}
@@ -256,7 +256,7 @@ export function SearchResults({ query }: SearchResultsProps) {
         )
       ) : tab === 'videos' ? (
         videos.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {videos.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
