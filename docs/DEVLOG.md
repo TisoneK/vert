@@ -14,6 +14,16 @@ _Nothing yet._
 
 ---
 
+## Maintenance note — 2026-07-08
+
+**CHANGELOG.md rewritten to remove technical/security detail.** Flagged by Ti: the public, unauthenticated `/changelog` page (added in 0.4.0) had been accumulating implementation-level detail across multiple sessions/agents — API route paths (`DELETE /api/v1/admin/videos/[id]`), ORM/library internals (Prisma match modes, DB constraint types), env var names, and worse, a description of a since-fixed timing-attack vulnerability and a since-fixed public diagnostic endpoint leak. That's a real information-disclosure risk on a page anyone can view without logging in — even for fixed bugs, describing the exact mechanism tells a reader what to go looking for elsewhere in the app.
+
+Rewrote every CHANGELOG.md entry (0.1.0 through 0.6.3) in plain, non-technical language. Verified first that every version already had a matching entry here in DEVLOG.md, so no technical detail was lost — it's just no longer duplicated in the public-facing file. Confirmed the `/api/v1/changelog` parser only depends on the generic `## [version] — date` heading format and `- **bold**` bullets, both preserved, so the public changelog page renders unaffected.
+
+**Versioning correction:** Ti also flagged the 0.5.5 → 0.6.0 jump. That minor-version bump (for the header-decluttering change) wasn't justified under semver — it was the same tier of change as the patch bumps before and after it (0.5.1–0.5.5, 0.6.2, 0.6.3), not a new feature. Already-released versions won't be renumbered (would break the GitHub release tags CHANGELOG.md links to), but going forward: patch bump for fixes/small UI adjustments, minor bump reserved for actual new functionality.
+
+---
+
 ## [0.6.3] — 2026-07-08
 
 ### Fixed
