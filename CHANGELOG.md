@@ -37,6 +37,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.6] — 2026-07-08
+
+### Fixed
+- **The admin panel had several surfaces that didn't adapt to dark mode** — warning banners, error and success messages, the database migration cards, the test-account creation form, and the user management badges all stayed light-colored when the rest of the app was dark. These now all follow the dark theme consistently.
+
+---
+
 ## [0.6.5] — 2026-07-08
 
 ### Fixed
@@ -242,7 +249,8 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.5...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.6...HEAD
+[0.6.6]: https://github.com/TisoneK/vert/releases/tag/v0.6.6
 [0.6.5]: https://github.com/TisoneK/vert/releases/tag/v0.6.5
 [0.6.4]: https://github.com/TisoneK/vert/releases/tag/v0.6.4
 [0.6.3]: https://github.com/TisoneK/vert/releases/tag/v0.6.3

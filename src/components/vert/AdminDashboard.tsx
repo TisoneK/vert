@@ -397,8 +397,8 @@ export function AdminDashboard() {
 
   const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-600 border-yellow-200',
-    reviewed: 'bg-blue-100 text-blue-600 border-blue-200',
-    actioned: 'bg-emerald-100 text-emerald-600 border-emerald-200',
+    reviewed: 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900',
+    actioned: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900',
     dismissed: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700',
   }
 
@@ -462,7 +462,7 @@ export function AdminDashboard() {
           <Database className="h-4 w-4" />
           Database
           {migrations.some((m) => !m.applied) && (
-            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-semibold">
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 text-[10px] font-semibold">
               {migrations.filter((m) => !m.applied).length}
             </span>
           )}
@@ -688,7 +688,7 @@ export function AdminDashboard() {
                           size="sm"
                           variant="ghost"
                           onClick={() => updateFlagStatus(flag.id, 'reviewed')}
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/30"
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           Review
@@ -697,7 +697,7 @@ export function AdminDashboard() {
                           size="sm"
                           variant="ghost"
                           onClick={() => removeVideo(flag.video.id, flag.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30"
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
                           Remove
@@ -719,7 +719,7 @@ export function AdminDashboard() {
                           size="sm"
                           variant="ghost"
                           onClick={() => updateFlagStatus(flag.id, 'actioned')}
-                          className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                          className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
                           Action
@@ -747,17 +747,17 @@ export function AdminDashboard() {
       {tab === 'database' && (
         <div className="space-y-4">
           {/* Warning banner */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-4 flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-amber-900">
+              <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
                 Schema migrations run SQL against the production database.
               </p>
-              <p className="text-xs text-amber-700 mt-1">
+              <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
                 Each migration is wrapped in a transaction and tracked in
-                the <code className="px-1 py-0.5 bg-amber-100 rounded">_admin_migration</code> table.
+                the <code className="px-1 py-0.5 bg-amber-100 dark:bg-amber-900/40 rounded">_admin_migration</code> table.
                 Applied migrations cannot be undone from the UI — review the SQL before applying.
-                CLI alternative: <code className="px-1 py-0.5 bg-amber-100 rounded">./scripts/apply-admin-migrations.sh</code>
+                CLI alternative: <code className="px-1 py-0.5 bg-amber-100 dark:bg-amber-900/40 rounded">./scripts/apply-admin-migrations.sh</code>
               </p>
             </div>
             <Button
@@ -765,7 +765,7 @@ export function AdminDashboard() {
               size="sm"
               onClick={fetchMigrations}
               disabled={migrationsLoading}
-              className="text-amber-700 hover:text-amber-900 hover:bg-amber-100 shrink-0"
+              className="text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40 shrink-0"
             >
               <RefreshCw className={`h-4 w-4 ${migrationsLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -774,12 +774,12 @@ export function AdminDashboard() {
 
           {/* Status messages */}
           {migrationError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-3 text-sm text-red-700 dark:text-red-400">
               {migrationError}
             </div>
           )}
           {migrationSuccess && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-700">
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-lg p-3 text-sm text-emerald-700 dark:text-emerald-400">
               {migrationSuccess}
             </div>
           )}
@@ -812,12 +812,12 @@ export function AdminDashboard() {
                     {migrations.filter((m) => !m.applied).map((m) => (
                       <div
                         key={m.id}
-                        className="bg-white border border-orange-200 rounded-lg p-4 flex items-center justify-between gap-4"
+                        className="bg-white dark:bg-zinc-800 border border-orange-200 dark:border-orange-900 rounded-lg p-4 flex items-center justify-between gap-4"
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <code className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">{m.id}</code>
-                            <Badge variant="outline" className="border-orange-200 text-orange-700 text-[10px]">
+                            <Badge variant="outline" className="border-orange-200 dark:border-orange-900 text-orange-700 dark:text-orange-400 text-[10px]">
                               pending
                             </Badge>
                           </div>
@@ -866,7 +866,7 @@ export function AdminDashboard() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <code className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">{m.id}</code>
-                            <Badge variant="outline" className="border-emerald-200 text-emerald-700 text-[10px]">
+                            <Badge variant="outline" className="border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400 text-[10px]">
                               <CheckCircle className="h-3 w-3 mr-0.5" />
                               applied
                             </Badge>
@@ -884,10 +884,10 @@ export function AdminDashboard() {
 
               {/* All caught up */}
               {migrations.every((m) => m.applied) && (
-                <div className="text-center py-8 bg-emerald-50 border border-emerald-200 rounded-lg">
-                  <CheckCircle className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-emerald-900">All migrations applied</p>
-                  <p className="text-xs text-emerald-700 mt-1">Database schema is up to date.</p>
+                <div className="text-center py-8 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-lg">
+                  <CheckCircle className="h-8 w-8 text-emerald-600 dark:text-emerald-400 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-emerald-900 dark:text-emerald-300">All migrations applied</p>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">Database schema is up to date.</p>
                 </div>
               )}
             </>
@@ -934,7 +934,7 @@ export function AdminDashboard() {
               variant="outline"
               size="sm"
               onClick={() => { setShowCreateTest(!showCreateTest); setTestResult(null) }}
-              className="border-violet-200 text-violet-700 hover:bg-violet-50 shrink-0"
+              className="border-violet-200 dark:border-violet-900 text-violet-700 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 shrink-0"
               title="Generate test accounts with channels for QA"
             >
               <UserPlus className="h-4 w-4 mr-1" />
@@ -944,7 +944,7 @@ export function AdminDashboard() {
 
           {/* Create test accounts form */}
           {showCreateTest && (
-            <div className="bg-violet-50 border border-violet-200 rounded-lg p-4 space-y-3">
+            <div className="bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-900 rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Create test accounts</h3>
                 <button
@@ -957,8 +957,8 @@ export function AdminDashboard() {
               </div>
               <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 Generates test users with channels. Each gets the member role, a channel,
-                and the password <code className="px-1 py-0.5 bg-violet-100 rounded text-violet-700">testpass123</code>.
-                Emails follow the pattern <code className="px-1 py-0.5 bg-violet-100 rounded text-violet-700">testuser_&lt;batch&gt;_N@test.vert.com</code>.
+                and the password <code className="px-1 py-0.5 bg-violet-100 dark:bg-violet-900/40 rounded text-violet-700 dark:text-violet-400">testpass123</code>.
+                Emails follow the pattern <code className="px-1 py-0.5 bg-violet-100 dark:bg-violet-900/40 rounded text-violet-700 dark:text-violet-400">testuser_&lt;batch&gt;_N@test.vert.com</code>.
               </p>
               <div className="flex items-center gap-3">
                 <label className="text-sm text-zinc-700 dark:text-zinc-300 shrink-0">How many?</label>
@@ -996,24 +996,24 @@ export function AdminDashboard() {
           {/* Test account creation result — shows generated credentials
               so the admin can copy them for testing. */}
           {testResult && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 space-y-3">
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-emerald-900 flex items-center gap-1.5">
+                <h3 className="text-sm font-semibold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
                   <CheckCircle className="h-4 w-4" />
                   Created {testResult.created} test account{testResult.created !== 1 ? 's' : ''}
                 </h3>
                 <button
                   onClick={() => setTestResult(null)}
-                  className="text-emerald-400 hover:text-emerald-700 p-1"
+                  className="text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 p-1"
                   aria-label="Dismiss"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="bg-white border border-emerald-100 rounded-lg overflow-hidden">
+              <div className="bg-white dark:bg-zinc-800 border border-emerald-100 dark:border-emerald-900 rounded-lg overflow-hidden">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b border-emerald-100 bg-emerald-50/50">
+                    <tr className="border-b border-emerald-100 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/20">
                       <th className="text-left font-medium text-zinc-600 dark:text-zinc-400 px-3 py-2">Username</th>
                       <th className="text-left font-medium text-zinc-600 dark:text-zinc-400 px-3 py-2">Email</th>
                       <th className="text-left font-medium text-zinc-600 dark:text-zinc-400 px-3 py-2">Password</th>
@@ -1022,7 +1022,7 @@ export function AdminDashboard() {
                   </thead>
                   <tbody>
                     {testResult.users.map((u) => (
-                      <tr key={u.email} className="border-b border-emerald-50 last:border-0">
+                      <tr key={u.email} className="border-b border-emerald-50 dark:border-emerald-900/50 last:border-0">
                         <td className="px-3 py-2 text-zinc-900 dark:text-zinc-100 font-medium">{u.username}</td>
                         <td className="px-3 py-2 text-zinc-600 dark:text-zinc-400">{u.email}</td>
                         <td className="px-3 py-2 text-zinc-600 dark:text-zinc-400 font-mono">{u.password}</td>
@@ -1032,13 +1032,13 @@ export function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-              <p className="text-xs text-emerald-700">{testResult.note}</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-400">{testResult.note}</p>
             </div>
           )}
 
           {/* Error */}
           {userError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-3 text-sm text-red-700 dark:text-red-400">
               {userError}
             </div>
           )}
@@ -1106,7 +1106,7 @@ export function AdminDashboard() {
                           <Badge
                             variant="outline"
                             className={u.role === 'admin'
-                              ? 'border-violet-200 text-violet-700 text-xs'
+                              ? 'border-violet-200 dark:border-violet-900 text-violet-700 dark:text-violet-400 text-xs'
                               : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 text-xs'}
                           >
                             {u.role}
@@ -1133,18 +1133,18 @@ export function AdminDashboard() {
                             "active" meant "online right now"). */}
                         <td className="px-3 py-3">
                           {u.isActive ? (
-                            <Badge variant="outline" className="border-emerald-200 text-emerald-700 text-xs">
+                            <Badge variant="outline" className="border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400 text-xs">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1" />
                               active
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="border-red-200 text-red-700 text-xs">
+                            <Badge variant="outline" className="border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 text-xs">
                               <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1" />
                               suspended
                             </Badge>
                           )}
                           {u.channel?.isSuspended && (
-                            <Badge variant="outline" className="border-orange-200 text-orange-700 text-xs ml-1">
+                            <Badge variant="outline" className="border-orange-200 dark:border-orange-900 text-orange-700 dark:text-orange-400 text-xs ml-1">
                               channel suspended
                             </Badge>
                           )}
@@ -1167,7 +1167,7 @@ export function AdminDashboard() {
                               title={u.role === 'admin' ? 'Demote to member' : 'Promote to admin'}
                               className={`p-1.5 rounded transition-colors disabled:opacity-50 ${
                                 u.role === 'admin'
-                                  ? 'text-violet-600 hover:bg-violet-100'
+                                  ? 'text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/30'
                                   : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-violet-600'
                               }`}
                             >
@@ -1185,7 +1185,7 @@ export function AdminDashboard() {
                               className={`p-1.5 rounded transition-colors disabled:opacity-50 ${
                                 u.isActive
                                   ? 'text-zinc-500 dark:text-zinc-400 hover:bg-orange-100 hover:text-orange-600'
-                                  : 'text-emerald-600 hover:bg-emerald-100'
+                                  : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
                               }`}
                             >
                               {u.isActive ? (
@@ -1211,7 +1211,7 @@ export function AdminDashboard() {
                 </table>
               </div>
               {/* Footer with count + legend */}
-              <div className="px-4 py-2 border-t border-zinc-200 dark:border-zinc-700 bg-white flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+              <div className="px-4 py-2 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
                 <span>{adminUsers.length} user{adminUsers.length !== 1 ? 's' : ''} shown · <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 align-middle" /> online = active in last 5 min</span>
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1">

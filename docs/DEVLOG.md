@@ -21,6 +21,34 @@ _Nothing yet._
 
 ---
 
+## [0.6.6] — 2026-07-08
+
+### Fixed
+
+#### Admin panel dark mode gaps (40 surfaces)
+
+**File:** `src/components/vert/AdminDashboard.tsx`
+
+The v0.5.0 dark mode pass covered ~37 component files but missed several surfaces in the admin panel. 40 light-mode class strings had no `dark:` variant, leaving them rendering as bright light-colored boxes when the rest of the app was in dark mode.
+
+**Surfaces fixed:**
+- Flag moderation action buttons (Review/Remove/Action) — `text-blue-600 hover:bg-blue-50`, `text-red-600 hover:bg-red-50`, `text-emerald-600 hover:bg-emerald-50` → added `dark:text-*-400 dark:hover:bg-*-950/30`
+- Database tab amber warning banner — `bg-amber-50 border-amber-200 text-amber-900 text-amber-700` → added `dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-200 dark:text-amber-400`
+- Migration error/success status banners — `bg-red-50` / `bg-emerald-50` → `dark:bg-*-950/30`
+- Pending migration cards — `bg-white border-orange-200` → `dark:bg-zinc-800 dark:border-orange-900`
+- Applied/pending status badges — `border-*-200 text-*-700` → `dark:border-*-900 dark:text-*-400`
+- "All migrations applied" empty state — `bg-emerald-50 text-emerald-900` → `dark:bg-emerald-950/30 dark:text-emerald-300`
+- Create test accounts button + form — `bg-violet-50 border-violet-200 text-violet-700` → `dark:bg-violet-950/30 dark:border-violet-900 dark:text-violet-400`
+- Test result banner + credentials table — `bg-emerald-50 bg-white border-emerald-100` → `dark:bg-emerald-950/30 dark:bg-zinc-800 dark:border-emerald-900`
+- User management role/active/suspended/channel-suspended badges — all colored badges got `dark:` border + text variants
+- Role toggle / activate toggle action buttons — `hover:bg-violet-100` / `hover:bg-emerald-100` → `dark:hover:bg-*-900/30`
+- Users table footer bar — `bg-white` → `dark:bg-zinc-800`
+- Flag status badge class map (reviewed/actioned) — `bg-blue-100 text-blue-600` / `bg-emerald-100 text-emerald-600` → added `dark:bg-*-900/40 dark:text-*-400`
+
+**Not changed:** solid colored status dots (`bg-orange-500`, `bg-emerald-500`, `bg-red-500`) — these are full-saturation accent colors that read fine on both light and dark backgrounds, no dark variant needed.
+
+---
+
 ## [0.6.5] — 2026-07-08
 
 ### Fixed
@@ -814,7 +842,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.5...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.6...HEAD
+[0.6.6]: https://github.com/TisoneK/vert/releases/tag/v0.6.6
 [0.6.5]: https://github.com/TisoneK/vert/releases/tag/v0.6.5
 [0.6.4]: https://github.com/TisoneK/vert/releases/tag/v0.6.4
 [0.6.3]: https://github.com/TisoneK/vert/releases/tag/v0.6.3
