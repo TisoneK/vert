@@ -21,6 +21,25 @@ _Nothing yet._
 
 ---
 
+## [0.6.5] — 2026-07-08
+
+### Fixed
+
+#### Mobile drawer missing Creator Studio and Admin Panel
+
+**File:** `src/components/vert/MobileNav.tsx`
+
+The desktop `Sidebar.tsx` has a "Creator" section (lines 312–347) gated by `user && (user.channelId || user.role === 'admin')`, containing Creator Studio (gated by `user.channelId`) and Admin Panel (gated by `user.role === 'admin'`). The mobile drawer (`MobileNav.tsx`) had no equivalent — mobile users could only reach those pages by navigating to them indirectly (e.g. via the profile page). The bottom nav's "More" tab highlights `creator-studio` and `admin` as active states, but tapping "More" just opened the drawer which didn't contain the links.
+
+**Fix:** added a matching "Creator" section inside the drawer's logged-in block, placed after Playlists and before Upload. Same gating logic as the desktop sidebar:
+- Section wrapper: `user.channelId || user.role === 'admin'`
+- Creator Studio button: `user.channelId` (only users with a channel)
+- Admin Panel button: `user.role === 'admin'`
+
+Uses the same icons as the desktop sidebar (`BarChart3` for Creator Studio, `Shield` for Admin Panel) and the same "CREATOR" uppercase label with a top divider. Button styling matches the drawer's existing pattern (`bg-zinc-100 dark:bg-zinc-800` + `border-l-2 border-violet-600` for active, rather than the desktop sidebar's `bg-violet-50` — consistent with every other button in the drawer). Both buttons call `onDrawerOpenChange(false)` after navigating, matching every other drawer entry.
+
+---
+
 ## [0.6.4] — 2026-07-08
 
 ### Fixed
@@ -795,7 +814,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.4...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.5...HEAD
+[0.6.5]: https://github.com/TisoneK/vert/releases/tag/v0.6.5
 [0.6.4]: https://github.com/TisoneK/vert/releases/tag/v0.6.4
 [0.6.3]: https://github.com/TisoneK/vert/releases/tag/v0.6.3
 [0.6.2]: https://github.com/TisoneK/vert/releases/tag/v0.6.2

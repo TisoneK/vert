@@ -37,6 +37,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.5] — 2026-07-08
+
+### Fixed
+- **On phones, the Creator Studio and Admin Panel were unreachable from the menu.** Both were only listed in the desktop sidebar — the mobile menu had no way to get to them. They now appear in the mobile menu under a "Creator" heading, matching the desktop layout. Creator Studio shows for anyone who has a channel; Admin Panel shows for admins.
+
+---
+
 ## [0.6.4] — 2026-07-08
 
 ### Fixed
@@ -235,7 +242,8 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.4...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.5...HEAD
+[0.6.5]: https://github.com/TisoneK/vert/releases/tag/v0.6.5
 [0.6.4]: https://github.com/TisoneK/vert/releases/tag/v0.6.4
 [0.6.3]: https://github.com/TisoneK/vert/releases/tag/v0.6.3
 [0.6.2]: https://github.com/TisoneK/vert/releases/tag/v0.6.2

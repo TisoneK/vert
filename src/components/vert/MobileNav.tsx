@@ -2,7 +2,7 @@
 
 import { useNavigation, useAuth } from '@/lib/store'
 import { useEffect } from 'react'
-import { Home, Upload, User, Compass, Flame, Clock, Bookmark, ListVideo, ScrollText, X, Mail } from 'lucide-react'
+import { Home, Upload, User, Compass, Flame, Clock, Bookmark, ListVideo, ScrollText, X, Mail, BarChart3, Shield } from 'lucide-react'
 
 interface MobileNavProps {
   drawerOpen: boolean
@@ -108,6 +108,38 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
                   >
                     <ListVideo className="h-4 w-4" /> Playlists
                   </button>
+                  {/* Creator / Admin section — mirrors the desktop Sidebar's
+                      "Creator" section: gated by channelId (Creator Studio)
+                      and role === 'admin' (Admin Panel). Previously these
+                      were only reachable from the desktop sidebar, leaving
+                      mobile users with no way to access their studio or
+                      the admin panel from the drawer. */}
+                  {(user.channelId || user.role === 'admin') && (
+                    <>
+                      <div className="my-2 border-t border-zinc-200 dark:border-zinc-700" />
+                      <p className="px-3 mb-1 text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Creator</p>
+                      {user.channelId && (
+                        <button
+                          onClick={() => { navigate({ page: 'creator-studio' }); onDrawerOpenChange(false) }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                            isActive('creator-studio') ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-l-2 border-violet-600' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                          }`}
+                        >
+                          <BarChart3 className="h-4 w-4" /> Creator Studio
+                        </button>
+                      )}
+                      {user.role === 'admin' && (
+                        <button
+                          onClick={() => { navigate({ page: 'admin' }); onDrawerOpenChange(false) }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                            isActive('admin') ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-l-2 border-violet-600' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                          }`}
+                        >
+                          <Shield className="h-4 w-4" /> Admin Panel
+                        </button>
+                      )}
+                    </>
+                  )}
                   <button
                     onClick={() => { navigate({ page: 'upload' }); onDrawerOpenChange(false) }}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
