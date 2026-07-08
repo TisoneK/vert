@@ -2,11 +2,32 @@
 
 All notable changes to Vert are documented in this file, newest first.
 
+> **READ BEFORE ADDING AN ENTRY — for both human contributors and AI agents:**
+> This file is rendered on a **public, unauthenticated page** (`/changelog`) —
+> anyone can read it without logging in. Write every entry as if explaining
+> the change to a normal user who has never seen the codebase and doesn't
+> know what an API, a database, or a component is. Describe **what changed
+> and why it matters to them** — not how it was built or fixed.
+>
+> **Do not include, in this file:**
+> - File names, function/component names, or code snippets
+> - API route paths, database/ORM details, library names
+> - Environment variable names or config details
+> - Descriptions of *how* a security vulnerability worked, even if it's
+>   already fixed — that's a roadmap for anyone looking to attack the app
+> - Commit hashes or PR numbers
+>
+> All of that belongs in [`docs/DEVLOG.md`](./docs/DEVLOG.md) instead, which
+> is a plain repo file (not rendered on any public page) meant for whoever
+> works on this codebase next. **Every version below should have a matching
+> DEVLOG.md entry with the technical detail** — write that one first, then
+> write the plain-language version here.
+>
+> If you're not sure whether a detail is "too technical," a good test: would
+> your grandmother understand this sentence? If not, it belongs in DEVLOG,
+> not here.
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-This file describes changes in plain language for anyone using the app. For
-technical implementation detail (file references, API routes, commit hashes),
-see [`docs/DEVLOG.md`](./docs/DEVLOG.md), which is intended for contributors
-rather than the public changelog page.
 
 ---
 

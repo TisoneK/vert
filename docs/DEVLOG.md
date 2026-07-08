@@ -4,6 +4,13 @@ Technical change log for developers working on Vert. Complements
 [`CHANGELOG.md`](../CHANGELOG.md) (which is user-facing) with implementation
 details, file references, and architectural reasoning.
 
+> **For contributors and AI agents:** `CHANGELOG.md` is rendered on a public,
+> unauthenticated page — see the notice at the top of that file for what
+> must never go there (file/route/library names, env vars, security
+> vulnerability mechanics, commit hashes). All of that technical detail
+> belongs here instead. Write the DEVLOG entry first, then the plain-language
+> CHANGELOG entry.
+
 Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ---
