@@ -23,18 +23,16 @@
 ## Overview
 
 `Vert` is a portrait-first video platform built with Next.js 16 (App Router),
-React 19, TypeScript, Prisma, and Tailwind CSS v4. The current v1 deployment
-uses SQLite + local-filesystem uploads as a deliberate trade-off for fast
-iteration — see [ARCHITECTURE.md](./ARCHITECTURE.md) for the rationale and
-the migration triggers that would force a move to Postgres / S3 / Cloudflare
-Stream.
+React 19, TypeScript, Prisma + PostgreSQL, Vercel Blob for media storage,
+NextAuth for authentication, and Tailwind CSS v4 — see
+[ARCHITECTURE.md](./ARCHITECTURE.md) for the full design rationale.
 
 ## Quickstart
 
 ```bash
 bun install
 bun run db:generate    # generate Prisma client
-bun run db:push        # create SQLite DB + apply schema
+bun run db:push        # create PostgreSQL DB + apply schema
 bun prisma/seed.ts     # (optional) load demo data
 bun run dev            # http://localhost:3000
 ```
@@ -55,17 +53,17 @@ Demo logins after seeding:
 
 ## Environment
 
-Required environment variables (set in `.env.local`, never committed):
+Required environment variables (set in `.env.local`, never committed — see [`.env.example`](./.env.example) for a full template):
 
-- `DATABASE_URL` — Prisma connection string (e.g. `file:./dev.db` for SQLite)
+- `DATABASE_URL` — PostgreSQL connection string (e.g. `postgresql://user:password@localhost:5432/vert`). Serverless pool params (`connection_limit=1&pool_timeout=10`) are appended automatically by `src/lib/db.ts`.
 - `NEXTAUTH_SECRET` — random secret for JWT signing (generate with `openssl rand -hex 32`)
 - `NEXTAUTH_URL` — app URL (e.g. `http://localhost:3000` for dev)
 
-Optional (only when upload storage is migrated off local FS — see `ARCHITECTURE.md`):
+Optional:
 
-- `STORAGE_BUCKET`, `STORAGE_ACCESS_KEY`, `STORAGE_SECRET_KEY`, `STORAGE_ENDPOINT`
-
-Store secrets securely in production (Vercel dashboard, CI secrets, or Vault).
+- `VERT_BLOB_READ_WRITE_TOKEN` or `BLOB_READ_WRITE_TOKEN` — Vercel Blob token for video/image uploads (required for upload functionality; the latter is auto-set when a Blob store is connected via the Vercel dashboard)
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — Google OAuth credentials (optional; credentials provider works without them)
+- `SEED_KEY` — secret key for protected internal endpoints (seed, cleanup-demo)
 
 ## Scripts
 
@@ -113,9 +111,7 @@ time. See the file header for details.
 ## Architecture
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for:
-- The v1 architectural choices (SQLite, local-FS uploads, single-route SPA) and why they were chosen
-- The originally-spec'd design (Postgres, Clerk, Cloudflare Stream, Redis) and why it was deferred
-- Migration triggers that would force each deferral to be revisited
+- The architectural choices (PostgreSQL, Vercel Blob, NextAuth, SPA-on-Next.js shell) and why they were chosen
 - A file map for new contributors
 
 ## Contributing
