@@ -15,6 +15,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.2] — 2026-07-08
+
+### Fixed
+- **Username login was case-sensitive, so "John" couldn't log in as "john".** Registration preserved the original case of the username (only trimmed, not lowercased), but the credentials-provider lookup did an exact `username === identifier` match. Email was already lowercased on both sides, so email login worked — only username login was broken. A user who registered as "John" and later typed "john" at the login screen got "Invalid email/username or password" with no hint as to why. Username lookup is now case-insensitive (`mode: 'insensitive'` in Prisma, supported on Postgres). The registration uniqueness check got the same treatment, preventing "John" and "john" from registering as two separate accounts (the DB-level unique constraint is case-sensitive on a plain `VARCHAR`, so the application-level check is what actually enforces this).
+
+---
+
 ## [0.6.1] — 2026-07-07
 
 ### Changed
@@ -214,9 +221,17 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/TisoneK/vert/releases/tag/v0.6.2
+[0.6.1]: https://github.com/TisoneK/vert/releases/tag/v0.6.1
+[0.6.0]: https://github.com/TisoneK/vert/releases/tag/v0.6.0
+[0.5.5]: https://github.com/TisoneK/vert/releases/tag/v0.5.5
+[0.5.4]: https://github.com/TisoneK/vert/releases/tag/v0.5.4
+[0.5.3]: https://github.com/TisoneK/vert/releases/tag/v0.5.3
+[0.5.2]: https://github.com/TisoneK/vert/releases/tag/v0.5.2
 [0.5.1]: https://github.com/TisoneK/vert/releases/tag/v0.5.1
 [0.5.0]: https://github.com/TisoneK/vert/releases/tag/v0.5.0
+[0.4.1]: https://github.com/TisoneK/vert/releases/tag/v0.4.1
 [0.4.0]: https://github.com/TisoneK/vert/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TisoneK/vert/releases/tag/v0.3.0
 [0.2.0]: https://github.com/TisoneK/vert/releases/tag/v0.2.0

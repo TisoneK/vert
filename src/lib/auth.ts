@@ -29,11 +29,14 @@ export const authOptions: NextAuthOptions = {
 
         const identifier = credentials.identifier.trim()
 
+        // Username lookup is case-insensitive — registration preserves the
+        // original case ("John"), so an exact match would reject a login
+        // typed as "john". Email is already lowercased on both sides.
         const user = await db.user.findFirst({
           where: {
             OR: [
               { email: identifier.toLowerCase() },
-              { username: identifier },
+              { username: { equals: identifier, mode: 'insensitive' } },
             ],
           },
         })

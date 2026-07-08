@@ -66,10 +66,17 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Check if user already exists
+    // Check if user already exists.
+    // Username match is case-insensitive — otherwise "John" and "john" could
+    // register as separate accounts, then login (also case-insensitive) would
+    // be ambiguous. The DB unique constraint is case-sensitive (plain VARCHAR),
+    // so this application-level check is what actually prevents duplicates.
     const existingUser = await db.user.findFirst({
       where: {
-        OR: [{ email: normalizedEmail }, { username: normalizedUsername }],
+        OR: [
+          { email: normalizedEmail },
+          { username: { equals: normalizedUsername, mode: 'insensitive' } },
+        ],
       },
     })
 

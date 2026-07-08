@@ -14,6 +14,29 @@ _Nothing yet._
 
 ---
 
+## [0.6.2] — 2026-07-08
+
+### Fixed
+
+#### Username login was case-sensitive ("John" couldn't log in as "john")
+
+**Files:** `src/lib/auth.ts`, `src/app/api/auth/register/route.ts`
+
+**Root cause:** Registration stored the username with its original case — `normalizedUsername = username.toString().trim()` (line 26 of `register/route.ts`) trims but does not lowercase. The credentials provider in `auth.ts` then looked the user up with an exact `username === identifier` match (line 36). Email was already lowercased on both register and login, so email login worked — but a user who registered as "John" and later typed "john" at the login screen got `Invalid email/username or password` with no indication of why.
+
+The Google OAuth path already lowercased usernames (`username.toLowerCase().replace(/[^a-z0-9]/g, '')` in `auth.ts` line 77-80), so OAuth users were unaffected. The bug was isolated to credentials-provider registrations.
+
+**Secondary issue:** the registration uniqueness check (`register/route.ts` line 72) was also case-sensitive, so "John" and "john" could register as two separate accounts. The DB-level `@unique` constraint on `username` is a plain `VARCHAR` unique index in Postgres, which is case-sensitive by default — so the database alone does not prevent this. The application-level check is what enforces case-insensitive uniqueness.
+
+**Fix:** both lookups now use Prisma's `mode: 'insensitive'` filter (supported on the Postgres provider):
+
+- `auth.ts` login lookup: `{ username: { equals: identifier, mode: 'insensitive' } }`
+- `register/route.ts` uniqueness check: `{ username: { equals: normalizedUsername, mode: 'insensitive' } }`
+
+No migration needed — `mode: 'insensitive'` is a query-time feature, not a schema change. Existing users with mixed-case usernames can now log in regardless of the case they type.
+
+---
+
 ## [0.6.1] — 2026-07-07
 
 ### Changed
@@ -713,9 +736,17 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/TisoneK/vert/releases/tag/v0.6.2
+[0.6.1]: https://github.com/TisoneK/vert/releases/tag/v0.6.1
+[0.6.0]: https://github.com/TisoneK/vert/releases/tag/v0.6.0
+[0.5.5]: https://github.com/TisoneK/vert/releases/tag/v0.5.5
+[0.5.4]: https://github.com/TisoneK/vert/releases/tag/v0.5.4
+[0.5.3]: https://github.com/TisoneK/vert/releases/tag/v0.5.3
+[0.5.2]: https://github.com/TisoneK/vert/releases/tag/v0.5.2
 [0.5.1]: https://github.com/TisoneK/vert/releases/tag/v0.5.1
 [0.5.0]: https://github.com/TisoneK/vert/releases/tag/v0.5.0
+[0.4.1]: https://github.com/TisoneK/vert/releases/tag/v0.4.1
 [0.4.0]: https://github.com/TisoneK/vert/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TisoneK/vert/releases/tag/v0.3.0
 [0.2.0]: https://github.com/TisoneK/vert/releases/tag/v0.2.0
