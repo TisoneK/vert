@@ -28,10 +28,12 @@ function generatePathname(userId: string, contentType: string, filename: string)
     'video/mp4': 'mp4',
     'video/webm': 'webm',
     'video/quicktime': 'mov',
+    'video/x-matroska': 'mkv',
     'image/jpeg': 'jpg',
     'image/png': 'png',
     'image/webp': 'webp',
     'image/gif': 'gif',
+    'image/avif': 'avif',
   }
   const ext = extByMime[contentType] || (filename.toLowerCase().match(/\.([a-z0-9]{2,5})$/)?.[1] || 'bin')
 
