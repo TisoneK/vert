@@ -250,6 +250,36 @@ export async function POST(req: NextRequest) {
       tagLinks = tagRecords.map((t) => ({ tagId: t.id }))
     }
 
+    // Validate format — VideoCard and the player use this to pick the aspect
+    // ratio class. An invalid value silently falls through to portrait, which
+    // is misleading (a landscape video rendered in a 9:16 box). Default to
+    // portrait only if omitted; reject anything else.
+    const VALID_FORMATS = ['portrait', 'landscape', 'square'] as const
+    const normalizedFormat =
+      format === undefined ? 'portrait'
+      : VALID_FORMATS.includes(format) ? format
+      : null
+    if (normalizedFormat === null) {
+      return NextResponse.json(
+        { error: `format must be one of: ${VALID_FORMATS.join(', ')}` },
+        { status: 400 }
+      )
+    }
+
+    // Validate durationSeconds — must be a non-negative finite number if
+    // provided. Use `?? null` (not `|| null`) so a legitimate 0 is preserved.
+    let normalizedDuration: number | null = null
+    if (durationSeconds !== undefined && durationSeconds !== null) {
+      const d = Number(durationSeconds)
+      if (!Number.isFinite(d) || d < 0) {
+        return NextResponse.json(
+          { error: 'durationSeconds must be a non-negative number' },
+          { status: 400 }
+        )
+      }
+      normalizedDuration = d
+    }
+
     const video = await db.video.create({
       data: {
         channelId,
@@ -257,9 +287,9 @@ export async function POST(req: NextRequest) {
         description: trimmedDescription,
         videoUrl,
         thumbnailUrl: thumbnailUrl || null,
-        durationSeconds: durationSeconds || null,
+        durationSeconds: normalizedDuration,
         aspectRatio: aspectRatio || '9:16',
-        format: format || 'portrait',
+        format: normalizedFormat,
         status: 'ready',
         categories: categoryIds?.length
           ? {
