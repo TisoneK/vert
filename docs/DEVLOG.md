@@ -14,6 +14,21 @@ _Nothing yet._
 
 ---
 
+## [0.6.1] — 2026-07-07
+
+### Changed
+
+#### Video cards: visible Bookmark icon instead of everything hidden in "⋮"
+**Commit:** `df613d4`
+
+Second item from the Dailymotion comparison list: cards had 5 actions (Save to Watch Later, Add to Playlist, Share, Not Interested, Report) all behind a single unlabeled "⋮" — nothing was reachable without opening a menu first, unlike Dailymotion's exposed Like/Bookmark/Share row.
+
+**Constraint:** this grid is dense (2–5 columns; a card can be ~160px wide), so a full 3-button row like Dailymotion's single-column feed would break the layout at small widths.
+
+**Fix:** `VideoCard.tsx` — added a standalone Bookmark icon button (same visual treatment as the existing "⋮": `bg-zinc-900/70` rounded chip, positioned top-right) that directly calls `onContextMenuAction?.('save', video.id)`, for both the mobile-always-visible menu and the desktop hover-reveal menu. Removed the now-redundant "Save to Watch Later" entry from both dropdown menus, since it's one tap away without opening them. Playlist, Share, Not Interested, and Report remain in the overflow.
+
+---
+
 ## [0.6.0] — 2026-07-07
 
 ### Changed

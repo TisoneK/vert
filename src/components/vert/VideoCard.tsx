@@ -4,7 +4,7 @@ import { useNavigation } from '@/lib/store'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { CategoryBadge } from './CategoryBadge'
 import { PlaylistPicker } from './PlaylistPicker'
-import { Play, Smartphone, Monitor, Square, MoreVertical, ListVideo } from 'lucide-react'
+import { Play, Smartphone, Monitor, Square, MoreVertical, ListVideo, Bookmark } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 
 interface VideoCardProps {
@@ -152,8 +152,23 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
             open the menu — tapping the card just navigates to the video. */}
         {showContextMenu && (
           <>
-            {/* Mobile: always visible */}
-            <div ref={mobileMenuRef} className="md:hidden absolute top-1.5 right-1.5">
+            {/* Mobile: always visible. Bookmark is the single highest-value
+                action (matches Dailymotion's exposed Like/Bookmark/Share
+                row) surfaced directly so it doesn't require opening a menu;
+                everything else (playlist, share, not interested, report)
+                stays in the overflow since the card is too narrow in a
+                dense grid for a full 3-button row. */}
+            <div ref={mobileMenuRef} className="md:hidden absolute top-1.5 right-1.5 flex items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onContextMenuAction?.('save', video.id)
+                }}
+                className="p-1.5 bg-zinc-900/70 rounded text-white hover:bg-zinc-900/90 transition-colors backdrop-blur-sm"
+                aria-label="Save to Watch Later"
+              >
+                <Bookmark className="h-4 w-4" />
+              </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -169,12 +184,6 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
                   className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-1 z-50"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <button
-                    onClick={() => { onContextMenuAction?.('save', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    Save to Watch Later
-                  </button>
                   <button
                     onClick={() => { setShowPlaylistPicker(true); setShowMenu(false) }}
                     className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5"
@@ -204,7 +213,17 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
               )}
             </div>
             {/* Desktop: hover-reveal */}
-            <div ref={desktopMenuRef} className="hidden md:block absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div ref={desktopMenuRef} className="hidden md:flex items-center gap-1 absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onContextMenuAction?.('save', video.id)
+                }}
+                className="p-1 bg-zinc-900/70 rounded text-white hover:bg-zinc-900/90 transition-colors"
+                aria-label="Save to Watch Later"
+              >
+                <Bookmark className="h-3.5 w-3.5" />
+              </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -219,12 +238,6 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
                   className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-1 z-50"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <button
-                    onClick={() => { onContextMenuAction?.('save', video.id); setShowMenu(false) }}
-                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    Save to Watch Later
-                  </button>
                   <button
                     onClick={() => { setShowPlaylistPicker(true); setShowMenu(false) }}
                     className="w-full text-left px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5"

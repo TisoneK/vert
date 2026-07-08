@@ -15,6 +15,13 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.1] — 2026-07-07
+
+### Changed
+- **Video cards surface Save/Bookmark directly instead of hiding it in a menu.** Every card had 5 actions (Save, Add to Playlist, Share, Not Interested, Report) all buried behind one unlabeled "⋮" icon — you had to open a menu to do anything. Added a visible Bookmark icon next to the "⋮" for the single highest-value action, matching how Dailymotion exposes its top actions directly. The rest stay in the overflow menu since cards are too narrow in this dense grid for a full 3-button row.
+
+---
+
 ## [0.6.0] — 2026-07-07
 
 ### Changed
