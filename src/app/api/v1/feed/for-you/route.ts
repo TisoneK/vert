@@ -227,12 +227,18 @@ export async function GET(req: NextRequest) {
       scored.push({ id: video.id, score })
     }
 
+    // Build lookup Maps so the sort tiebreaker and formatting step are O(1)
+    // per lookup instead of O(n) via Array.find. With 400 candidates the
+    // previous find-inside-sort was ~2.8M operations per request.
+    const viewCountById = new Map(candidates.map((v) => [v.id, v.viewCount]))
+    const scoreById = new Map(scored.map((s) => [s.id, s.score]))
+
     // Sort by score desc, then by viewCount desc as a tiebreaker
     scored.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score
       // Tiebreaker: more-viewed video first
-      const aViews = candidates.find((v) => v.id === a.id)?.viewCount ?? 0
-      const bViews = candidates.find((v) => v.id === b.id)?.viewCount ?? 0
+      const aViews = viewCountById.get(a.id) ?? 0
+      const bViews = viewCountById.get(b.id) ?? 0
       return bViews - aViews
     })
 
@@ -242,14 +248,15 @@ export async function GET(req: NextRequest) {
     const topVideos = candidates.filter((v) => topSet.has(v.id))
 
     // Preserve the sorted order from `scored` (candidates may be in any order)
-    topVideos.sort((a, b) => topIds.indexOf(a.id) - topIds.indexOf(b.id))
+    const topIdIndex = new Map(topIds.map((id, i) => [id, i]))
+    topVideos.sort((a, b) => (topIdIndex.get(a.id) ?? 0) - (topIdIndex.get(b.id) ?? 0))
 
     const formattedVideos = topVideos.map((v) => ({
       ...v,
       categories: v.categories.map((vc) => vc.category),
       tags: v.tags.map((vt) => vt.tag),
       // Include the score for debugging / UI affordances ("Because you watched…")
-      _forYouScore: scored.find((s) => s.id === v.id)?.score ?? 0,
+      _forYouScore: scoreById.get(v.id) ?? 0,
     }))
 
     return NextResponse.json({
