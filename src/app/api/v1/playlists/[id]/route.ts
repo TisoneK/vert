@@ -40,6 +40,18 @@ export async function GET(
       return NextResponse.json({ error: 'Playlist not found' }, { status: 404 })
     }
 
+    // Private playlists are only visible to their owner.
+    if (!playlist.isPublic) {
+      const { getCurrentUser } = await import('@/lib/auth-helpers')
+      const user = await getCurrentUser()
+      const owner = user
+        ? await db.channel.findUnique({ where: { id: playlist.channelId }, select: { userId: true } })
+        : null
+      if (!owner || owner.userId !== user!.id) {
+        return NextResponse.json({ error: 'Playlist not found' }, { status: 404 })
+      }
+    }
+
     // Filter out removed/deleted videos — a playlist may still reference
     // a video whose isRemoved=true. The client shouldn't see those.
     const visibleItems = playlist.items.filter(
@@ -84,12 +96,43 @@ export async function PATCH(
     }
 
     const body = await req.json()
+
+    // Title rules mirror POST /api/v1/playlists: 1-100 chars if provided.
+    let trimmedTitle: string | undefined
+    if (body.title !== undefined) {
+      const t: string = typeof body.title === 'string' ? body.title.trim() : ''
+      if (t.length === 0) {
+        return NextResponse.json({ error: 'Title cannot be empty' }, { status: 400 })
+      }
+      if (t.length > 100) {
+        return NextResponse.json(
+          { error: 'Title is too long (max 100 characters)' },
+          { status: 400 }
+        )
+      }
+      trimmedTitle = t
+    }
+
+    let trimmedDescription: string | null | undefined
+    if (body.description !== undefined) {
+      trimmedDescription =
+        typeof body.description === 'string' ? body.description.trim().slice(0, 1000) : null
+    }
+
+    let normalizedIsPublic: boolean | undefined
+    if (body.isPublic !== undefined) {
+      if (typeof body.isPublic !== 'boolean') {
+        return NextResponse.json({ error: 'isPublic must be a boolean' }, { status: 400 })
+      }
+      normalizedIsPublic = body.isPublic
+    }
+
     const updated = await db.playlist.update({
       where: { id },
       data: {
-        title: body.title,
-        description: body.description,
-        isPublic: body.isPublic,
+        title: trimmedTitle,
+        description: trimmedDescription,
+        isPublic: normalizedIsPublic,
       },
     })
 
