@@ -85,17 +85,17 @@ export function ExplorePage() {
           return (
             <>
               {withVideos.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                   {withVideos.map((cat) => {
                     const Icon = categoryIconMap[cat.slug] || Film
                     return (
                       <button
                         key={cat.id}
                         onClick={() => navigate({ page: 'category', slug: cat.slug })}
-                        className="group flex items-center gap-3 rounded-lg p-4 text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-sm transition-all"
+                        className="group flex items-center gap-3 rounded-lg p-3 md:p-4 text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-sm active:scale-[0.98] transition-all"
                       >
-                        <div className="w-12 h-12 shrink-0 rounded-lg bg-violet-50 flex items-center justify-center">
-                          <Icon className="h-6 w-6 text-violet-600" />
+                        <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-lg bg-violet-50 dark:bg-violet-950/40 flex items-center justify-center">
+                          <Icon className="h-5 w-5 md:h-6 md:w-6 text-violet-600" />
                         </div>
                         <div className="min-w-0">
                           <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-violet-600 transition-colors truncate">{cat.name}</h3>
@@ -114,17 +114,17 @@ export function ExplorePage() {
                   <h2 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mt-8 mb-3">
                     {withVideos.length > 0 ? 'More categories' : 'All categories'}
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {empty.map((cat) => {
                       const Icon = categoryIconMap[cat.slug] || Film
                       return (
                         <button
                           key={cat.id}
                           onClick={() => navigate({ page: 'category', slug: cat.slug })}
-                          className="group flex items-center gap-3 rounded-lg p-4 text-left bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-600 hover:bg-white dark:hover:bg-zinc-800 transition-all"
+                          className="group flex items-center gap-3 rounded-lg p-3 md:p-4 text-left bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-600 hover:bg-white dark:hover:bg-zinc-800 active:scale-[0.98] transition-all"
                         >
-                          <div className="w-12 h-12 shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center">
-                            <Icon className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
+                          <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center">
+                            <Icon className="h-5 w-5 md:h-6 md:w-6 text-zinc-400 dark:text-zinc-500" />
                           </div>
                           <div className="min-w-0">
                             <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors truncate">{cat.name}</h3>
