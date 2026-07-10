@@ -99,7 +99,12 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       // title is shorter than a card with a 2-line title next to it, making
       // the grid look ragged. The thumbnail keeps its aspect ratio; the info
       // section grows to fill the remaining space.
-      className="group cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 h-full flex flex-col"
+      // Landscape cards span the full row on phones (col-span-2 in the
+      // 2-column mobile grids) — at half width a 16:9 thumbnail is too small
+      // to read, the original complaint behind v0.6.4's full-width cards.
+      // Portrait/square cards stay 2-up for browse density. md:col-span-1
+      // restores normal flow in the 4/5-column desktop grids.
+      className={`group cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 h-full flex flex-col ${format === 'landscape' ? 'col-span-2 md:col-span-1' : ''}`}
       onClick={() => navigate({ page: 'video', videoId: video.id })}
     >
       {/* Thumbnail container */}
