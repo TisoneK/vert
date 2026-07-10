@@ -124,7 +124,7 @@ export function ProfilePage() {
   if (!channel) {
     return (
       <div className="max-w-5xl mx-auto animate-vert-fade-in">
-        <div className="h-24 md:h-36 bg-gradient-to-br from-violet-100 via-violet-50 to-zinc-100" />
+        <div className="h-24 md:h-36 bg-gradient-to-br from-violet-100 via-violet-50 to-zinc-100 dark:from-violet-950/40 dark:via-zinc-900 dark:to-zinc-900" />
         <div className="px-4 md:px-6 py-4">
           <div className="flex items-start gap-4">
             <div className="shrink-0 -mt-8">

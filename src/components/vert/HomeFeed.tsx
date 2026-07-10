@@ -291,7 +291,7 @@ export function HomeFeed() {
                       className="w-16 h-16 rounded-full object-cover ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 transition-all"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-100 to-zinc-100 flex items-center justify-center text-violet-600 text-xl font-bold ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 transition-all">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-100 to-zinc-100 dark:from-violet-950/40 dark:to-zinc-800 flex items-center justify-center text-violet-600 dark:text-violet-400 text-xl font-bold ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 dark:group-hover:ring-violet-800 transition-all">
                       {ch.channelName[0]?.toUpperCase()}
                     </div>
                   )}

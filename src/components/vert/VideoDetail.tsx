@@ -184,7 +184,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                   <button
                     key={tag.name}
                     onClick={() => navigate({ page: 'tag', slug: tag.name })}
-                    className="px-2 py-0.5 bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-900 rounded-md text-xs font-medium transition-colors"
+                    className="px-2 py-0.5 bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 hover:text-violet-900 dark:hover:text-violet-300 rounded-md text-xs font-medium transition-colors"
                   >
                     {tag.label}
                   </button>
