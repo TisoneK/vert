@@ -283,7 +283,7 @@ export function VertApp() {
           {renderView()}
         </main>
       </div>
-      <MobileNav drawerOpen={mobileDrawerOpen} onDrawerOpenChange={setMobileDrawerOpen} />
+      <MobileNav drawerOpen={mobileDrawerOpen} onDrawerOpenChange={setMobileDrawerOpen} onLogout={handleLogout} />
     </div>
   )
 }

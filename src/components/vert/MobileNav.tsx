@@ -2,14 +2,15 @@
 
 import { useNavigation, useAuth } from '@/lib/store'
 import { useEffect } from 'react'
-import { Home, Upload, User, Compass, Flame, Clock, Bookmark, ListVideo, ScrollText, X, Mail, BarChart3, Shield } from 'lucide-react'
+import { Home, Upload, User, Compass, Flame, Clock, Bookmark, ListVideo, ScrollText, X, Mail, BarChart3, Shield, Settings, LogOut } from 'lucide-react'
 
 interface MobileNavProps {
   drawerOpen: boolean
   onDrawerOpenChange: (open: boolean) => void
+  onLogout: () => void
 }
 
-export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
+export function MobileNav({ drawerOpen, onDrawerOpenChange, onLogout }: MobileNavProps) {
   const { navigate, currentView } = useNavigation()
   const { user } = useAuth()
 
@@ -145,6 +146,34 @@ export function MobileNav({ drawerOpen, onDrawerOpenChange }: MobileNavProps) {
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
                   >
                     <Upload className="h-4 w-4" /> Upload
+                  </button>
+                  {/* Account section — mirrors the header avatar dropdown so
+                      mobile users can reach their channel, settings, and
+                      sign-out from the drawer (the "More" tab) without
+                      knowing the tiny header avatar is tappable. */}
+                  <div className="my-2 border-t border-zinc-200 dark:border-zinc-700" />
+                  <p className="px-3 mb-1 text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Account</p>
+                  <button
+                    onClick={() => { navigate({ page: 'profile' }); onDrawerOpenChange(false) }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                      isActive('profile') ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-l-2 border-violet-600' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                    }`}
+                  >
+                    <User className="h-4 w-4" /> My Channel
+                  </button>
+                  <button
+                    onClick={() => { navigate({ page: 'settings' }); onDrawerOpenChange(false) }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                      isActive('settings') ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-l-2 border-violet-600' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                    }`}
+                  >
+                    <Settings className="h-4 w-4" /> Settings
+                  </button>
+                  <button
+                    onClick={() => { onLogout(); onDrawerOpenChange(false) }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" /> Sign Out
                   </button>
                 </>
               )}
