@@ -37,6 +37,25 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.10] — 2026-07-10
+
+A polish pass focused on how the app feels on phones.
+
+### Fixed
+- **Opening a new page no longer keeps your old scroll position.** Before, if you scrolled down the home feed and then tapped Trending, the new page opened scrolled partway down instead of at the top.
+- **A few violet-tinted elements (video tags, some placeholder avatars and banners) stayed light-colored in dark mode.** They now follow the dark theme.
+
+### Changed
+- **Browsing on a phone now shows two vertical videos side by side instead of one giant card per row**, so scanning the feed, search results, channels, and playlists is much faster. Widescreen videos still get the full width of the screen so they stay easy to see.
+- **The Explore page shows categories two per row on phones**, so the full list fits on one or two screens instead of a long single-column list.
+- **Buttons and video cards now visibly respond when you tap them**, and the side menu and search bar ease in smoothly instead of popping into place. Small touches that make the app feel more alive under your thumb.
+- **Loading placeholders now match the shape of the videos that replace them**, so the page no longer jumps around when content finishes loading.
+
+### Added
+- **Your account shortcuts are now in the side menu too.** My Channel, Settings, and Sign Out used to be hidden behind the small avatar in the top corner — they're now also in the menu that opens from the "More" tab.
+
+---
+
 ## [0.6.9] — 2026-07-10
 
 ### Security
@@ -277,7 +296,8 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.8...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.10...HEAD
+[0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
 [0.6.9]: https://github.com/TisoneK/vert/releases/tag/v0.6.9
 [0.6.8]: https://github.com/TisoneK/vert/releases/tag/v0.6.8
 [0.6.7]: https://github.com/TisoneK/vert/releases/tag/v0.6.7

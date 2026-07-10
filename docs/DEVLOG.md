@@ -21,6 +21,138 @@ _Nothing yet._
 
 ---
 
+## [0.6.10] — 2026-07-10
+
+Mobile-first UI pass: everything below was audited and verified at a 375×812
+viewport against a locally seeded database.
+
+### Fixed
+
+#### Scroll position leaked across page navigations
+
+**File:** `src/components/vert/VertApp.tsx`
+
+`<main class="app-main-scroll">` is the single scroll container for every
+view, and nothing reset it on navigation — scroll 1,200px down Home, tap
+Trending in the bottom bar, and you landed 1,200px down Trending (or past
+its content entirely if it was shorter). Reproduced locally by setting
+`main.scrollTop` and clicking through the bottom nav. Fix: a `mainRef` +
+`useEffect` on `currentView` that calls `scrollTo({ top: 0 })`. Back/forward
+navigation also resets to top (per-history-entry scroll restoration isn't
+tracked — noted as a possible future refinement, not a regression: before
+this fix back/forward *also* kept whatever offset was current).
+
+#### Dark-mode gaps: violet surfaces in 4 components
+
+**Files:** `VideoDetail.tsx`, `SearchResults.tsx`, `ProfilePage.tsx`, `HomeFeed.tsx`
+
+The line-based grep used by the v0.6.7/v0.6.9 dark-mode scans excludes any
+line containing `dark:` — which misses lines that have a dark variant for a
+*different* property. HomeFeed's Popular Creators avatar fallback was exactly
+that: `dark:ring-zinc-800` present, but the violet gradient + text had no
+dark variants. Fixed:
+
+- `VideoDetail.tsx` tag chips — `bg-violet-50 text-violet-700` (+hover) →
+  added `dark:bg-violet-950/30 dark:text-violet-400` (+dark hovers)
+- `SearchResults.tsx` channel-result avatar fallback — `bg-violet-100` →
+  added `dark:bg-violet-950/40 dark:text-violet-400`
+- `ProfilePage.tsx` channel-missing banner — pastel violet gradient → added
+  `dark:from-violet-950/40 dark:via-zinc-900 dark:to-zinc-900`
+- `HomeFeed.tsx` creator avatar fallback — gradient/text/ring-hover dark
+  variants added
+
+All follow the violet dark pattern established by the v0.6.6 admin fixes
+(`dark:bg-violet-950/30-40` + `dark:text-violet-400`).
+
+### Changed
+
+#### 2-column video grids on phones
+
+**Files:** `HomeFeed.tsx`, `TrendingPage.tsx`, `SearchResults.tsx`,
+`CategoryPage.tsx`, `TagPage.tsx`, `SavedPage.tsx`, `PlaylistsPage.tsx`,
+`PlaylistDetailPage.tsx`, `ChannelPage.tsx`, `ProfilePage.tsx`, `Skeleton.tsx`
+
+Every video grid used `grid-cols-1 sm:grid-cols-2 md:grid-cols-4
+lg:grid-cols-5` — below 640px that's one ~343px-wide × ~610px-tall portrait
+card per row, and the Home feed measured **28,044px** of scroll height.
+Changed the pattern to `grid-cols-2 md:grid-cols-4 lg:grid-cols-5` (the
+`sm` step became redundant) across all 20 video-card grids. Home feed is now
+~10,016px (-64%) with two portrait cards per row — the standard density for
+vertical-video apps. `ContactPage.tsx`'s `grid-cols-1 sm:grid-cols-2` was
+deliberately left alone (it's a form-field grid, not video cards).
+
+**Relationship to v0.6.4:** that release went full-width (1 column)
+specifically because *landscape* thumbnails were illegible at ~48% width in
+the old 2-column grid (Dailymotion side-by-side). This pass surfaced the
+cost for portrait-first content: one 9:16 card per screen. Flagged the
+conflict to the owner, who picked the hybrid: portrait/square cards stay
+2-up, while `VideoCard` gives landscape cards `col-span-2 md:col-span-1`
+so they still render full-width on phones (the YouTube-mobile treatment).
+Mixed-format rows can leave an occasional gap (a 1-wide card followed by a
+2-wide card wraps); `grid-flow-dense` was considered and rejected because
+it reorders content visually against its semantic/feed order.
+
+Matching skeleton fix: `CardSkeleton` and HomeFeed's inline loading skeleton
+used `aspect-video` (16:9) placeholders that got replaced by 9:16 portrait
+cards — a large layout jump on every load. Both now use `aspect-[9/16]`.
+Also removed dead `CardSkeleton` imports from `HistoryPage.tsx`,
+`ProfilePage.tsx`, `ChannelPage.tsx` (imported, never rendered).
+
+#### 2-column Explore categories on phones
+
+**File:** `ExplorePage.tsx`
+
+Category cards (both the populated and the "More categories" sections)
+rendered one per row on phones, stretching 13 categories across ~4 screens.
+Now `grid-cols-2` below `md` with `p-3` padding and 40px icon tiles
+(`md:` restores the original 48px/`p-4`). Also added `active:scale-[0.98]`
+press feedback and fixed the populated-card icon tile's missing dark variant
+(`bg-violet-50` → `+ dark:bg-violet-950/40`).
+
+#### Touch press feedback + entry animations
+
+**Files:** `VideoCard.tsx`, `MobileNav.tsx`, `Header.tsx`, `VideoDetail.tsx`,
+`FlagDialog.tsx`, `globals.css`
+
+- `VideoCard`: `active:scale-[0.98]` — the existing hover lift is
+  desktop-only, so taps had zero visible response
+- Bottom nav tabs: `transition-all duration-150 active:scale-90` on all four
+  labeled tabs (only the upload pill responded before)
+- Drawer backdrop: new `vert-overlay-in` opacity keyframe
+  (`animate-overlay-in`, 0.25s to match `vert-drawer-in`) so the 60%-black
+  backdrop fades in with the drawer slide instead of popping; drawer panel
+  gets `shadow-2xl`
+- Header mobile search overlay + profile dropdown: reuse `animate-vert-fade-in`
+- Watch-page action row: `active:scale-95 duration-100` on the save, share,
+  and logged-out report pills — `VoteButtons` and the logged-in `FlagDialog`
+  trigger already had it; the row is now uniformly responsive
+
+### Added
+
+#### Account section in the mobile drawer
+
+**Files:** `MobileNav.tsx`, `VertApp.tsx`
+
+My Channel, Settings, and Sign Out were only reachable through the header
+avatar dropdown. The drawer now has an "Account" section (below Creator,
+above Changelog/Contact) mirroring those entries. `MobileNav` takes a new
+`onLogout` prop wired to `VertApp`'s existing `handleLogout`. Sign Out uses
+the destructive red treatment matching the header dropdown.
+
+### Notes for the next agent
+
+- `SearchSuggestions.tsx` is imported nowhere and its "trending" suggestions
+  are a hardcoded fake list — don't wire it up as-is; it needs a real
+  suggestions endpoint first.
+- The stale `[Unreleased]` compare link (still `v0.6.8...HEAD` after v0.6.9
+  shipped) was fixed in this release's link update.
+- Local dev setup used for this pass: `prisma dev` (local Prisma Postgres,
+  no Docker needed) + `prisma db push` + the seed script; `pgbouncer=true`
+  must be appended to the local `DATABASE_URL` or every pooled query after
+  the first fails with "prepared statement s0 already exists".
+
+---
+
 ## [0.6.9] — 2026-07-10
 
 ### Fixed
@@ -942,7 +1074,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.8...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.10...HEAD
+[0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
 [0.6.9]: https://github.com/TisoneK/vert/releases/tag/v0.6.9
 [0.6.8]: https://github.com/TisoneK/vert/releases/tag/v0.6.8
 [0.6.7]: https://github.com/TisoneK/vert/releases/tag/v0.6.7
