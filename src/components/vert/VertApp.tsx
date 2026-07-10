@@ -1,7 +1,7 @@
 'use client'
 
 import { useNavigation, useAuth, pathToView } from '@/lib/store'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { signOut } from 'next-auth/react'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
@@ -34,6 +34,16 @@ export function VertApp() {
   const { setUser, isLoading, user } = useAuth()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
+  const mainRef = useRef<HTMLElement>(null)
+
+  // Reset the content scroll position when the view changes. <main> is the
+  // single scroll container for every page, so without this the scroll
+  // offset leaks across navigations — scroll halfway down Home, tap
+  // Trending, and you land halfway down Trending. (Back/forward also
+  // resets to top; per-entry scroll restoration isn't tracked.)
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 })
+  }, [currentView])
 
   // Fetch session on mount — with a 3-second timeout so the app never
   // gets stuck on the loading spinner if the session endpoint is slow
@@ -269,7 +279,7 @@ export function VertApp() {
         <Sidebar collapsed={sidebarCollapsed} />
         {/* pb-16 on mobile clears the bottom MobileNav bar (h-12 + safe-area).
             md:pb-0 removes it on desktop where there's no bottom bar. */}
-        <main className="flex-1 overflow-y-auto pb-16 md:pb-0 app-main-scroll">
+        <main ref={mainRef} className="flex-1 overflow-y-auto pb-16 md:pb-0 app-main-scroll">
           {renderView()}
         </main>
       </div>
