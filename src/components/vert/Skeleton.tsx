@@ -58,11 +58,11 @@ export function ShelfSkeleton() {
       <div className="flex gap-3 overflow-hidden">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="shrink-0 w-[220px] animate-pulse">
-            <div className="aspect-video bg-zinc-200 rounded-lg" />
+            <div className="aspect-video bg-zinc-200 dark:bg-zinc-700 rounded-lg" />
             <div className="mt-2 space-y-1.5">
-              <div className="h-3.5 bg-zinc-200 rounded w-4/5" />
-              <div className="h-3 bg-zinc-200 rounded w-3/5" />
-              <div className="h-2.5 bg-zinc-200 rounded w-2/5" />
+              <div className="h-3.5 bg-zinc-200 dark:bg-zinc-700 rounded w-4/5" />
+              <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-3/5" />
+              <div className="h-2.5 bg-zinc-200 dark:bg-zinc-700 rounded w-2/5" />
             </div>
           </div>
         ))}
@@ -74,11 +74,11 @@ export function ShelfSkeleton() {
 export function CommentSkeleton() {
   return (
     <div className="flex gap-3 animate-pulse">
-      <div className="w-8 h-8 rounded-full bg-zinc-200 shrink-0" />
+      <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 shrink-0" />
       <div className="flex-1 space-y-2">
-        <div className="h-3 bg-zinc-200 rounded w-24" />
-        <div className="h-3 bg-zinc-200 rounded w-full" />
-        <div className="h-3 bg-zinc-200 rounded w-2/3" />
+        <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-24" />
+        <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-full" />
+        <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-2/3" />
       </div>
     </div>
   )
@@ -87,11 +87,11 @@ export function CommentSkeleton() {
 export function RelatedVideoSkeleton() {
   return (
     <div className="flex gap-2 animate-pulse">
-      <div className="w-32 h-[72px] bg-zinc-200 rounded shrink-0" />
+      <div className="w-32 h-[72px] bg-zinc-200 dark:bg-zinc-700 rounded shrink-0" />
       <div className="flex-1 space-y-1.5 py-0.5">
-        <div className="h-3 bg-zinc-200 rounded w-full" />
-        <div className="h-2.5 bg-zinc-200 rounded w-3/4" />
-        <div className="h-2 bg-zinc-200 rounded w-1/2" />
+        <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-full" />
+        <div className="h-2.5 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4" />
+        <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2" />
       </div>
     </div>
   )
