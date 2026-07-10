@@ -133,7 +133,7 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
     return (
       <div className="p-4 md:p-6 max-w-5xl mx-auto">
         <div className="h-8 w-48 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse mb-4" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="aspect-video rounded-lg bg-zinc-200 dark:bg-zinc-700" />
@@ -236,7 +236,7 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {videos.map((video) => (
             <div key={video.id} className="relative group">
               <VideoCard video={video} showContextMenu={false} />

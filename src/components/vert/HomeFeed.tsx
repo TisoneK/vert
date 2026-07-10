@@ -112,10 +112,10 @@ export function HomeFeed() {
   if (loading) {
     return (
       <div className="p-4 md:p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="aspect-video rounded-lg bg-zinc-200 dark:bg-zinc-700" />
+              <div className="aspect-[9/16] rounded-lg bg-zinc-200 dark:bg-zinc-700" />
               <div className="mt-2 h-3.5 w-3/4 rounded bg-zinc-200 dark:bg-zinc-700" />
               <div className="mt-1.5 h-3 w-1/2 rounded bg-zinc-200 dark:bg-zinc-700" />
             </div>
@@ -134,7 +134,7 @@ export function HomeFeed() {
             <Sparkles className="h-4 w-4 text-violet-600" />
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">For You</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {forYouVideos.slice(0, 10).map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
@@ -204,7 +204,7 @@ export function HomeFeed() {
               See all
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {trendingVideos.slice(1, 11).map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
@@ -227,7 +227,7 @@ export function HomeFeed() {
                 See all
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
               {catVideos.map((video) => (
                 <VideoCard key={video.id} video={video} />
               ))}
@@ -248,7 +248,7 @@ export function HomeFeed() {
               See all
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {videos.slice(0, 15).map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}

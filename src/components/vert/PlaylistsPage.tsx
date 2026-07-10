@@ -111,7 +111,7 @@ export function PlaylistsPage() {
   if (loading) {
     return (
       <div className="p-4 md:p-6 max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="animate-pulse">
                 <div className="aspect-video rounded-lg bg-zinc-200 dark:bg-zinc-800" />
@@ -215,7 +215,7 @@ export function PlaylistsPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {playlists.map((playlist) => (
             <div
               key={playlist.id}

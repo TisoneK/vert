@@ -3,7 +3,10 @@
 export function CardSkeleton({ className = '' }: { className?: string }) {
   return (
     <div className={`animate-pulse ${className}`}>
-      <div className="aspect-video bg-zinc-200 dark:bg-zinc-700 rounded-lg" />
+      {/* aspect-[9/16] matches VideoCard's default portrait shape, so the
+          layout doesn't jump when real (mostly portrait) cards replace the
+          skeletons. */}
+      <div className="aspect-[9/16] bg-zinc-200 dark:bg-zinc-700 rounded-lg" />
       <div className="mt-2 flex gap-2">
         <div className="w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 shrink-0" />
         <div className="flex-1 space-y-1.5">
