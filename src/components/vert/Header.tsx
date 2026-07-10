@@ -152,7 +152,7 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
                 <ChevronDown className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400 hidden sm:block" />
               </button>
               {showProfileMenu && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg dark:shadow-zinc-900/50 rounded-lg py-1 z-50">
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg dark:shadow-zinc-900/50 rounded-lg py-1 z-50 animate-vert-fade-in">
                   <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-700">
                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{user.username}</p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">{user.email}</p>
@@ -228,7 +228,7 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
 
       {/* Mobile search overlay */}
       {showMobileSearch && (
-        <div className="md:hidden border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3">
+        <div className="md:hidden border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 animate-vert-fade-in">
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 dark:text-zinc-400" />

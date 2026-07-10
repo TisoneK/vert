@@ -99,7 +99,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       // title is shorter than a card with a 2-line title next to it, making
       // the grid look ragged. The thumbnail keeps its aspect ratio; the info
       // section grows to fill the remaining space.
-      className="group cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 h-full flex flex-col"
+      className="group cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 h-full flex flex-col"
       onClick={() => navigate({ page: 'video', videoId: video.id })}
     >
       {/* Thumbnail container */}

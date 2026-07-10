@@ -272,6 +272,17 @@
   animation: vert-drawer-in 0.25s ease-out;
 }
 
+/* Overlay fade — used by the mobile drawer backdrop so it eases in
+   alongside the drawer's slide instead of popping to 60% black. */
+@keyframes vert-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-overlay-in {
+  animation: vert-overlay-in 0.25s ease-out;
+}
+
 /* Sidebar transition */
 .sidebar-transition {
   transition: width 0.2s ease-out;
