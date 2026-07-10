@@ -37,6 +37,17 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 
 ---
 
+## [0.6.9] — 2026-07-10
+
+### Security
+- **Channel pages no longer include more account information in their response than they should.**
+- **Playlists that are marked private are now actually kept private**, closing a gap that existed before the private-playlists feature was fully wired up.
+
+### Fixed
+- **A few more loading placeholders (the gray "skeleton" boxes shown while content loads) stayed light-colored in dark mode.** They now follow the dark theme like the rest of the app.
+
+---
+
 ## [0.6.8] — 2026-07-08
 
 ### Added
@@ -267,6 +278,7 @@ _Nothing yet — changes pushed to main are immediately deployed, so this sectio
 ---
 
 [Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.8...HEAD
+[0.6.9]: https://github.com/TisoneK/vert/releases/tag/v0.6.9
 [0.6.8]: https://github.com/TisoneK/vert/releases/tag/v0.6.8
 [0.6.7]: https://github.com/TisoneK/vert/releases/tag/v0.6.7
 [0.6.6]: https://github.com/TisoneK/vert/releases/tag/v0.6.6

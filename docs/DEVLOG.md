@@ -21,6 +21,34 @@ _Nothing yet._
 
 ---
 
+## [0.6.9] — 2026-07-10
+
+### Fixed
+
+#### Channel API leaked owner email address
+
+**File:** `src/app/api/v1/channels/[id]/route.ts`
+
+The public `GET /api/v1/channels/[id]` handler (no auth required — this is what every channel-page visit hits) included `email: true` in the `user` select, so every response carried the channel owner's email address even though `ChannelPage.tsx` never reads it. Removed `email` from the select. This predates the 2026-07-06 review (`docs/REVIEW.md`) — found while auditing channel routes during this pass, not a regression from recent commits.
+
+#### Private playlists were fully readable via direct API access
+
+**File:** `src/app/api/v1/playlists/[id]/route.ts`
+
+`GET /api/v1/playlists/[id]` had no authorization check at all — it returned the full playlist (title, description, video list) regardless of the `isPublic` flag or who was asking. `isPublic` is a real column (settable via `POST`/`PATCH`) but has zero UI surface today (no toggle, no privacy indicator anywhere in `PlaylistsPage.tsx` / `PlaylistDetailPage.tsx`), so no current user was exposed by browsing the app normally — but a playlist created with `isPublic: false` via a direct API call was still world-readable by anyone with the id, and this would become a live bug the moment a private-playlist UI ships.
+
+Fix: when `playlist.isPublic` is `false`, require `getCurrentUser()` to match the playlist's channel owner, else 404 (not 403, to avoid confirming the id exists). The ownership check does its own scoped `db.channel.findUnique({ select: { userId } })` rather than reusing the response's `channel` include, so `channel.userId` never has to be added to the JSON payload.
+
+Also hardened `PATCH /api/v1/playlists/[id]`: it previously wrote `body.title` / `body.description` / `body.isPublic` straight into `db.playlist.update()` with zero validation — no length limits, no type checks — unlike `POST /api/v1/playlists` which enforces a 1–100 char title and a 1000-char description cap. PATCH now applies the same rules and rejects a non-boolean `isPublic`.
+
+#### Dark mode gaps in three loading skeletons
+
+**File:** `src/components/vert/Skeleton.tsx`
+
+`ShelfSkeleton`, `CommentSkeleton`, and `RelatedVideoSkeleton` used `bg-zinc-200` with no `dark:` variant, while `CardSkeleton`, `HeroCardSkeleton`, `TextSkeleton`, and `AvatarSkeleton` in the same file already had `dark:bg-zinc-700` — same file, same pattern, three components missed. Found via the same deep-scan grep used by the 2026-07-08 dark-mode commits (43b63ba, e187d2c), just re-run against a file those commits didn't happen to touch. Added the missing variant to all three.
+
+---
+
 ## [0.6.8] — 2026-07-08
 
 ### Added
@@ -915,6 +943,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 ---
 
 [Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.8...HEAD
+[0.6.9]: https://github.com/TisoneK/vert/releases/tag/v0.6.9
 [0.6.8]: https://github.com/TisoneK/vert/releases/tag/v0.6.8
 [0.6.7]: https://github.com/TisoneK/vert/releases/tag/v0.6.7
 [0.6.6]: https://github.com/TisoneK/vert/releases/tag/v0.6.6
