@@ -87,7 +87,7 @@ async function handleChannelGet(req: NextRequest, id: string) {
     where: { id },
     include: {
       user: {
-        select: { id: true, username: true, avatarUrl: true, email: true },
+        select: { id: true, username: true, avatarUrl: true },
       },
     },
   })
