@@ -14,7 +14,7 @@ export async function POST(
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { reason } = body
 
     const validReasons = ['spam', 'nudity', 'hate_speech', 'violence', 'misinformation', 'other']

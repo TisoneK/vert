@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { channelId, title, description, isPublic } = body
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {

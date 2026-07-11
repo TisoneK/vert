@@ -17,7 +17,31 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ## [Unreleased]
 
-_Nothing yet._
+### Fixed
+
+#### Malformed request bodies returned 500 instead of 400 across 17 API routes
+
+**Files:** all POST/PATCH handlers under `src/app/api/v1/*` and `src/app/api/auth/register` that did `const body = await req.json()`
+
+`req.json()` throws when the request body is empty or not valid JSON. Every
+handler already validated its fields and returned a clean `400` when they
+were missing — but the parse itself sat unguarded inside the route's outer
+`try/catch`, so a malformed body threw *before* validation and fell through
+to the generic `500 Internal server error`. A client sending `{}`, no body,
+or truncated JSON got a 500 (a server-fault signal) for what is really a
+client-input error.
+
+Fix: wrap each call as `await req.json().catch(() => ({}))` — the same
+pattern already used in `admin/create-test-users` and the DELETE handler of
+`admin/users/[id]`. On a bad body the handler now receives `{}`, the
+existing field validation runs, and the caller gets the correct `400` with a
+descriptive message. No behavior change for well-formed requests. 17 sites
+updated in one pass (negative-lookahead replace so the 2 already-guarded
+calls weren't double-wrapped). Typecheck + lint clean.
+
+Not surfaced in `CHANGELOG.md` or version-bumped: the change is invisible to
+normal users (it only affects malformed API calls) and the public changelog
+is user-facing only — it rides along with the next user-facing release.
 
 ---
 

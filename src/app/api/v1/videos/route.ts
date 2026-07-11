@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { channelId, title, description, videoUrl, thumbnailUrl, durationSeconds, aspectRatio, format, categoryIds, tags: tagNames } = body
 
     if (!channelId || !title || !videoUrl) {

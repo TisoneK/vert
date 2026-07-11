@@ -13,7 +13,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { status, reason } = body
 
     const validStatuses = ['pending', 'reviewed', 'actioned', 'dismissed']

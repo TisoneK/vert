@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const videoId = body?.videoId as string | undefined
     const progress = typeof body?.progress === 'number' ? body.progress : 0
 

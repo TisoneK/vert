@@ -36,7 +36,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { role, isActive } = body
 
     // Validate inputs

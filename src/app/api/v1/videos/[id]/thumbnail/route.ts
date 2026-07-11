@@ -52,7 +52,7 @@ export async function POST(
       )
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { thumbnailUrl } = body as { thumbnailUrl?: string }
 
     if (!thumbnailUrl || typeof thumbnailUrl !== 'string') {

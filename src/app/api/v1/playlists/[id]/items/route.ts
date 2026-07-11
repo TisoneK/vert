@@ -26,7 +26,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { videoId } = body
 
     if (!videoId) {

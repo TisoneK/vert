@@ -95,7 +95,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
 
     // Title rules mirror POST /api/v1/playlists: 1-100 chars if provided.
     let trimmedTitle: string | undefined

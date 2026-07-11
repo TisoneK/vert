@@ -160,7 +160,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
 
     // Validate title if provided — same rules as POST /api/v1/videos.
     const trimmedTitle =

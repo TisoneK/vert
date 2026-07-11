@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const rl = rateLimit(req, RATE_LIMITS.signup, `ip:${ip}`)
     if (!rl.ok) return rl.response!
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { email, username, password } = body
 
     if (!email || !username || !password) {
