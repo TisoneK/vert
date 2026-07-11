@@ -13,6 +13,7 @@ This directory describes the **process**.
 ```text
 .context/
 ├── README.md            # this file — structure + rules
+├── SYNC.md              # structural-vs-data split + how sync from the package works
 ├── system/
 │   ├── environments.md  # machines/sandboxes agents have run on (OS, toolchain versions, quirks)
 │   └── ai-models.md     # registry: which agents + models have worked on this repo
@@ -101,6 +102,11 @@ project's product, or am I editing the agent's memory of the project?"
    to the entry here; don't delete the original.
 8. **Verify before trusting.** Entries reflect what was true when written.
    If the codebase disagrees, the codebase wins — append a correction.
+9. **Structure tracks the package; data is yours.** The `README.md` and
+   `.gitignore` files here (and `SYNC.md`) are package-owned *structure* — an
+   agent syncs them from `context-skeleton/` at session start (see `SYNC.md`).
+   Every other file is project-owned *data* and is never overwritten by sync.
+   Project-specific notes go in a data file, never in a structural README.
 
 ## File modes at a glance
 
@@ -119,3 +125,4 @@ project's product, or am I editing the agent's memory of the project?"
 | `user/identity.md` | update in place |
 | `user/preferences.md` | update in place |
 | `secrets/<slug>` | local-only — never committed, never travels |
+| `SYNC.md`, `*/README.md`, `secrets/.gitignore` | structural — synced from the package (see `SYNC.md`) |
