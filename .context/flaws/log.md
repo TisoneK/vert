@@ -33,4 +33,10 @@ Friction caused by the `.context/` system or the protocol itself. See
   agent already inside the repo, skip Step 0b (project clone) — only clone the
   `.context-package` sibling and cd into the existing repo" note at the top of
   Step 0.
-- **Status:** open
+- **Status:** fixed in package `f261b70` (2026-07-11) — `universal-kickoff.md`
+  committed to `TisoneK/.context` with Step 0 branched Local vs Cloud/sandbox,
+  every PAT/`GIT_TOKEN` reference marked cloud-only, a shared `0c. Verify` +
+  `../.context-package` path-normalization note, refined model-identity
+  guidance, and a Local-repo-path Pre-Flight field. The Desktop copy handed to
+  this session was corrected in lockstep. Reported and fixed in the same
+  session (Session 1). See package `flaws/log.md`, 2026-07-11.
