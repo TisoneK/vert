@@ -11,6 +11,11 @@ check its session entry and backlog before starting.
 - **Status:** in-progress | done | blocked (<blocker>)
 -->
 
-- **Session:** 2026-07-11 — Claude Code / claude-opus-4-8
-- **Task:** Bootstrap `.context/`, then general-sweep review (discovery + review + fix safe issues) of the Vert codebase
-- **Status:** in-progress
+- **Session:** —
+- **Task:** none — no session in progress
+- **Status:** idle
+
+<!-- Last session: 2026-07-11 (Session 1, Claude Code / claude-opus-4-8) —
+bootstrapped .context/ + general-sweep review. Done. See
+.context/reviews/2026-07-11-review.md and tasks/backlog.md. -->
+
