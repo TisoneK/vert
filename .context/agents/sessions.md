@@ -19,6 +19,6 @@ past entries — append corrections instead.
 - **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** engineer
 - **Task:** Bootstrap `.context/` from the TisoneK/.context skeleton; general-sweep review of the Vert codebase (discovery + review + fix safe issues)
 - **Commits:** 3 — `5652a44` (bootstrap .context/), `b21a094` (fix(api): 400 on malformed body, 17 routes), + this context/report commit
-- **Outcome:** done — baseline healthy (typecheck + lint clean); 1 Medium fixed & pushed; 3 low items backlogged. No Critical/High findings.
+- **Outcome:** done — typecheck clean; ESLint has 35 pre-existing errors (all in components/vert, ui, hooks, lib — none in API code; gate = no new errors). 1 Medium fixed & pushed (changed files error-clean); 3 low items backlogged. No Critical/High findings.
 - **Open items:** tasks/backlog.md — dual lockfiles, seed/cleanup Prisma singleton, test suite + CI
 - **Report:** .context/reviews/2026-07-11-review.md

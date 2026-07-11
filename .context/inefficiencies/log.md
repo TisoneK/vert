@@ -30,3 +30,24 @@ if literally nothing slowed you down.
 - **Prevent next time:** Next agent on this machine: read
   `system/environments.md` first — npm + `next dev`, no bun, no psql. Don't run
   bun-only scripts here.
+
+---
+## 2026-07-11 — Claude Code / claude-opus-4-8 (2)
+- **Problem:** A backgrounded `eslint .` baseline run's captured output was
+  truncated to just the header, and I read exit code 0 from the wrapping
+  compound command — so I initially recorded a FALSE "lint clean (0 errors)"
+  baseline and wrote it into the report + session entry. The real baseline is
+  35 errors + 32 warnings (pre-existing, all in components/hooks/lib).
+- **Cost:** Moderate — had to re-run eslint, re-verify error locations, and
+  correct the report, session entry, and environments doc after the fact.
+- **Cause:** Trusted an exit code + truncated background-task output instead of
+  the eslint problem-summary line. The wrapping `{ ...; echo EXIT:$?; }` in a
+  backgrounded compound command didn't reflect eslint's real exit status.
+- **Workaround / fix:** Re-ran `npx eslint .` in the foreground and read the
+  `✖ N problems (E errors, W warnings)` summary directly. Caught only because a
+  personal memory note flagged "~32 pre-existing errors" — the contradiction
+  prompted re-verification.
+- **Prevent next time:** For lint/test baselines, always parse the printed
+  problem-summary line; never conclude "clean" from an exit code alone,
+  especially from a backgrounded/`tee`'d capture. Recorded the same warning in
+  `system/environments.md`.
