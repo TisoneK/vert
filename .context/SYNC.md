@@ -51,14 +51,15 @@ package ever adds one (e.g. a root `.context/AGENTS.md`), add its path here.
   `tasks/backlog.md`, `plans/decisions.md`
 - current-state (overwrite): `tasks/current.md`, `workflows/active.md`
 - update-in-place: `system/environments.md`, `system/ai-models.md`,
-  `user/identity.md`, `user/preferences.md`
+  `user/identity.md`, `user/preferences.md`, `kickoff.md` (generated at
+  bootstrap from the skeleton template; project-owned after that)
 - per-session: `reviews/YYYY-MM-DD-*.md`
 - local-only, never tracked: `secrets/<slug>`
 
 ## How an agent syncs (protocol Step 3, Path B)
 
 When `.context/` already exists **and** the package skeleton is on disk
-(`../.context/context-skeleton/`, freshened by the kickoff):
+(`../context/context-skeleton/`, freshened by the kickoff):
 
 1. For each **structural** file, compare `.context/<path>` to
    `context-skeleton/<path>`. **Add** missing ones; **update** differing ones.
