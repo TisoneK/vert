@@ -34,7 +34,7 @@ don't remove the line.
       test for the 400-on-malformed-body fix (commit b21a094). See review [L-3].
       _2026-07-14 addendum:_ also backfill regression tests for the
       non-string-body-field 400 fix (commit `a27d338`, review 2026-07-14 [M-2]).
-- [ ] **Fix `~/.npm` ownership so `npx prisma dev` works on Baos-Mac-mini**
+- [x] **Fix `~/.npm` ownership so `npx prisma dev` works on Baos-Mac-mini**
       (added 2026-07-14 by Claude Code) — npm's dynamic-subcommand install hits
       EACCES on root-owned files in `~/.npm/_cacache`, so the local Prisma dev
       DB (port 51214) cannot start and no DB-touching flow can be tested
@@ -42,3 +42,8 @@ don't remove the line.
       (npm's own suggested fix — agents must not run sudo). Until then,
       functional testing of authenticated endpoints is blocked on this machine.
       See review 2026-07-14 §5.
+      **Done 2026-07-14** — user ran the chown same day; `prisma dev` verified
+      working (named server `vert` on port 51214 — see
+      `system/environments.md` for the exact start command). Full
+      authenticated-route verification of a27d338 then completed; see the
+      2026-07-14 review addendum.

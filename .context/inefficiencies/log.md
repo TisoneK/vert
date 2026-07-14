@@ -74,3 +74,27 @@ if literally nothing slowed you down.
   check that backlog item first; if still open, plan verification around
   unauthenticated/non-DB routes and say so in the report instead of
   burning time on login flows.
+
+---
+## 2026-07-14 — Claude Code / claude-fable-5 (2) — CORRECTION + new findings
+- **Problem:** (a) CORRECTION to the entry above: the claim "seed demo
+  accounts do NOT exist in the local dev DB" was WRONG — the 401s came from
+  posting `email=` to NextAuth's credentials callback, which expects
+  `identifier=` (`src/lib/auth.ts` authorize()). With the right field,
+  user1@vert.com logs in fine and the seed accounts are present.
+  (b) After the user fixed `~/.npm`, a bare `npx prisma dev` started the
+  `default` server on port 51218 while the app expects 51214 — the project
+  uses the **named** server `vert` (`npx prisma dev start vert --detach`),
+  discoverable via `npx prisma dev ls`.
+- **Cost:** Minor — one failed login round + one wrong-server start/stop
+  cycle; but the wrong "no seed accounts" conclusion could have cost future
+  sessions real time.
+- **Cause:** Concluded "accounts missing" from a 401 without checking the
+  credentials provider's expected field names; assumed `prisma dev` has one
+  server per machine rather than named per-project servers.
+- **Workaround / fix:** `prisma dev ls` to find the named server; grep
+  `src/lib/auth.ts` before scripting a login. Both now recorded in
+  `system/environments.md`.
+- **Prevent next time:** A 401 from an auth endpoint is "credentials not
+  accepted," not "user doesn't exist" — verify the request contract against
+  the provider code before drawing data conclusions.

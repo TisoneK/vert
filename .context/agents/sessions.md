@@ -38,3 +38,11 @@ past entries — append corrections instead.
 - **Outcome:** done — register fix verified live (400, was 500); authenticated-route runtime testing blocked (local prisma dev DB can't start: ~/.npm EACCES, user action needed)
 - **Open items:** tasks/backlog.md — dual lockfiles [L-1], tests+CI [L-3] (+ a27d338 regression addendum), NEW: ~/.npm chown fix (user, one command)
 - **Report:** .context/reviews/2026-07-14-review.md
+---
+## 2026-07-14 — Session 3 (continued, same day)
+- **Agent:** Claude Code | **Model:** claude-fable-5 | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** engineer
+- **Task:** User ran the ~/.npm chown → completed the blocked runtime verification of a27d338 with an authenticated session (all 6 malformed-input cases → correct 400s; regressions clean; probe account deleted). Corrected a wrong conclusion: seed accounts ARE in the local dev DB — earlier 401s were from posting `email=` instead of `identifier=` to the NextAuth callback. DB start command recorded (named server `vert`, port 51214).
+- **Commits:** 2 — docs(review) addendum, chore(context) (this commit)
+- **Outcome:** done — 2026-07-14 review §8 addendum has the verification table; ~/.npm backlog item checked off
+- **Open items:** tasks/backlog.md — dual lockfiles [L-1], tests+CI [L-3]
+- **Report:** .context/reviews/2026-07-14-review.md (§8 addendum)
