@@ -22,3 +22,11 @@ past entries — append corrections instead.
 - **Outcome:** done — typecheck clean; ESLint has 35 pre-existing errors (all in components/vert, ui, hooks, lib — none in API code; gate = no new errors). 1 Medium fixed & pushed (changed files error-clean); 3 low items backlogged. No Critical/High findings.
 - **Open items:** tasks/backlog.md — dual lockfiles, seed/cleanup Prisma singleton, test suite + CI
 - **Report:** .context/reviews/2026-07-11-review.md
+---
+## 2026-07-14 — Session 2
+- **Agent:** Claude Code | **Model:** claude-fable-5 | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** engineer (memory mode — .context/ maintenance only)
+- **Task:** Context sync: pull package (f1c73e5), sync structural files (README.md, SYNC.md now document kickoff.md); backfill `.context/kickoff.md` from the package skeleton template (facts verified: project repo Public, package repo Private, default branch main); correct `workflows/active.md` Protocol field to "by agent type" per package fix f1c73e5.
+- **Commits:** 3 — structure sync, kickoff backfill, active.md protocol correction (this commit)
+- **Outcome:** done — no project-surface changes this session
+- **Open items:** none new (backlog unchanged)
+- **Report:** none — maintenance session, no review performed

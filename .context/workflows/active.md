@@ -5,7 +5,10 @@ agents follow and the standing session parameters. Update only when the
 user changes the rules; note the change in your session entry.
 
 <!-- TEMPLATE — replace everything below this comment:
-- **Protocol:** <ai-engineering-protocol.md (cloud) | ai-engineering-protocol-local.md (local) | both, by agent type>
+- **Protocol:** by agent type — local agents → ai-engineering-protocol-local.md; cloud/sandbox agents → ai-engineering-protocol.md
+  (ALWAYS record it exactly like that — "by agent type", naming BOTH.
+  Never record only the edition YOU happen to be: the edition is a
+  per-agent-type fact, not a project fact.)
 - **Protocol source (raw — for agent fetch):** <https://raw.githubusercontent.com/TisoneK/.context/main/ai-engineering-protocol.md (cloud) | https://raw.githubusercontent.com/TisoneK/.context/main/ai-engineering-protocol-local.md (local)>
 - **Protocol source (blob — for human browsing):** <https://github.com/TisoneK/.context/blob/main/ai-engineering-protocol.md (cloud) | https://github.com/TisoneK/.context/blob/main/ai-engineering-protocol-local.md (local)>
 - **Fallback:** if the raw URL 404s, clone `TisoneK/.context` with `--depth 1` and read the file locally — this is the reliable fallback.
@@ -21,9 +24,9 @@ user changes the rules; note the change in your session entry.
 - **Deliverable:** <e.g., report in .context/reviews/ + chat summary>
 -->
 
-- **Protocol:** ai-engineering-protocol-local.md (local)
-- **Protocol source (raw):** https://raw.githubusercontent.com/TisoneK/.context/main/ai-engineering-protocol-local.md
-- **Protocol source (blob):** https://github.com/TisoneK/.context/blob/main/ai-engineering-protocol-local.md
+- **Protocol:** by agent type — local agents → ai-engineering-protocol-local.md; cloud/sandbox agents → ai-engineering-protocol.md
+- **Protocol source (raw):** https://raw.githubusercontent.com/TisoneK/.context/main/ai-engineering-protocol-local.md (local) | https://raw.githubusercontent.com/TisoneK/.context/main/ai-engineering-protocol.md (cloud)
+- **Protocol source (blob):** https://github.com/TisoneK/.context/blob/main/ai-engineering-protocol-local.md (local) | https://github.com/TisoneK/.context/blob/main/ai-engineering-protocol.md (cloud)
 - **Fallback:** if the raw URL 404s, clone `TisoneK/.context --depth 1` and read locally
 - **Since:** 2026-07-11
 - **Default role:** engineer (full-scope) — unless a session hands over a role overlay from the package's `roles/`
