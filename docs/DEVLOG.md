@@ -49,6 +49,18 @@ locally for authenticated-route testing — see session notes).
 Not surfaced in `CHANGELOG.md` or version-bumped (same rationale as below:
 invisible to normal users).
 
+#### Ops endpoints now use the shared Prisma singleton
+
+**Files:** `src/app/api/seed/route.ts`, `src/app/api/cleanup-demo/route.ts`
+
+Both endpoints instantiated `new PrismaClient()` directly, bypassing the
+lazy pooled singleton in `src/lib/db.ts` and its serverless pool params
+(`connection_limit=1&pool_timeout=10`) — each invocation opened its own
+connection pool alongside the app's. They now import the shared `db`
+client; the `finally { $disconnect() }` blocks are gone (the singleton must
+stay connected for the rest of the app). Closes review item [L-2] from
+2026-07-11. No user-visible change; not in `CHANGELOG.md`.
+
 #### Malformed request bodies returned 500 instead of 400 across 17 API routes
 
 **Files:** all POST/PATCH handlers under `src/app/api/v1/*` and `src/app/api/auth/register` that did `const body = await req.json()`

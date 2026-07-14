@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { db } from '@/lib/db'
 import { timingSafeEqual } from 'crypto'
 
 /**
@@ -47,7 +47,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const prisma = new PrismaClient()
+  // Shared lazy singleton from src/lib/db.ts — carries the serverless pool
+  // params and must not be $disconnect()ed here.
+  const prisma = db
 
   try {
     const deleted: Record<string, number> = {}
@@ -119,7 +121,5 @@ export async function GET(req: NextRequest) {
       { error: 'Cleanup failed', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }
