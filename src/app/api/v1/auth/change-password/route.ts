@@ -52,6 +52,16 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Reject non-string passwords before they reach .length / bcrypt —
+    // a JSON number here would skip the length checks and make compare()
+    // throw, turning a client error into a 500.
+    if (typeof currentPassword !== 'string' || typeof newPassword !== 'string') {
+      return NextResponse.json(
+        { error: 'Passwords must be strings' },
+        { status: 400 }
+      )
+    }
+
     if (newPassword.length < 6) {
       return NextResponse.json(
         { error: 'New password must be at least 6 characters' },

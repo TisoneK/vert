@@ -19,6 +19,36 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Fixed
 
+#### Non-string body fields returned 500 instead of 400 in 5 API routes
+
+**Files:** `src/app/api/auth/register/route.ts`,
+`src/app/api/v1/auth/change-password/route.ts`,
+`src/app/api/v1/videos/[id]/comments/route.ts`,
+`src/app/api/v1/videos/route.ts` (POST), `src/app/api/v1/videos/[id]/route.ts` (PATCH)
+
+Follow-up to the malformed-body fix below — one level deeper into the same
+bug class. A syntactically valid JSON body whose *field types* were wrong
+(e.g. `{"password": 123}`, `{"content": 123}`, `{"aspectRatio": 1.78}`)
+slipped past the truthiness checks and hit `.length` / `.trim()` / bcrypt /
+Prisma with a non-string, which threw and fell through to the generic
+`500`. Notably, a numeric password skipped *both* length checks
+(`(123).length` is `undefined`, and `undefined < 6` is `false`) before
+`bcrypt.hash` threw.
+
+Fix: explicit `typeof !== 'string'` guards (and `Array.isArray` +
+element-type check for `categoryIds`) returning `400` with a descriptive
+message — the same pattern `playlists` POST already used. Also simplified
+the videos PATCH `title: trimmedTitle ?? body.title` fallback, which
+existed only to forward the now-rejected non-string case to Prisma. No
+behavior change for well-formed requests. Verified live against the dev
+server on `register` (non-string password → `400 Password must be a
+string`; short password still → `400` length message); the other routes
+carry the identical guard and are covered by typecheck (DB was unreachable
+locally for authenticated-route testing — see session notes).
+
+Not surfaced in `CHANGELOG.md` or version-bumped (same rationale as below:
+invisible to normal users).
+
 #### Malformed request bodies returned 500 instead of 400 across 17 API routes
 
 **Files:** all POST/PATCH handlers under `src/app/api/v1/*` and `src/app/api/auth/register` that did `const body = await req.json()`

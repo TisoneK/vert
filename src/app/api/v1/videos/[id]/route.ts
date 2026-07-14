@@ -162,6 +162,18 @@ export async function PATCH(
 
     const body = await req.json().catch(() => ({}))
 
+    // Reject non-string values for string fields — otherwise they'd flow
+    // into Prisma and turn a client error into a 500.
+    if (body.title !== undefined && typeof body.title !== 'string') {
+      return NextResponse.json({ error: 'Title must be a string' }, { status: 400 })
+    }
+    if (body.description !== undefined && body.description !== null && typeof body.description !== 'string') {
+      return NextResponse.json({ error: 'Description must be a string' }, { status: 400 })
+    }
+    if (body.thumbnailUrl !== undefined && body.thumbnailUrl !== null && typeof body.thumbnailUrl !== 'string') {
+      return NextResponse.json({ error: 'thumbnailUrl must be a string' }, { status: 400 })
+    }
+
     // Validate title if provided — same rules as POST /api/v1/videos.
     const trimmedTitle =
       typeof body.title === 'string' ? body.title.trim() : undefined
@@ -196,7 +208,7 @@ export async function PATCH(
     const updated = await db.video.update({
       where: { id },
       data: {
-        title: trimmedTitle ?? body.title,
+        title: trimmedTitle,
         description: trimmedDescription,
         thumbnailUrl: body.thumbnailUrl,
       },

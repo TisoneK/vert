@@ -174,6 +174,29 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Reject non-string values for string fields — otherwise they'd flow
+    // into Prisma (or coerce oddly in new URL()) and turn a client error
+    // into a 500.
+    if (typeof channelId !== 'string' || typeof videoUrl !== 'string') {
+      return NextResponse.json(
+        { error: 'channelId and videoUrl must be strings' },
+        { status: 400 }
+      )
+    }
+    if (thumbnailUrl !== undefined && thumbnailUrl !== null && typeof thumbnailUrl !== 'string') {
+      return NextResponse.json({ error: 'thumbnailUrl must be a string' }, { status: 400 })
+    }
+    if (aspectRatio !== undefined && aspectRatio !== null && typeof aspectRatio !== 'string') {
+      return NextResponse.json({ error: 'aspectRatio must be a string' }, { status: 400 })
+    }
+    if (categoryIds !== undefined && categoryIds !== null &&
+        (!Array.isArray(categoryIds) || categoryIds.some((c: unknown) => typeof c !== 'string'))) {
+      return NextResponse.json(
+        { error: 'categoryIds must be an array of strings' },
+        { status: 400 }
+      )
+    }
+
     // Title rules: 1–100 chars after trim. Matches YouTube's title limit
     // and keeps the listing UI from breaking on huge strings.
     const trimmedTitle = typeof title === 'string' ? title.trim() : ''

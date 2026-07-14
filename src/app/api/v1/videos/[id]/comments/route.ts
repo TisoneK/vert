@@ -61,7 +61,7 @@ export async function POST(
     const body = await req.json().catch(() => ({}))
     const { content } = body
 
-    if (!content || content.trim().length === 0) {
+    if (!content || typeof content !== 'string' || content.trim().length === 0) {
       return NextResponse.json({ error: 'Comment content is required' }, { status: 400 })
     }
 

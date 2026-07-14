@@ -21,6 +21,16 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Reject non-string passwords before they reach .length / bcrypt —
+    // a JSON number here would skip both length checks and make hash()
+    // throw, turning a client error into a 500.
+    if (typeof password !== 'string') {
+      return NextResponse.json(
+        { error: 'Password must be a string' },
+        { status: 400 }
+      )
+    }
+
     // Normalize email — lowercase + trim — before any further validation.
     const normalizedEmail = email.toString().trim().toLowerCase()
     const normalizedUsername = username.toString().trim()
