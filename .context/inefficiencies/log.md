@@ -51,3 +51,26 @@ if literally nothing slowed you down.
   problem-summary line; never conclude "clean" from an exit code alone,
   especially from a backgrounded/`tee`'d capture. Recorded the same warning in
   `system/environments.md`.
+
+---
+## 2026-07-14 — Claude Code / claude-fable-5
+- **Problem:** Local functional testing of DB-touching flows impossible:
+  `npx prisma dev` fails (npm EACCES on root-owned `~/.npm/_cacache` files),
+  so the dev DB on localhost:51214 never starts. Separately, the seed demo
+  accounts (admin@vert.com / user1@vert.com) do NOT exist in the local dev
+  DB — a NextAuth credentials login attempt with them 401s even when the DB
+  is up-to-spec assumptions said otherwise.
+- **Cost:** Minor-moderate — a login-flow attempt, a probe-user registration
+  (500), and log-reading before the root cause (DB down) was clear; then
+  authenticated-route verification had to be downgraded to
+  typecheck+pattern-identity evidence.
+- **Cause:** Root-owned files in `~/.npm` from an old npm bug block npm's
+  dynamic-subcommand install that `prisma dev` needs. Agents can't (and must
+  not) sudo.
+- **Workaround / fix:** Verified the fix class live on the unauthenticated
+  `register` route (validation runs before any DB access). Backlogged the
+  one-command user fix: `sudo chown -R 501:20 ~/.npm`.
+- **Prevent next time:** Recorded in `system/environments.md`. Next agent:
+  check that backlog item first; if still open, plan verification around
+  unauthenticated/non-DB routes and say so in the report instead of
+  burning time on login flows.

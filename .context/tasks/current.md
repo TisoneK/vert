@@ -15,7 +15,7 @@ check its session entry and backlog before starting.
 - **Task:** none — no session in progress
 - **Status:** idle
 
-<!-- Last session: 2026-07-11 (Session 1, Claude Code / claude-opus-4-8) —
-bootstrapped .context/ + general-sweep review. Done. See
-.context/reviews/2026-07-11-review.md and tasks/backlog.md. -->
-
+<!-- Last session: 2026-07-14 (Session 3, Claude Code / claude-fable-5) —
+general sweep: fixed non-string-body-field 500s (a27d338), closed backlog
+[L-2] seed/cleanup Prisma singleton (59f23da). Done. See
+.context/reviews/2026-07-14-review.md and tasks/backlog.md. -->

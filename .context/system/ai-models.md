@@ -14,10 +14,12 @@ accordingly).
 | Agent | Model | First seen | Last seen | Sessions |
 |---|---|---|---|---|
 | Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-07-11 | 1 |
+| Claude Code | claude-fable-5 | 2026-07-14 | 2026-07-14 | 2 |
 
 ## Observations
 
 - **Claude Code / claude-opus-4-8:** Model id is stated explicitly in this agent's system prompt, so it is recorded verbatim (not guessed). (2026-07-11)
+- **Claude Code / claude-fable-5:** Model id stated in system prompt, recorded verbatim. Ran the full local-edition protocol end-to-end (Sessions 2–3); verified an API fix live against `next dev` via curl, including a NextAuth credentials login attempt. (2026-07-14)
 
 Concrete, evidence-based capabilities and limits — things demonstrated
 in this repo's sessions, not marketing claims or self-assessment.

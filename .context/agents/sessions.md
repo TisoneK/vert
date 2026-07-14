@@ -30,3 +30,11 @@ past entries — append corrections instead.
 - **Outcome:** done — no project-surface changes this session
 - **Open items:** none new (backlog unchanged)
 - **Report:** none — maintenance session, no review performed
+---
+## 2026-07-14 — Session 3
+- **Agent:** Claude Code | **Model:** claude-fable-5 | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** engineer
+- **Task:** General sweep (standing Target): verified Session 1 baseline (typecheck 0, eslint 35+32 pre-existing, npm audit 0 vulns); fixed [M-2] non-string body fields → 500 in 5 routes; closed backlog [L-2] (seed/cleanup via shared db singleton)
+- **Commits:** 4 (a27d338..this) — fix(api) a27d338, refactor(db) 59f23da, docs(review) 7125bf3, + this context commit
+- **Outcome:** done — register fix verified live (400, was 500); authenticated-route runtime testing blocked (local prisma dev DB can't start: ~/.npm EACCES, user action needed)
+- **Open items:** tasks/backlog.md — dual lockfiles [L-1], tests+CI [L-3] (+ a27d338 regression addendum), NEW: ~/.npm chown fix (user, one command)
+- **Report:** .context/reviews/2026-07-14-review.md
