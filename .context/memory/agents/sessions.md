@@ -11,7 +11,7 @@ past entries — append corrections instead.
 - **Commits:** <count> (<first-sha>..<last-sha>)
 - **Outcome:** <done / partial / blocked — one line>
 - **Open items:** <pointers into tasks/backlog.md, or "none">
-- **Report:** .context/reviews/YYYY-MM-DD-review.md
+- **Report:** .context/memory/reviews/YYYY-MM-DD-review.md
 -->
 
 ---
@@ -46,3 +46,11 @@ past entries — append corrections instead.
 - **Outcome:** done — 2026-07-14 review §8 addendum has the verification table; ~/.npm backlog item checked off
 - **Open items:** tasks/backlog.md — dual lockfiles [L-1], tests+CI [L-3]
 - **Report:** .context/reviews/2026-07-14-review.md (§8 addendum)
+---
+## 2026-07-15 — Session 4
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15, Darwin 24.6.0) | **Role:** engineer (memory mode — `.context/` maintenance only)
+- **Task:** Context sync. Package `TisoneK/.context` had moved to **Core 0.2.0** (two-zone layout) and dropped `context-skeleton/`, so the old Path-B structural sync was a no-op. With the user's go-ahead, ran the package `MIGRATION.md`: `git mv` every memory module under `memory/` (history preserved), retired `SYNC.md` + old flat `README.md`/`kickoff.md`, vendored `core/` (0.2.0, `context-sync verify` clean, `memory/core.lock` written), seeded `memory/overrides/`, added root `AGENTS.md`. Refilled `kickoff.md` Project Facts + `AGENTS.md`; rewrote `workflows/active.md` to the 0.2.0 shape (protocol "by agent type" at `.context/core/rules/`, "Protocol location: vendored", Package upstream URL). Path sweep: refreshed the three module READMEs (flaws/reviews/secrets) from 0.2.0 templates to drop `context-skeleton/`/old-path references, and fixed the `.context/reviews/` → `.context/memory/reviews/` report pointers in the `sessions.md` template + `current.md` breadcrumb (historical entries left as written).
+- **Commits:** 1 (this commit)
+- **Outcome:** done — zero data loss (all logs/reviews/decisions/tasks preserved); no project-surface changes. core 0.2.0 vendored + verified.
+- **Open items:** tasks/backlog.md unchanged — dual lockfiles [L-1], tests+CI [L-3]
+- **Report:** none — migration/maintenance session, no review performed

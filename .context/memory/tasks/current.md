@@ -18,4 +18,4 @@ check its session entry and backlog before starting.
 <!-- Last session: 2026-07-14 (Session 3, Claude Code / claude-fable-5) —
 general sweep: fixed non-string-body-field 500s (a27d338), closed backlog
 [L-2] seed/cleanup Prisma singleton (59f23da). Done. See
-.context/reviews/2026-07-14-review.md and tasks/backlog.md. -->
+.context/memory/reviews/2026-07-14-review.md and tasks/backlog.md. -->
