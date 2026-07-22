@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   build:
-    name: typecheck · build
+    name: typecheck · build · lint
     runs-on: ubuntu-latest
 
     # Placeholder env only. The build never connects to the database — the
@@ -78,11 +78,9 @@ jobs:
         # deploy-only standalone-packaging (cp) steps irrelevant to CI.
         run: bunx next build
 
-      - name: Lint (advisory)
-        # Non-blocking for now: the repo carries a known baseline of ~35
-        # pre-existing eslint errors (react-hooks compiler rules on older
-        # components in src/components/vert, ui, hooks, lib). Once that
-        # baseline is burned down (Tier 2), flip continue-on-error to false so
-        # NEW violations block the merge.
-        continue-on-error: true
+      - name: Lint
+        # Blocking gate. The ~35-error React-Compiler baseline was burned down
+        # via the react-query migration (see .context ADR-2), so eslint is now
+        # at 0 errors and any NEW error fails the build. Warnings still don't
+        # fail (eslint only exits non-zero on errors).
         run: bunx eslint .
