@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
 import {
   BarChart3,
@@ -73,75 +74,47 @@ interface AccountAnalytics {
 
 type Tab = 'studio' | 'analytics'
 
+async function fetchStats(): Promise<CreatorStats | null> {
+  const res = await fetch('/api/v1/creator/stats')
+  if (!res.ok) throw new Error(`Failed to fetch creator stats: ${res.status}`)
+  const data = await res.json()
+  return data.stats ?? null
+}
+
+async function fetchVideos(): Promise<CreatorVideo[]> {
+  const res = await fetch('/api/v1/creator/videos?limit=20')
+  if (!res.ok) throw new Error(`Failed to fetch creator videos: ${res.status}`)
+  const data = await res.json()
+  return data.videos ?? []
+}
+
+async function fetchAnalytics(channelId: string): Promise<AccountAnalytics> {
+  const res = await fetch(`/api/v1/analytics/account/${channelId}`)
+  if (!res.ok) throw new Error(`Failed to fetch account analytics: ${res.status}`)
+  return res.json()
+}
+
 export function CreatorStudio() {
   const { navigate } = useNavigation()
   const { user } = useAuth()
   const [tab, setTab] = useState<Tab>('studio')
 
-  // Studio data
-  const [stats, setStats] = useState<CreatorStats | null>(null)
-  const [videos, setVideos] = useState<CreatorVideo[]>([])
-  const [loading, setLoading] = useState(true)
-
-  // Analytics data
-  const [analytics, setAnalytics] = useState<AccountAnalytics | null>(null)
-  const [analyticsLoading, setAnalyticsLoading] = useState(true)
-
-  useEffect(() => {
-    if (user?.channelId) {
-      fetchStats()
-      fetchVideos()
-    } else {
-      setLoading(false)
-    }
-  }, [user])
-
-  useEffect(() => {
-    if (tab === 'analytics' && user?.channelId && !analytics) {
-      fetchAnalytics()
-    }
-  }, [tab, user, analytics])
-
-  async function fetchStats() {
-    try {
-      const res = await fetch('/api/v1/creator/stats')
-      if (res.ok) {
-        const data = await res.json()
-        setStats(data.stats)
-      }
-    } catch (error) {
-      console.error('Failed to fetch creator stats:', error)
-    }
-  }
-
-  async function fetchVideos() {
-    try {
-      const res = await fetch('/api/v1/creator/videos?limit=20')
-      if (res.ok) {
-        const data = await res.json()
-        setVideos(data.videos)
-      }
-    } catch (error) {
-      console.error('Failed to fetch creator videos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function fetchAnalytics() {
-    if (!user?.channelId) return
-    setAnalyticsLoading(true)
-    try {
-      const res = await fetch(`/api/v1/analytics/account/${user.channelId}`)
-      if (res.ok) {
-        setAnalytics(await res.json())
-      }
-    } catch (error) {
-      console.error('Failed to fetch account analytics:', error)
-    } finally {
-      setAnalyticsLoading(false)
-    }
-  }
+  const { data: stats = null } = useQuery({
+    queryKey: ['creator-stats', user?.channelId],
+    queryFn: fetchStats,
+    enabled: !!user?.channelId,
+  })
+  const { data: videos = [], isLoading: loading } = useQuery({
+    queryKey: ['creator-videos', user?.channelId],
+    queryFn: fetchVideos,
+    enabled: !!user?.channelId,
+  })
+  // Analytics is fetched lazily — only once the analytics tab is opened.
+  const { data: analytics = null, isLoading: analyticsLoading } = useQuery({
+    queryKey: ['creator-analytics', user?.channelId],
+    queryFn: () => fetchAnalytics(user!.channelId!),
+    enabled: tab === 'analytics' && !!user?.channelId,
+  })
 
   // Redirect to login if not authenticated. Previously this was a
   // setState-during-render call (navigate inside the render body), which

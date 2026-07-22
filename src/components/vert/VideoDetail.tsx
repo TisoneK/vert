@@ -2,6 +2,7 @@
 
 import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoPlayer } from './VideoPlayer'
 import { VoteButtons } from './VoteButtons'
@@ -18,48 +19,67 @@ interface VideoDetailProps {
   videoId: string
 }
 
+async function fetchVideoDetail(
+  videoId: string,
+): Promise<{ video: Record<string, unknown>; userVote: string | null }> {
+  const res = await fetchWithRetry(`/api/v1/videos/${videoId}`)
+  if (!res.ok) throw new Error(`Failed to fetch video: ${res.status}`)
+  const data = await res.json()
+  const votes = data.votes as { userId: string; voteType: string }[] | undefined
+  let userVote: string | null = null
+  try {
+    const sessionRes = await fetchWithRetry('/api/auth/session-info')
+    const sessionData = await sessionRes.json()
+    if (sessionData.user) {
+      userVote = votes?.find((v) => v.userId === sessionData.user.id)?.voteType || null
+    }
+  } catch { /* ignore session errors — just leave userVote null */ }
+  return { video: data, userVote }
+}
+
+async function checkIfSaved(videoId: string): Promise<boolean> {
+  const res = await fetch('/api/v1/saved?limit=100')
+  if (!res.ok) return false
+  const data = await res.json()
+  return data.saved.map((s: { videoId: string }) => s.videoId).includes(videoId)
+}
+
+async function recordWatchHistory(videoId: string) {
+  try {
+    await fetch('/api/v1/history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ videoId, progress: 0 }),
+    })
+  } catch { /* Silently fail */ }
+}
+
 export function VideoDetail({ videoId }: VideoDetailProps) {
   const { navigate } = useNavigation()
   const { user } = useAuth()
-  const [video, setVideo] = useState<Record<string, unknown> | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [userVote, setUserVote] = useState<string | null>(null)
-  const [isSaved, setIsSaved] = useState(false)
+  const queryClient = useQueryClient()
   const [descriptionExpanded, setDescriptionExpanded] = useState(false)
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
 
-  useEffect(() => {
-    fetchVideo()
-  }, [videoId])
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['video', videoId],
+    queryFn: () => fetchVideoDetail(videoId),
+  })
+  const video = data?.video ?? null
+  const userVote = data?.userVote ?? null
 
+  const savedKey = ['video-saved', videoId, user?.id] as const
+  const { data: isSaved = false } = useQuery({
+    queryKey: savedKey,
+    queryFn: () => checkIfSaved(videoId),
+    enabled: !!user && !!videoId,
+  })
+
+  // Record watch history as a fire-and-forget side-effect (no state).
   useEffect(() => {
-    if (user && videoId) {
-      recordWatchHistory()
-      checkIfSaved()
-    }
+    if (user && videoId) recordWatchHistory(videoId)
   }, [videoId, user])
-
-  async function recordWatchHistory() {
-    try {
-      await fetch('/api/v1/history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoId, progress: 0 }),
-      })
-    } catch { /* Silently fail */ }
-  }
-
-  async function checkIfSaved() {
-    try {
-      const res = await fetch('/api/v1/saved?limit=100')
-      if (res.ok) {
-        const data = await res.json()
-        const savedVideoIds = data.saved.map((s: { videoId: string }) => s.videoId)
-        setIsSaved(savedVideoIds.includes(videoId))
-      }
-    } catch { /* ignore */ }
-  }
 
   async function toggleSave() {
     if (!user) {
@@ -72,30 +92,8 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
       } else {
         await fetch(`/api/v1/videos/${videoId}/save`, { method: 'POST' })
       }
-      setIsSaved(!isSaved)
+      queryClient.setQueryData(savedKey, !isSaved)
     } catch { /* ignore */ }
-  }
-
-  async function fetchVideo() {
-    setLoading(true)
-    try {
-      const res = await fetchWithRetry(`/api/v1/videos/${videoId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setVideo(data)
-        const votes = data.votes as { userId: string; voteType: string }[]
-        const sessionRes = await fetchWithRetry('/api/auth/session-info')
-        const sessionData = await sessionRes.json()
-        if (sessionData.user) {
-          const userVoteRecord = votes?.find((v) => v.userId === sessionData.user.id)
-          setUserVote(userVoteRecord?.voteType || null)
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch video:', error)
-    } finally {
-      setLoading(false)
-    }
   }
 
   const handleCopyLink = () => {
