@@ -34,6 +34,15 @@ don't remove the line.
       test for the 400-on-malformed-body fix (commit b21a094). See review [L-3].
       _2026-07-14 addendum:_ also backfill regression tests for the
       non-string-body-field 400 fix (commit `a27d338`, review 2026-07-14 [M-2]).
+      **CI half done 2026-07-21** by Claude Code / claude-opus-4-8, commit
+      `4a35892` (Session 5) — `.github/workflows/ci.yml` runs `tsc --noEmit` +
+      `next build` (hard) and `eslint .` (advisory) on PRs into `main`. Still
+      open: (a) the **test runner + tests** (Vitest/Playwright) — the larger
+      part of this item; (b) **GitHub Actions is billing-locked** so no run has
+      gone green yet (user must unlock billing); (c) **enable branch protection
+      on `main`** with the `typecheck · build` check required, or the gate only
+      reports and doesn't block merges (user, repo setting); (d) flip the eslint
+      step from advisory to blocking once the 35-error baseline is cleared.
 - [x] **Fix `~/.npm` ownership so `npx prisma dev` works on Baos-Mac-mini**
       (added 2026-07-14 by Claude Code) — npm's dynamic-subcommand install hits
       EACCES on root-owned files in `~/.npm/_cacache`, so the local Prisma dev

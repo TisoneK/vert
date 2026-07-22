@@ -54,3 +54,11 @@ past entries — append corrections instead.
 - **Outcome:** done — zero data loss (all logs/reviews/decisions/tasks preserved); no project-surface changes. core 0.2.0 vendored + verified.
 - **Open items:** tasks/backlog.md unchanged — dual lockfiles [L-1], tests+CI [L-3]
 - **Report:** none — migration/maintenance session, no review performed
+---
+## 2026-07-21 — Session 5
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15, Darwin 24.6.0) | **Role:** engineer
+- **Task:** (1) Context sync — `context-sync update` 0.2.0 → 0.3.0 ("harvest release", additive, no memory migration; verify clean, core.lock bumped). (2) Delivered the CI half of backlog [L-3]: added `.github/workflows/ci.yml` — a deploy gate running `tsc --noEmit` + `next build` (hard gates) and `eslint .` (advisory, `continue-on-error`, because of the 35-error baseline) on PRs into `main` + push to `main`. Installs with **bun** (authoritative per dependabot.yml). Build needs no DB/secrets — Prisma client is lazy (Proxy in `src/lib/db.ts`), all queries in dynamic route handlers — so only placeholder env is provided. Verified locally: `tsc --noEmit` exit 0.
+- **Commits:** 2 — `chore(context)` core 0.3.0 (`4ba2908`), `ci:` deploy gate (`4a35892`). Both pushed to main.
+- **Outcome:** workflow committed + correct, but **the first run failed at startup (billing)** — GitHub API annotation: *"The job was not started because your account is locked due to a billing issue."* Zero steps ran; not a workflow defect. Gate goes green once GitHub billing is unlocked (user action).
+- **Open items:** backlog [L-3] — CI workflow now exists (test suite still pending). NEW blockers/todos: **GitHub Actions billing lock** (user); **enable branch protection on `main`** with the `typecheck · build` check required to make it a true merge gate (user, repo setting); flip eslint step to blocking once the 35-error baseline is burned down (Tier 2).
+- **Report:** none this session — CI infra + context sync; the Tier-1/2/3 review the user pasted originated from a prior focused review, not re-run here.
