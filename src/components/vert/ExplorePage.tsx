@@ -1,7 +1,7 @@
 'use client'
 
 import { fetchWithRetry } from '@/lib/fetch-retry'
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
 import { Music, Trophy, Gamepad2, Film, Newspaper, Monitor, Cpu, Compass } from 'lucide-react'
 import { ShelfSkeleton } from './Skeleton'
@@ -12,6 +12,13 @@ interface Category {
   slug: string
   description: string | null
   videoCount: number
+}
+
+async function fetchCategories(): Promise<Category[]> {
+  const res = await fetchWithRetry('/api/v1/categories')
+  if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`)
+  const data = await res.json()
+  return data.categories ?? []
 }
 
 const categoryIconMap: Record<string, React.ElementType> = {
@@ -32,27 +39,14 @@ const categoryIconMap: Record<string, React.ElementType> = {
 
 export function ExplorePage() {
   const { navigate } = useNavigation()
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
-  async function fetchCategories() {
-    setLoading(true)
-    try {
-      const res = await fetchWithRetry('/api/v1/categories')
-      if (res.ok) {
-        const data = await res.json()
-        setCategories(data.categories ?? [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch categories:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Shared ['categories'] query key: every component that reads categories
+  // (HomeFeed, TrendingPage, CategoryPage, UploadPage) hits one cache entry.
+  // On error, data falls back to [] — same as the old code, which logged and
+  // showed the empty state rather than an error screen.
+  const { data: categories = [], isLoading: loading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  })
 
   if (loading) {
     return (
