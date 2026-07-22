@@ -56,3 +56,26 @@ don't remove the line.
       `system/environments.md` for the exact start command). Full
       authenticated-route verification of a27d338 then completed; see the
       2026-07-14 review addendum.
+
+---
+- [ ] **Migrate fetch-in-effect components to react-query (clears the 33
+      remaining eslint errors)** (added 2026-07-21 by Claude Code) — ~20
+      components in `src/components/vert/` use the
+      `useEffect(() => fetchX(), [])` + `setState` pattern, which trips the
+      React-Compiler rules `react-hooks/immutability` (22) and
+      `react-hooks/set-state-in-effect` (11 remaining). Per **ADR-2**, these
+      two rule classes are coupled — `useCallback`/reordering only trades one
+      for the other, so do NOT attempt a mechanical burndown. The real fix is
+      `@tanstack/react-query` (already a dependency): replace each fetch
+      effect with `useQuery`. Architectural — owner approval obtained
+      2026-07-21 to DEFER (chose "safe subset now"). Do incrementally with
+      per-component verification (loading/refetch behavior, caching). When it
+      lands, flip the CI lint step (`.github/workflows/ci.yml`, "Lint
+      (advisory)") from `continue-on-error: true` to blocking.
+      _Safe subset already done 2026-07-21, commit `67f1009`:_ `use-mobile.ts`
+      → `useSyncExternalStore`; `sidebar.tsx` skeleton → hashed `useId()`
+      (baseline 35 → 33). Remaining files (all fetch-in-effect): CategoryPage,
+      ChangelogPage, ChannelPage, CreatorStudio, ExplorePage, HistoryPage,
+      HomeFeed, NotificationCenter, PlaylistDetailPage, PlaylistPicker,
+      ProfilePage, RelatedVideos, SavedPage, SearchResults, TagPage,
+      TrendingPage, UploadPage, VideoDetail, VideoPlayer, carousel.tsx.

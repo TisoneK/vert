@@ -70,3 +70,11 @@ past entries — append corrections instead.
 - **Outcome:** done + verified end-to-end via `next dev` with injected env (guard returns before any DB access, so no DB needed): prod/no-flag → 404 on both endpoints; prod + `ENABLE_OPS_ENDPOINTS=true` + bad key → 401 (key gate reached); local unchanged. tsc clean. Boolean truth-table test also passed.
 - **Open items:** Remaining Tier-1 need external setup/decisions — password reset (email provider), error monitoring (Sentry DSN). Tier-2: ESLint burndown, SearchSuggestions dead code, dual lockfiles, test suite. **User action still pending:** unlock GitHub Actions billing; enable branch protection on `main`. **Deploy note:** do NOT set `ENABLE_OPS_ENDPOINTS` in prod env unless deliberately running seed/cleanup once.
 - **Report:** none — targeted fix.
+---
+## 2026-07-21 — Session 5 (continued, ESLint)
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini | **Role:** engineer
+- **Task:** Started the Tier-2 ESLint burndown; discovered it's not mechanical (see **ADR-2**). The 22 `immutability` + 12 `set-state-in-effect` errors are coupled — memoizing an effect-called fetch fn with `useCallback` just converts an immutability error into a set-state error (the set-state rule fires for ANY effect that transitively setStates, sync or async — verified on HomeFeed and UploadPage, both reverted). Real fix = react-query migration (architectural). Asked owner; chose **"safe subset now, defer migration."** Shipped the 2 genuinely-standalone fixes: `use-mobile.ts` → `useSyncExternalStore`; `sidebar.tsx` skeleton width → hashed `useId()` (drops Math.random purity error).
+- **Commits:** 1 — `fix(hooks,ui)` (`67f1009`), pushed to main.
+- **Outcome:** done — baseline **35 → 33** eslint errors. Verified: eslint clean on both files, tsc clean, `next build` succeeds (exit 0, also re-confirms the CI gate builds with placeholder env + no DB).
+- **Open items:** NEW backlog item — react-query migration for the remaining 33 (owner-approved to defer); ADR-2 records the coupling + the "don't mechanically burn down" rule. CI lint step stays advisory until that lands. Higher-value Tier work still open: password reset (email provider), error monitoring (Sentry DSN), test suite; user actions: GitHub Actions billing, branch protection.
+- **Report:** none — targeted fixes + decision record.
