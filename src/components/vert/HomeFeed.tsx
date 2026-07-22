@@ -1,7 +1,7 @@
 'use client'
 import { fetchWithRetry } from '@/lib/fetch-retry'
 
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { ShelfSkeleton } from './Skeleton'
@@ -33,76 +33,56 @@ interface Category {
   videoCount: number
 }
 
+async function fetchCategories(): Promise<Category[]> {
+  const res = await fetchWithRetry('/api/v1/categories')
+  if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`)
+  const data = await res.json()
+  return data.categories ?? []
+}
+
+async function fetchTrending(limit: number): Promise<Video[]> {
+  const res = await fetch(`/api/v1/trending?limit=${limit}`)
+  if (!res.ok) throw new Error(`Failed to fetch trending: ${res.status}`)
+  const data = await res.json()
+  return data.videos ?? []
+}
+
+async function fetchForYou(): Promise<Video[]> {
+  const res = await fetch('/api/v1/feed/for-you?limit=12', { cache: 'no-store' })
+  if (!res.ok) throw new Error(`Failed to fetch for-you: ${res.status}`)
+  const data = await res.json()
+  return data.personalized ? (data.videos ?? []) : []
+}
+
+async function fetchVideos(): Promise<Video[]> {
+  const res = await fetch('/api/v1/videos?page=1&limit=24')
+  if (!res.ok) throw new Error(`Failed to fetch videos: ${res.status}`)
+  const data = await res.json()
+  return data.videos ?? []
+}
+
 export function HomeFeed() {
   const { navigate } = useNavigation()
   const { user } = useAuth()
-  const [videos, setVideos] = useState<Video[]>([])
-  const [trendingVideos, setTrendingVideos] = useState<Video[]>([])
-  const [forYouVideos, setForYouVideos] = useState<Video[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchCategories()
-    fetchTrending()
-    fetchVideos()
-    if (user) fetchForYou()
-  }, [user])
-
-  async function fetchCategories() {
-    try {
-      const res = await fetchWithRetry('/api/v1/categories')
-      if (res.ok) {
-        const data = await res.json()
-        setCategories(data.categories ?? [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch categories:', error)
-    }
-  }
-
-  async function fetchTrending() {
-    try {
-      const res = await fetch('/api/v1/trending?limit=12')
-      if (res.ok) {
-        const data = await res.json()
-        setTrendingVideos(data.videos ?? [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch trending:', error)
-    }
-  }
-
-  async function fetchForYou() {
-    try {
-      const res = await fetch('/api/v1/feed/for-you?limit=12', { cache: 'no-store' })
-      if (res.ok) {
-        const data = await res.json()
-        if (data.personalized) {
-          setForYouVideos(data.videos ?? [])
-        } else {
-          setForYouVideos([])
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch for-you:', error)
-    }
-  }
-
-  async function fetchVideos() {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/v1/videos?page=1&limit=24')
-      if (res.ok) {
-        const data = await res.json()
-        setVideos(data.videos ?? [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch videos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Shared ['categories'] cache; trending keyed with limit:12 so it doesn't
+  // collide with TrendingPage's limit:20 query. "For You" only runs when
+  // signed in. The page's loading skeleton tracks the main videos query
+  // (as the old code did — only fetchVideos toggled `loading`).
+  const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories })
+  const { data: trendingVideos = [] } = useQuery({
+    queryKey: ['trending', { limit: 12 }],
+    queryFn: () => fetchTrending(12),
+  })
+  const { data: videos = [], isLoading: loading } = useQuery({
+    queryKey: ['videos', { page: 1, limit: 24 }],
+    queryFn: fetchVideos,
+  })
+  const { data: forYouVideos = [] } = useQuery({
+    queryKey: ['for-you', user?.id],
+    queryFn: fetchForYou,
+    enabled: !!user,
+  })
 
   // Group videos by category
   const getVideosByCategory = (categorySlug: string) => {

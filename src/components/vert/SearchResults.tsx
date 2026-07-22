@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { CardSkeleton } from './Skeleton'
@@ -39,64 +40,60 @@ type SortOption = 'relevance' | 'date' | 'views'
 type FormatFilter = '' | 'portrait' | 'landscape' | 'square'
 type DateFilter = '' | 'today' | 'week' | 'month' | 'year'
 
+async function fetchVideos(
+  q: string,
+  sortBy: SortOption,
+  formatFilter: FormatFilter,
+  dateFilter: DateFilter,
+): Promise<VideoResult[]> {
+  const params = new URLSearchParams({
+    search: q,
+    limit: '20',
+    sort: sortBy === 'relevance' ? 'latest' : sortBy,
+  })
+  if (formatFilter) params.set('format', formatFilter)
+  if (dateFilter) params.set('date', dateFilter)
+  const res = await fetch(`/api/v1/videos?${params}`)
+  if (!res.ok) throw new Error(`Search failed: ${res.status}`)
+  const data = await res.json()
+  return data.videos ?? []
+}
+
+async function fetchChannels(q: string): Promise<ChannelResult[]> {
+  const res = await fetch(`/api/v1/channels/search?q=${encodeURIComponent(q)}&limit=20`)
+  if (!res.ok) throw new Error(`Channel search failed: ${res.status}`)
+  const data = await res.json()
+  return data.channels ?? []
+}
+
 export function SearchResults({ query }: SearchResultsProps) {
   const { navigate } = useNavigation()
-  const [videos, setVideos] = useState<VideoResult[]>([])
-  const [channels, setChannels] = useState<ChannelResult[]>([])
-  const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState(query)
+  const [prevQuery, setPrevQuery] = useState(query)
   const [tab, setTab] = useState<ResultTab>('videos')
   const [sortBy, setSortBy] = useState<SortOption>('relevance')
   const [formatFilter, setFormatFilter] = useState<FormatFilter>('')
   const [dateFilter, setDateFilter] = useState<DateFilter>('')
 
-  // Re-fetch whenever query, tab, or any filter changes
-  useEffect(() => {
-    if (!query) return
-    if (tab === 'videos') {
-      fetchVideos(query)
-    } else {
-      fetchChannels(query)
-    }
-  }, [query, tab, sortBy, formatFilter, dateFilter])
-
-  // Keep the local input box in sync with the URL prop
-  useEffect(() => {
+  // Keep the search box in sync with the URL prop without an effect —
+  // React's "adjust state while rendering" pattern for a prop-derived value.
+  if (query !== prevQuery) {
+    setPrevQuery(query)
     setSearchQuery(query)
-  }, [query])
-
-  async function fetchVideos(q: string) {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        search: q,
-        limit: '20',
-        sort: sortBy === 'relevance' ? 'latest' : sortBy,
-      })
-      if (formatFilter) params.set('format', formatFilter)
-      if (dateFilter) params.set('date', dateFilter)
-      const res = await fetch(`/api/v1/videos?${params}`)
-      const data = await res.json()
-      setVideos(data.videos ?? [])
-    } catch (error) {
-      console.error('Search error:', error)
-    } finally {
-      setLoading(false)
-    }
   }
 
-  async function fetchChannels(q: string) {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/v1/channels/search?q=${encodeURIComponent(q)}&limit=20`)
-      const data = await res.json()
-      setChannels(data.channels ?? [])
-    } catch (error) {
-      console.error('Channel search error:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // One query per tab; only the active tab (with a non-empty query) fetches.
+  const { data: videos = [], isLoading: videosLoading } = useQuery({
+    queryKey: ['search-videos', query, sortBy, formatFilter, dateFilter],
+    queryFn: () => fetchVideos(query, sortBy, formatFilter, dateFilter),
+    enabled: !!query && tab === 'videos',
+  })
+  const { data: channels = [], isLoading: channelsLoading } = useQuery({
+    queryKey: ['search-channels', query],
+    queryFn: () => fetchChannels(query),
+    enabled: !!query && tab === 'channels',
+  })
+  const loading = tab === 'videos' ? videosLoading : channelsLoading
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
