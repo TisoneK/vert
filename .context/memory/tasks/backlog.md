@@ -11,13 +11,22 @@ don't remove the line.
 -->
 
 ---
-- [ ] **Resolve dual lockfiles** (added 2026-07-11 by Claude Code) — both
+- [x] **Resolve dual lockfiles** (added 2026-07-11 by Claude Code) — both
       `bun.lock` and `package-lock.json` are committed. Two package managers'
       lockfiles drift independently and cause false-positive audit alerts /
       divergent dependency trees across machines. Pick one authoritative
       manager and delete the other lockfile. Low severity; tooling decision,
       not a code fix. Note: `bun` is not installed on Baos-Mac-mini, so npm is
       the de-facto local manager there. See 2026-07-11 review [L-1].
+      **Already resolved — verified 2026-07-21 (Session 5).** This was fixed
+      before it was even filed: commit `aab2c89` (2026-07-08) removed the
+      tracked `package-lock.json` and added it to `.gitignore` (with a comment
+      naming `bun.lock` authoritative), plus the Dependabot config. Current
+      state: `git ls-files` tracks **only `bun.lock`**; `package-lock.json` is
+      gitignored, so the copy on Baos-Mac-mini is an untracked npm artifact
+      that never reaches the repo — harmless, no drift, nothing to delete. The
+      2026-07-11/pasted-review flag was a false positive (saw both files on
+      disk without checking git tracking). No action needed.
 - [x] **Route `seed`/`cleanup-demo` through the shared `db` singleton** (added
       2026-07-11 by Claude Code) — `src/app/api/seed/route.ts` and
       `src/app/api/cleanup-demo/route.ts` instantiate `new PrismaClient()`
