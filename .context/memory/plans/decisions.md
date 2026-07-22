@@ -57,3 +57,13 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   advisory (`continue-on-error`) until the react-query migration lands, at
   which point flip it to blocking. Treat the migration as its own scoped,
   approved effort with per-component verification (behavior + caching).
+- **UPDATE 2026-07-22 (Session 6):** the defer was reversed — owner said
+  "refactor it." The full react-query migration landed (commits
+  `27ac41a`..`cf87a8c`): `QueryClientProvider` wired in
+  `src/app/providers.tsx`; every fetch-in-effect component moved to
+  `useQuery`/`useInfiniteQuery`, mutations to `setQueryData`, Notifications
+  polling to `refetchInterval`; the two genuine external-system syncs
+  (carousel embla-init, VideoPlayer HLS setup) kept as documented
+  `eslint-disable`s. **eslint is now at 0 errors** and the CI lint step is
+  **blocking** (`c4929d9`). Keep the "don't mechanically burn down" rule for
+  any FUTURE fetch-in-effect code: reach for react-query, not `useCallback`.

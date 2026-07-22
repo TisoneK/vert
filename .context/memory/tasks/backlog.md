@@ -67,7 +67,7 @@ don't remove the line.
       2026-07-14 review addendum.
 
 ---
-- [ ] **Migrate fetch-in-effect components to react-query (clears the 33
+- [x] **Migrate fetch-in-effect components to react-query (clears the 33
       remaining eslint errors)** (added 2026-07-21 by Claude Code) — ~20
       components in `src/components/vert/` use the
       `useEffect(() => fetchX(), [])` + `setState` pattern, which trips the
@@ -88,3 +88,16 @@ don't remove the line.
       HomeFeed, NotificationCenter, PlaylistDetailPage, PlaylistPicker,
       ProfilePage, RelatedVideos, SavedPage, SearchResults, TagPage,
       TrendingPage, UploadPage, VideoDetail, VideoPlayer, carousel.tsx.
+      **DONE 2026-07-22 (Session 6)** — owner reversed the defer ("refactor
+      it"); full migration landed across commits `27ac41a`..`cf87a8c`. Wired
+      `QueryClientProvider` (`src/app/providers.tsx`, was never mounted despite
+      the dep). All list/paginated reads → `useQuery`/`useInfiniteQuery`;
+      mutations (History/Saved/Playlist/Notifications/VideoDetail-save) write
+      through `setQueryData`; Notifications polling → `refetchInterval`. The
+      two non-fetch external-syncs (carousel init, VideoPlayer HLS) got
+      documented `eslint-disable`s. **eslint 35 → 0 errors**; tsc + `next
+      build` clean; runtime-verified explore/trending(filter)/category(sort)/
+      tag/home/watch. CI lint step flipped to **blocking** (`c4929d9`). Follow-
+      up (not blocking): shared query-key/hook factory to dedupe the inline
+      `['categories']` etc. queryFns; consider react-query for the remaining
+      one-off `fetch` calls in mutation handlers.
