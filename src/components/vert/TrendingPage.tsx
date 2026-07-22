@@ -1,7 +1,8 @@
 'use client'
 
 import { fetchWithRetry } from '@/lib/fetch-retry'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { Flame, Play } from 'lucide-react'
@@ -34,50 +35,44 @@ interface Category {
   videoCount: number
 }
 
+async function fetchCategories(): Promise<Category[]> {
+  const res = await fetchWithRetry('/api/v1/categories')
+  if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`)
+  const data = await res.json()
+  return data.categories ?? []
+}
+
+async function fetchTrending(category: string | null): Promise<Video[]> {
+  const params = new URLSearchParams({ limit: '20' })
+  if (category) params.set('category', category)
+  const res = await fetchWithRetry(`/api/v1/trending?${params}`)
+  if (!res.ok) throw new Error(`Failed to fetch trending: ${res.status}`)
+  const data = await res.json()
+  return data.videos ?? []
+}
+
 export function TrendingPage() {
   const { navigate } = useNavigation()
-  const [videos, setVideos] = useState<Video[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchCategories()
-    fetchTrending()
-  }, [])
+  // Shared categories cache (see ExplorePage).
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  })
 
-  async function fetchCategories() {
-    try {
-      const res = await fetchWithRetry('/api/v1/categories')
-      if (res.ok) {
-        const data = await res.json()
-        setCategories(data.categories ?? [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch categories:', error)
-    }
-  }
-
-  async function fetchTrending(category?: string) {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ limit: '20' })
-      if (category) params.set('category', category)
-      const res = await fetchWithRetry(`/api/v1/trending?${params}`)
-      if (res.ok) {
-        const data = await res.json()
-        setVideos(data.videos ?? [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch trending:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Trending is keyed on the active category, so switching the filter is a
+  // query-key change that react-query refetches automatically — the old code
+  // called fetchTrending() manually from the click handler. The key includes
+  // limit:20 so it won't collide with other pages' differently-sized trending
+  // queries (e.g. HomeFeed's limit:12).
+  const { data: videos = [], isLoading: loading } = useQuery({
+    queryKey: ['trending', { category: activeCategory, limit: 20 }],
+    queryFn: () => fetchTrending(activeCategory),
+  })
 
   const handleCategoryFilter = (slug: string | null) => {
     setActiveCategory(slug)
-    fetchTrending(slug || undefined)
   }
 
   const heroVideo = videos[0]
