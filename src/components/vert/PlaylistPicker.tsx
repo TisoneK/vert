@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,6 +28,38 @@ interface Playlist {
   thumbnailUrl: string | null
 }
 
+interface PickerData {
+  playlists: Playlist[]
+  containedIn: Set<string>
+}
+
+// Fetches the user's playlists plus which of them already contain this video
+// (N+1 detail requests, but only run when the modal opens and N is small).
+async function fetchPlaylistsWithContainment(videoId: string): Promise<PickerData> {
+  const res = await fetch('/api/v1/playlists')
+  if (!res.ok) throw new Error(`Failed to fetch playlists: ${res.status}`)
+  const data = await res.json()
+  const pls: Playlist[] = data.playlists ?? []
+  const contained = new Set<string>()
+  await Promise.all(
+    pls.map(async (pl) => {
+      try {
+        const detailRes = await fetch(`/api/v1/playlists/${pl.id}`)
+        if (detailRes.ok) {
+          const detail = await detailRes.json()
+          const hasVideo = detail.playlist?.items?.some(
+            (item: { video: { id: string } }) => item.video.id === videoId
+          )
+          if (hasVideo) contained.add(pl.id)
+        }
+      } catch {
+        // ignore — individual playlist failures shouldn't block the modal
+      }
+    })
+  )
+  return { playlists: pls, containedIn: contained }
+}
+
 /**
  * Playlist picker modal — shown when a user clicks "Add to playlist"
  * on a VideoCard context menu.
@@ -38,20 +71,22 @@ interface Playlist {
 export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerProps) {
   const { user } = useAuth()
   const { toast } = useToast()
-  const [playlists, setPlaylists] = useState<Playlist[]>([])
-  const [loading, setLoading] = useState(true)
-  const [containedIn, setContainedIn] = useState<Set<string>>(new Set())
+  const queryClient = useQueryClient()
+  const pickerKey = ['playlist-picker', videoId, user?.id] as const
   const [togglingId, setTogglingId] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [creating, setCreating] = useState(false)
   const titleInputRef = useRef<HTMLInputElement>(null)
 
-  // Fetch playlists + check which ones already contain this video
-  useEffect(() => {
-    if (!open || !user) return
-    fetchPlaylists()
-  }, [open, user])
+  // Only fetches while the modal is open for a signed-in user.
+  const { data, isLoading: loading } = useQuery({
+    queryKey: pickerKey,
+    queryFn: () => fetchPlaylistsWithContainment(videoId),
+    enabled: open && !!user,
+  })
+  const playlists = data?.playlists ?? []
+  const containedIn = data?.containedIn ?? new Set<string>()
 
   // Focus the title input when the create form opens
   useEffect(() => {
@@ -59,43 +94,6 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
       titleInputRef.current.focus()
     }
   }, [showCreate])
-
-  async function fetchPlaylists() {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/v1/playlists')
-      if (res.ok) {
-        const data = await res.json()
-        const pls = data.playlists ?? []
-        setPlaylists(pls)
-        // Check which playlists already contain this video — fetch each
-        // playlist's items. This is N requests, but N is typically small
-        // (most users have < 10 playlists) and we only do it on modal open.
-        const contained = new Set<string>()
-        await Promise.all(
-          pls.map(async (pl: Playlist) => {
-            try {
-              const detailRes = await fetch(`/api/v1/playlists/${pl.id}`)
-              if (detailRes.ok) {
-                const detail = await detailRes.json()
-                const hasVideo = detail.playlist?.items?.some(
-                  (item: { video: { id: string } }) => item.video.id === videoId
-                )
-                if (hasVideo) contained.add(pl.id)
-              }
-            } catch {
-              // ignore — individual playlist failures shouldn't block the modal
-            }
-          })
-        )
-        setContainedIn(contained)
-      }
-    } catch (error) {
-      console.error('Failed to fetch playlists:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   async function handleToggle(playlistId: string) {
     setTogglingId(playlistId)
@@ -107,16 +105,12 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
           method: 'DELETE',
         })
         if (res.ok) {
-          setContainedIn((prev) => {
-            const next = new Set(prev)
-            next.delete(playlistId)
-            return next
-          })
-          setPlaylists((prev) =>
-            prev.map((p) =>
+          queryClient.setQueryData<PickerData>(pickerKey, (prev) => prev ? {
+            playlists: prev.playlists.map((p) =>
               p.id === playlistId ? { ...p, videoCount: Math.max(0, p.videoCount - 1) } : p
-            )
-          )
+            ),
+            containedIn: new Set([...prev.containedIn].filter((id) => id !== playlistId)),
+          } : prev)
         }
       } else {
         // Add to playlist
@@ -126,12 +120,12 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
           body: JSON.stringify({ videoId }),
         })
         if (res.ok) {
-          setContainedIn((prev) => new Set(prev).add(playlistId))
-          setPlaylists((prev) =>
-            prev.map((p) =>
+          queryClient.setQueryData<PickerData>(pickerKey, (prev) => prev ? {
+            playlists: prev.playlists.map((p) =>
               p.id === playlistId ? { ...p, videoCount: p.videoCount + 1 } : p
-            )
-          )
+            ),
+            containedIn: new Set(prev.containedIn).add(playlistId),
+          } : prev)
         } else {
           const data = await res.json()
           toast({ title: 'Failed', description: data.error, variant: 'destructive' })
@@ -163,7 +157,9 @@ export function PlaylistPicker({ videoId, open, onOpenChange }: PlaylistPickerPr
           videoCount: 0,
           thumbnailUrl: null,
         }
-        setPlaylists((prev) => [newPl, ...prev])
+        queryClient.setQueryData<PickerData>(pickerKey, (prev) => prev
+          ? { playlists: [newPl, ...prev.playlists], containedIn: prev.containedIn }
+          : { playlists: [newPl], containedIn: new Set<string>() })
         setNewTitle('')
         setShowCreate(false)
         // Auto-add the video to the new playlist

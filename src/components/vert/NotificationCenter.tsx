@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bell, X, Check } from 'lucide-react'
 import { useAuth } from '@/lib/store'
 
@@ -13,6 +14,18 @@ interface Notification {
   createdAt: string
   relatedVideoId?: string | null
   relatedChannelId?: string | null
+}
+
+interface NotificationsData {
+  notifications: Notification[]
+  unreadCount: number
+}
+
+async function fetchNotifications(): Promise<NotificationsData> {
+  const res = await fetch('/api/v1/notifications?limit=50', { cache: 'no-store' })
+  if (!res.ok) throw new Error(`Failed to fetch notifications: ${res.status}`)
+  const data = await res.json()
+  return { notifications: data.notifications ?? [], unreadCount: data.unreadCount ?? 0 }
 }
 
 function formatRelative(iso: string): string {
@@ -32,40 +45,23 @@ function formatRelative(iso: string): string {
 
 export function NotificationCenter() {
   const { user } = useAuth()
+  const queryClient = useQueryClient()
+  const notifKey = ['notifications', user?.id] as const
   const [open, setOpen] = useState(false)
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [loading, setLoading] = useState(false)
   const [markingAll, setMarkingAll] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  const fetchNotifications = useCallback(async () => {
-    if (!user) {
-      setNotifications([])
-      setUnreadCount(0)
-      return
-    }
-    setLoading(true)
-    try {
-      const res = await fetch('/api/v1/notifications?limit=50', { cache: 'no-store' })
-      if (!res.ok) return
-      const data = await res.json()
-      setNotifications(data.notifications ?? [])
-      setUnreadCount(data.unreadCount ?? 0)
-    } catch {
-      // Silent failure — UI will just show empty state
-    } finally {
-      setLoading(false)
-    }
-  }, [user])
-
-  // Load on mount + when user changes + light polling every 60s while mounted
-  useEffect(() => {
-    fetchNotifications()
-    if (!user) return
-    const id = setInterval(fetchNotifications, 60_000)
-    return () => clearInterval(id)
-  }, [fetchNotifications, user])
+  // react-query replaces the manual fetch + 60s setInterval polling with a
+  // refetchInterval. With no user the query stays idle (empty data), matching
+  // the old early-return behavior.
+  const { data, isLoading: loading } = useQuery({
+    queryKey: notifKey,
+    queryFn: fetchNotifications,
+    enabled: !!user,
+    refetchInterval: 60_000,
+  })
+  const notifications = data?.notifications ?? []
+  const unreadCount = data?.unreadCount ?? 0
 
   // Close on outside click
   useEffect(() => {
@@ -80,31 +76,34 @@ export function NotificationCenter() {
   }, [open])
 
   const markAsRead = async (id: string) => {
-    // Optimistic update
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    // Optimistic update straight into the query cache
+    queryClient.setQueryData<NotificationsData>(notifKey, (prev) =>
+      prev
+        ? {
+            notifications: prev.notifications.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
+            unreadCount: Math.max(0, prev.unreadCount - 1),
+          }
+        : prev
     )
-    setUnreadCount((prev) => Math.max(0, prev - 1))
     try {
       await fetch(`/api/v1/notifications/${id}/read`, { method: 'PATCH' })
     } catch {
-      // Revert on failure
-      fetchNotifications()
+      // Revert on failure by refetching
+      queryClient.invalidateQueries({ queryKey: notifKey })
     }
   }
 
   const markAllAsRead = async () => {
     if (markingAll || unreadCount === 0) return
     setMarkingAll(true)
-    const prevCount = unreadCount
     // Optimistic
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })))
-    setUnreadCount(0)
+    queryClient.setQueryData<NotificationsData>(notifKey, (prev) =>
+      prev ? { notifications: prev.notifications.map((n) => ({ ...n, isRead: true })), unreadCount: 0 } : prev
+    )
     try {
       await fetch('/api/v1/notifications/read-all', { method: 'POST' })
     } catch {
-      setUnreadCount(prevCount)
-      fetchNotifications()
+      queryClient.invalidateQueries({ queryKey: notifKey })
     } finally {
       setMarkingAll(false)
     }
