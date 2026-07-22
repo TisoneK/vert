@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth, useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { Button } from '@/components/ui/button'
@@ -11,16 +12,30 @@ import { Settings, Save, BarChart3, Film } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { formatSubscribers } from '@/lib/utils-vert'
 
+async function fetchChannel(channelId: string): Promise<Record<string, unknown>> {
+  const res = await fetch(`/api/v1/channels/${channelId}`)
+  if (!res.ok) throw new Error(`Failed to fetch channel: ${res.status}`)
+  return res.json()
+}
+
 export function ProfilePage() {
   const { user, setUser } = useAuth()
   const { navigate } = useNavigation()
   const { toast } = useToast()
-  const [channelData, setChannelData] = useState<Record<string, unknown> | null>(null)
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [channelName, setChannelName] = useState('')
   const [description, setDescription] = useState('')
   const [saving, setSaving] = useState(false)
+
+  // Shares the ['channel', id] cache with ChannelPage. enabled gates on the
+  // user having a channel (old code set loading false in that case).
+  const channelKey = ['channel', user?.channelId] as const
+  const { data: channelData = null, isLoading: loading } = useQuery({
+    queryKey: channelKey,
+    queryFn: () => fetchChannel(user!.channelId!),
+    enabled: !!user?.channelId,
+  })
 
   // Redirect to login if not authenticated. Previously this was a
   // setState-during-render call (navigate inside the render body), which
@@ -30,30 +45,13 @@ export function ProfilePage() {
     if (!user) navigate({ page: 'login' })
   }, [user, navigate])
 
-  useEffect(() => {
-    if (user?.channelId) {
-      fetchChannel()
-    } else {
-      setLoading(false)
-    }
-  }, [user?.channelId])
-
-  async function fetchChannel() {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/v1/channels/${user!.channelId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setChannelData(data)
-        const ch = data.channel as { channelName: string; description: string | null }
-        setChannelName(ch.channelName)
-        setDescription(ch.description || '')
-      }
-    } catch (error) {
-      console.error('Failed to fetch channel:', error)
-    } finally {
-      setLoading(false)
-    }
+  // Seed the edit form from the current channel when entering edit mode,
+  // instead of syncing server data into form state inside an effect.
+  function startEditing() {
+    const ch = (channelData as { channel?: { channelName: string; description: string | null } } | null)?.channel
+    setChannelName(ch?.channelName ?? '')
+    setDescription(ch?.description || '')
+    setEditing(true)
   }
 
   async function handleSave() {
@@ -68,7 +66,7 @@ export function ProfilePage() {
       if (res.ok) {
         toast({ title: 'Channel updated!', description: 'Your changes have been saved.' })
         setEditing(false)
-        fetchChannel()
+        queryClient.invalidateQueries({ queryKey: channelKey })
       }
     } catch (error) {
       console.error('Channel update error:', error)
@@ -201,7 +199,7 @@ export function ProfilePage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setEditing(!editing)}
+              onClick={() => (editing ? setEditing(false) : startEditing())}
               className="border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
             >
               <Settings className="h-4 w-4 mr-1" />

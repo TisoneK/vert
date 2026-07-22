@@ -1,7 +1,8 @@
 'use client'
 
 import { fetchWithRetry } from '@/lib/fetch-retry'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { ArrowLeft, Film, Music, Trophy, Gamepad2, Newspaper, Monitor, Cpu } from 'lucide-react'
@@ -48,55 +49,50 @@ const categoryIconMap: Record<string, React.ElementType> = {
   other: Film,
 }
 
+interface CategoryVideosPage {
+  category: CategoryInfo
+  videos: Video[]
+  pagination: { totalPages: number }
+}
+
+async function fetchCategoryVideos(
+  slug: string,
+  sort: string,
+  pageNum: number,
+): Promise<CategoryVideosPage> {
+  const params = new URLSearchParams({ page: pageNum.toString(), limit: '12', sort })
+  const res = await fetchWithRetry(`/api/v1/categories/${slug}/videos?${params}`)
+  if (!res.ok) throw new Error(`Failed to fetch category videos: ${res.status}`)
+  return res.json()
+}
+
 export function CategoryPage({ slug }: { slug: string }) {
   const { navigate } = useNavigation()
-  const [videos, setVideos] = useState<Video[]>([])
-  const [category, setCategory] = useState<CategoryInfo | null>(null)
-  const [loading, setLoading] = useState(true)
   const [sort, setSort] = useState<'latest' | 'trending' | 'popular'>('latest')
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
 
-  useEffect(() => {
-    setPage(1)
-    fetchCategoryVideos(1, true)
-  }, [slug, sort])
+  // Paginated feed -> useInfiniteQuery. Changing slug/sort is a query-key
+  // change (fresh page 1); "Load More" is fetchNextPage. Unlike the old code,
+  // fetching the next page no longer blanks the grid with skeletons — the
+  // existing videos stay while the button shows a loading state.
+  const {
+    data,
+    isLoading: loading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['category-videos', slug, sort],
+    queryFn: ({ pageParam }) => fetchCategoryVideos(slug, sort, pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      allPages.length < lastPage.pagination.totalPages ? allPages.length + 1 : undefined,
+  })
 
-  async function fetchCategoryVideos(pageNum: number, reset = false) {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        page: pageNum.toString(),
-        limit: '12',
-        sort,
-      })
-      const res = await fetchWithRetry(`/api/v1/categories/${slug}/videos?${params}`)
-      if (res.ok) {
-        const data = await res.json()
-        setCategory(data.category)
-        if (reset) {
-          setVideos(data.videos ?? [])
-        } else {
-          setVideos((prev) => [...prev, ...(data.videos ?? [])])
-        }
-        setHasMore(pageNum < data.pagination.totalPages)
-      }
-    } catch (error) {
-      console.error('Failed to fetch category videos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const videos = data?.pages.flatMap((p) => p.videos ?? []) ?? []
+  const category = data?.pages[0]?.category ?? null
 
   const handleSortChange = (newSort: 'latest' | 'trending' | 'popular') => {
     setSort(newSort)
-    setPage(1)
-  }
-
-  const loadMore = () => {
-    const nextPage = page + 1
-    setPage(nextPage)
-    fetchCategoryVideos(nextPage)
   }
 
   const Icon = category ? (categoryIconMap[category.slug] || Film) : Film
@@ -163,14 +159,15 @@ export function CategoryPage({ slug }: { slug: string }) {
         </div>
       )}
 
-      {!loading && hasMore && videos.length > 0 && (
+      {!loading && hasNextPage && videos.length > 0 && (
         <div className="flex justify-center mt-8">
           <Button
-            onClick={loadMore}
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
             variant="outline"
             className="border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
-            Load More
+            {isFetchingNextPage ? 'Loading…' : 'Load More'}
           </Button>
         </div>
       )}
