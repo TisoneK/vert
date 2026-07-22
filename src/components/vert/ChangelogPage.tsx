@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { ScrollText, Loader2, AlertCircle } from 'lucide-react'
 
 interface ChangelogSection {
@@ -11,15 +12,19 @@ interface ChangelogSection {
   html: string
 }
 
-export function ChangelogPage() {
-  const [sections, setSections] = useState<ChangelogSection[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [activeId, setActiveId] = useState<string | null>(null)
+async function fetchChangelog(): Promise<ChangelogSection[]> {
+  const res = await fetch('/api/v1/changelog')
+  if (!res.ok) throw new Error('Failed to load changelog')
+  const data = await res.json()
+  return data.sections ?? []
+}
 
-  useEffect(() => {
-    fetchChangelog()
-  }, [])
+export function ChangelogPage() {
+  const { data: sections = [], isLoading: loading, isError, refetch } = useQuery({
+    queryKey: ['changelog'],
+    queryFn: fetchChangelog,
+  })
+  const [activeId, setActiveId] = useState<string | null>(null)
 
   // Track which section is in view for the sticky sidebar highlight.
   useEffect(() => {
@@ -41,31 +46,12 @@ export function ChangelogPage() {
       if (el) observer.observe(el)
     }
 
-    // Default to first section
-    if (!activeId && sections.length > 0) {
-      setActiveId(sections[0]!.id)
-    }
-
     return () => observer.disconnect()
   }, [sections])
 
-  async function fetchChangelog() {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/v1/changelog')
-      if (res.ok) {
-        const data = await res.json()
-        setSections(data.sections ?? [])
-      } else {
-        setError('Failed to load changelog')
-      }
-    } catch {
-      setError('Network error')
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Highlight the scrolled-into-view section, defaulting to the first one.
+  // Derived at render instead of setState-in-effect (react-hooks rule).
+  const effectiveActiveId = activeId ?? sections[0]?.id ?? null
 
   function scrollToSection(id: string) {
     const el = document.getElementById(id)
@@ -82,13 +68,13 @@ export function ChangelogPage() {
     )
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
         <AlertCircle className="h-10 w-10 text-zinc-400 dark:text-zinc-500 mb-3" />
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">{error}</p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">Failed to load changelog</p>
         <button
-          onClick={fetchChangelog}
+          onClick={() => refetch()}
           className="mt-3 text-sm text-violet-600 hover:text-violet-700 font-medium"
         >
           Try again
@@ -125,7 +111,7 @@ export function ChangelogPage() {
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
                 className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
-                  activeId === section.id
+                  effectiveActiveId === section.id
                     ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 font-medium'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { SubscribeButton } from './SubscribeButton'
@@ -12,29 +12,20 @@ interface ChannelPageProps {
   channelId: string
 }
 
+async function fetchChannel(channelId: string): Promise<Record<string, unknown>> {
+  const res = await fetch(`/api/v1/channels/${channelId}`)
+  if (!res.ok) throw new Error(`Failed to fetch channel: ${res.status}`)
+  return res.json()
+}
+
 export function ChannelPage({ channelId }: ChannelPageProps) {
   const { navigate } = useNavigation()
-  const [channelData, setChannelData] = useState<Record<string, unknown> | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchChannel()
-  }, [channelId])
-
-  async function fetchChannel() {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/v1/channels/${channelId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setChannelData(data)
-      }
-    } catch (error) {
-      console.error('Failed to fetch channel:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Keyed on channelId; on error data is null -> "Channel not found" (same as
+  // the old code, which left channelData null on a failed/404 fetch).
+  const { data: channelData = null, isLoading: loading } = useQuery({
+    queryKey: ['channel', channelId],
+    queryFn: () => fetchChannel(channelId),
+  })
 
   if (loading) {
     return (

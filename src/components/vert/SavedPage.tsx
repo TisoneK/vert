@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { Button } from '@/components/ui/button'
@@ -27,40 +27,32 @@ interface SavedEntry {
   }
 }
 
+async function fetchSaved(): Promise<SavedEntry[]> {
+  const res = await fetch('/api/v1/saved?limit=30')
+  if (!res.ok) throw new Error(`Failed to fetch saved: ${res.status}`)
+  const data = await res.json()
+  return data.saved ?? []
+}
+
 export function SavedPage() {
   const { navigate } = useNavigation()
   const { user } = useAuth()
-  const [saved, setSaved] = useState<SavedEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
+  const savedKey = ['saved', user?.id] as const
 
-  useEffect(() => {
-    if (user) {
-      fetchSaved()
-    } else {
-      setLoading(false)
-    }
-  }, [user])
-
-  async function fetchSaved() {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/v1/saved?limit=30')
-      if (res.ok) {
-        const data = await res.json()
-        setSaved(data.saved)
-      }
-    } catch (error) {
-      console.error('Failed to fetch saved:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { data: saved = [], isLoading: loading } = useQuery({
+    queryKey: savedKey,
+    queryFn: fetchSaved,
+    enabled: !!user,
+  })
 
   async function unsaveVideo(videoId: string) {
     try {
       const res = await fetch(`/api/v1/videos/${videoId}/save`, { method: 'DELETE' })
       if (res.ok) {
-        setSaved((prev) => prev.filter((s) => s.videoId !== videoId))
+        queryClient.setQueryData<SavedEntry[]>(savedKey, (prev) =>
+          (prev ?? []).filter((s) => s.videoId !== videoId)
+        )
       }
     } catch (error) {
       console.error('Failed to unsave video:', error)

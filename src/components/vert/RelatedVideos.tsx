@@ -1,7 +1,7 @@
 'use client'
 
 import { fetchWithRetry } from '@/lib/fetch-retry'
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { Play } from 'lucide-react'
@@ -28,29 +28,20 @@ interface RelatedVideosProps {
   videoId: string
 }
 
+async function fetchRelated(videoId: string): Promise<RelatedVideo[]> {
+  const res = await fetchWithRetry(`/api/v1/videos/${videoId}/related?limit=10`)
+  if (!res.ok) throw new Error(`Failed to fetch related videos: ${res.status}`)
+  const data = await res.json()
+  return data.videos ?? []
+}
+
 export function RelatedVideos({ videoId }: RelatedVideosProps) {
   const { navigate } = useNavigation()
-  const [videos, setVideos] = useState<RelatedVideo[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchRelated()
-  }, [videoId])
-
-  async function fetchRelated() {
-    setLoading(true)
-    try {
-      const res = await fetchWithRetry(`/api/v1/videos/${videoId}/related?limit=10`)
-      if (res.ok) {
-        const data = await res.json()
-        setVideos(data.videos)
-      }
-    } catch (error) {
-      console.error('Failed to fetch related videos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Keyed on videoId so navigating between videos refetches the right list.
+  const { data: videos = [], isLoading: loading } = useQuery({
+    queryKey: ['related-videos', videoId],
+    queryFn: () => fetchRelated(videoId),
+  })
 
   if (loading) {
     return (

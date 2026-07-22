@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { Button } from '@/components/ui/button'
@@ -28,40 +28,35 @@ interface HistoryEntry {
   }
 }
 
+async function fetchHistory(): Promise<HistoryEntry[]> {
+  const res = await fetch('/api/v1/history?limit=30')
+  if (!res.ok) throw new Error(`Failed to fetch history: ${res.status}`)
+  const data = await res.json()
+  return data.history ?? []
+}
+
 export function HistoryPage() {
   const { navigate } = useNavigation()
   const { user } = useAuth()
-  const [history, setHistory] = useState<HistoryEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
+  const historyKey = ['history', user?.id] as const
 
-  useEffect(() => {
-    if (user) {
-      fetchHistory()
-    } else {
-      setLoading(false)
-    }
-  }, [user])
+  // enabled:!!user reproduces the old "no user -> not loading, empty list"
+  // behavior (the query stays idle, isLoading is false).
+  const { data: history = [], isLoading: loading } = useQuery({
+    queryKey: historyKey,
+    queryFn: fetchHistory,
+    enabled: !!user,
+  })
 
-  async function fetchHistory() {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/v1/history?limit=30')
-      if (res.ok) {
-        const data = await res.json()
-        setHistory(data.history)
-      }
-    } catch (error) {
-      console.error('Failed to fetch history:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  // Deletes are event handlers (not effects), so they stay plain functions —
+  // they just write the result straight into the query cache instead of local
+  // state, preserving the old optimistic update.
   async function clearAllHistory() {
     try {
       const res = await fetch('/api/v1/history', { method: 'DELETE' })
       if (res.ok) {
-        setHistory([])
+        queryClient.setQueryData(historyKey, [])
       }
     } catch (error) {
       console.error('Failed to clear history:', error)
@@ -72,7 +67,9 @@ export function HistoryPage() {
     try {
       const res = await fetch(`/api/v1/history/${videoId}`, { method: 'DELETE' })
       if (res.ok) {
-        setHistory((prev) => prev.filter((h) => h.video.id !== videoId))
+        queryClient.setQueryData<HistoryEntry[]>(historyKey, (prev) =>
+          (prev ?? []).filter((h) => h.video.id !== videoId)
+        )
       }
     } catch (error) {
       console.error('Failed to remove history entry:', error)
