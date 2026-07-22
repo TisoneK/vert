@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { ArrowLeft, Hash } from 'lucide-react'
@@ -32,59 +33,44 @@ interface TagInfo {
   usageCount: number
 }
 
+interface TagVideosPage {
+  tag: TagInfo
+  videos: Video[]
+  pagination: { totalPages: number }
+}
+
+async function fetchTagVideos(slug: string, sort: string, pageNum: number): Promise<TagVideosPage> {
+  const params = new URLSearchParams({ page: pageNum.toString(), limit: '12', sort })
+  const res = await fetch(`/api/v1/tags/${encodeURIComponent(slug)}/videos?${params}`)
+  if (!res.ok) throw new Error(`Failed to fetch tag videos: ${res.status}`)
+  return res.json()
+}
+
 export function TagPage({ slug }: { slug: string }) {
   const { navigate } = useNavigation()
-  const [videos, setVideos] = useState<Video[]>([])
-  const [tag, setTag] = useState<TagInfo | null>(null)
-  const [loading, setLoading] = useState(true)
   const [sort, setSort] = useState<'latest' | 'trending' | 'popular'>('latest')
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
 
-  useEffect(() => {
-    setPage(1)
-    fetchTagVideos(1, true)
-  }, [slug, sort])
+  const {
+    data,
+    isLoading: loading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['tag-videos', slug, sort],
+    queryFn: ({ pageParam }) => fetchTagVideos(slug, sort, pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      allPages.length < lastPage.pagination.totalPages ? allPages.length + 1 : undefined,
+  })
 
-  async function fetchTagVideos(pageNum: number, reset = false) {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        page: pageNum.toString(),
-        limit: '12',
-        sort,
-      })
-      const res = await fetch(`/api/v1/tags/${encodeURIComponent(slug)}/videos?${params}`)
-      if (res.ok) {
-        const data = await res.json()
-        setTag(data.tag)
-        if (reset) {
-          setVideos(data.videos ?? [])
-        } else {
-          setVideos((prev) => [...prev, ...(data.videos ?? [])])
-        }
-        setHasMore(pageNum < data.pagination.totalPages)
-      } else if (res.status === 404) {
-        setTag(null)
-        setVideos([])
-        setHasMore(false)
-      }
-    } catch (error) {
-      console.error('Failed to fetch tag videos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const videos = data?.pages.flatMap((p) => p.videos ?? []) ?? []
+  // On a 404 the queryFn throws -> data is undefined -> tag null -> the
+  // "Tag not found" header shows (same as the old code's 404 branch).
+  const tag = data?.pages[0]?.tag ?? null
 
   const handleSortChange = (newSort: 'latest' | 'trending' | 'popular') => {
     setSort(newSort)
-    setPage(1)
-  }
-
-  const loadMore = () => {
-    const nextPage = page + 1
-    setPage(nextPage)
-    fetchTagVideos(nextPage)
   }
 
   return (
@@ -163,14 +149,15 @@ export function TagPage({ slug }: { slug: string }) {
         </div>
       )}
 
-      {!loading && hasMore && videos.length > 0 && (
+      {!loading && hasNextPage && videos.length > 0 && (
         <div className="flex justify-center mt-8">
           <Button
-            onClick={loadMore}
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
             variant="outline"
             className="border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
-            Load More
+            {isFetchingNextPage ? 'Loading…' : 'Load More'}
           </Button>
         </div>
       )}

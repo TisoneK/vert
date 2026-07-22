@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth, useNavigation } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,6 +15,13 @@ interface Category {
   id: string
   name: string
   slug: string
+}
+
+async function fetchCategories(): Promise<Category[]> {
+  const res = await fetch('/api/v1/categories')
+  if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`)
+  const data = await res.json()
+  return data.categories ?? []
 }
 
 export function UploadPage() {
@@ -31,23 +39,13 @@ export function UploadPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [format, setFormat] = useState('portrait')
   const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null) // actual w/h ratio
-  const [categories, setCategories] = useState<Category[]>([])
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState<string[]>([])
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
-  async function fetchCategories() {
-    try {
-      const res = await fetch('/api/v1/categories')
-      if (res.ok) {
-        const data = await res.json()
-        setCategories(data.categories)
-      }
-    } catch { /* ignore */ }
-  }
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  })
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

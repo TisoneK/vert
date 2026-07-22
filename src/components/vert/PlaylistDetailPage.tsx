@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth, useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { Button } from '@/components/ui/button'
@@ -47,40 +48,33 @@ interface PlaylistData {
   items: PlaylistItem[]
 }
 
+async function fetchPlaylist(playlistId: string): Promise<PlaylistData | null> {
+  const res = await fetch(`/api/v1/playlists/${playlistId}`)
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`Failed to fetch playlist: ${res.status}`)
+  const data = await res.json()
+  return data.playlist
+}
+
 export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
   const { user } = useAuth()
   const { navigate } = useNavigation()
   const { toast } = useToast()
-  const [playlist, setPlaylist] = useState<PlaylistData | null>(null)
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
   const [removingVideoId, setRemovingVideoId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  useEffect(() => {
-    fetchPlaylist()
-  }, [playlistId])
+  const playlistKey = ['playlist', playlistId] as const
+  const { data: playlist = null, isLoading: loading } = useQuery({
+    queryKey: playlistKey,
+    queryFn: () => fetchPlaylist(playlistId),
+    enabled: !!user,
+  })
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!user) navigate({ page: 'login' })
   }, [user, navigate])
-
-  async function fetchPlaylist() {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/v1/playlists/${playlistId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setPlaylist(data.playlist)
-      } else if (res.status === 404) {
-        setPlaylist(null)
-      }
-    } catch (error) {
-      console.error('Failed to fetch playlist:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   async function handleRemoveVideo(videoId: string) {
     setRemovingVideoId(videoId)
@@ -89,7 +83,7 @@ export function PlaylistDetailPage({ playlistId }: PlaylistDetailProps) {
         method: 'DELETE',
       })
       if (res.ok) {
-        setPlaylist((prev) => prev ? {
+        queryClient.setQueryData<PlaylistData | null>(playlistKey, (prev) => prev ? {
           ...prev,
           items: prev.items.filter((item) => item.video.id !== videoId),
         } : null)
