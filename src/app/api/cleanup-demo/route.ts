@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { timingSafeEqual } from 'crypto'
+import { opsEndpointDisabledResponse } from '@/lib/ops-endpoint-guard'
 
 /**
  * GET /api/cleanup-demo?key=<SEED_KEY>
@@ -15,7 +16,13 @@ import { timingSafeEqual } from 'crypto'
  * - All videos with the BigBuckBunny placeholder URL
  * - All comments, votes, subscriptions, playlists from demo users
  * - All demo notifications
- * - All tags (they were only attached to demo videos)
+ * - All tags and video-tag/video-category links (unfiltered deleteMany —
+ *   NOT demo-scoped), which is exactly why this must never sit open on prod.
+ *
+ * Gated like /api/seed: blocked on Vercel production (404) unless
+ * ENABLE_OPS_ENDPOINTS=true, then key-gated by SEED_KEY. See
+ * opsEndpointDisabledResponse. Being purely destructive, this has no real
+ * production use — the opt-in flag exists only for a deliberate emergency.
  */
 
 const DEMO_EMAILS = [
@@ -40,6 +47,11 @@ function keyMatches(candidate: string | null, expected: string | undefined): boo
 }
 
 export async function GET(req: NextRequest) {
+  // Environment gate first, before touching the key, so production never
+  // reveals the endpoint exists (or leaks key-matching timing).
+  const disabled = opsEndpointDisabledResponse()
+  if (disabled) return disabled
+
   const { searchParams } = new URL(req.url)
   const key = searchParams.get('key')
 

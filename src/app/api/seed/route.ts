@@ -2,16 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { hash } from 'bcryptjs'
 import { timingSafeEqual } from 'crypto'
+import { opsEndpointDisabledResponse } from '@/lib/ops-endpoint-guard'
 
 /**
  * GET /api/seed?key=<SECRET>
  *
- * One-time seed endpoint for production. Visit this URL in the browser
- * to populate the database with demo content.
+ * One-time seed endpoint. Visit this URL in the browser to populate the
+ * database with demo content.
  *
- * Protected by a query param key so random visitors can't trigger it.
- * Set SEED_KEY in your Vercel env vars, then visit:
- *   https://vert-wine.vercel.app/api/seed?key=YOUR_SEED_KEY
+ * Two gates:
+ * 1. Environment (opsEndpointDisabledResponse) — blocked on Vercel
+ *    production (404) unless ENABLE_OPS_ENDPOINTS=true is set, so a seed
+ *    endpoint isn't standing open on the live URL. For the documented
+ *    one-time production seed: set ENABLE_OPS_ENDPOINTS=true, visit once,
+ *    then remove the flag. Preview and local dev are always allowed.
+ * 2. Key — a SEED_KEY query param so random visitors can't trigger it.
+ *    Set SEED_KEY in your env vars, then visit:
+ *      https://vert-wine.vercel.app/api/seed?key=YOUR_SEED_KEY
  *
  * Idempotent: if data already exists, it skips. Does NOT delete existing
  * users or videos — only adds demo data if the DB is empty.
@@ -30,6 +37,11 @@ function keyMatches(candidate: string | null, expected: string | undefined): boo
 }
 
 export async function GET(req: NextRequest) {
+  // Environment gate first, before touching the key, so production never
+  // reveals the endpoint exists (or leaks key-matching timing).
+  const disabled = opsEndpointDisabledResponse()
+  if (disabled) return disabled
+
   const { searchParams } = new URL(req.url)
   const key = searchParams.get('key')
 
