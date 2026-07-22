@@ -1,0 +1,88 @@
+name: CI
+
+# Deploy gate. `main` auto-deploys to Vercel on push, so a change that fails
+# to typecheck or build must be caught BEFORE it merges — otherwise a broken
+# build ships to users. Runs on every PR into `main`, and on `main` itself as
+# a post-merge safety net.
+#
+# NOTE: this workflow reports status but does not by itself block a merge.
+# To make it a true gate, enable branch protection on `main` in the repo
+# settings and mark the "typecheck · build" check as a required status check.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref so a rapid push sequence doesn't
+# pile up billable minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: typecheck · build
+    runs-on: ubuntu-latest
+
+    # Placeholder env only. The build never connects to the database — the
+    # Prisma client is lazy (src/lib/db.ts constructs it on first query, not
+    # at import), and every DB call lives inside dynamic Route Handlers that
+    # don't run at build time. next-auth reads these vars only at request
+    # time. These values just satisfy any module-level `process.env` reads so
+    # the build is deterministic without wiring real secrets into CI.
+    env:
+      DATABASE_URL: postgresql://user:pass@localhost:5432/vert?schema=public
+      NEXTAUTH_SECRET: ci-placeholder-not-a-real-secret
+      NEXTAUTH_URL: http://localhost:3000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up bun
+        # bun is this project's authoritative package manager — bun.lock is the
+        # source of truth (see .github/dependabot.yml).
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        # --frozen-lockfile fails if bun.lock is out of sync with package.json,
+        # so CI can't silently drift from the committed lockfile. The package's
+        # postinstall runs `prisma generate`, so the Prisma client is ready for
+        # the typecheck and build steps below.
+        run: bun install --frozen-lockfile
+
+      # Cache Next.js's build cache across runs to keep the gate fast/cheap.
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('bun.lock') }}-${{ hashFiles('src/**', 'app/**', '*.ts', '*.tsx') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('bun.lock') }}-
+
+      - name: Typecheck
+        # Fast first signal. next build also type-checks
+        # (next.config.ts sets ignoreBuildErrors: false), but tsc gives a
+        # quicker, standalone failure.
+        run: bunx tsc --noEmit
+
+      - name: Build
+        # THE gate: compiles every route and fails on any type or build error,
+        # stopping a broken build from auto-deploying. Runs `next build`
+        # directly rather than the package `build` script, which also does
+        # deploy-only standalone-packaging (cp) steps irrelevant to CI.
+        run: bunx next build
+
+      - name: Lint (advisory)
+        # Non-blocking for now: the repo carries a known baseline of ~35
+        # pre-existing eslint errors (react-hooks compiler rules on older
+        # components in src/components/vert, ui, hooks, lib). Once that
+        # baseline is burned down (Tier 2), flip continue-on-error to false so
+        # NEW violations block the merge.
+        continue-on-error: true
+        run: bunx eslint .
