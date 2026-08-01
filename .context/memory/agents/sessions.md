@@ -3,14 +3,15 @@
 One entry per agent session, newest at the bottom. Never edit or delete
 past entries — append corrections instead.
 
-<!-- TEMPLATE — copy below the last entry:
+<!-- TEMPLATE — copy below the last entry and FILL IN every placeholder:
 ---
 ## YYYY-MM-DD — Session N
-- **Agent:** <name> | **Model:** <model id> | **Platform:** <machine/sandbox + OS> | **Role:** <engineer, or overlay from the protocol package's roles/>
+- **Agent:** <name> | **Model:** <model id> | **Platform:** <machine/sandbox + OS> | **Role:** <engineer, or overlay from .context/core/roles/> | **Core:** <version from .context/core/VERSION>
 - **Task:** <what this session set out to do>
 - **Commits:** <count> (<first-sha>..<last-sha>)
 - **Outcome:** <done / partial / blocked — one line>
 - **Open items:** <pointers into tasks/backlog.md, or "none">
+- **Notes:** .context/memory/sessions/<date>-<N>/notes.md  (or "none")
 - **Report:** .context/memory/reviews/YYYY-MM-DD-review.md
 -->
 
@@ -90,7 +91,7 @@ past entries — append corrections instead.
 ## 2026-08-01 — Session 7
 - **Agent:** Buffy | **Model:** deepseek-v4-flash | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** engineer | **Core:** 0.5.0
 - **Task:** Context sync (target: "Sync .context") — `git pull --ff-only` (already up to date), `context-sync update` 0.3.0 → **0.5.0** (Windows `context-sync.ps1` + session-scoped `memory/sessions/` module), verify clean; regenerated `.context/kickoff.md` + root `AGENTS.md` from the new templates (facts unchanged); adopted the new sessions module (README, SUMMARY.md seeded with Sessions 5–7, this session's notes); refreshed `system/ai-models.md` (Buffy row) + `environments.md` (last-verified 2026-08-01, corrected the stale 35-error eslint baseline note → baseline is 0, CI lint blocking).
-- **Commits:** 2 (pending — core update + session log)
+- **Commits:** 2 (`c1ace88`..`d707024`)
 - **Outcome:** done — core at 0.5.0, entry points regenerated, 0.5.0 memory module live; no project-surface changes this session.
 - **Open items:** backlog unchanged — test suite [L-3] (runner + tests still open), shared query-key/hook factory (follow-up), user actions: password reset (email provider), Sentry DSN, GitHub Actions billing, branch protection on main.
 - **Notes:** .context/memory/sessions/2026-08-01-7/notes.md
