@@ -86,3 +86,12 @@ past entries — append corrections instead.
 - **Outcome:** done. **eslint 35 → 0 errors**; tsc clean; `next build` exit 0. Runtime-verified on the live dev server (DB `vert` @ 51214): explore, trending (category filter refetch), category (sort refetch), tag, home, watch (VideoDetail + RelatedVideos + comments) all render correctly. NOTE: browser-pane coordinate-clicks were non-functional this session (dark-mode toggle test confirmed) — used programmatic `.click()` to exercise interactions. A stale Turbopack console error for TagPage:59 persisted from a mid-edit broken state; it's a cache artifact (build passes, page renders, current file correct).
 - **Open items:** backlog react-query item CHECKED; ADR-2 updated (defer reversed → done). Follow-up (non-blocking): shared query-key/hook factory to dedupe inline queryFns. Still needs owner: password reset (email provider), Sentry DSN, GitHub Actions billing, branch protection (now with `typecheck · build · lint` as the required check).
 - **Report:** none — refactor; verification inline above.
+---
+## 2026-08-01 — Session 7
+- **Agent:** Buffy | **Model:** deepseek-v4-flash | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** engineer | **Core:** 0.5.0
+- **Task:** Context sync (target: "Sync .context") — `git pull --ff-only` (already up to date), `context-sync update` 0.3.0 → **0.5.0** (Windows `context-sync.ps1` + session-scoped `memory/sessions/` module), verify clean; regenerated `.context/kickoff.md` + root `AGENTS.md` from the new templates (facts unchanged); adopted the new sessions module (README, SUMMARY.md seeded with Sessions 5–7, this session's notes); refreshed `system/ai-models.md` (Buffy row) + `environments.md` (last-verified 2026-08-01, corrected the stale 35-error eslint baseline note → baseline is 0, CI lint blocking).
+- **Commits:** 2 (pending — core update + session log)
+- **Outcome:** done — core at 0.5.0, entry points regenerated, 0.5.0 memory module live; no project-surface changes this session.
+- **Open items:** backlog unchanged — test suite [L-3] (runner + tests still open), shared query-key/hook factory (follow-up), user actions: password reset (email provider), Sentry DSN, GitHub Actions billing, branch protection on main.
+- **Notes:** .context/memory/sessions/2026-08-01-7/notes.md
+- **Report:** none — maintenance/sync session, no review performed

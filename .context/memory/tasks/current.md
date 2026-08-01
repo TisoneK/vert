@@ -15,7 +15,8 @@ check its session entry and backlog before starting.
 - **Task:** none — no session in progress
 - **Status:** idle
 
-<!-- Last session: 2026-07-14 (Session 3, Claude Code / claude-fable-5) —
-general sweep: fixed non-string-body-field 500s (a27d338), closed backlog
-[L-2] seed/cleanup Prisma singleton (59f23da). Done. See
-.context/memory/reviews/2026-07-14-review.md and tasks/backlog.md. -->
+<!-- Last session: 2026-08-01 (Session 7, Buffy / deepseek-v4-flash) —
+context sync: core 0.3.0 → 0.5.0, kickoff/AGENTS regenerated, sessions
+module adopted, session logged. Done. See
+.context/memory/agents/sessions.md and
+.context/memory/sessions/2026-08-01-7/notes.md. -->

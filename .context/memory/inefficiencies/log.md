@@ -98,3 +98,22 @@ if literally nothing slowed you down.
 - **Prevent next time:** A 401 from an auth endpoint is "credentials not
   accepted," not "user doesn't exist" — verify the request contract against
   the provider code before drawing data conclusions.
+
+---
+## 2026-08-01 — Buffy / deepseek-v4-flash
+- **Problem:** The core-update path (`context-sync update`) is smooth, but its
+  printed "next steps" hint only mentions regenerating kickoff/AGENTS — it
+  doesn't mention the 0.5.0 `memory/sessions/` module adoption, the sessions.md
+  `Core:`/`Notes:` field additions, or the SUMMARY.md seeding. A hurried agent
+  could commit the core update and skip the memory-module side entirely.
+- **Cost:** Minor — I caught it from the CHANGELOG; a few extra reads to map
+  every new template/field to its memory file.
+- **Cause:** The CHANGELOG is the authoritative migration doc, but the tool
+  hint is terse; the 0.5.0 migration is spread across CHANGELOG + schema +
+  templates.
+- **Workaround / fix:** Read `core/CHANGELOG.md` fully before committing the
+  update; walk the changed `core/templates/` against the live memory files.
+- **Prevent next time:** Future sync sessions: after `context-sync update`,
+  diff `git diff core/templates` to enumerate what must be regenerated/adopted
+  (kickoff/AGENTS regeneration is called out by the tool; the sessions module
+  and sessions.md entry-format fields are not).
