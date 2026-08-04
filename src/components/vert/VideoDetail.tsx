@@ -1,8 +1,8 @@
 'use client'
 
-import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { videoDetailQueryOptions } from '@/lib/video-queries'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoPlayer } from './VideoPlayer'
 import { VoteButtons } from './VoteButtons'
@@ -17,24 +17,6 @@ import { Button } from '@/components/ui/button'
 
 interface VideoDetailProps {
   videoId: string
-}
-
-async function fetchVideoDetail(
-  videoId: string,
-): Promise<{ video: Record<string, unknown>; userVote: string | null }> {
-  const res = await fetchWithRetry(`/api/v1/videos/${videoId}`)
-  if (!res.ok) throw new Error(`Failed to fetch video: ${res.status}`)
-  const data = await res.json()
-  const votes = data.votes as { userId: string; voteType: string }[] | undefined
-  let userVote: string | null = null
-  try {
-    const sessionRes = await fetchWithRetry('/api/auth/session-info')
-    const sessionData = await sessionRes.json()
-    if (sessionData.user) {
-      userVote = votes?.find((v) => v.userId === sessionData.user.id)?.voteType || null
-    }
-  } catch { /* ignore session errors — just leave userVote null */ }
-  return { video: data, userVote }
 }
 
 async function checkIfSaved(videoId: string): Promise<boolean> {
@@ -62,10 +44,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
 
-  const { data, isLoading: loading } = useQuery({
-    queryKey: ['video', videoId],
-    queryFn: () => fetchVideoDetail(videoId),
-  })
+  const { data, isLoading: loading } = useQuery(videoDetailQueryOptions(videoId))
   const video = data?.video ?? null
   const userVote = data?.userVote ?? null
 
