@@ -114,3 +114,12 @@ past entries — append corrections instead.
 - **Open items:** tasks/backlog.md — the other two "lazy" readings now filed as their own items (**Infinite scroll**, **Code-split heavy components**) + a shared `<LazyImage>` refactor follow-up; unchanged: test suite [L-3], user actions (password reset, Sentry DSN, GitHub Actions billing, branch protection).
 - **Notes:** none — durable facts promoted to ADR-4, the feature report, and `system/environments.md`.
 - **Report:** .context/memory/reviews/2026-08-04-feature-review-2.md
+---
+## 2026-08-04 — Session 10 (investigation, no code change)
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** engineer | **Core:** 0.5.0
+- **Task:** User reported the Session 8/9 features "made things worse" — cold load (new/private browser) takes 5+ min on the LIVE site vs ~2s warm. Investigated.
+- **Commits:** 0 — diagnosis only (delivered in chat).
+- **Outcome:** **Features are NOT the cause** (verified): prefetch fetches only small JSON on hover (never media, never on initial load); lazy loading *defers* off-screen images (measured: live landing loads 541KB, 0 images until scroll). Deployed shell cold-loads ~2s, no errors. **Real cause = large unoptimized media on the live blob store:** thumbnails served via plain `<img>` (NO `next/image`) as raw uploads — PNGs up to **445KB** each; videos served as **raw progressive download** (not HLS) — `.mp4` ~2MB and a **20MB `.mov`** (VideoPlayer only uses hls.js for `.m3u8`; everything else is a native `<video>` full-file download). Opening that watch page = 20MB download = the "5 min". Pre-existing, unrelated to Sessions 8/9.
+- **Open items:** Recommended fixes → became the **Image Optimization** feature (Session 11, this session's target) + backlog: video `preload="metadata"`, video transcoding/HLS. Nothing from Sessions 8/9 reverted.
+- **Notes:** none — diagnosis captured here + in the Session 11 ADR context.
+- **Report:** none — investigation; findings in this entry + chat.

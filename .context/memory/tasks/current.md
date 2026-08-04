@@ -11,15 +11,6 @@ check its session entry and backlog before starting.
 - **Status:** in-progress | done | blocked (<blocker>)
 -->
 
-- **Session:** —
-- **Task:** none — no session in progress
-- **Status:** idle
-
-<!-- Last session: 2026-08-04 (Session 9, Claude Code / claude-opus-4-8,
-feature-engineer) — shipped LAZY LOADING (images): native loading="lazy"
-+ decoding="async" on 12 list/grid <img> sites; hero/LCP images left
-eager (ADR-4). Verified render-level (attributes in live DOM), pushed
-(ecd3a96..HEAD). eslint 0 errors, tsc clean. Both requested features
-(Pre-fetch ADR-3, Lazy Loading ADR-4) now done. Remaining "lazy" readings
-(infinite scroll, code-splitting) backlogged. See
-.context/memory/reviews/2026-08-04-feature-review-2.md. -->
+- **Session:** 2026-08-04 — Claude Code / claude-opus-4-8 (Session 11)
+- **Task:** feature — **Image Optimization**. Compress image file sizes + convert to next-gen formats (WebP/AVIF) so pages load fast without losing quality. Directly addresses the Session 10 diagnosis (445KB PNG thumbnails via plain `<img>`, no next/image, are a main cold-load cost on the live site). Role: feature-engineer.
+- **Status:** in-progress

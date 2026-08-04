@@ -171,3 +171,27 @@ if literally nothing slowed you down.
   use `/logo.svg?i=N` not favicon to inject a decodable test image; don't trust
   `read_network_requests`). For any media/image feature here, plan on render-level
   verification or a deploy check, not local network timing.
+
+---
+## 2026-08-04 — Claude Code / claude-opus-4-8 (Session 10)
+- **Problem:** Sessions 8 & 9 verified the prefetch/lazy features only against
+  LOCAL seed data (null thumbnails, no video files), so I never exercised the real
+  media path. When the user reported a 5-min cold load on the LIVE site and
+  suspected those features, I initially reasoned from the local (media-less) view.
+  The real cause turned out to be **large unoptimized media on the live blob
+  store** (445KB PNG thumbnails via plain `<img>`; a 20MB `.mov` served as a raw
+  progressive download) — invisible locally.
+- **Cost:** Moderate — a round of investigation + one wrong initial framing before
+  measuring the live site directly (production API + blob `Content-Length` via
+  `curl`, `performance` resource timing on `vert-wine.vercel.app`).
+- **Cause:** Local seed DB has no real media; both feature reports even flagged
+  "verify on a deploy with real thumbnails" but that check wasn't done until the
+  user pushed back.
+- **Workaround / fix:** Measure the LIVE deployment for any media/perf claim —
+  `curl -sI <blobUrl>` for real asset sizes, `performance.getEntriesByType('resource')`
+  on the live origin, production API for real `thumbnailUrl`/`videoUrl`. The live
+  URL is **https://vert-wine.vercel.app** (blob host `7omh3o8afcek9nbu.public.blob.vercel-storage.com`).
+- **Prevent next time:** For ANY image/video/perf feature, verify against the live
+  deploy (or real media), not local seed data — recorded in `system/environments.md`.
+  A "verify on deploy" note in a report is not verification; do it or say it's
+  unverified (Pitfall #42).

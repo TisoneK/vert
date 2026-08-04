@@ -34,3 +34,6 @@ records.
 ---
 - **2026-08-04 — Session 9** — Claude Code / claude-opus-4-8 — shipped **Lazy Loading (images)**: native `loading="lazy"`+`decoding="async"` on the 12 list/grid `<img>` sites; hero/LCP images left eager. Asked the user to pick the scope (images vs infinite-scroll vs code-split → images). Verified render-level (attrs in live DOM). eslint 0 errors. **ADR-4.** Both requested features now done.
   Detail: summary only (facts in ADR-4 + 2026-08-04-feature-review-2.md).
+---
+- **2026-08-04 — Session 10** — Claude Code / claude-opus-4-8 — investigation (no code). User's "5-min cold load" is NOT the prefetch/lazy features (verified) — it's **large unoptimized media on the live site**: 445KB PNG thumbnails via plain `<img>` (no next/image) + raw progressive videos (a 20MB `.mov`). Motivated the Image Optimization feature (Session 11).
+  Detail: summary only (facts in the Session 10 sessions.md entry).
