@@ -28,9 +28,10 @@ export function ProfilePage() {
   const [description, setDescription] = useState('')
   const [saving, setSaving] = useState(false)
 
-  // Shares the ['channel', id] cache with ChannelPage. enabled gates on the
+  // Shares the channel query shape with ChannelPage while keeping the
+  // user-specific subscription state in its own cache entry. enabled gates on the
   // user having a channel (old code set loading false in that case).
-  const channelKey = ['channel', user?.channelId] as const
+  const channelKey = ['channel', user?.channelId, user?.id ?? 'anonymous'] as const
   const { data: channelData = null, isLoading: loading } = useQuery({
     queryKey: channelKey,
     queryFn: () => fetchChannel(user!.channelId!),

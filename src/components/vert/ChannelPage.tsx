@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { useNavigation } from '@/lib/store'
+import { useNavigation, useAuth } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { SubscribeButton } from './SubscribeButton'
 import { ArrowLeft } from 'lucide-react'
@@ -20,10 +20,11 @@ async function fetchChannel(channelId: string): Promise<Record<string, unknown>>
 
 export function ChannelPage({ channelId }: ChannelPageProps) {
   const { navigate } = useNavigation()
+  const { user } = useAuth()
   // Keyed on channelId; on error data is null -> "Channel not found" (same as
   // the old code, which left channelData null on a failed/404 fetch).
   const { data: channelData = null, isLoading: loading } = useQuery({
-    queryKey: ['channel', channelId],
+    queryKey: ['channel', channelId, user?.id ?? 'anonymous'],
     queryFn: () => fetchChannel(channelId),
   })
 
@@ -69,6 +70,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
     isSuspended: boolean
     createdAt: string
     user: { id: string; username: string; avatarUrl: string | null }
+    isSubscribed: boolean
   }
 
   const videos = (channelData.videos as Array<{
@@ -168,9 +170,9 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
           </div>
           <div className="shrink-0 self-start">
             <SubscribeButton
+              key={`${channel.id}-${user?.id ?? 'anonymous'}-${channel.isSubscribed}`}
               channelId={channel.id}
-              initialSubscribed={false}
-              subscriberCount={channel.subscriberCount}
+              initialSubscribed={channel.isSubscribed}
             />
           </div>
         </div>

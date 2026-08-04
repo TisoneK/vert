@@ -1,21 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/lib/store'
+import { useAuth, useNavigation } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Bell, BellOff } from 'lucide-react'
-import { formatSubscribers } from '@/lib/utils-vert'
 
 interface SubscribeButtonProps {
   channelId: string
   initialSubscribed: boolean
-  subscriberCount: number
 }
 
-export function SubscribeButton({ channelId, initialSubscribed, subscriberCount: initialCount }: SubscribeButtonProps) {
+export function SubscribeButton({ channelId, initialSubscribed }: SubscribeButtonProps) {
   const { user } = useAuth()
+  const { navigate } = useNavigation()
   const [subscribed, setSubscribed] = useState(initialSubscribed)
-  const [subscriberCount, setSubscriberCount] = useState(initialCount)
   const [loading, setLoading] = useState(false)
   const [animating, setAnimating] = useState(false)
 
@@ -28,13 +26,11 @@ export function SubscribeButton({ channelId, initialSubscribed, subscriberCount:
         const res = await fetch(`/api/v1/channels/${channelId}/subscribe`, { method: 'DELETE' })
         if (res.ok) {
           setSubscribed(false)
-          setSubscriberCount((c) => c - 1)
         }
       } else {
         const res = await fetch(`/api/v1/channels/${channelId}/subscribe`, { method: 'POST' })
         if (res.ok) {
           setSubscribed(true)
-          setSubscriberCount((c) => c + 1)
         }
       }
     } catch (error) {
@@ -55,9 +51,11 @@ export function SubscribeButton({ channelId, initialSubscribed, subscriberCount:
       <Button
         variant="outline"
         size="sm"
-        className="border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 cursor-default text-xs"
+        onClick={() => navigate({ page: 'login' })}
+        className="border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:border-violet-500 hover:text-violet-600 dark:hover:text-violet-400 text-xs"
+        aria-label="Log in to subscribe"
       >
-        {formatSubscribers(subscriberCount)}
+        Subscribe
       </Button>
     )
   }

@@ -44,7 +44,9 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
 
-  const { data, isLoading: loading } = useQuery(videoDetailQueryOptions(videoId))
+  const { data, isLoading: loading } = useQuery(
+    videoDetailQueryOptions(videoId, user?.id ?? 'anonymous'),
+  )
   const video = data?.video ?? null
   const userVote = data?.userVote ?? null
 
@@ -114,6 +116,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
     subscriberCount: number
     isSuspended: boolean
     user: { avatarUrl: string | null; username: string }
+    isSubscribed: boolean
   }
 
   const categories = (video.categories as Array<{ name: string; slug: string }>) || []
@@ -211,9 +214,9 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                 </div>
               </div>
               <SubscribeButton
+                key={`${channel.id}-${user?.id ?? 'anonymous'}-${channel.isSubscribed}`}
                 channelId={channel.id}
-                initialSubscribed={false}
-                subscriberCount={channel.subscriberCount}
+                initialSubscribed={channel.isSubscribed}
               />
             </div>
 

@@ -57,14 +57,15 @@ export async function fetchRelated(videoId: string): Promise<RelatedVideo[]> {
 
 /**
  * The watch page's primary (skeleton-gating) query. Passed to both
- * `useQuery` on mount and `prefetchQuery` on hover.
- */
-export function videoDetailQueryOptions(videoId: string) {
-  return {
-    queryKey: ['video', videoId] as const,
-    queryFn: () => fetchVideoDetail(videoId),
+ * `useQuery` on mount and `prefetchQuery` on hover.  */
+export function videoDetailQueryOptions(videoId: string, viewerId = 'anonymous') {
+
+    return {
+      queryKey: ['video', videoId, viewerId] as const,
+      queryFn: () => fetchVideoDetail(videoId),
+    }
   }
-}
+
 
 /** The "Up Next" list query for the watch page. */
 export function relatedVideosQueryOptions(videoId: string) {

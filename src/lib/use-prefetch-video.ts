@@ -1,6 +1,7 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '@/lib/store'
 import { useCallback } from 'react'
 import { videoDetailQueryOptions, relatedVideosQueryOptions } from '@/lib/video-queries'
 
@@ -17,12 +18,13 @@ import { videoDetailQueryOptions, relatedVideosQueryOptions } from '@/lib/video-
  */
 export function usePrefetchVideo() {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
   return useCallback(
     (videoId: string) => {
       if (!videoId) return
-      void queryClient.prefetchQuery(videoDetailQueryOptions(videoId))
+      void queryClient.prefetchQuery(videoDetailQueryOptions(videoId, user?.id ?? 'anonymous'))
       void queryClient.prefetchQuery(relatedVideosQueryOptions(videoId))
     },
-    [queryClient],
+    [queryClient, user?.id],
   )
 }

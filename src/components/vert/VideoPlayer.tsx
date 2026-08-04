@@ -68,11 +68,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [duration, setDuration] = useState(0)
   const [showSettings, setShowSettings] = useState(false)
   const [playbackSpeed, setPlaybackSpeed] = useState(1)
-  // Buffering state — true when the video is waiting for data to download
-  // before it can continue playing (the `waiting` event fires when playback
-  // stalls, `playing` fires when it resumes). Also shown during initial load
-  // before the first frame is ready.
-  const [isBuffering, setIsBuffering] = useState(true)
+  // Buffering state — true only while the video is waiting for data to download
+  // before it can continue playing. Start false so metadata-only loading doesn't
+  // trap the player behind a spinner; the waiting event turns it on when playback
+  // actually stalls.
+  const [isBuffering, setIsBuffering] = useState(false)
   // How much of the video has been downloaded, as a percentage (0–100).
   // Updated from the `progress` event reading video.buffered.
   const [bufferedPercent, setBufferedPercent] = useState(0)
@@ -121,6 +121,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
     const onLoadedMeta = () => {
       setDuration(video.duration)
+      // Metadata is enough to render the player and show its play affordance;
+      // preload="metadata" intentionally does not guarantee a first frame yet.
+      setIsBuffering(false)
       // Capture actual video dimensions for proper aspect ratio
       if (video.videoWidth > 0 && video.videoHeight > 0) {
         setVideoAspectRatio(video.videoWidth / video.videoHeight)
@@ -188,7 +191,10 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         })
 
         hls.on(Hls.Events.ERROR, (_event, data) => {
-          if (data.fatal) setHasError(true)
+          if (data.fatal) {
+            setIsBuffering(false)
+            setHasError(true)
+          }
         })
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS — no level switching API exposed, expose a single
@@ -597,7 +603,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           // See ADR-6 for the remaining transcoding/HLS architecture gap.
           preload="metadata"
           playsInline
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover"
           // crossOrigin='anonymous' is required so we can capture frames to a
           // <canvas> without tainting it (for the auto-thumbnail backfill).
           // Vercel Blob sends Access-Control-Allow-Origin: * so this is safe.
@@ -608,7 +614,10 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           disablePictureInPicture
           disableRemotePlayback
           onClick={handleContainerTap}
-          onError={() => setHasError(true)}
+          onError={() => {
+            setIsBuffering(false)
+            setHasError(true)
+          }}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
         />
@@ -776,12 +785,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         </div>
       )}
-      {/* Buffering spinner — shown when the video is waiting for data
-          (initial load, re-buffering after a stall, or seeking ahead of
-          what's downloaded). Replaces the play button so the user sees
-          something is happening. pointer-events-none so taps pass through
-          to the container (which toggles controls on mobile). */}
-      {isBuffering && (
+      {/* Buffering spinner — shown only while active playback is waiting for
+          data (re-buffering after a stall or seeking ahead of what's
+          downloaded). It replaces the pause affordance while playback waits;
+          pointer-events-none lets taps pass through to the container. */}
+      {isPlaying && isBuffering && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <Loader2 className="h-10 w-10 text-white/80 animate-spin" />
         </div>

@@ -54,6 +54,17 @@ export async function GET(
     // client-side rather than a DB row.
     const { getCurrentUser } = await import('@/lib/auth-helpers')
     const user = await getCurrentUser()
+    const isSubscribed = user
+      ? Boolean(await db.subscription.findUnique({
+          where: {
+            subscriberId_channelId: {
+              subscriberId: user.id,
+              channelId: video.channel.id,
+            },
+          },
+          select: { subscriberId: true },
+        }))
+      : false
 
     let viewCountDelta = 0
     let anonCookieToSet: string | null = null
@@ -116,7 +127,11 @@ export async function GET(
       tags: video.tags.map((vt) => vt.tag),
     }
 
-    const response = NextResponse.json({ ...formatted, viewCount: video.viewCount + viewCountDelta })
+    const response = NextResponse.json({
+      ...formatted,
+      channel: { ...formatted.channel, isSubscribed },
+      viewCount: video.viewCount + viewCountDelta,
+    })
 
     if (anonCookieToSet) {
       response.cookies.set(anonCookieToSet, '1', {

@@ -21,6 +21,47 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.12] — 2026-08-04
+
+### Fixed
+
+#### Watch-page subscription CTA and user-specific state
+
+**Files:** `src/components/vert/SubscribeButton.tsx`,
+`src/components/vert/VideoDetail.tsx`, `src/components/vert/ChannelPage.tsx`,
+`src/app/api/v1/videos/[id]/route.ts`, `src/app/api/v1/channels/[id]/route.ts`
+
+The logged-out watch page rendered the subscriber count twice: once in the
+channel metadata and again inside the non-interactive `SubscribeButton`. The
+button now has one clear purpose for logged-out visitors: it reads `Subscribe`,
+uses an outline CTA style, and navigates to login. The count remains in the
+channel metadata only.
+
+The API now returns a boolean `isSubscribed` for the current viewer, and the
+watch/channel query keys include the viewer identity. This prevents an anonymous
+cached response from making a logged-in subscriber see the wrong CTA. Hover
+prefetch uses the same viewer-aware key, and the small button remounts when its
+server-provided subscription state or viewer changes without introducing a
+set-state-in-effect pattern.
+
+#### Watch-page video framing and buffering state
+
+**File:** `src/components/vert/VideoPlayer.tsx`
+
+The native video element now uses `object-cover` so it fills the player frame
+rather than visibly pillarboxing/letterboxing within it. The outer frame still
+uses the video's intrinsic metadata aspect ratio; CSS cannot remove black bars
+that are already encoded into a source file.
+
+The player no longer starts in a buffering state merely because metadata-only
+preloading is in progress. `loadedmetadata` clears readiness state, `waiting`
+marks active stalls, `canplay`/`playing` clear them, and native/HLS errors clear
+the spinner before showing the error UI. The spinner is rendered only while
+playback is active and waiting for data, so a paused ready video shows its play
+affordance instead of a stuck loader.
+
+---
+
 ## [0.6.11] — 2026-08-04
 
 ### Added
@@ -1262,7 +1303,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.11...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.12...HEAD
+[0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
 [0.6.9]: https://github.com/TisoneK/vert/releases/tag/v0.6.9

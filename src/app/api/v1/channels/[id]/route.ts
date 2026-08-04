@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { parsePagination } from '@/lib/pagination'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 /**
  * GET /api/v1/channels  (no [id] param) — search channels by name.
@@ -96,6 +97,19 @@ async function handleChannelGet(req: NextRequest, id: string) {
     return NextResponse.json({ error: 'Channel not found' }, { status: 404 })
   }
 
+  const user = await getCurrentUser()
+  const isSubscribed = user
+    ? Boolean(await db.subscription.findUnique({
+        where: {
+          subscriberId_channelId: {
+            subscriberId: user.id,
+            channelId: id,
+          },
+        },
+        select: { subscriberId: true },
+      }))
+    : false
+
   const [videos, totalVideos] = await Promise.all([
     db.video.findMany({
       where: { channelId: id, isRemoved: false, status: 'ready' },
@@ -118,7 +132,7 @@ async function handleChannelGet(req: NextRequest, id: string) {
   ])
 
   return NextResponse.json({
-    channel,
+    channel: { ...channel, isSubscribed },
     videos,
     pagination: {
       page,

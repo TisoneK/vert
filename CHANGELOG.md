@@ -37,6 +37,15 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.12] — 2026-08-04
+
+### Fixed
+- **The watch page no longer repeats the subscriber count.** The count appears once beside the channel name, while logged-out visitors see a clear **Subscribe** button that takes them to sign in.
+- **Videos now use the player frame more effectively.** The video content fills the available frame instead of appearing surrounded by unnecessary empty bars.
+- **The loading indicator no longer gets stuck over ready videos.** It now appears only while playback is actively waiting for more data, and video errors clear the loading state.
+
+---
+
 ## [0.6.11] — 2026-08-04
 
 ### Added
@@ -306,7 +315,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.11...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.12...HEAD
+[0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
 [0.6.9]: https://github.com/TisoneK/vert/releases/tag/v0.6.9
