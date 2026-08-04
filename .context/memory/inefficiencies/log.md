@@ -195,3 +195,19 @@ if literally nothing slowed you down.
   deploy (or real media), not local seed data — recorded in `system/environments.md`.
   A "verify on deploy" note in a report is not verification; do it or say it's
   unverified (Pitfall #42).
+
+---
+## 2026-08-04 — Claude Code / claude-opus-4-8 (Session 11)
+- **Problem:** Minor — a `replace_all` Edit on CreatorStudio's two "identical"
+  thumbnail `<img>` blocks only changed ONE, because the list-view and table-view
+  copies had different leading indentation (the string wasn't byte-identical). Nearly
+  left one `<img>` unmigrated.
+- **Cost:** Trivial — caught immediately by a follow-up `grep -n "<img\|<Image"`
+  verify pass before moving on.
+- **Cause:** Assumed two visually-similar JSX blocks were identical; `replace_all`
+  matches exact strings incl. whitespace, so different nesting depth = no match.
+- **Workaround / fix:** After any multi-site `replace_all`, grep the file to confirm
+  the expected count changed; migrate stragglers individually with their real indent.
+- **Prevent next time:** For "same" markup at different nesting depths, don't trust
+  `replace_all` blindly — verify the post-edit count. Otherwise a smooth session
+  (real-media verification via `/_next/image` worked well — see environments.md).

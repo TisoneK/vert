@@ -37,3 +37,6 @@ records.
 ---
 - **2026-08-04 — Session 10** — Claude Code / claude-opus-4-8 — investigation (no code). User's "5-min cold load" is NOT the prefetch/lazy features (verified) — it's **large unoptimized media on the live site**: 445KB PNG thumbnails via plain `<img>` (no next/image) + raw progressive videos (a 20MB `.mov`). Motivated the Image Optimization feature (Session 11).
   Detail: summary only (facts in the Session 10 sessions.md entry).
+---
+- **2026-08-04 — Session 11** — Claude Code / claude-opus-4-8 — shipped **Image Optimization**: thumbnails via `next/image` (AVIF/WebP + per-device resize; heroes `priority`). Real 445KB PNG → **29KB AVIF (−93%)**, verified on live media. Chose next/image over upload-time sharp (direct-to-blob uploads have no server hook). eslint 0 errors. **ADR-5.** Video load still open (backlog).
+  Detail: summary only (facts in ADR-5 + 2026-08-04-feature-review-3.md).

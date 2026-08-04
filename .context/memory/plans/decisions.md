@@ -148,3 +148,43 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   adding a NEW image inside a list/grid, add `loading="lazy" decoding="async"`; for a
   new hero/LCP/above-the-fold image, leave it eager (optionally `fetchpriority="high"`).
   The eager-hero exclusions are intentional — do not "fix" them to lazy.
+
+---
+## ADR-5: Image Optimization = `next/image` (serve-time WebP/AVIF + resize), not upload-time transcoding (2026-08-04)
+- **Status:** accepted
+- **Context:** Session 10 traced the live site's slow cold load to **large
+  unoptimized images** — thumbnails served as raw uploads via plain `<img>` (PNGs up
+  to 445KB), no resizing, no next-gen formats. Target for this session: "automatically
+  compress + convert to WebP/AVIF so pages load instantly." Two implementation paths:
+  (A) `next/image` — optimize at *serve* time via the Vercel Image Optimization CDN
+  (resize per device + AVIF/WebP + cache + lazy), or (B) compress/convert at *upload*
+  time with `sharp` (installed) and store optimized blobs.
+- **Decision:** Use **`next/image` (A)**. Decisive factor: uploads go **browser →
+  Vercel Blob directly** (`src/app/api/v1/upload/route.ts` only mints a client token;
+  the file bytes never pass through a server function — that's how it beats the 4.5MB
+  serverless body limit). So upload-time `sharp` compression has **no server hook** to
+  run in — it would require re-architecting uploads (route bytes through the server, or
+  add a post-upload blob-processing worker). `next/image` needs none of that AND it
+  optimizes the images **already in the blob store** (the actual diagnosed problem),
+  not just future uploads.
+  - **Config:** add `images.formats: ['image/avif','image/webp']` (AVIF first, WebP
+    fallback). `remotePatterns` already allows the blob host + `lh3.googleusercontent.com`.
+  - **Scope this session:** migrate the high-impact **content thumbnails** (the big
+    PNGs) to `<Image>` — `VideoCard` thumbnail (covers all 10 feeds), `RelatedVideos`,
+    the `HomeFeed` + `TrendingPage` heroes (with `priority` for LCP), `HistoryPage`,
+    `PlaylistsPage`, `LandingPage`, `CreatorStudio` (×2). Use `fill` + a context-tuned
+    `sizes` (the containers already are `relative aspect-…`), keep each site's existing
+    null-src/`onError` fallback. `next/image` is lazy by default, so it supersedes
+    Session 9's manual `loading="lazy"` on the migrated thumbnails (removed there).
+- **Alternatives considered:** (B) upload-time `sharp` — rejected as primary (no server
+  hook in the direct-to-blob flow; doesn't fix existing images) but kept as a
+  complementary backlog item (shrinks stored bytes for new uploads). Avatars (small,
+  KB-range) and a shared `<OptimizedImage>` component — backlogged; low impact / risk of
+  scope creep this session. Plain-`<img>` + a manual srcset — rejected (reinvents
+  next/image).
+- **Consequences:** Client downloads small resized AVIF/WebP instead of full-size PNGs
+  → the diagnosed cold-load cost drops sharply, for existing and future images. Tradeoff:
+  Vercel Image Optimization has transformation quotas/cost — acceptable and standard, but
+  noted. `next/image` needs `sharp` at runtime for self-hosted/standalone (installed) and
+  uses Vercel's optimizer on Vercel. Future agents: new content images use `<Image>` with
+  `fill`+`sizes` (thumbnails) or `width`/`height` (avatars); heroes/LCP get `priority`.

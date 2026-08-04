@@ -11,6 +11,13 @@ check its session entry and backlog before starting.
 - **Status:** in-progress | done | blocked (<blocker>)
 -->
 
-- **Session:** 2026-08-04 — Claude Code / claude-opus-4-8 (Session 11)
-- **Task:** feature — **Image Optimization**. Compress image file sizes + convert to next-gen formats (WebP/AVIF) so pages load fast without losing quality. Directly addresses the Session 10 diagnosis (445KB PNG thumbnails via plain `<img>`, no next/image, are a main cold-load cost on the live site). Role: feature-engineer.
-- **Status:** in-progress
+- **Session:** —
+- **Task:** none — no session in progress
+- **Status:** idle
+
+<!-- Last session: 2026-08-04 (Session 11, Claude Code / claude-opus-4-8,
+feature-engineer) — shipped IMAGE OPTIMIZATION: thumbnails via next/image
+(AVIF/WebP + resize); real 445KB PNG → ~29KB AVIF (−93%), verified on live
+media. ADR-5. Pushed (d107680..d18f37f). eslint 0 errors. Backlog: optimize
+avatars/poster/banners; video preload/transcoding (Session 10 diagnosis).
+See .context/memory/reviews/2026-08-04-feature-review-3.md. -->

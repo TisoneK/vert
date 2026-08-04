@@ -156,3 +156,34 @@ don't remove the line.
       handlers in `VideoCard.tsx`, `RelatedVideos.tsx`, `LandingPage.tsx` so
       keyboard users get the same head start. Low priority; coupled to the larger
       a11y question of making cards proper buttons.
+- [ ] **Slow video load on the live site (Session 10 diagnosis)** (added 2026-08-04
+      by Claude Code) — the biggest cold-load cost is raw video files: uploads are
+      served as **progressive-download** `.mp4`/`.mov` (a real one is **20MB**;
+      `VideoPlayer` only uses hls.js for `.m3u8`, everything else is a native
+      `<video>` full-file download), and the `<video>` in `VideoPlayer.tsx:591` has
+      **no `preload`** attr. Quick win: add `preload="metadata"` so the watch page
+      doesn't pull the whole file before Play. Bigger: transcode uploads to
+      web-friendly H.264 MP4 + HLS (adaptive streaming) and convert-or-reject `.mov`.
+      Live blob host `7omh3o8afcek9nbu.public.blob.vercel-storage.com`; live URL
+      https://vert-wine.vercel.app.
+- [ ] **Optimize the remaining images with next/image** (added 2026-08-04 by Claude
+      Code) — Session 11 (ADR-5) migrated the high-impact THUMBNAILS to `next/image`
+      but deliberately left these as plain `<img>`: **avatars** (VideoCard:~294,
+      HomeFeed creator shelf, ChannelPage header, VideoDetail, CommentSection,
+      Sidebar, SearchResults, ProfilePage — KB-range, lower impact), the
+      **VideoPlayer poster** (`VideoPlayer.tsx:538`, inside the player's canvas
+      frame-capture logic — migrate carefully), and **channel/profile banners**
+      (`ChannelPage.tsx:93`, `ProfilePage.tsx:160`). Same `<Image fill sizes>` /
+      `width`+`height` pattern; keep each `onError` fallback.
+- [ ] **Upload-time image compression (complementary to next/image)** (added
+      2026-08-04 by Claude Code) — `sharp` is installed but uploads go **browser →
+      Vercel Blob directly** (`api/v1/upload` only mints a client token; no server
+      hook to compress on upload). To shrink STORED bytes for new uploads, add a
+      post-upload processing step (a blob webhook / separate function that fetches,
+      compresses via sharp, re-stores). next/image (ADR-5) already handles delivery,
+      so this is a storage/origin-bytes optimization, not urgent.
+- [ ] **Shared `<OptimizedImage>` component** (added 2026-08-04 by Claude Code) —
+      supersedes the ADR-4 `<LazyImage>` idea. Wrap `next/image` + the repeated
+      null-src/`onError` fallback into one component so new content images get
+      optimization + fallback for free. Deferred from Session 11 as scope creep. A
+      refactor, not a feature.

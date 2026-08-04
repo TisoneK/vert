@@ -123,3 +123,12 @@ past entries — append corrections instead.
 - **Open items:** Recommended fixes → became the **Image Optimization** feature (Session 11, this session's target) + backlog: video `preload="metadata"`, video transcoding/HLS. Nothing from Sessions 8/9 reverted.
 - **Notes:** none — diagnosis captured here + in the Session 11 ADR context.
 - **Report:** none — investigation; findings in this entry + chat.
+---
+## 2026-08-04 — Session 11
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Feature — **Image Optimization** (implements fix for the Session 10 diagnosis). Chose **`next/image`** (serve-time AVIF/WebP + per-device resize via the Vercel optimizer) over upload-time `sharp` — decisive: uploads go browser→Blob directly, no server hook, and next/image fixes the *existing* images. Enabled `images.formats: ['image/avif','image/webp']`; migrated 9 thumbnail sites (VideoCard→all feeds, RelatedVideos, HomeFeed+Trending heroes w/ `priority`, HistoryPage, PlaylistsPage, LandingPage, CreatorStudio ×2) to `<Image fill sizes>`; dropped the now-redundant manual lazy attrs; kept fallbacks. Design = **ADR-5**.
+- **Commits:** 3 (`5a2d796`..`<this>`) — `5a2d796` feat(images) next/image, `d18f37f` docs changelog+devlog, `docs(review)` report, + this `chore(context)`. (Also `d107680` earlier this turn = Session 10 closure + Session 11 open.)
+- **Outcome:** done. **Verified on REAL media** (Session 10 lesson applied): local `/_next/image` on a real 445KB blob PNG → **29KB AVIF / 33KB WebP (−93%)**; browser render check confirmed migrated components emit `<img src="/_next/image?url=…">`, load (naturalWidth 158), content-type `image/avif`, no console errors, no layout shift. `tsc` 0 errors; `eslint .` **0 errors** (19 warnings, baseline unchanged).
+- **Open items:** tasks/backlog.md — optimize remaining images (avatars, VideoPlayer poster, banners); **video** load fixes (preload=metadata, transcode/HLS — the bigger cold-load lever); upload-time sharp; shared `<OptimizedImage>`. Unchanged: test suite [L-3], user actions.
+- **Notes:** none — durable facts promoted to ADR-5, the feature report, and `system/environments.md`.
+- **Report:** .context/memory/reviews/2026-08-04-feature-review-3.md
