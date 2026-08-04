@@ -15,9 +15,9 @@ check its session entry and backlog before starting.
 - **Task:** none — no session in progress
 - **Status:** idle
 
-<!-- Last session: 2026-08-04 (Session 11, Claude Code / claude-opus-4-8,
-feature-engineer) — shipped IMAGE OPTIMIZATION: thumbnails via next/image
-(AVIF/WebP + resize); real 445KB PNG → ~29KB AVIF (−93%), verified on live
-media. ADR-5. Pushed (d107680..d18f37f). eslint 0 errors. Backlog: optimize
-avatars/poster/banners; video preload/transcoding (Session 10 diagnosis).
-See .context/memory/reviews/2026-08-04-feature-review-3.md. -->
+<!-- Last session: 2026-08-04 (Session 12, Buffy / openai/gpt-5.6-luna,
+feature-engineer) — completed the safe video-delivery mitigation: progressive
+playback now requests metadata first via `preload="metadata"` and uses
+`playsInline`; corrected the hint-vs-guarantee wording, documented ADR-6, and
+left transcoding/HLS + hosting-provider selection as architectural backlog
+items. Product commit `879510e`. -->

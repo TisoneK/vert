@@ -40,3 +40,6 @@ records.
 ---
 - **2026-08-04 — Session 11** — Claude Code / claude-opus-4-8 — shipped **Image Optimization**: thumbnails via `next/image` (AVIF/WebP + per-device resize; heroes `priority`). Real 445KB PNG → **29KB AVIF (−93%)**, verified on live media. Chose next/image over upload-time sharp (direct-to-blob uploads have no server hook). eslint 0 errors. **ADR-5.** Video load still open (backlog).
   Detail: summary only (facts in ADR-5 + 2026-08-04-feature-review-3.md).
+---
+- **2026-08-04 — Session 12** — Buffy / openai/gpt-5.6-luna — resumed the interrupted Video Optimization task; completed the safe `preload="metadata"` + `playsInline` mitigation for progressive uploads, corrected the hint-vs-guarantee wording, and explicitly left transcoding/HLS/provider selection as architectural backlog. Product commit `879510e`; validation: tsc, lint, build clean.
+  Detail: .context/memory/sessions/2026-08-04-12/notes.md

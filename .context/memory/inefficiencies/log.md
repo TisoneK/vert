@@ -211,3 +211,20 @@ if literally nothing slowed you down.
 - **Prevent next time:** For "same" markup at different nesting depths, don't trust
   `replace_all` blindly — verify the post-edit count. Otherwise a smooth session
   (real-media verification via `/_next/image` worked well — see environments.md).
+
+---
+## 2026-08-04 — Buffy / openai/gpt-5.6-luna (Session 12)
+- **Problem:** Session 12 was interrupted with a legitimate in-progress task marker
+  and unstaged product work; the resuming agent needed to reconstruct the exact
+  Session 11 boundary before editing. Tool availability also varied during the
+  handoff, so context was gathered through targeted shell agents.
+- **Cost:** Minor — additional state inspection and validation passes; no work was
+  lost because the diff was only two files and nothing was staged.
+- **Cause:** The prior session stopped before committing product/docs/context work.
+- **Workaround / fix:** Compared HEAD (`356af9c`) with the working tree, confirmed
+  local/remote parity, preserved the existing `preload="metadata"` change, corrected
+  the comment's hint-vs-guarantee wording, and committed product files separately
+  as `879510e`.
+- **Prevent next time:** When resuming an interrupted session, inspect `git status`,
+  staged/unstaged diffs, and `origin/main` before making changes; treat the current
+  task marker as a handoff, not a reason to restart the feature.

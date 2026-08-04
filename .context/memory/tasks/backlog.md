@@ -166,6 +166,22 @@ don't remove the line.
       web-friendly H.264 MP4 + HLS (adaptive streaming) and convert-or-reject `.mov`.
       Live blob host `7omh3o8afcek9nbu.public.blob.vercel-storage.com`; live URL
       https://vert-wine.vercel.app.
+- [x] **Slow video load — progressive preload mitigation** (added 2026-08-04;
+      completed Session 12, commit `879510e`) — `VideoPlayer` now uses
+      `preload="metadata"` and `playsInline`, asking browsers to fetch only
+      metadata before playback for raw progressive uploads. `preload` is a hint,
+      not a guarantee, and does not control the hls.js path. The original live
+      diagnosis remains: raw `.mp4`/`.mov` delivery (one real file was **20MB**)
+      is still not compressed or adaptive-streamed.
+- [ ] **Slow video load — transcode and delivery architecture** (follow-up from
+      Session 10/12) — add a processing pipeline that produces web-friendly H.264
+      MP4 and HLS/adaptive renditions, and decide whether to convert/reject `.mov`.
+      Vercel Blob is direct-upload object storage, not a native transcoder; choose
+      a dedicated video platform or separately operated processing worker before
+      implementing. This requires a service decision, credentials, lifecycle
+      handling, and a migration plan for existing blobs. Live blob host
+      `7omh3o8afcek9nbu.public.blob.vercel-storage.com`; live URL
+      https://vert-wine.vercel.app.
 - [ ] **Optimize the remaining images with next/image** (added 2026-08-04 by Claude
       Code) — Session 11 (ADR-5) migrated the high-impact THUMBNAILS to `next/image`
       but deliberately left these as plain `<img>`: **avatars** (VideoCard:~294,

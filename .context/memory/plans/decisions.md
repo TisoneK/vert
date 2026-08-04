@@ -188,3 +188,26 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   noted. `next/image` needs `sharp` at runtime for self-hosted/standalone (installed) and
   uses Vercel's optimizer on Vercel. Future agents: new content images use `<Image>` with
   `fill`+`sizes` (thumbnails) or `width`/`height` (avatars); heroes/LCP get `priority`.
+
+---
+## ADR-6: Defer progressive video loading; do not pretend it is transcoding (2026-08-04)
+- **Status:** accepted
+- **Context:** Session 10 measured the live cold-load problem: uploaded videos are
+  stored as raw progressive `.mp4`/`.mov` objects, including a real **20MB** file.
+  `VideoPlayer` already handled `.m3u8` with hls.js, but native progressive playback
+  had no preload hint and could request the full object when a watch page opened.
+- **Decision:** Set `preload="metadata"` and `playsInline` on the native `<video>` element.
+  Treat `preload` as a browser hint: it reduces eager progressive downloads where the
+  user agent honors it, but it is not a hard network guarantee and does not control
+  hls.js-managed HLS loading. Keep the existing HLS/progressive split unchanged.
+- **Alternatives considered:** `preload="none"` would reduce initial bytes further but
+  would also delay duration/dimensions and is a less compatible watch-page default.
+  Client-side FFmpeg/WASM was not chosen: it adds substantial browser cost and is not
+  a reliable replacement for server-side media processing. Upload-time server
+  transcoding is unavailable in the current direct browser-to-Blob flow without a
+  separate worker or provider.
+- **Consequences:** Watch pages avoid an eager full-file request on conforming browsers
+  for progressive uploads, and mobile playback remains inline. File sizes and
+  adaptive bitrate delivery are unchanged. A future transcoding/HLS or dedicated
+  video-hosting decision must cover new uploads and migration of existing blobs;
+  Vercel Blob alone does not provide that processing pipeline.

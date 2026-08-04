@@ -132,3 +132,12 @@ past entries — append corrections instead.
 - **Open items:** tasks/backlog.md — optimize remaining images (avatars, VideoPlayer poster, banners); **video** load fixes (preload=metadata, transcode/HLS — the bigger cold-load lever); upload-time sharp; shared `<OptimizedImage>`. Unchanged: test suite [L-3], user actions.
 - **Notes:** none — durable facts promoted to ADR-5, the feature report, and `system/environments.md`.
 - **Report:** .context/memory/reviews/2026-08-04-feature-review-3.md
+---
+## 2026-08-04 — Session 12
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Resume interrupted Video Optimization session; complete the safe progressive-playback mitigation and document the unresolved transcoding/HLS/provider architecture.
+- **Commits:** 2 (`879510e`..`<context commit>`)
+- **Outcome:** done — `VideoPlayer` now requests metadata before progressive playback and stays inline on mobile; typecheck, lint, and production build pass.
+- **Open items:** transcode/host videos via a dedicated provider or processing worker; choose credentials, lifecycle, `.mov` policy, and migration for existing blobs. Test suite remains open.
+- **Notes:** .context/memory/sessions/2026-08-04-12/notes.md
+- **Report:** .context/memory/reviews/2026-08-04-feature-review-4.md
