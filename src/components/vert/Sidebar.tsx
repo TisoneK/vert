@@ -250,7 +250,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
                     }`}
                   >
                     {ch.user.avatarUrl ? (
-                      <img src={ch.user.avatarUrl} alt={ch.channelName} className="w-5 h-5 rounded-full object-cover" />
+                      <img src={ch.user.avatarUrl} alt={ch.channelName} loading="lazy" decoding="async" className="w-5 h-5 rounded-full object-cover" />
                     ) : (
                       <div className="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-[9px] font-bold">
                         {ch.channelName[0]?.toUpperCase()}

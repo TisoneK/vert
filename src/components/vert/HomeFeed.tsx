@@ -268,6 +268,8 @@ export function HomeFeed() {
                     <img
                       src={ch.avatarUrl}
                       alt={ch.channelName}
+                      loading="lazy"
+                      decoding="async"
                       className="w-16 h-16 rounded-full object-cover ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 transition-all"
                     />
                   ) : (

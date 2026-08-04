@@ -276,7 +276,7 @@ export function SearchResults({ query }: SearchResultsProps) {
                 {/* Avatar */}
                 <div className="shrink-0">
                   {ch.user.avatarUrl ? (
-                    <img src={ch.user.avatarUrl} alt={ch.channelName} className="w-12 h-12 rounded-full object-cover" />
+                    <img src={ch.user.avatarUrl} alt={ch.channelName} loading="lazy" decoding="async" className="w-12 h-12 rounded-full object-cover" />
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center text-violet-600 dark:text-violet-400 text-lg font-bold">
                       {ch.channelName[0]?.toUpperCase()}

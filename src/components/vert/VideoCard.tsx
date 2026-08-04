@@ -119,6 +119,8 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
           <img
             src={video.thumbnailUrl!}
             alt={video.title}
+            loading="lazy"
+            decoding="async"
             onError={() => setThumbnailFailed(true)}
             className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
           />
@@ -292,6 +294,8 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
             <img
               src={video.channel.user.avatarUrl}
               alt={video.channel.channelName}
+              loading="lazy"
+              decoding="async"
               onError={() => setAvatarFailed(true)}
               className="w-6 h-6 rounded-full object-cover"
             />

@@ -228,6 +228,8 @@ export function PlaylistsPage() {
                   <img
                     src={playlist.thumbnailUrl}
                     alt={playlist.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
                   />
                 ) : (

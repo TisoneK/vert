@@ -62,6 +62,8 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
                   <img
                     src={video.thumbnailUrl}
                     alt={video.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
                   />
                 ) : (

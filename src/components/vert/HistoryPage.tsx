@@ -148,7 +148,7 @@ export function HistoryPage() {
               <div className="relative w-32 sm:w-40 shrink-0 rounded overflow-hidden bg-zinc-200 dark:bg-zinc-800">
                 <div className={entry.video.format === 'portrait' ? 'aspect-[9/16]' : entry.video.format === 'square' ? 'aspect-square' : 'aspect-video'}>
                   {entry.video.thumbnailUrl ? (
-                    <img src={entry.video.thumbnailUrl} alt={entry.video.title} className="w-full h-full object-cover" />
+                    <img src={entry.video.thumbnailUrl} alt={entry.video.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
                       <Play className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
