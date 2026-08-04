@@ -19,6 +19,34 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Lazy-load off-screen thumbnails and avatars
+
+**Files:** `src/components/vert/VideoCard.tsx` (thumbnail + avatar),
+`RelatedVideos.tsx`, `HistoryPage.tsx`, `PlaylistsPage.tsx`,
+`CommentSection.tsx`, `LandingPage.tsx`, `CreatorStudio.tsx` (×2),
+`Sidebar.tsx`, `SearchResults.tsx`, `HomeFeed.tsx` (Popular Creators shelf)
+
+No `<img>` in the app used `loading="lazy"` — every thumbnail and avatar loaded
+eagerly, so a feed grid or long comment list fetched all its images up front.
+Added `loading="lazy"` + `decoding="async"` to the 12 image sites that render
+inside repeating lists/grids (the ones that can be numerous and off-screen).
+
+Above-the-fold / LCP singletons were **deliberately left eager** (untouched),
+because `loading="lazy"` on an LCP image can delay it: the `VideoPlayer` poster,
+the `TrendingPage` + `HomeFeed` "Featured" heroes, the `ChannelPage`/`ProfilePage`
+banners, the `ChannelPage` header avatar, the `VideoDetail` (watch-page) channel
+avatar, and the `UploadPage` preview. All images already sit in
+aspect-ratio/fixed-size wrappers, so deferring causes **no layout shift**.
+Design + the eager-exclusion rationale: `.context` ADR-4. Complements ADR-3's
+data prefetch (prefetch warms JSON; this defers image bytes).
+
+Verified: `tsc` + `eslint` clean (0 errors); render-level check on the live dev
+server confirmed the feed `<img>` elements carry `loading="lazy"` +
+`decoding="async"` in the DOM. Network-timing deferral is native browser
+behavior and wasn't measured against seed data (seed videos have
+`thumbnailUrl: null`, so no real images render locally — worth a look on a deploy
+with real thumbnails).
+
 #### Hover/touch pre-fetch of the watch page's data
 
 **Files:** `src/lib/video-queries.ts` (new), `src/lib/use-prefetch-video.ts`
