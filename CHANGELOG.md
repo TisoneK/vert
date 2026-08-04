@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **Videos open faster.** When you hover over a video (or touch it on your phone), Vert quietly starts loading that video's page in the background — so by the time you tap, it's usually ready to watch right away instead of showing a loading placeholder. This works everywhere videos are listed, including the "Up Next" list while you're already watching something.
+- **Video pages use less data before playback.** Vert now asks your browser to load only a video's basic details before you press play, reducing wasted data when you open a video but don't watch it.
 - **Feeds load lighter.** Video thumbnails and channel pictures that are further down the page now load only as you scroll to them, instead of all at once when the page opens. Browsing uses less data and busy pages feel quicker to appear.
 - **Thumbnails load dramatically faster.** Video thumbnails are now automatically shrunk to the size they're shown at and delivered in modern, lighter image formats — often around a tenth of their previous size — with no visible loss in quality. Pages with lots of thumbnails appear much quicker and use far less data, especially on phones.
 

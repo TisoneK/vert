@@ -19,6 +19,23 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Video playback — defer progressive downloads until playback
+
+**File:** `src/components/vert/VideoPlayer.tsx`
+
+The player now renders progressive uploads with `preload="metadata"` and
+`playsInline`. This asks the browser to fetch only duration/dimensions and track
+metadata before playback instead of eagerly downloading the complete raw `.mp4`,
+`.webm`, `.mov`, or `.mkv` object when a watch page opens. `playsInline` keeps
+mobile playback inside the page rather than forcing a full-screen transition.
+
+`preload` is a browser hint, not a guarantee, and it does not govern the HLS path:
+`hls.js` controls manifest/segment loading for `.m3u8` URLs. The change is therefore
+a safe mitigation for the current progressive-download path, not transcoding or
+adaptive streaming. Vercel Blob is the current direct-upload object store and does
+not transcode uploaded video; producing H.264/HLS renditions still requires a
+separate processing worker or dedicated video platform. See ADR-6.
+
 #### Image optimization — serve thumbnails as resized AVIF/WebP via next/image
 
 **Files:** `next.config.ts` (`images.formats`), `src/components/vert/VideoCard.tsx`,

@@ -591,6 +591,12 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         <video
           ref={videoRef}
           poster={thumbnailUrl || undefined}
+          // Ask the browser to fetch only media metadata before playback. This
+          // is a hint (not a guarantee), and does not control hls.js loading;
+          // it prevents eager full-file fetches for progressive uploads.
+          // See ADR-6 for the remaining transcoding/HLS architecture gap.
+          preload="metadata"
+          playsInline
           className="w-full h-full object-contain"
           // crossOrigin='anonymous' is required so we can capture frames to a
           // <canvas> without tainting it (for the auto-thumbnail backfill).
