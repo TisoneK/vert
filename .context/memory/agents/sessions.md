@@ -141,3 +141,12 @@ past entries — append corrections instead.
 - **Open items:** transcode/host videos via a dedicated provider or processing worker; choose credentials, lifecycle, `.mov` policy, and migration for existing blobs. Test suite remains open.
 - **Notes:** .context/memory/sessions/2026-08-04-12/notes.md
 - **Report:** .context/memory/reviews/2026-08-04-feature-review-4.md
+---
+## 2026-08-04 — Session 13
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** engineer | **Core:** 0.5.0
+- **Task:** Correct release bookkeeping so features pushed to auto-deploying `main` are published releases, not `[Unreleased]` entries.
+- **Commits:** 1 (`49b015a`)
+- **Outcome:** done — deployed Sessions 8–12 moved to `0.6.11`; package version bumped; annotated tag `v0.6.11` pushed; fresh `[Unreleased]` section created.
+- **Open items:** none for this task; future user-visible changes follow ADR-7. Existing video-transcoding and test-suite backlog remains.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-04-release-review.md

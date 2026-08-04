@@ -15,9 +15,8 @@ check its session entry and backlog before starting.
 - **Task:** none — no session in progress
 - **Status:** idle
 
-<!-- Last session: 2026-08-04 (Session 12, Buffy / openai/gpt-5.6-luna,
-feature-engineer) — completed the safe video-delivery mitigation: progressive
-playback now requests metadata first via `preload="metadata"` and uses
-`playsInline`; corrected the hint-vs-guarantee wording, documented ADR-6, and
-left transcoding/HLS + hosting-provider selection as architectural backlog
-items. Product commit `879510e`. -->
+<!-- Last session: 2026-08-04 (Session 13, Buffy / openai/gpt-5.6-luna,
+engineer) — corrected release bookkeeping: deployed Sessions 8–12 were moved
+from `[Unreleased]` to `0.6.11`, package version bumped, and annotated tag
+`v0.6.11` pushed. Future work has a fresh empty `[Unreleased]` section. Release
+commit `49b015a`. -->

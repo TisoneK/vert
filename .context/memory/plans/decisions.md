@@ -211,3 +211,22 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   adaptive bitrate delivery are unchanged. A future transcoding/HLS or dedicated
   video-hosting decision must cover new uploads and migration of existing blobs;
   Vercel Blob alone does not provide that processing pipeline.
+
+---
+## ADR-7: Pushing to main is a production release (2026-08-04)
+- **Status:** accepted
+- **Context:** Vert deploys automatically to Vercel whenever `main` receives a
+  push. Sessions 8–12 shipped user-visible features to `main`, but their notes
+  remained under the public changelog's `[Unreleased]` heading, making deployed
+  functionality appear pre-released.
+- **Decision:** Treat every successful push to `main` as a release for changelog
+  purposes. Before or with that push, move the shipped entries from `[Unreleased]`
+  into the next numbered version section, bump `package.json` to the matching
+  patch version when appropriate, update both CHANGELOG/DEVLOG comparison links,
+  and push an annotated `v<version>` tag. Keep a fresh, empty `[Unreleased]`
+  section for work not yet deployed.
+- **Consequences:** The public `/changelog` reflects production reality rather
+  than an unreleased staging queue. A release is not complete until the main
+  commit and matching tag are pushed; future agents must not leave deployed
+  user-facing work under `[Unreleased]`. Internal-only changes may still follow
+  ADR-1 and remain DEVLOG-only.

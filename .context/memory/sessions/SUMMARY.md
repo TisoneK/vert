@@ -43,3 +43,6 @@ records.
 ---
 - **2026-08-04 — Session 12** — Buffy / openai/gpt-5.6-luna — resumed the interrupted Video Optimization task; completed the safe `preload="metadata"` + `playsInline` mitigation for progressive uploads, corrected the hint-vs-guarantee wording, and explicitly left transcoding/HLS/provider selection as architectural backlog. Product commit `879510e`; validation: tsc, lint, build clean.
   Detail: .context/memory/sessions/2026-08-04-12/notes.md
+---
+- **2026-08-04 — Session 13** — Buffy / openai/gpt-5.6-luna — corrected release bookkeeping: pushed features were moved from `[Unreleased]` into `0.6.11`, `package.json` was bumped, annotated tag `v0.6.11` was pushed, and a fresh `[Unreleased]` section was left for future work. **ADR-7:** pushing to `main` is a production release for changelog purposes.
+  Detail: summary only (facts in `.context/memory/reviews/2026-08-04-release-review.md`).

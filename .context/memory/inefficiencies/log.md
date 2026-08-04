@@ -228,3 +228,18 @@ if literally nothing slowed you down.
 - **Prevent next time:** When resuming an interrupted session, inspect `git status`,
   staged/unstaged diffs, and `origin/main` before making changes; treat the current
   task marker as a handoff, not a reason to restart the feature.
+
+---
+## 2026-08-04 — Buffy / openai/gpt-5.6-luna (Session 13)
+- **Problem:** User-visible entries were left under `[Unreleased]` even though pushes
+  to `main` automatically deploy production. The release correction also exposed
+  that local/remote repositories had no existing `v0.6.*` tags despite historical
+  changelog links assuming tags.
+- **Cost:** Minor — required a release audit and a second commit for durable context.
+- **Cause:** Feature sessions updated the changelog before deployment but no release
+  step promoted the section after the main push; the prior convention was implicit.
+- **Workaround / fix:** Published the deployed batch as `0.6.11`, bumped the package
+  version, created/pushed annotated tag `v0.6.11`, and recorded ADR-7.
+- **Prevent next time:** Release bookkeeping now happens as part of the feature
+  workflow: a pushed user-visible change belongs in a numbered release, while
+  `[Unreleased]` is reserved for work not yet on production.
