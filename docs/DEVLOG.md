@@ -17,6 +17,12 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ## [Unreleased]
 
+_No unreleased changes yet._
+
+---
+
+## [0.6.11] — 2026-08-04
+
 ### Added
 
 #### Video playback — defer progressive downloads until playback
@@ -1256,7 +1262,8 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.10...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.11...HEAD
+[0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
 [0.6.9]: https://github.com/TisoneK/vert/releases/tag/v0.6.9
 [0.6.8]: https://github.com/TisoneK/vert/releases/tag/v0.6.8

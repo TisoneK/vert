@@ -33,6 +33,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+_No unreleased changes yet._
+
+---
+
+## [0.6.11] — 2026-08-04
+
 ### Added
 - **Videos open faster.** When you hover over a video (or touch it on your phone), Vert quietly starts loading that video's page in the background — so by the time you tap, it's usually ready to watch right away instead of showing a loading placeholder. This works everywhere videos are listed, including the "Up Next" list while you're already watching something.
 - **Video pages use less data before playback.** Vert now asks your browser to load only a video's basic details before you press play, reducing wasted data when you open a video but don't watch it.
@@ -300,7 +306,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.10...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.11...HEAD
+[0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
 [0.6.9]: https://github.com/TisoneK/vert/releases/tag/v0.6.9
 [0.6.8]: https://github.com/TisoneK/vert/releases/tag/v0.6.8
