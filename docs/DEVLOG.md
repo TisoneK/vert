@@ -17,6 +17,42 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ## [Unreleased]
 
+### Added
+
+#### Hover/touch pre-fetch of the watch page's data
+
+**Files:** `src/lib/video-queries.ts` (new), `src/lib/use-prefetch-video.ts`
+(new), `src/components/vert/VideoDetail.tsx`,
+`src/components/vert/RelatedVideos.tsx`, `src/components/vert/VideoCard.tsx`,
+`src/components/vert/LandingPage.tsx`
+
+Navigation is a client-side zustand store (`useNavigation().navigate`), not
+`next/link`, so there is no route-level prefetch to lean on. The latency a user
+feels when opening a video is the watch page's data fetch after the click: the
+primary `['video', id]` query (`fetchVideoDetail`) gates a loading skeleton, and
+`['related-videos', id]` fills the "Up Next" column — both fire only on mount.
+
+Pre-fetch warms the react-query cache on intent. `usePrefetchVideo()` returns a
+`prefetch(videoId)` callback that fires `queryClient.prefetchQuery` for both
+queries; it is wired to `onMouseEnter` (desktop hover) + `onTouchStart` (mobile,
+fires just before the click) on every video-navigation surface: the shared
+`VideoCard` (all 10 feeds), the `RelatedVideos` "Up Next" rows, and the
+logged-out `LandingPage` trending cards.
+
+The prefetch and the on-mount `useQuery` MUST use a byte-identical
+`queryKey`+`queryFn` or the warmed entry is never read, so the definitions were
+extracted into `src/lib/video-queries.ts` (`videoDetailQueryOptions` /
+`relatedVideosQueryOptions`) as the single source of truth; `VideoDetail` and
+`RelatedVideos` now consume them. Cost control is delegated to react-query's
+in-flight dedup + the app's 60s `staleTime` (no manual debounce). A failed
+prefetch is a silent no-op — the click falls back to a normal on-mount fetch.
+Design rationale + alternatives: `.context` ADR-3.
+
+Verified on the dev server (DB `vert`): hovering a `VideoCard` fires exactly one
+detail + one related request; the subsequent click renders the watch page from
+cache with **no duplicate request and no skeleton**. The `RelatedVideos` and
+`LandingPage` surfaces each fired their own prefetch on hover.
+
 ### Fixed
 
 #### Non-string body fields returned 500 instead of 400 in 5 API routes
