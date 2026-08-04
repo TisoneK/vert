@@ -67,3 +67,49 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   `eslint-disable`s. **eslint is now at 0 errors** and the CI lint step is
   **blocking** (`c4929d9`). Keep the "don't mechanically burn down" rule for
   any FUTURE fetch-in-effect code: reach for react-query, not `useCallback`.
+
+---
+## ADR-3: Pre-fetch = warm the react-query cache on hover/touch intent, not Next.js Link prefetch (2026-08-04)
+- **Status:** accepted
+- **Context:** Feature request: "Pre-fetch" (one of two feature sessions; the
+  other is Lazy Loading). The obvious instinct — Next.js `<Link prefetch>` — does
+  NOT apply here: this app does not navigate with `next/link`. Navigation is a
+  **zustand client store** (`src/lib/store.tsx`, `useNavigation().navigate({page,…})`)
+  that swaps the rendered view in place; the thin Next route files just render
+  `<VertApp/>`. So there is no route-level prefetch to lean on. The real latency a
+  user feels is the **data fetch** after clicking a video card: the watch page's
+  primary query `['video', videoId]` (`fetchVideoDetail`) gates a loading skeleton,
+  and `['related-videos', videoId]` fills the "Up Next" column — both fire only on
+  mount, i.e. after the click.
+- **Decision:** Implement pre-fetch as **react-query cache warming**. On pointer/touch
+  intent over a video card, call `queryClient.prefetchQuery` for the same
+  `queryKey`+`queryFn` the watch page will use, so the click renders from cache.
+  - **Shared query definitions** — extract `fetchVideoDetail`/`fetchRelated` and
+    `videoDetailQueryOptions(id)`/`relatedVideosQueryOptions(id)` into
+    `src/lib/video-queries.ts`. This is mandatory, not just DRY: prefetch and the
+    on-mount `useQuery` MUST use byte-identical key+fn or the warmed entry won't be
+    read. (Also closes the backlog follow-up "shared query-key/hook factory".)
+  - **Injection point** — `VideoCard` (the card shared by all 10 feeds: Home,
+    Trending, Category, Tag, Search, Channel, History, Saved, Profile,
+    PlaylistDetail) + the "Up Next" rows in `RelatedVideos`. One hook,
+    `usePrefetchVideo()`, wraps the two `prefetchQuery` calls.
+  - **Triggers** — `onMouseEnter` (desktop hover intent) + `onTouchStart` (mobile,
+    fires just before the click, buying a head start). No `onFocus`: the card root
+    is a non-focusable `div` (existing pattern), so wiring focus would imply a11y
+    affordance that isn't there — out of scope for this feature.
+  - **Cost control** — rely on react-query's built-in in-flight dedup +
+    `staleTime: 60_000` (the app default): repeat hovers within 60s are cheap
+    no-ops with zero extra network. No manual debounce/guard needed.
+- **Alternatives considered:** (a) Next.js `<Link prefetch>` — rejected, app doesn't
+  route via next/link. (b) Prefetch only `['video', id]` and skip related — rejected,
+  related is a cheap second request and a hover is strong intent; warming both makes
+  the whole watch page instant. (c) A manual `Set` of already-warmed ids — rejected as
+  redundant with react-query's dedup and it would suppress a retry after a failed
+  prefetch.
+- **Consequences:** Future agents: `src/lib/video-queries.ts` is now the single source
+  of truth for the video-detail + related query key/fn — new consumers import from it,
+  don't re-inline. Prefetch is best-effort and silent (a failed prefetch just means the
+  click falls back to a normal on-mount fetch — no user-visible error). If the watch
+  page's query shape changes, update it in `video-queries.ts` and prefetch follows for
+  free. The Lazy Loading feature (next session) is the deliberate counterpart — see the
+  backlog item.

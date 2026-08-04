@@ -96,3 +96,12 @@ past entries — append corrections instead.
 - **Open items:** backlog unchanged — test suite [L-3] (runner + tests still open), shared query-key/hook factory (follow-up), user actions: password reset (email provider), Sentry DSN, GitHub Actions billing, branch protection on main.
 - **Notes:** .context/memory/sessions/2026-08-01-7/notes.md
 - **Report:** none — maintenance/sync session, no review performed
+---
+## 2026-08-04 — Session 8
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Feature — add **Pre-fetch** (first of two features; the user asked for Pre-fetch and Lazy Loading "each in a separate session" — Lazy Loading backlogged for next session). Navigation is a zustand client store (not `next/link`), so pre-fetch = warming the react-query cache on hover/touch intent. Extracted the watch page's query defs into `src/lib/video-queries.ts` (single source so prefetch + on-mount `useQuery` share a byte-identical key/fn); added `usePrefetchVideo()` (`src/lib/use-prefetch-video.ts`); wired `onMouseEnter`+`onTouchStart` into `VideoCard` (all 10 feeds), `RelatedVideos` "Up Next" rows, and the logged-out `LandingPage` cards. Design = **ADR-3**.
+- **Commits:** 5 (`dee2b9b`..`<this>`) — `dee2b9b` refactor(video) shared query defs, `42acc99` feat(video) prefetch wiring, `2b4b9c4` docs changelog+devlog, `94c54c5` docs(review) feature report, + this `chore(context)`.
+- **Outcome:** done + verified live (dev server :63588, DB `vert`). Hover on a VideoCard fires `['video',id]`+`['related-videos',id]` before the click; click renders the watch page from cache — **no duplicate request, 0 skeletons**. RelatedVideos + LandingPage prefetch each confirmed by request-log evidence. `tsc` 0 errors; `eslint .` **0 errors**, 19 warnings (down from 20 — dropped one unused var). CI lint stays green.
+- **Open items:** tasks/backlog.md — **Feature: Lazy Loading** (the next session), prefetch-on-focus follow-up; unchanged: test suite [L-3], user actions (password reset, Sentry DSN, GitHub Actions billing, branch protection).
+- **Notes:** none — durable facts promoted to ADR-3, the feature report, and `system/environments.md`.
+- **Report:** .context/memory/reviews/2026-08-04-feature-review.md

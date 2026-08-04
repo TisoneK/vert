@@ -117,3 +117,30 @@ if literally nothing slowed you down.
   diff `git diff core/templates` to enumerate what must be regenerated/adopted
   (kickoff/AGENTS regeneration is called out by the tool; the sessions module
   and sessions.md entry-format fields are not).
+
+---
+## 2026-08-04 — Claude Code / claude-opus-4-8
+- **Problem:** Live-verifying the prefetch feature in the browser pane cost
+  more round-trips than expected. Three snags: (1) **port 3000 was held by an
+  unrelated app** ("LocalMind") so `preview_start` refused — had to switch
+  `.claude/launch.json` to `autoPort`. (2) **Browser-pane coordinate/ref
+  `left_click` didn't register** the React onClick (the click "succeeded" but the
+  page never navigated) — this was already logged for Session 6 but I re-hit it
+  before recalling the fix. (3) I first tried triggering `onMouseEnter` by
+  dispatching a synthetic `mouseover` via `javascript_tool` — React did NOT
+  treat it as an enter, so no prefetch fired; a real CDP `hover` was needed. Also
+  wasted one hover on the Trending page's featured card, which is a bespoke `<h2>`
+  layout, NOT a `VideoCard`.
+- **Cost:** Moderate — ~6 extra tool calls diagnosing the click/hover/port issues
+  before landing a clean end-to-end verification.
+- **Cause:** Session 6's "coordinate-clicks non-functional" note lived only in a
+  session entry, not in `environments.md` where I'd have seen it during Step 3.
+  Port 3000 assumption baked into the dev script + launch.json.
+- **Workaround / fix:** Programmatic `element.click()` for navigation; real CDP
+  `hover` (not dispatched events) for `onMouseEnter`; `autoPort` in the gitignored
+  `.claude/launch.json`; verify via server request-log evidence. All now recorded
+  in `system/environments.md` (Baos-Mac-mini block) so the next agent sees it at
+  Step 3, not after re-hitting it.
+- **Prevent next time:** Read the Baos-Mac-mini `environments.md` block before any
+  browser-pane verification here: use `.click()` not coordinate-clicks, real
+  `hover` not synthetic events, and expect an off-port dev server.

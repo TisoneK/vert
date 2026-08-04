@@ -101,3 +101,31 @@ don't remove the line.
       up (not blocking): shared query-key/hook factory to dedupe the inline
       `['categories']` etc. queryFns; consider react-query for the remaining
       one-off `fetch` calls in mutation handlers.
+
+---
+- [ ] **Feature: Lazy Loading** (added 2026-08-04 by Claude Code) — the SECOND of
+      the two features the user requested ("Add features; Pre-fetch and Lazy
+      Loading each in a separate session"). Pre-fetch shipped in Session 8
+      (`42acc99`); Lazy Loading is its own session. Scope to define at kickoff, but
+      the likely surfaces in this codebase: (a) **images** — `VideoCard`,
+      `RelatedVideos`, `LandingPage`, and channel/avatar `<img>` tags are plain
+      `<img>` with eager loading; add `loading="lazy"` + `decoding="async"` (or
+      migrate to `next/image`), and/or an IntersectionObserver so off-screen
+      thumbnails don't all fetch at once. (b) **feed pagination** — several feeds
+      use `useInfiniteQuery` (CategoryPage/TagPage) but load more via a button or
+      full list; an IntersectionObserver "load next page when the sentinel scrolls
+      into view" (infinite scroll) is the natural lazy-load counterpart to
+      Session 8's prefetch. (c) **route/component code-splitting** — heavy
+      client components (e.g. `@mdxeditor/editor` in CreatorStudio, the HLS
+      `VideoPlayer`) could `React.lazy`/`next/dynamic` to shrink the initial
+      bundle. Use the feature-engineer role (design ADR first). Runtime-verify in
+      the browser pane (note: coordinate-clicks are flaky here — use programmatic
+      `.click()`; see `system/environments.md`).
+- [ ] **Prefetch on keyboard focus** (added 2026-08-04 by Claude Code) — the
+      Session-8 pre-fetch fires on `onMouseEnter`/`onTouchStart` but NOT `onFocus`,
+      because `VideoCard`'s root is a non-focusable `<div onClick>` (existing
+      pattern across the app). If cards ever gain `tabIndex`/`role="button"` for
+      accessibility, add `onFocus={() => prefetchVideo(id)}` alongside the existing
+      handlers in `VideoCard.tsx`, `RelatedVideos.tsx`, `LandingPage.tsx` so
+      keyboard users get the same head start. Low priority; coupled to the larger
+      a11y question of making cards proper buttons.

@@ -15,8 +15,10 @@ check its session entry and backlog before starting.
 - **Task:** none — no session in progress
 - **Status:** idle
 
-<!-- Last session: 2026-08-01 (Session 7, Buffy / deepseek-v4-flash) —
-context sync: core 0.3.0 → 0.5.0, kickoff/AGENTS regenerated, sessions
-module adopted, session logged. Done. See
-.context/memory/agents/sessions.md and
-.context/memory/sessions/2026-08-01-7/notes.md. -->
+<!-- Last session: 2026-08-04 (Session 8, Claude Code / claude-opus-4-8,
+feature-engineer) — shipped the hover/touch PRE-FETCH feature
+(react-query cache warming on VideoCard / RelatedVideos / LandingPage),
+verified live, pushed (1943d50..HEAD). eslint 0 errors, tsc clean.
+NEXT FEATURE (user: "each in a separate session"): LAZY LOADING — see
+tasks/backlog.md. See .context/memory/reviews/2026-08-04-feature-review.md
+and plans/decisions.md ADR-3. -->

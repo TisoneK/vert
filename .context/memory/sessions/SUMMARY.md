@@ -28,3 +28,6 @@ records.
 ---
 - **2026-08-01 — Session 7** — Buffy / deepseek-v4-flash — context sync: updated vendored core 0.3.0 → **0.5.0** (Windows `context-sync.ps1` + session-scoped `memory/sessions/` module), regenerated kickoff.md/AGENTS.md, adopted the sessions module.
   Detail: .context/memory/sessions/2026-08-01-7/notes.md
+---
+- **2026-08-04 — Session 8** — Claude Code / claude-opus-4-8 — shipped the hover/touch **Pre-fetch** feature (react-query cache warming on VideoCard/RelatedVideos/LandingPage; navigation is a zustand store, not next/link). Verified live: hover→prefetch, click→cache hit, 0 skeletons. eslint 0 errors. **ADR-3.** Next feature: Lazy Loading (backlogged).
+  Detail: summary only (facts in ADR-3 + 2026-08-04-feature-review.md).
