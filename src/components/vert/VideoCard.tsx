@@ -1,6 +1,7 @@
 'use client'
 
 import { useNavigation } from '@/lib/store'
+import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { CategoryBadge } from './CategoryBadge'
 import { PlaylistPicker } from './PlaylistPicker'
@@ -56,6 +57,7 @@ function FormatIcon({ format }: { format: string }) {
 
 export function VideoCard({ video, watchProgress, showContextMenu = true, onContextMenuAction }: VideoCardProps) {
   const { navigate } = useNavigation()
+  const prefetchVideo = usePrefetchVideo()
   const [showMenu, setShowMenu] = useState(false)
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false)
   const [thumbnailFailed, setThumbnailFailed] = useState(false)
@@ -106,6 +108,10 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       // restores normal flow in the 4/5-column desktop grids.
       className={`group cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 h-full flex flex-col ${format === 'landscape' ? 'col-span-2 md:col-span-1' : ''}`}
       onClick={() => navigate({ page: 'video', videoId: video.id })}
+      // Pre-fetch the watch page's data on hover/touch intent so the click
+      // renders from cache instead of a loading skeleton. See .context ADR-3.
+      onMouseEnter={() => prefetchVideo(video.id)}
+      onTouchStart={() => prefetchVideo(video.id)}
     >
       {/* Thumbnail container */}
       <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800`}>

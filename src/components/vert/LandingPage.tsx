@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
+import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { Button } from '@/components/ui/button'
 import { Play, Hash } from 'lucide-react'
 
@@ -22,6 +23,7 @@ interface Tag {
 
 export function LandingPage() {
   const { navigate } = useNavigation()
+  const prefetchVideo = usePrefetchVideo()
   const [trending, setTrending] = useState<Video[]>([])
   const [tags, setTags] = useState<Tag[]>([])
 
@@ -88,6 +90,10 @@ export function LandingPage() {
                 <div
                   key={v.id}
                   onClick={() => navigate({ page: 'video', videoId: v.id })}
+                  // Warm the watch page's data on hover/touch intent — same
+                  // pre-fetch as the main VideoCard (see .context ADR-3).
+                  onMouseEnter={() => prefetchVideo(v.id)}
+                  onTouchStart={() => prefetchVideo(v.id)}
                   // h-full + flex flex-col so cards in the same row stretch to
                   // equal height regardless of title length. Without this, a
                   // card with a 1-line title is shorter than one with a 2-line

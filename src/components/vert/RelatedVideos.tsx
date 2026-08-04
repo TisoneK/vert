@@ -1,47 +1,22 @@
 'use client'
 
-import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useQuery } from '@tanstack/react-query'
+import { relatedVideosQueryOptions } from '@/lib/video-queries'
+import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { useNavigation } from '@/lib/store'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { Play } from 'lucide-react'
 import { RelatedVideoSkeleton } from './Skeleton'
 
-interface RelatedVideo {
-  id: string
-  title: string
-  thumbnailUrl: string | null
-  durationSeconds: number | null
-  viewCount: number
-  likeCount: number
-  createdAt: string
-  format: string
-  channel: {
-    id: string
-    channelName: string
-    user: { avatarUrl: string | null }
-  }
-  categories: Array<{ name: string; slug: string }>
-}
-
 interface RelatedVideosProps {
   videoId: string
 }
 
-async function fetchRelated(videoId: string): Promise<RelatedVideo[]> {
-  const res = await fetchWithRetry(`/api/v1/videos/${videoId}/related?limit=10`)
-  if (!res.ok) throw new Error(`Failed to fetch related videos: ${res.status}`)
-  const data = await res.json()
-  return data.videos ?? []
-}
-
 export function RelatedVideos({ videoId }: RelatedVideosProps) {
   const { navigate } = useNavigation()
+  const prefetchVideo = usePrefetchVideo()
   // Keyed on videoId so navigating between videos refetches the right list.
-  const { data: videos = [], isLoading: loading } = useQuery({
-    queryKey: ['related-videos', videoId],
-    queryFn: () => fetchRelated(videoId),
-  })
+  const { data: videos = [], isLoading: loading } = useQuery(relatedVideosQueryOptions(videoId))
 
   if (loading) {
     return (
@@ -69,11 +44,13 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
     <div>
       <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-3">Up Next</p>
       <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar pr-1">
-        {videos.map((video, index) => (
+        {videos.map((video) => (
           <div
             key={video.id}
             className="flex gap-2 cursor-pointer group p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             onClick={() => navigate({ page: 'video', videoId: video.id })}
+            onMouseEnter={() => prefetchVideo(video.id)}
+            onTouchStart={() => prefetchVideo(video.id)}
           >
             {/* Thumbnail — aspect ratio follows the video's format so
                 portrait videos show as portrait, not squished into 16:9.
