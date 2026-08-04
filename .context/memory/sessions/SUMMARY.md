@@ -46,3 +46,6 @@ records.
 ---
 - **2026-08-04 — Session 13** — Buffy / openai/gpt-5.6-luna — corrected release bookkeeping: pushed features were moved from `[Unreleased]` into `0.6.11`, `package.json` was bumped, annotated tag `v0.6.11` was pushed, and a fresh `[Unreleased]` section was left for future work. **ADR-7:** pushing to `main` is a production release for changelog purposes.
   Detail: summary only (facts in `.context/memory/reviews/2026-08-04-release-review.md`).
+---
+- **2026-08-04 — Session 14** — Buffy / openai/gpt-5.6-luna — fixed watch-page UX: subscriber count now appears once, logged-out visitors get an outline `Subscribe` CTA, subscription state is viewer-scoped, the player uses `object-cover`, and the spinner is shown only during active playback buffering. Released as `0.6.12` (`05cb8ff`, `v0.6.12`). **ADR-8.**
+  Detail: .context/memory/reviews/2026-08-04-watch-page-review.md

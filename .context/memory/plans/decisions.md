@@ -228,5 +228,28 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Consequences:** The public `/changelog` reflects production reality rather
   than an unreleased staging queue. A release is not complete until the main
   commit and matching tag are pushed; future agents must not leave deployed
-  user-facing work under `[Unreleased]`. Internal-only changes may still follow
-  ADR-1 and remain DEVLOG-only.
+  user-facing work under `[Unreleased]`.  Internal-only changes may still follow ADR-1 and remain DEVLOG-only.
+
+---
+## ADR-8: Keep subscription state viewer-scoped and make playback loading state explicit (2026-08-04)
+- **Status:** accepted
+- **Context:** The watch page duplicated the subscriber count for logged-out
+  visitors, hard-coded `initialSubscribed={false}` for all authenticated users,
+  and used query keys that did not distinguish anonymous from authenticated
+  viewers. Separately, `VideoPlayer` used `object-contain` and started its
+  buffering state as `true`, leaving a ready paused video looking letterboxed
+  or stuck behind a spinner.
+- **Decision:** Keep the subscriber count in channel metadata only; use an
+  outline `Subscribe` CTA for logged-out visitors that navigates to login; return
+  a boolean `isSubscribed` from channel/video APIs and include viewer identity in
+  channel/video query keys and hover prefetch keys. Use `object-cover` for the
+  player frame, clear readiness on metadata/media events, and render the spinner
+  only while active playback is buffering. Remount the small subscribe control
+  when viewer/server subscription state changes rather than syncing local state
+  through a cascading effect.
+- **Consequences:** Logged-out and logged-in watch pages show semantically correct
+  actions, and React Query cannot reuse anonymous subscription state for another
+  viewer. Playback no longer presents an initial loader over a ready paused video,
+  while active stalls remain visible. `object-cover` may crop content when the
+  frame ratio differs, and cannot remove black bars encoded into the source file;
+  source-level media cleanup remains a separate concern.

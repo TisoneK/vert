@@ -15,8 +15,8 @@ check its session entry and backlog before starting.
 - **Task:** none — no session in progress
 - **Status:** idle
 
-<!-- Last session: 2026-08-04 (Session 13, Buffy / openai/gpt-5.6-luna,
-engineer) — corrected release bookkeeping: deployed Sessions 8–12 were moved
-from `[Unreleased]` to `0.6.11`, package version bumped, and annotated tag
-`v0.6.11` pushed. Future work has a fresh empty `[Unreleased]` section. Release
-commit `49b015a`. -->
+<!-- Last session: 2026-08-04 (Session 14, Buffy / openai/gpt-5.6-luna,
+engineer) — fixed watch-page UX: one subscriber count plus a logged-out
+`Subscribe` CTA, user-aware subscription state, player-frame fill, and a
+buffering spinner limited to active playback stalls. Published as `0.6.12`
+(commit `05cb8ff`, tag `v0.6.12`). -->

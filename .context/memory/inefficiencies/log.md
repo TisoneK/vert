@@ -243,3 +243,20 @@ if literally nothing slowed you down.
 - **Prevent next time:** Release bookkeeping now happens as part of the feature
   workflow: a pushed user-visible change belongs in a numbered release, while
   `[Unreleased]` is reserved for work not yet on production.
+
+---
+## 2026-08-04 — Buffy / openai/gpt-5.6-luna (Session 14)
+- **Problem:** The watch-page fix exposed several coupled state boundaries: the
+  subscription result is viewer-specific, the existing query keys were not, and
+  React's compiler lint rejects a direct effect-based state synchronization for
+  the small CTA.
+- **Cost:** Moderate — required one review-driven iteration after the first green
+  validation pass; no broken commit was pushed.
+- **Cause:** Existing prefetch/channel query keys were designed as public data
+  keys, but the new `isSubscribed` boolean depends on the authenticated viewer.
+- **Workaround / fix:** Added viewer IDs to video/channel query keys and prefetch,
+  returned only a boolean from APIs, and remounted the CTA on viewer/server-state
+  changes instead of using `setState` in an effect. Final typecheck/lint/build
+  passed before release.
+- **Prevent next time:** When adding user-specific fields to a shared query,
+  include the identity in every query and prefetch key before wiring the UI.

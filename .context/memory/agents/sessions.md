@@ -150,3 +150,12 @@ past entries — append corrections instead.
 - **Open items:** none for this task; future user-visible changes follow ADR-7. Existing video-transcoding and test-suite backlog remains.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-04-release-review.md
+---
+## 2026-08-04 — Session 14
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** engineer | **Core:** 0.5.0
+- **Task:** Fix watch-page UX: duplicate subscriber count, logged-out CTA semantics, video framing, and stuck buffering spinner.
+- **Commits:** 1 (`05cb8ff`; tag `v0.6.12`)
+- **Outcome:** done — released `0.6.12`; count appears once, logged-out CTA reads Subscribe and routes to login, subscription state is viewer-scoped, player uses fill framing, and spinner is active-buffering-only.
+- **Open items:** Post-release browser verification of the deployed fix; CSS cannot remove black bars baked into source media. Existing transcoding/HLS and test-suite backlog remains.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-04-watch-page-review.md
