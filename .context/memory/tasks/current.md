@@ -15,10 +15,11 @@ check its session entry and backlog before starting.
 - **Task:** none — no session in progress
 - **Status:** idle
 
-<!-- Last session: 2026-08-04 (Session 8, Claude Code / claude-opus-4-8,
-feature-engineer) — shipped the hover/touch PRE-FETCH feature
-(react-query cache warming on VideoCard / RelatedVideos / LandingPage),
-verified live, pushed (1943d50..HEAD). eslint 0 errors, tsc clean.
-NEXT FEATURE (user: "each in a separate session"): LAZY LOADING — see
-tasks/backlog.md. See .context/memory/reviews/2026-08-04-feature-review.md
-and plans/decisions.md ADR-3. -->
+<!-- Last session: 2026-08-04 (Session 9, Claude Code / claude-opus-4-8,
+feature-engineer) — shipped LAZY LOADING (images): native loading="lazy"
++ decoding="async" on 12 list/grid <img> sites; hero/LCP images left
+eager (ADR-4). Verified render-level (attributes in live DOM), pushed
+(ecd3a96..HEAD). eslint 0 errors, tsc clean. Both requested features
+(Pre-fetch ADR-3, Lazy Loading ADR-4) now done. Remaining "lazy" readings
+(infinite scroll, code-splitting) backlogged. See
+.context/memory/reviews/2026-08-04-feature-review-2.md. -->

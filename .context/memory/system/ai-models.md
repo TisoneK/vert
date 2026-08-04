@@ -13,7 +13,7 @@ accordingly).
 
 | Agent | Model | First seen | Last seen | Sessions |
 |---|---|---|---|---|
-| Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-08-04 | 4 |
+| Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-08-04 | 5 |
 | Claude Code | claude-fable-5 | 2026-07-14 | 2026-07-14 | 2 |
 | Buffy | deepseek-v4-flash | 2026-08-01 | 2026-08-01 | 1 |
 
@@ -24,6 +24,7 @@ accordingly).
 - **Claude Code / claude-opus-4-8:** Session 5 (core 0.3.0 update + CI deploy gate) and Session 6 (react-query migration, eslint 35→0) both ran on 2026-07-21/22 — row's last-seen/session-count updated accordingly. (2026-08-01)
 - **Buffy / deepseek-v4-flash:** Model id stated in system prompt, recorded verbatim. First session = context sync (core 0.3.0→0.5.0, sessions module adoption). Completed a full local-edition session start-to-finish with no friction. (2026-08-01)
 - **Claude Code / claude-opus-4-8:** Session 8 (feature-engineer role) — shipped the hover/touch pre-fetch feature and verified it live via the browser pane (server request-log evidence, DOM inspection). Confirmed the Session-6 finding that browser-pane coordinate/ref clicks are unreliable here (used programmatic `element.click()`), and additionally that real CDP `hover` DOES fire React `onMouseEnter` while dispatched synthetic `mouseover` events do not. (2026-08-04)
+- **Claude Code / claude-opus-4-8:** Session 9 (feature-engineer role) — shipped the lazy-image-loading feature (ADR-4). Used AskUserQuestion to resolve genuine scope ambiguity ("lazy loading" = images vs infinite-scroll vs code-split) before Phase 3, per the feature-engineer role. Verified render-level by patching `window.fetch` to inject thumbnails (seed data has none) and inspecting the DOM. Note: `read_network_requests` returns empty even when requests fire in this browser pane (matches Session 8) — use server logs / DOM state, not the network tool, for evidence here. (2026-08-04)
 
 Concrete, evidence-based capabilities and limits — things demonstrated
 in this repo's sessions, not marketing claims or self-assessment.

@@ -144,3 +144,30 @@ if literally nothing slowed you down.
 - **Prevent next time:** Read the Baos-Mac-mini `environments.md` block before any
   browser-pane verification here: use `.click()` not coordinate-clicks, real
   `hover` not synthetic events, and expect an off-port dev server.
+
+---
+## 2026-08-04 — Claude Code / claude-opus-4-8 (Session 9)
+- **Problem:** Live-verifying an IMAGE feature (lazy loading) was awkward because
+  the seed DB has **no media** — every video's `thumbnailUrl` is null and channels'
+  `avatarUrl` is null, so no `<img>` renders locally at all (cards show
+  placeholders). Chased two dead ends trying to force images: (1) injected
+  `/favicon.ico?i=N` as a fake thumbnail — it isn't a decodable image here, so
+  `naturalWidth` stayed 0 and I couldn't measure load state; (2) switched to
+  `/logo.svg?i=N` (decodes 150×150) but the injected `<img>` elements still didn't
+  register as loaded in the tool's timing window even on-screen. Also re-confirmed
+  `read_network_requests` returns empty while requests are actually firing.
+- **Cost:** Moderate — several extra tool round-trips building a `window.fetch`
+  patch + SPA-nav remount dance to get any `<img>` to render, then more trying
+  (unsuccessfully) to time the deferral.
+- **Cause:** Seed data carries no image URLs (same class of gap as Session 8's
+  missing video files); the browser-pane network tool is unreliable here.
+- **Workaround / fix:** Settled on a **render-level** verification — patch
+  `window.fetch` to inject a same-origin thumbnail, remount a feed, and assert the
+  DOM `<img>` carry `loading="lazy"`+`decoding="async"`. The actual network
+  deferral is guaranteed native browser behavior; flagged a deploy-with-real-
+  thumbnails check as the remaining verification (Pitfall #42 — reported honestly,
+  didn't claim what I couldn't measure).
+- **Prevent next time:** Recorded in `system/environments.md` (seed has no media;
+  use `/logo.svg?i=N` not favicon to inject a decodable test image; don't trust
+  `read_network_requests`). For any media/image feature here, plan on render-level
+  verification or a deploy check, not local network timing.

@@ -113,3 +113,38 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   page's query shape changes, update it in `video-queries.ts` and prefetch follows for
   free. The Lazy Loading feature (next session) is the deliberate counterpart — see the
   backlog item.
+
+---
+## ADR-4: Lazy Loading = native `loading="lazy"` on off-screen list/grid images; hero/LCP images stay eager (2026-08-04)
+- **Status:** accepted
+- **Context:** Feature request "Lazy Loading" (second of the two feature sessions;
+  Pre-fetch was ADR-3). "Lazy loading" has three plausible readings in this codebase
+  — (a) defer off-screen images, (b) infinite-scroll pagination, (c) code-split heavy
+  components. The three produce very different diffs, so the scope was a genuine fork;
+  the user chose **(a) lazy-load images**. Survey: ~21 `<img>` sites, **none** used
+  `loading="lazy"` — every thumbnail and avatar loaded eagerly, so a feed grid or long
+  comment list fetched all its images up front. All images already sit inside
+  aspect-ratio / fixed-size wrappers, so deferring them causes **no layout shift**.
+- **Decision:** Add `loading="lazy"` + `decoding="async"` to the images that render
+  inside **repeating lists/grids** (the ones that can be numerous and off-screen):
+  `VideoCard` thumbnail + channel avatar (covers all 10 feeds), `RelatedVideos` Up Next
+  rows, `HistoryPage`, `PlaylistsPage`, `CommentSection` avatars, `LandingPage` trending
+  cards, `CreatorStudio` (×2), `Sidebar` channel avatars, `SearchResults` channel
+  avatars, and the `HomeFeed` "Popular Creators" shelf. **Deliberately left eager**
+  (untouched) are the above-the-fold / LCP singletons, because `loading="lazy"` on an
+  LCP image can delay it: the `VideoPlayer` poster, the `TrendingPage` + `HomeFeed`
+  "Featured" heroes, the `ChannelPage`/`ProfilePage` banners, the `ChannelPage` header
+  avatar, the `VideoDetail` (watch-page) channel avatar, and the `UploadPage` preview.
+- **Alternatives considered:** (b) infinite scroll and (c) code-splitting — both valid
+  "lazy" readings, both backlogged for their own sessions if wanted; the user picked
+  images. Also considered a shared `<LazyImage>`/`<Thumbnail>` component to DRY up the
+  attributes + the repeated `onError` fallback state — rejected as scope creep for this
+  session (it would touch each component's fallback state logic and raise risk); the
+  native-attribute change is surgical and behavior-preserving. Noted as a possible
+  future refactor.
+- **Consequences:** Off-screen images no longer download until they scroll near the
+  viewport — less bandwidth and faster initial paint on image-heavy feeds, complementing
+  ADR-3's data prefetch (prefetch warms JSON, lazy defers images). Future agents: when
+  adding a NEW image inside a list/grid, add `loading="lazy" decoding="async"`; for a
+  new hero/LCP/above-the-fold image, leave it eager (optionally `fetchpriority="high"`).
+  The eager-hero exclusions are intentional — do not "fix" them to lazy.

@@ -31,3 +31,6 @@ records.
 ---
 - **2026-08-04 — Session 8** — Claude Code / claude-opus-4-8 — shipped the hover/touch **Pre-fetch** feature (react-query cache warming on VideoCard/RelatedVideos/LandingPage; navigation is a zustand store, not next/link). Verified live: hover→prefetch, click→cache hit, 0 skeletons. eslint 0 errors. **ADR-3.** Next feature: Lazy Loading (backlogged).
   Detail: summary only (facts in ADR-3 + 2026-08-04-feature-review.md).
+---
+- **2026-08-04 — Session 9** — Claude Code / claude-opus-4-8 — shipped **Lazy Loading (images)**: native `loading="lazy"`+`decoding="async"` on the 12 list/grid `<img>` sites; hero/LCP images left eager. Asked the user to pick the scope (images vs infinite-scroll vs code-split → images). Verified render-level (attrs in live DOM). eslint 0 errors. **ADR-4.** Both requested features now done.
+  Detail: summary only (facts in ADR-4 + 2026-08-04-feature-review-2.md).

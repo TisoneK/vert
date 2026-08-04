@@ -105,3 +105,12 @@ past entries — append corrections instead.
 - **Open items:** tasks/backlog.md — **Feature: Lazy Loading** (the next session), prefetch-on-focus follow-up; unchanged: test suite [L-3], user actions (password reset, Sentry DSN, GitHub Actions billing, branch protection).
 - **Notes:** none — durable facts promoted to ADR-3, the feature report, and `system/environments.md`.
 - **Report:** .context/memory/reviews/2026-08-04-feature-review.md
+---
+## 2026-08-04 — Session 9
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Feature — **Lazy Loading** (second of the two requested features; Pre-fetch was Session 8). "Lazy loading" had three valid readings (images / infinite-scroll / code-split) with very different diffs, so asked the user once (feature-engineer scope-fork exception) — they chose **images**. Added native `loading="lazy"` + `decoding="async"` to the 12 `<img>` sites that render in repeating lists/grids (VideoCard thumbnail+avatar → all 10 feeds, RelatedVideos, HistoryPage, PlaylistsPage, CommentSection, LandingPage, CreatorStudio ×2, Sidebar, SearchResults, HomeFeed creator shelf). Above-the-fold/LCP singletons (VideoPlayer poster, Trending/HomeFeed heroes, banners, watch-page/channel-header avatars, upload preview) deliberately left eager. Design = **ADR-4**.
+- **Commits:** 3 (`5a564d5`..`104da3b`) — `5a564d5` feat(images) lazy-load, `097427c` docs changelog+devlog, `104da3b` docs(review) feature report, + this `chore(context)`.
+- **Outcome:** done. Verified: `tsc` 0 errors, `eslint .` **0 errors** (19 warnings, baseline unchanged); render-level check on the live dev server (patched `window.fetch` to inject thumbnails since seed data has none) confirmed feed `<img>` carry `loading="lazy"`+`decoding="async"` in the DOM; no regression (Trending renders normally). Network-timing deferral is native browser behavior, not measurable against seed data with null thumbnails — flagged for a deploy-with-real-thumbnails check.
+- **Open items:** tasks/backlog.md — the other two "lazy" readings now filed as their own items (**Infinite scroll**, **Code-split heavy components**) + a shared `<LazyImage>` refactor follow-up; unchanged: test suite [L-3], user actions (password reset, Sentry DSN, GitHub Actions billing, branch protection).
+- **Notes:** none — durable facts promoted to ADR-4, the feature report, and `system/environments.md`.
+- **Report:** .context/memory/reviews/2026-08-04-feature-review-2.md

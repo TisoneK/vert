@@ -103,7 +103,7 @@ don't remove the line.
       one-off `fetch` calls in mutation handlers.
 
 ---
-- [ ] **Feature: Lazy Loading** (added 2026-08-04 by Claude Code) — the SECOND of
+- [x] **Feature: Lazy Loading** (added 2026-08-04 by Claude Code) — the SECOND of
       the two features the user requested ("Add features; Pre-fetch and Lazy
       Loading each in a separate session"). Pre-fetch shipped in Session 8
       (`42acc99`); Lazy Loading is its own session. Scope to define at kickoff, but
@@ -121,6 +121,33 @@ don't remove the line.
       bundle. Use the feature-engineer role (design ADR first). Runtime-verify in
       the browser pane (note: coordinate-clicks are flaky here — use programmatic
       `.click()`; see `system/environments.md`).
+      **DONE 2026-08-04 (Session 9)** — user chose interpretation **(a) lazy-load
+      images**. Shipped `loading="lazy"` + `decoding="async"` on the 12 list/grid
+      `<img>` sites; hero/LCP images left eager on purpose (**ADR-4**). Commit
+      `5a564d5`, pushed. Verified render-level (attributes present in live DOM);
+      eslint 0 errors, tsc clean. Interpretations **(b) infinite scroll** and
+      **(c) code-splitting** were NOT done — see the two new backlog items below
+      if either is wanted as its own session.
+- [ ] **Feature: Infinite scroll (feed pagination)** (added 2026-08-04 by Claude
+      Code) — interpretation (b) of "Lazy Loading", deferred when the user scoped
+      Session 9 to images. Feeds like HomeFeed load a fixed `limit=24` batch in one
+      query and stop; CategoryPage/TagPage use `useInfiniteQuery` but load more via
+      a button. Add an IntersectionObserver sentinel that calls `fetchNextPage()`
+      when it scrolls into view (there's a precedent IO in `ChangelogPage.tsx:33`).
+      Feature-engineer role; design ADR first.
+- [ ] **Feature: Code-split heavy client components** (added 2026-08-04 by Claude
+      Code) — interpretation (c) of "Lazy Loading". `next/dynamic`/`React.lazy` for
+      heavy client components — the `@mdxeditor/editor` in CreatorStudio and the HLS
+      `VideoPlayer` are the prime candidates — to shrink the initial JS bundle.
+      Mostly-invisible perf win; verify bundle size before/after. Feature-engineer
+      role; design ADR first.
+- [ ] **Consider a shared `<LazyImage>`/`<Thumbnail>` component** (added 2026-08-04
+      by Claude Code) — follow-up from ADR-4. There are ~20 `<img>` sites repeating
+      the same `loading`/`decoding` attrs plus per-component `onError` fallback
+      state (`thumbnailFailed`/`avatarFailed` in VideoCard, etc.). A shared image
+      component would DRY this up and make "new image → correct defaults"
+      automatic. Deferred from Session 9 as scope creep. Low priority; a refactor,
+      not a feature.
 - [ ] **Prefetch on keyboard focus** (added 2026-08-04 by Claude Code) — the
       Session-8 pre-fetch fires on `onMouseEnter`/`onTouchStart` but NOT `onFocus`,
       because `VideoCard`'s root is a non-focusable `<div onClick>` (existing
