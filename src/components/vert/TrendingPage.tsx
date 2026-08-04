@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -151,9 +152,9 @@ export function TrendingPage() {
               className="relative mb-8 rounded-lg overflow-hidden cursor-pointer group shadow-sm hover:shadow-md transition-all duration-200"
               onClick={() => navigate({ page: 'video', videoId: heroVideo.id })}
             >
-              <div className={`${heroAspect} ${heroSizing} bg-zinc-200 dark:bg-zinc-800`}>
+              <div className={`relative ${heroAspect} ${heroSizing} bg-zinc-200 dark:bg-zinc-800`}>
                 {heroVideo.thumbnailUrl ? (
-                  <img src={heroVideo.thumbnailUrl} alt={heroVideo.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
+                  <Image src={heroVideo.thumbnailUrl} alt={heroVideo.title} fill priority sizes="(max-width: 768px) 100vw, 900px" className="object-cover group-hover:scale-[1.02] transition-transform duration-300" />
                 ) : (
                   <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
                     <Play className="h-10 w-10 text-zinc-500 dark:text-zinc-400" />

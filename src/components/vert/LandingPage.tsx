@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useNavigation } from '@/lib/store'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
@@ -102,12 +103,12 @@ export function LandingPage() {
                 >
                   <div className="aspect-[9/16] rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 relative">
                     {v.thumbnailUrl ? (
-                      <img
+                      <Image
                         src={v.thumbnailUrl}
                         alt={v.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                        fill
+                        sizes="(max-width: 768px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800">

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useNavigation } from '@/lib/store'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
@@ -116,13 +117,16 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       {/* Thumbnail container */}
       <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800`}>
         {showThumbnail ? (
-          <img
+          <Image
             src={video.thumbnailUrl!}
             alt={video.title}
-            loading="lazy"
-            decoding="async"
+            fill
+            // Cards render 2-up on phones, 3-up on tablet, 4–5-up on desktop —
+            // tell the optimizer so it serves a right-sized AVIF/WebP, not the
+            // full-resolution source. See .context ADR-5.
+            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
             onError={() => setThumbnailFailed(true)}
-            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
+            className="object-cover transition-transform group-hover:scale-105 duration-200"
           />
         ) : (
           <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">

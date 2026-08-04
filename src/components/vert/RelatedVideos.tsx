@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { relatedVideosQueryOptions } from '@/lib/video-queries'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
@@ -57,14 +58,14 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
                 The thumbnail width stays fixed at w-32; the height follows
                 from the aspect ratio. */}
             <div className="relative w-32 shrink-0 rounded overflow-hidden bg-zinc-200 dark:bg-zinc-800">
-              <div className={video.format === 'portrait' ? 'aspect-[9/16]' : video.format === 'square' ? 'aspect-square' : 'aspect-video'}>
+              <div className={`relative ${video.format === 'portrait' ? 'aspect-[9/16]' : video.format === 'square' ? 'aspect-square' : 'aspect-video'}`}>
                 {video.thumbnailUrl ? (
-                  <img
+                  <Image
                     src={video.thumbnailUrl}
                     alt={video.title}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
+                    fill
+                    sizes="128px"
+                    className="object-cover transition-transform group-hover:scale-105 duration-200"
                   />
                 ) : (
                   <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">

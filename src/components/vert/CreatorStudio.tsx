@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
@@ -231,9 +232,9 @@ export function CreatorStudio() {
                       onClick={() => navigate({ page: 'video', videoId: video.id })}
                       className="w-full flex items-center gap-3 p-3 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                     >
-                      <div className="w-10 h-14 rounded bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="relative w-10 h-14 rounded bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center shrink-0 overflow-hidden">
                         {video.thumbnailUrl ? (
-                          <img src={video.thumbnailUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                          <Image src={video.thumbnailUrl} alt="" fill sizes="40px" className="object-cover" />
                         ) : (
                           <Film className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
                         )}
@@ -280,9 +281,9 @@ export function CreatorStudio() {
                         >
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-14 rounded bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center shrink-0 overflow-hidden">
+                              <div className="relative w-10 h-14 rounded bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center shrink-0 overflow-hidden">
                                 {video.thumbnailUrl ? (
-                                  <img src={video.thumbnailUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                                  <Image src={video.thumbnailUrl} alt="" fill sizes="40px" className="object-cover" />
                                 ) : (
                                   <Film className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
                                 )}

@@ -1,6 +1,7 @@
 'use client'
 import { fetchWithRetry } from '@/lib/fetch-retry'
 
+import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoCard } from './VideoCard'
@@ -145,10 +146,14 @@ export function HomeFeed() {
             onClick={() => navigate({ page: 'video', videoId: hero.id })}
           >
             {hero.thumbnailUrl ? (
-              <img
+              <Image
                 src={hero.thumbnailUrl}
                 alt={hero.title}
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                fill
+                // Above-the-fold hero → priority (preload, no lazy) for LCP.
+                priority
+                sizes="(max-width: 768px) 100vw, 640px"
+                className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
               />
             ) : (
               <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useAuth, useNavigation } from '@/lib/store'
 import { Button } from '@/components/ui/button'
@@ -225,12 +226,12 @@ export function PlaylistsPage() {
               {/* Thumbnail */}
               <div className="relative aspect-video rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800">
                 {playlist.thumbnailUrl ? (
-                  <img
+                  <Image
                     src={playlist.thumbnailUrl}
                     alt={playlist.title}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                    className="object-cover transition-transform group-hover:scale-105 duration-200"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">

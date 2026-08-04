@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
   // all Vercel Blob stores in this account. We use the wildcard form
   // because each store has a unique subdomain (e.g. 7omh3o8afcek9nbu).
   images: {
+    // Serve next-gen formats. AVIF first (best compression), WebP fallback,
+    // then the original. The Vercel Image Optimization CDN (and the local
+    // dev optimizer via sharp) transcodes + resizes on the fly and caches
+    // the result, so a 445KB source PNG reaches the browser as a small
+    // AVIF/WebP sized for the device. See .context ADR-5.
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
