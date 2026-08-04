@@ -19,6 +19,41 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ### Added
 
+#### Image optimization — serve thumbnails as resized AVIF/WebP via next/image
+
+**Files:** `next.config.ts` (`images.formats`), `src/components/vert/VideoCard.tsx`,
+`RelatedVideos.tsx`, `HomeFeed.tsx`, `TrendingPage.tsx`, `HistoryPage.tsx`,
+`PlaylistsPage.tsx`, `LandingPage.tsx`, `CreatorStudio.tsx`
+
+Thumbnails were served as raw uploads via plain `<img>` — full-resolution PNGs up
+to 445KB each (a main cold-load cost identified in the Session 10 diagnosis).
+Migrated the high-impact thumbnail sites to `next/image`, which resizes per device
+and transcodes to AVIF/WebP through the Vercel Image Optimization CDN (locally via
+`sharp`), caching the result.
+
+- **Config:** added `images.formats: ['image/avif', 'image/webp']`. The blob host
+  (`*.public.blob.vercel-storage.com`) and `lh3.googleusercontent.com` were already
+  allowed `remotePatterns`.
+- **Migration:** `<img>` → `<Image fill>` with a context-tuned `sizes` for
+  `VideoCard` thumbnail (all 10 feeds), `RelatedVideos`, the `HomeFeed` +
+  `TrendingPage` heroes (`priority` for LCP), `HistoryPage`, `PlaylistsPage`,
+  `LandingPage`, `CreatorStudio` (list + table). `fill` needs a positioned parent, so
+  a `relative` was added to the aspect wrappers that lacked one. `next/image` is lazy
+  by default, so the manual `loading="lazy"`/`decoding="async"` from the lazy-loading
+  work was removed on these sites; each keeps its null-src/`onError` fallback.
+- **Why next/image, not upload-time `sharp`:** uploads go browser → Vercel Blob
+  directly (`api/v1/upload` only mints a client token; bytes never hit a server
+  function), so there's no server hook to compress on upload. next/image also fixes
+  the images *already* in the blob store. See ADR-5.
+- **Left as plain `<img>` (backlogged):** avatars (KB-range), the `VideoPlayer`
+  poster (inside the player's canvas-capture logic), channel/profile banners.
+
+**Verified** on the local dev optimizer against a real uploaded 445KB PNG:
+`/_next/image?...&w=640` returns **image/avif ~29KB** (WebP ~33KB) — **−93%**; at
+card width (384) ~27KB. Browser render check: migrated components emit `<img
+src="/_next/image?url=…">`, load successfully (naturalWidth > 0), content-type
+`image/avif`, no console errors, no layout shift. `tsc` + `eslint` clean (0 errors).
+
 #### Lazy-load off-screen thumbnails and avatars
 
 **Files:** `src/components/vert/VideoCard.tsx` (thumbnail + avatar),
