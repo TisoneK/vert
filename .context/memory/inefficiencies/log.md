@@ -257,6 +257,13 @@ if literally nothing slowed you down.
 - **Workaround / fix:** Added viewer IDs to video/channel query keys and prefetch,
   returned only a boolean from APIs, and remounted the CTA on viewer/server-state
   changes instead of using `setState` in an effect. Final typecheck/lint/build
-  passed before release.
-- **Prevent next time:** When adding user-specific fields to a shared query,
-  include the identity in every query and prefetch key before wiring the UI.
+  passed before release.- **Prevent next time:** When adding user-specific fields to a shared query, include the identity in every query and prefetch key before wiring the UI.
+
+---
+## 2026-08-05 — Buffy / openai/gpt-5.6-luna (Sessions 15–17)
+- **Problem:** The repository tool environment intermittently lacked `read_files`/`rg` during the session, and one broad changelog write attempt replaced more content than intended.
+- **Cost:** Minor — switched to targeted reads/sed/grep and restored the changelog from HEAD before applying exact replacements.
+- **Cause:** Tool availability changed mid-session; the whole-file write path was too broad for a large public changelog.
+- **Workaround / fix:** Used targeted file reads and `grep`/`sed`; restored `CHANGELOG.md` before making bounded string replacements.
+- **Prevent next time:** Prefer exact replacements for large documents and verify `git diff --stat` immediately after any write; fall back to shell inspection when search/read helpers are unavailable.
+

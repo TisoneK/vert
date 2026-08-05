@@ -49,3 +49,6 @@ records.
 ---
 - **2026-08-04 — Session 14** — Buffy / openai/gpt-5.6-luna — fixed watch-page UX: subscriber count now appears once, logged-out visitors get an outline `Subscribe` CTA, subscription state is viewer-scoped, the player uses `object-cover`, and the spinner is shown only during active playback buffering. Released as `0.6.12` (`05cb8ff`, `v0.6.12`). **ADR-8.**
   Detail: .context/memory/reviews/2026-08-04-watch-page-review.md
+---
+- **2026-08-05 — Sessions 15–17** — Buffy / openai/gpt-5.6-luna — fixed hidden scroll affordances, bounded progress indicators, and blocked video control interactions; released as **0.6.13** (`33a87c5`, `35a6bc6`, `4a90f2d`, release `032e4dd`, tag `v0.6.13`). Validation: typecheck/build pass, lint 0 errors/19 warnings.
+  Detail: .context/memory/reviews/2026-08-05-review.md

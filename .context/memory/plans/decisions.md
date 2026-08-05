@@ -253,3 +253,10 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   while active stalls remain visible. `object-cover` may crop content when the
   frame ratio differs, and cannot remove black bars encoded into the source file;
   source-level media cleanup remains a separate concern.
+
+---
+## ADR-9: Preserve visible scroll and control affordances (2026-08-05)
+- **Status:** accepted
+- **Context:** The main viewport and horizontal shelves explicitly hid native scrollbars, while progress transforms and the custom video-player overlay permitted edge values or invisible hit targets to interfere with interaction.
+- **Decision:** Keep scrollbars visibly styled on scrollable surfaces; clamp progress values to their valid range and clip tracks; make hidden player overlays pointer-transparent, keep center affordances as buttons, and expose keyboard-safe slider semantics for seeking.
+- **Consequences:** Users receive clearer scroll feedback and reliable pointer/keyboard playback controls. Native overlay-scrollbar platforms may still hide tracks according to OS settings, and the player remains a custom control implementation that needs targeted regression tests when its layering changes.

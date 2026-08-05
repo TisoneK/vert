@@ -159,3 +159,12 @@ past entries — append corrections instead.
 - **Open items:** Post-release browser verification of the deployed fix; CSS cannot remove black bars baked into source media. Existing transcoding/HLS and test-suite backlog remains.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-04-watch-page-review.md
+---
+## 2026-08-05 — Sessions 15–17
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** engineer | **Core:** 0.5.0
+- **Task:** Fix missing scrollbars, out-of-container progress indicators, and non-functional video controls as separate sequential sessions.
+- **Commits:** 3 (`33a87c5`..`4a90f2d`) plus release/context bookkeeping
+- **Outcome:** done — visible scroll affordances restored; progress values bounded and tracks clipped; pointer and keyboard video controls restored. Typecheck/build pass; lint 0 errors, 19 warnings.
+- **Open items:** Existing video transcoding/HLS architecture, test suite, and one GitHub Dependabot high-severity vulnerability remain separate sessions.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-05-review.md

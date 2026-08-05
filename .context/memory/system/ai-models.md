@@ -16,7 +16,7 @@ accordingly).
 | Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-08-04 | 6 |
 | Claude Code | claude-fable-5 | 2026-07-14 | 2026-07-14 | 2 |
 | Buffy | deepseek-v4-flash | 2026-08-01 | 2026-08-01 | 1 |
-| Buffy | openai/gpt-5.6-luna | 2026-08-04 | 2026-08-04 | 2 |
+| Buffy | openai/gpt-5.6-luna | 2026-08-04 | 2026-08-05 | 3 |
 
 ## Observations
 
@@ -29,6 +29,7 @@ accordingly).
 - **Claude Code / claude-opus-4-8:** Session 10 (investigation) + Session 11 (feature). S10: diagnosed a user-reported "5-min cold load" as large unoptimized live media (NOT the S8/9 features) by measuring the production deploy directly. S11: shipped image optimization (next/image, ADR-5) and — applying the S10 lesson — verified against REAL media via the local `/_next/image` optimizer endpoint (445KB PNG → 29KB AVIF) plus a browser render check, not empty seed data. (2026-08-04)
 - **Buffy / openai/gpt-5.6-luna:** Session 12 resumed an interrupted feature session from the exact unstaged diff, preserved the safe `preload="metadata"` mitigation, corrected its browser-hint wording, and separated the unresolved transcoding/provider decision instead of over-claiming completion. (2026-08-04)
 - **Buffy / openai/gpt-5.6-luna:** Session 13 corrected release bookkeeping by publishing deployed work as `v0.6.11`, creating the matching annotated tag, and recording the rule that pushes to `main` are production releases for changelog purposes. (2026-08-04)
+- **Buffy / openai/gpt-5.6-luna:** Sessions 15–17 handled a sequential UI bug sweep, used review-driven pointer/keyboard checks for the custom video player, and released the validated batch as `v0.6.13`. (2026-08-05)
 
 Concrete, evidence-based capabilities and limits — things demonstrated
 in this repo's sessions, not marketing claims or self-assessment.
