@@ -1,7 +1,7 @@
 'use client'
 
 import { useNavigation, useAuth } from '@/lib/store'
-import { useState, useEffect, useRef, type ElementType, type RefObject } from 'react'
+import { useState, useEffect, useRef, type ElementType } from 'react'
 import {
   Home,
   Flame,
@@ -57,10 +57,9 @@ const categoryIconMap: Record<string, ElementType> = {
 interface SidebarProps {
   collapsed: boolean
   onClose: () => void
-  restoreFocusRef: RefObject<HTMLButtonElement | null>
 }
 
-export function Sidebar({ collapsed, onClose, restoreFocusRef }: SidebarProps) {
+export function Sidebar({ collapsed, onClose }: SidebarProps) {
   const { navigate, currentView } = useNavigation()
   const { user } = useAuth()
   const [categories, setCategories] = useState<SidebarCategory[]>([])
@@ -69,16 +68,14 @@ export function Sidebar({ collapsed, onClose, restoreFocusRef }: SidebarProps) {
   const [channelsExpanded, setChannelsExpanded] = useState(true)
   const drawerRef = useRef<HTMLElement>(null)
 
-  const wasOpenRef = useRef(false)
-
   useEffect(() => {
-    if (collapsed) {
-      if (wasOpenRef.current) restoreFocusRef.current?.focus()
-      wasOpenRef.current = false
-      return
-    }
+    if (collapsed) return
 
-    wasOpenRef.current = true
+    const closeOnMobileResize = () => {
+      if (window.matchMedia('(max-width: 767px)').matches) onClose()
+    }
+    window.addEventListener('resize', closeOnMobileResize)
+
     const firstFocusable = drawerRef.current?.querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
     firstFocusable?.focus()
     const trapFocus = (event: KeyboardEvent) => {
@@ -96,8 +93,11 @@ export function Sidebar({ collapsed, onClose, restoreFocusRef }: SidebarProps) {
       }
     }
     document.addEventListener('keydown', trapFocus)
-    return () => document.removeEventListener('keydown', trapFocus)
-  }, [collapsed, restoreFocusRef])
+    return () => {
+      window.removeEventListener('resize', closeOnMobileResize)
+      document.removeEventListener('keydown', trapFocus)
+    }
+  }, [collapsed, onClose])
 
   useEffect(() => {
     if (collapsed) return

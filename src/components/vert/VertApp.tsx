@@ -38,6 +38,15 @@ export function VertApp() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const mainRef = useRef<HTMLElement>(null)
   const desktopMenuButtonRef = useRef<HTMLButtonElement>(null)
+  const previousSidebarOpenRef = useRef(false)
+
+  useEffect(() => {
+    const sidebarOpen = !sidebarCollapsed
+    if (previousSidebarOpenRef.current && !sidebarOpen) {
+      desktopMenuButtonRef.current?.focus()
+    }
+    previousSidebarOpenRef.current = sidebarOpen
+  }, [sidebarCollapsed])
 
   // Reset the content scroll position when the view changes. <main> is the
   // single scroll container for every page, so without this the scroll
@@ -287,7 +296,7 @@ export function VertApp() {
         onToggleMobileDrawer={() => setMobileDrawerOpen(!mobileDrawerOpen)}
       />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar collapsed={sidebarCollapsed} onClose={closeSidebar} restoreFocusRef={desktopMenuButtonRef} />
+        <Sidebar collapsed={sidebarCollapsed} onClose={closeSidebar} />
         {/* pb-16 on mobile clears the bottom MobileNav bar (h-12 + safe-area).
             md:pb-0 removes it on desktop where there's no bottom bar. */}
         <main ref={mainRef} className="flex-1 overflow-y-auto pb-16 md:pb-0 app-main-scroll">
