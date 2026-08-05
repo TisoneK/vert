@@ -554,7 +554,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     )
   }
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0
+  const progress = duration > 0
+    ? Math.min(100, Math.max(0, (currentTime / duration) * 100))
+    : 0
 
   return (
     // Outer wrapper: full-width on mobile so portrait video fills the screen
@@ -637,7 +639,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         }`}
       >
         <div
-          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0 relative"
+          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0 relative overflow-hidden rounded-full"
           onClick={handleProgressClick}
         >
           {/* Buffer bar — lighter zinc bar behind the violet progress bar
