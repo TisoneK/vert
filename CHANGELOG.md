@@ -37,6 +37,15 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.13] — 2026-08-05
+
+### Fixed
+- **Scrollbars are back where scrolling is available.** Long pages and horizontal content rows now make it clearer when more content is available.
+- **Progress indicators stay inside their tracks.** Upload, watch-history, and playback progress no longer extend beyond their containers, even at edge values.
+- **Video controls respond reliably.** Play, pause, mute, volume, settings, fullscreen, and seeking work through the visible control bar, while keyboard users can seek without accidentally toggling playback.
+
+---
+
 ## [0.6.12] — 2026-08-04
 
 ### Fixed
@@ -315,7 +324,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.12...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.13...HEAD
+[0.6.13]: https://github.com/TisoneK/vert/releases/tag/v0.6.13
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

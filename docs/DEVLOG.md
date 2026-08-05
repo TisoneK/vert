@@ -21,6 +21,50 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.13] — 2026-08-05
+
+### Fixed
+
+#### Visible scroll affordances
+
+**File:** `src/app/globals.css`
+
+The main app viewport and horizontal shelves explicitly hid their native
+scrollbars (`scrollbar-width: none` and zero-sized WebKit tracks), leaving
+users without a reliable indication that more content was available. Restored
+thin, themed scrollbar tracks for `.app-main-scroll` and `.shelf-scroll` in
+light and dark mode. Scrolling behavior remains unchanged; the change restores
+the visual affordance.
+
+#### Progress indicators remain inside their tracks
+
+**Files:** `src/components/ui/progress.tsx`,
+`src/components/vert/VideoPlayer.tsx`
+
+The shared progress primitive used raw values in its translate transform. Values
+outside the expected range could move the indicator beyond its clipped track.
+Progress values are now finite and bounded against the configured max before
+being passed to Radix and converted into the visual percentage. The player
+also bounds its computed playback percentage, clamps click-derived seek
+positions, and clips its seek track.
+
+#### Video controls receive pointer and keyboard input reliably
+
+**File:** `src/components/vert/VideoPlayer.tsx`
+
+The invisible controls overlay could intercept taps even at zero opacity, and
+the centered pause overlay was layered above the bottom control bar while
+playing. Hidden controls now disable pointer events, the center affordances use
+button targets, and the pause target no longer blocks the bar. The seek track
+clamps pointer positions and now exposes slider semantics plus Arrow/Home/End
+keyboard seeking. Container-level shortcuts ignore events originating inside
+interactive controls so pressing Space does not toggle playback twice.
+
+**Verification:** `npx tsc --noEmit` passed; `npx eslint .` passed with 0 errors
+and 19 existing warnings; `npx next build` passed and generated all 47 routes.
+
+---
+
 ## [0.6.12] — 2026-08-04
 
 ### Fixed
