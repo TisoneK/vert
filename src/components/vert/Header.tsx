@@ -1,7 +1,7 @@
 'use client'
 
 import { useNavigation, useAuth } from '@/lib/store'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, type RefObject } from 'react'
 import { useTheme } from 'next-themes'
 import {
   Search,
@@ -24,9 +24,11 @@ interface HeaderProps {
   onLogout: () => void
   onToggleSidebar: () => void
   onToggleMobileDrawer: () => void
+  sidebarOpen: boolean
+  menuButtonRef: RefObject<HTMLButtonElement | null>
 }
 
-export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: HeaderProps) {
+export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer, sidebarOpen, menuButtonRef }: HeaderProps) {
   const { navigate } = useNavigation()
   const { user } = useAuth()
   const { theme, setTheme } = useTheme()
@@ -67,9 +69,11 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer }: Head
             <Menu className="h-5 w-5" />
           </button>
           <button
+            ref={menuButtonRef}
             onClick={onToggleSidebar}
             className="hidden md:block p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
-            aria-label="Toggle sidebar"
+            aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={sidebarOpen}
           >
             <Menu className="h-5 w-5" />
           </button>

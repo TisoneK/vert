@@ -1,7 +1,7 @@
 'use client'
 
 import { useNavigation, useAuth, pathToView } from '@/lib/store'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { signOut } from 'next-auth/react'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
@@ -32,9 +32,12 @@ import { ChangelogPage } from './ChangelogPage'
 export function VertApp() {
   const { currentView, navigate } = useNavigation()
   const { setUser, isLoading, user } = useAuth()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  // Desktop navigation stays out of the content flow until the menu is
+  // explicitly opened, matching the mobile/drawer interaction model.
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const mainRef = useRef<HTMLElement>(null)
+  const desktopMenuButtonRef = useRef<HTMLButtonElement>(null)
 
   // Reset the content scroll position when the view changes. <main> is the
   // single scroll container for every page, so without this the scroll
@@ -95,6 +98,8 @@ export function VertApp() {
     window.addEventListener('popstate', syncFromUrl)
     return () => window.removeEventListener('popstate', syncFromUrl)
   }, [navigate])
+
+  const closeSidebar = useCallback(() => setSidebarCollapsed(true), [])
 
   const handleLogout = async () => {
     try {
@@ -274,9 +279,15 @@ export function VertApp() {
 
   return (
     <div className="h-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 flex flex-col">
-      <Header onLogout={handleLogout} onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} onToggleMobileDrawer={() => setMobileDrawerOpen(!mobileDrawerOpen)} />
+      <Header
+        onLogout={handleLogout}
+        sidebarOpen={!sidebarCollapsed}
+        menuButtonRef={desktopMenuButtonRef}
+        onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onToggleMobileDrawer={() => setMobileDrawerOpen(!mobileDrawerOpen)}
+      />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar collapsed={sidebarCollapsed} />
+        <Sidebar collapsed={sidebarCollapsed} onClose={closeSidebar} restoreFocusRef={desktopMenuButtonRef} />
         {/* pb-16 on mobile clears the bottom MobileNav bar (h-12 + safe-area).
             md:pb-0 removes it on desktop where there's no bottom bar. */}
         <main ref={mainRef} className="flex-1 overflow-y-auto pb-16 md:pb-0 app-main-scroll">
