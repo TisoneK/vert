@@ -1,13 +1,10 @@
 'use client'
 import { fetchWithRetry } from '@/lib/fetch-retry'
 
-import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoCard } from './VideoCard'
-import { ShelfSkeleton } from './Skeleton'
-import { formatViews } from '@/lib/utils-vert'
-import { Play, Film, Sparkles } from 'lucide-react'
+import { Film, Sparkles } from 'lucide-react'
 
 interface Video {
   id: string
@@ -90,6 +87,15 @@ export function HomeFeed() {
     return videos.filter(v => v.categories?.some(c => c.slug === categorySlug)).slice(0, 8)
   }
 
+  // Feature a small editorial set instead of turning the first trending video
+  // into an oversized lone hero. If trending is sparse, fill the set from the
+  // latest feed so Featured never becomes an accidental one-card section.
+  const featuredVideos = Array.from(
+    new Map([...trendingVideos, ...videos].map((video) => [video.id, video])).values(),
+  ).slice(0, 4)
+  const featuredIds = new Set(featuredVideos.map((video) => video.id))
+  const remainingTrendingVideos = trendingVideos.filter((video) => !featuredIds.has(video.id))
+
   if (loading) {
     return (
       <div className="p-4 md:p-6">
@@ -123,62 +129,35 @@ export function HomeFeed() {
         </section>
       )}
 
-      {/* Featured — one hero video. On mobile the hero is tall (60vh) so a
-          portrait video doesn't look shrunked in the middle of a wide screen;
-          on desktop it's capped at 42vh so the next section peeks below the
-          fold. Aspect ratio matches the video's actual format (same logic as
-          VideoCard) — portrait/square videos are height-driven (width follows
-          from the aspect ratio, centered), landscape is width-driven. */}
-      {trendingVideos.length > 0 && (() => {
-        const hero = trendingVideos[0]
-        const heroAspect =
-          hero.format === 'landscape' ? 'aspect-video' :
-          hero.format === 'square' ? 'aspect-square' :
-          'aspect-[9/16]'
-        const heroSizing = hero.format === 'landscape'
-          ? 'w-full max-h-[60vh] md:max-h-[42vh]'
-          : 'h-[60vh] md:h-[42vh] mx-auto'
-        return (
+      {/* Featured — a compact editorial set rather than a lone oversized hero.
+          Keeping the cards in the same visual language as the rest of the
+          feed makes the section feel intentional at every result count. */}
+      {featuredVideos.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Featured</h2>
-          <div
-            className={`relative ${heroAspect} ${heroSizing} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 cursor-pointer group`}
-            onClick={() => navigate({ page: 'video', videoId: hero.id })}
-          >
-            {hero.thumbnailUrl ? (
-              <Image
-                src={hero.thumbnailUrl}
-                alt={hero.title}
-                fill
-                // Above-the-fold hero → priority (preload, no lazy) for LCP.
-                priority
-                sizes="(max-width: 768px) 100vw, 640px"
-                className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
-              />
-            ) : (
-              <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
-                <Play className="h-10 w-10 text-zinc-400 dark:text-zinc-500" />
-              </div>
-            )}
-            {/* Stronger gradient (from-black/90 via-black/40) so the title
-                and channel name stay readable on bright thumbnails. */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              {/* Smaller, more transparent badge so it doesn't compete with
-                  the title for attention. */}
-              <span className="inline-block px-1.5 py-0.5 bg-violet-600/80 backdrop-blur-sm text-white rounded text-[9px] font-bold uppercase tracking-wider mb-2">Featured</span>
-              <h3 className="text-lg font-bold text-white line-clamp-1 drop-shadow-sm">{hero.title}</h3>
-              <p className="text-sm text-zinc-200 mt-0.5 drop-shadow-sm">
-                {hero.channel.channelName} · {formatViews(hero.viewCount)} views
-              </p>
-            </div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              {featuredVideos.length > trendingVideos.length ? 'Featured picks' : 'Featured'}
+            </h2>
+            <button
+              onClick={() => navigate({ page: 'trending' })}
+              className="text-xs text-violet-600 hover:text-violet-700 font-medium"
+            >
+              See all
+            </button>
+          </div>
+          <div className={featuredVideos.length === 1
+            ? 'grid grid-cols-1 max-w-sm gap-3 md:gap-4'
+            : 'grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4'}>
+            {featuredVideos.map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
           </div>
         </section>
-        )
-      })()}
+      )}
 
-      {/* Trending — grid, not a shelf */}
-      {trendingVideos.length > 1 && (
+      {/* Trending — the remaining results, so Featured and Trending do not
+          repeat the same cards on the homepage. */}
+      {remainingTrendingVideos.length > 0 && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Trending</h2>
@@ -190,7 +169,7 @@ export function HomeFeed() {
             </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-            {trendingVideos.slice(1, 11).map((video) => (
+            {remainingTrendingVideos.slice(0, 10).map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
           </div>
