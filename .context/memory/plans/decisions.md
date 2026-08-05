@@ -260,3 +260,18 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Context:** The main viewport and horizontal shelves explicitly hid native scrollbars, while progress transforms and the custom video-player overlay permitted edge values or invisible hit targets to interfere with interaction.
 - **Decision:** Keep scrollbars visibly styled on scrollable surfaces; clamp progress values to their valid range and clip tracks; make hidden player overlays pointer-transparent, keep center affordances as buttons, and expose keyboard-safe slider semantics for seeking.
 - **Consequences:** Users receive clearer scroll feedback and reliable pointer/keyboard playback controls. Native overlay-scrollbar platforms may still hide tracks according to OS settings, and the player remains a custom control implementation that needs targeted regression tests when its layering changes.
+
+---
+## ADR-10: Use an overlay drawer for desktop navigation (2026-08-05)
+- **Status:** accepted
+- **Context:** The desktop sidebar's icon rail remained visible and consumed page width even when users wanted the navigation closed. The mobile experience already used an on-demand drawer.
+- **Decision:** Keep desktop navigation closed by default and open the full navigation as a fixed overlay drawer from the header menu button. Preserve focus management and close on backdrop, Escape, explicit close, or navigation selection.
+- **Consequences:** Content gets the full desktop viewport until navigation is requested, matching the mobile interaction model. The drawer requires responsive focus cleanup when crossing into the mobile breakpoint.
+
+---
+## ADR-11: Treat Featured as a resilient editorial card set (2026-08-05)
+- **Status:** accepted
+- **Context:** The homepage had enough trending data for a collection but rendered only the first item as a bespoke hero. Sparse responses made the section look accidentally incomplete.
+- **Decision:** Render up to four standard video cards as Featured, fill sparse sets from latest feed data with a transparent `Featured picks` label, and remove Featured IDs from the lower Trending section.
+- **Consequences:** The homepage has consistent card density and no duplicate Featured/Trending items. Featured fallback content is clearly labeled rather than implying a curated editorial source.
+---

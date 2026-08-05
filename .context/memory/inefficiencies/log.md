@@ -267,3 +267,11 @@ if literally nothing slowed you down.
 - **Workaround / fix:** Used targeted file reads and `grep`/`sed`; restored `CHANGELOG.md` before making bounded string replacements.
 - **Prevent next time:** Prefer exact replacements for large documents and verify `git diff --stat` immediately after any write; fall back to shell inspection when search/read helpers are unavailable.
 
+---
+## 2026-08-05 — Buffy / openai/gpt-5.6-luna (Sessions 18–20)
+- **Problem:** Full-repo `npx eslint .` timed out twice in the local tool environment during the Featured session, so it did not produce a trustworthy repository-wide problem summary.
+- **Cost:** Moderate — the combined validation command also timed out after typecheck/build work, requiring separate checks.
+- **Cause:** The repository-wide lint traversal exceeded the available tool timeout; this was an execution timeout rather than a reported lint failure.
+- **Workaround / fix:** Ran targeted ESLint on every changed product file; it passed with 0 errors. Typecheck passed and `npx next build` completed successfully with all 47 routes.
+- **Prevent next time:** Run targeted lint and build/typecheck as separate commands first; only use full-repo lint when the environment provides a longer reliable foreground timeout, and never treat a timeout as a pass.
+

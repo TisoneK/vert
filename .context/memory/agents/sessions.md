@@ -168,3 +168,12 @@ past entries — append corrections instead.
 - **Open items:** Existing video transcoding/HLS architecture, test suite, and one GitHub Dependabot high-severity vulnerability remain separate sessions.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-05-review.md
+---
+## 2026-08-05 — Sessions 18–20
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** engineer | **Core:** 0.5.0
+- **Task:** Sequentially close desktop navigation, compact the player progress track, and make homepage Featured content intentional.
+- **Commits:** 5 (`7456fc8`..`331d767`; product, follow-up, and release commits)
+- **Outcome:** done — released `0.6.14`; desktop drawer, inset player progress, and resilient Featured collection shipped. Typecheck/targeted lint/build passed; full-repo lint timed out.
+- **Open items:** Existing video transcoding/HLS architecture, test suite, remaining image optimization, and Dependabot high-severity vulnerability remain separate backlog work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-05-review-2.md

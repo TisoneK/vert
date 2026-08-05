@@ -16,7 +16,7 @@ accordingly).
 | Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-08-04 | 6 |
 | Claude Code | claude-fable-5 | 2026-07-14 | 2026-07-14 | 2 |
 | Buffy | deepseek-v4-flash | 2026-08-01 | 2026-08-01 | 1 |
-| Buffy | openai/gpt-5.6-luna | 2026-08-04 | 2026-08-05 | 3 |
+| Buffy | openai/gpt-5.6-luna | 2026-08-04 | 2026-08-05 | 6 |
 
 ## Observations
 
@@ -30,6 +30,7 @@ accordingly).
 - **Buffy / openai/gpt-5.6-luna:** Session 12 resumed an interrupted feature session from the exact unstaged diff, preserved the safe `preload="metadata"` mitigation, corrected its browser-hint wording, and separated the unresolved transcoding/provider decision instead of over-claiming completion. (2026-08-04)
 - **Buffy / openai/gpt-5.6-luna:** Session 13 corrected release bookkeeping by publishing deployed work as `v0.6.11`, creating the matching annotated tag, and recording the rule that pushes to `main` are production releases for changelog purposes. (2026-08-04)
 - **Buffy / openai/gpt-5.6-luna:** Sessions 15–17 handled a sequential UI bug sweep, used review-driven pointer/keyboard checks for the custom video player, and released the validated batch as `v0.6.13`. (2026-08-05)
+- **Buffy / openai/gpt-5.6-luna:** Sessions 18–20 completed a sequential navigation/player/homepage UX batch, used review-driven accessibility and sparse-data checks, and released it as `v0.6.14`. Targeted lint and production build passed; full-repo ESLint timed out in the local tool environment. (2026-08-05)
 
 Concrete, evidence-based capabilities and limits — things demonstrated
 in this repo's sessions, not marketing claims or self-assessment.
