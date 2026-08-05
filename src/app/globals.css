@@ -164,27 +164,64 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* Vert-specific scrollbar for shelf */
+/* Horizontal shelves remain visibly scrollable. The fade hint is useful
+   alongside the scrollbar, but it should not be the only indication that
+   more content is available. */
 .shelf-scroll::-webkit-scrollbar {
-  height: 0px;
+  height: 6px;
+}
+.shelf-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.shelf-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 3px;
+}
+.shelf-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+.dark .shelf-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+.dark .shelf-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32);
 }
 .shelf-scroll {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+}
+.dark .shelf-scroll {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-/* Main content viewport scrollbar. The default (non-overlay) browser
-   scrollbar reserves ~15-17px on the right of `main`, but `Header` above it
-   spans the full width unaffected. Since page content is centered with
-   `mx-auto` *inside main's own box*, that reserved space made every page
-   (Categories, Explore, etc.) look shifted left relative to the header on
-   any browser/viewport that doesn't use overlay scrollbars (common in
-   desktop Chrome/Firefox mobile-emulation and some Android WebViews).
-   Hiding the track removes the asymmetry; scrolling itself is unaffected. */
+/* Main content viewport scrollbar. Keep it visible so pages with long
+   content have an obvious, reliable scroll affordance in browsers that do
+   not use overlay scrollbars. */
 .app-main-scroll::-webkit-scrollbar {
-  width: 0px;
+  width: 8px;
+}
+.app-main-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.app-main-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 4px;
+}
+.app-main-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+.dark .app-main-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+.dark .app-main-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32);
 }
 .app-main-scroll {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.16) transparent;
+}
+.dark .app-main-scroll {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 /* Vert line clamp */
