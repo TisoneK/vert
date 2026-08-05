@@ -407,8 +407,13 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     if (!container) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input field
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      // Let native keyboard behavior handle controls and form fields. Otherwise,
+      // pressing Space on a button would both click it and toggle playback via
+      // this container-level shortcut.
+      if (
+        e.target instanceof HTMLElement &&
+        e.target.closest('button, input, select, textarea, a')
+      ) return
 
       // Prevent default for our shortcuts to avoid page scrolling
       const shouldPreventDefault = [' ', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)
@@ -497,8 +502,22 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!videoRef.current || !duration) return
     const rect = e.currentTarget.getBoundingClientRect()
-    const pos = (e.clientX - rect.left) / rect.width
+    const pos = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
     videoRef.current.currentTime = pos * duration
+  }
+
+  const handleProgressKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!videoRef.current || !duration) return
+
+    let nextTime = videoRef.current.currentTime
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') nextTime -= SEEK_SHORT_STEP
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') nextTime += SEEK_SHORT_STEP
+    else if (e.key === 'Home') nextTime = 0
+    else if (e.key === 'End') nextTime = duration
+    else return
+
+    e.preventDefault()
+    videoRef.current.currentTime = Math.min(duration, Math.max(0, nextTime))
   }
 
   const handleSpeedChange = (speed: number) => {
@@ -634,13 +653,21 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       <div
         className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-200 ${
           controlsVisible
-            ? 'opacity-100'
-            : 'opacity-0 group-hover:opacity-100'
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto'
         }`}
       >
         <div
-          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0 relative overflow-hidden rounded-full"
+          role="slider"
+          tabIndex={0}
+          aria-label="Video progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progress}
+          aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0 relative overflow-hidden rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
           onClick={handleProgressClick}
+          onKeyDown={handleProgressKeyDown}
         >
           {/* Buffer bar — lighter zinc bar behind the violet progress bar
               showing how much of the video has been downloaded. Helps users
@@ -775,16 +802,20 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           place) so the user doesn't see a play button they can't use. */}
       {!isPlaying && !isBuffering && (
         <div
-          className="absolute inset-0 flex items-center justify-center cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation()
-            togglePlay()
-            setControlsVisible(true)
-          }}
+          className="absolute inset-0 flex items-center justify-center cursor-pointer pointer-events-none"
         >
-          <div className="w-14 h-14 rounded-full bg-zinc-900/50 flex items-center justify-center backdrop-blur-sm">
+          <button
+            type="button"
+            aria-label="Play"
+            className="w-14 h-14 rounded-full bg-zinc-900/50 flex items-center justify-center backdrop-blur-sm pointer-events-auto"
+            onClick={(e) => {
+              e.stopPropagation()
+              togglePlay()
+              setControlsVisible(true)
+            }}
+          >
             <Play className="h-7 w-7 text-white ml-0.5" />
-          </div>
+          </button>
         </div>
       )}
       {/* Buffering spinner — shown only while active playback is waiting for
@@ -798,15 +829,19 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       )}
       {isPlaying && !isBuffering && controlsVisible && (
         <div
-          className="absolute inset-0 flex items-center justify-center cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation()
-            togglePlay()
-          }}
+          className="absolute inset-0 flex items-center justify-center cursor-pointer pointer-events-none"
         >
-          <div className="w-14 h-14 rounded-full bg-zinc-900/50 flex items-center justify-center backdrop-blur-sm">
+          <button
+            type="button"
+            aria-label="Pause"
+            className="w-14 h-14 rounded-full bg-zinc-900/50 flex items-center justify-center backdrop-blur-sm pointer-events-auto"
+            onClick={(e) => {
+              e.stopPropagation()
+              togglePlay()
+            }}
+          >
             <Pause className="h-7 w-7 text-white" />
-          </div>
+          </button>
         </div>
       )}
     </div>
