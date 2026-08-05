@@ -665,7 +665,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           aria-valuemax={100}
           aria-valuenow={progress}
           aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
-          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-0 relative overflow-hidden rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-3 mb-1 relative overflow-hidden rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
           onClick={handleProgressClick}
           onKeyDown={handleProgressKeyDown}
         >
