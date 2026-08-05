@@ -37,6 +37,15 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.14] — 2026-08-05
+
+### Fixed
+- **The side menu now stays closed until you ask for it.** Open it from the menu button when you need navigation, without losing space on the page.
+- **The video progress bar now sits neatly inside the player.** It is shorter and inset from the rounded edges, so it no longer runs through the corners.
+- **Featured content now looks like a real collection.** The homepage shows several featured picks when available and avoids repeating them in Trending.
+
+---
+
 ## [0.6.13] — 2026-08-05
 
 ### Fixed
@@ -324,7 +333,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.13...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.14...HEAD
+[0.6.14]: https://github.com/TisoneK/vert/releases/tag/v0.6.14
 [0.6.13]: https://github.com/TisoneK/vert/releases/tag/v0.6.13
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11

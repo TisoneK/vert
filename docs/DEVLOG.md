@@ -21,6 +21,51 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.14] — 2026-08-05
+
+### Fixed
+
+#### Desktop navigation is closed until explicitly opened
+
+**Files:** `src/components/vert/VertApp.tsx`, `Header.tsx`, `Sidebar.tsx`
+
+The desktop shell previously initialized its sidebar in an icon-rail state,
+which still occupied layout space and did not match the mobile drawer model.
+The sidebar now starts closed, leaves the content viewport full width, and opens
+as a fixed overlay drawer from the header menu button. The drawer closes from
+its close button, backdrop, Escape, or a navigation selection. It has dialog
+semantics, focus entry/trapping/restoration, and clears its keyboard state when
+resizing into the mobile breakpoint.
+
+#### Compact, inset player progress
+
+**File:** `src/components/vert/VideoPlayer.tsx`
+
+The seek track previously ran edge-to-edge across the control overlay, making
+its rounded ends meet the player corners. It now uses a compact one-pixel-ish
+inset with matching horizontal margins and a bottom gap. Existing pointer
+seeking, keyboard slider semantics, buffered progress, and value clamping are
+unchanged.
+
+#### Featured content uses an intentional collection layout
+
+**File:** `src/components/vert/HomeFeed.tsx`
+
+The homepage previously rendered only `trendingVideos[0]` as a large bespoke
+hero, while the remaining results appeared in a separate grid. This made
+Featured look like a broken one-item section and made the layout depend on a
+single result. Featured now renders up to four standard video cards, uses latest
+feed items as a sparse-data fallback (labeled "Featured picks"), and filters
+those IDs from the remaining Trending section to avoid duplicates. A lone
+fallback card uses a constrained single-column layout rather than an empty
+half-width grid.
+
+**Verification:** `npx tsc --noEmit` passed; targeted ESLint passed with 0
+errors; `npx next build` passed and generated all 47 routes. A full `eslint .`
+run timed out in the local tool environment and was not used as a passing result.
+
+---
+
 ## [0.6.13] — 2026-08-05
 
 ### Fixed
