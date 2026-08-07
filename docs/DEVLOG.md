@@ -17,7 +17,28 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ## [Unreleased]
 
-_No unreleased changes yet._
+### Changed
+
+#### Desktop watch stage keeps portrait playback in view
+
+**Files:** `src/components/vert/VideoDetail.tsx`, `src/components/vert/VideoPlayer.tsx`
+
+The watch page now uses a responsive two-column desktop stage. The portrait
+player is left-aligned and sticky within the app's existing `main` scroll
+viewport, while the `Up Next` rail stays on the right and keeps its own bounded
+vertical scroll. This follows the practical desktop pattern seen across
+portrait-video products: preserve a readable player width, use the horizontal
+space for contextual content, and avoid forcing a tall portrait frame into a
+full-width landscape box.
+
+At mobile/tablet widths the stage returns to normal document flow: the player,
+metadata, comments, and related videos stack vertically. No ad provider or fake
+ad inventory was added; monetized side content remains a separate product/
+service decision.
+
+**Verification:** `npx tsc --noEmit`, targeted ESLint, and `npx next build` all
+passed; all 47 routes generated. Browser verification was blocked because the
+configured port 3000 was occupied by an unrelated LocalMind app.
 
 ---
 

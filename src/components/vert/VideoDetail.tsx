@@ -128,29 +128,26 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const description = video.description as string | null
 
   return (
-    <div className="max-w-5xl mx-auto animate-vert-fade-in">
-      {/* ============================================================
-          BLOCK 1: VIDEO
-          On mobile: full screen width (like Shorts/Reels).
-          On desktop: portrait videos are constrained to ~380px so they
-          don't get absurdly tall. The freed-up right space is used for
-          the "Up Next" queue instead of being empty canvas.
-          ============================================================ */}
-      <div className="w-full flex justify-center">
-        <VideoPlayer
-          videoUrl={video.videoUrl as string}
-          thumbnailUrl={video.thumbnailUrl as string | null}
-          title={video.title as string}
-          format={format}
-          videoId={video.id as string}
-        />
-      </div>
-
-      {/* Two-column on desktop: video info (left) + Up Next queue (right).
-          On mobile/tablet the queue collapses below everything. */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 p-4 md:p-6">
-        {/* ============== LEFT COLUMN: video info + comments ============== */}
+    <div className="max-w-7xl mx-auto animate-vert-fade-in">
+      {/* Desktop watch stage: the player stays in the left column while the
+          surrounding app viewport scrolls. Up Next occupies a dedicated rail
+          on the right, matching the desktop pattern used by long-form watch
+          pages while keeping portrait video readable. Mobile stacks both
+          columns back into the normal page flow. */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 p-4 md:p-6 lg:items-start">
+        {/* ============== LEFT COLUMN: sticky player + video info ============== */}
         <div className="min-w-0">
+          <div className="lg:sticky lg:top-4 lg:z-10 lg:self-start lg:bg-zinc-50 lg:dark:bg-zinc-950 lg:pb-3">
+            <div className="w-full flex justify-start">
+              <VideoPlayer
+                videoUrl={video.videoUrl as string}
+                thumbnailUrl={video.thumbnailUrl as string | null}
+                title={video.title as string}
+                format={format}
+                videoId={video.id as string}
+              />
+            </div>
+          </div>
           {/* ----------------------------------------------------------
               BLOCK 2: TITLE + TAGS (same semantic group — both
               describe what the video is)
@@ -322,16 +319,18 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
           {/* Comments */}
           <CommentSection videoId={video.id as string} />
 
-          {/* Related videos — below comments on mobile/tablet */}
-          <div className="lg:hidden mt-6">
-            <RelatedVideos videoId={videoId} />
-          </div>
         </div>
 
         {/* ============== RIGHT COLUMN: Up Next queue (desktop) ============== */}
-        <div className="hidden lg:block">
+        <aside className="hidden lg:block lg:sticky lg:top-4 min-h-0" aria-label="Up next">
           <RelatedVideos videoId={videoId} />
-        </div>
+        </aside>
+      </div>
+
+      {/* On mobile/tablet the right rail follows the video details, preserving
+          the familiar single-column reading order. */}
+      <div className="lg:hidden px-4 md:px-6 pb-6">
+        <RelatedVideos videoId={videoId} />
       </div>
     </div>
   )

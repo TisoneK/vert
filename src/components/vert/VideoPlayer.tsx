@@ -200,7 +200,6 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         // Safari native HLS — no level switching API exposed, expose a single
         // "Auto (native)" entry. This setState is gated on a capability check
         // that is stable per URL change, so it cannot trigger cascading renders.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setQualityLevels([{ label: 'Auto (native)', level: -1 }])
         video.src = videoUrl
       } else {
@@ -589,7 +588,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     // be clipped on small players.
     // p-0.5 adds 2px breathing room all around so the black player has a
     // subtle gap from the surrounding page background.
-    <div className={`w-full flex justify-center rounded-lg p-0.5 ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
+    <div className={`w-full flex justify-start rounded-lg p-0.5 ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mr-auto' : ''}`}>
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
