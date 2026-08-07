@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/store'
@@ -37,6 +39,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
   const [sort, setSort] = useState<SortOption>('top')
+  const [failedAvatarUrls, setFailedAvatarUrls] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchComments(1, true)
@@ -171,14 +174,27 @@ export function CommentSection({ videoId }: CommentSectionProps) {
           {sortedComments.map((comment) => (
             <div key={comment.id} className="flex gap-3 group">
               <div className="shrink-0">
-                {comment.user.avatarUrl ? (
-                  <img
-                    src={comment.user.avatarUrl}
-                    alt={comment.user.username}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
+                {comment.user.avatarUrl && !failedAvatarUrls.has(comment.user.avatarUrl) ? (
+                  isNextImageSafeUrl(comment.user.avatarUrl) ? (
+                    <Image
+                      src={comment.user.avatarUrl}
+                      alt={comment.user.username}
+                      width={32}
+                      height={32}
+                      loading="lazy"
+                      className="w-8 h-8 rounded-full object-cover"
+                      onError={() => setFailedAvatarUrls((prev) => new Set(prev).add(comment.user.avatarUrl!))}
+                    />
+                  ) : (
+                    <img
+                      src={comment.user.avatarUrl}
+                      alt={comment.user.username}
+                      loading="lazy"
+                      decoding="async"
+                      onError={() => setFailedAvatarUrls((prev) => new Set(prev).add(comment.user.avatarUrl!))}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  )
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-xs font-bold">
                     {comment.user.username[0]?.toUpperCase()}

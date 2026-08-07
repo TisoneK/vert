@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { useNavigation, useAuth } from '@/lib/store'
 import { useState, useEffect, useRef, type ElementType } from 'react'
 import {
@@ -66,6 +68,7 @@ export function Sidebar({ collapsed, onClose }: SidebarProps) {
   const [channels, setChannels] = useState<SidebarChannel[]>([])
   const [categoriesExpanded, setCategoriesExpanded] = useState(true)
   const [channelsExpanded, setChannelsExpanded] = useState(true)
+  const [failedAvatarUrls, setFailedAvatarUrls] = useState<Set<string>>(new Set())
   const drawerRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -236,8 +239,27 @@ export function Sidebar({ collapsed, onClose }: SidebarProps) {
                       onClick={() => { navigate({ page: 'channel', channelId: ch.id }); onClose() }}
                       className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                     >
-                      {ch.user.avatarUrl ? (
-                        <img src={ch.user.avatarUrl} alt={ch.channelName} loading="lazy" decoding="async" className="w-5 h-5 rounded-full object-cover" />
+                      {ch.user.avatarUrl && !failedAvatarUrls.has(ch.user.avatarUrl) ? (
+                        isNextImageSafeUrl(ch.user.avatarUrl) ? (
+                          <Image
+                            src={ch.user.avatarUrl}
+                            alt={ch.channelName}
+                            width={20}
+                            height={20}
+                            loading="lazy"
+                            className="w-5 h-5 rounded-full object-cover"
+                            onError={() => setFailedAvatarUrls((prev) => new Set(prev).add(ch.user.avatarUrl!))}
+                          />
+                        ) : (
+                          <img
+                            src={ch.user.avatarUrl}
+                            alt={ch.channelName}
+                            loading="lazy"
+                            decoding="async"
+                            onError={() => setFailedAvatarUrls((prev) => new Set(prev).add(ch.user.avatarUrl!))}
+                            className="w-5 h-5 rounded-full object-cover"
+                          />
+                        )
                       ) : (
                         <div className="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-[9px] font-bold">{ch.channelName[0]?.toUpperCase()}</div>
                       )}

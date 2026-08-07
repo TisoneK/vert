@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
@@ -74,6 +76,7 @@ export function SearchResults({ query }: SearchResultsProps) {
   const [sortBy, setSortBy] = useState<SortOption>('relevance')
   const [formatFilter, setFormatFilter] = useState<FormatFilter>('')
   const [dateFilter, setDateFilter] = useState<DateFilter>('')
+  const [failedAvatarUrls, setFailedAvatarUrls] = useState<Set<string>>(new Set())
 
   // Keep the search box in sync with the URL prop without an effect —
   // React's "adjust state while rendering" pattern for a prop-derived value.
@@ -275,8 +278,27 @@ export function SearchResults({ query }: SearchResultsProps) {
               >
                 {/* Avatar */}
                 <div className="shrink-0">
-                  {ch.user.avatarUrl ? (
-                    <img src={ch.user.avatarUrl} alt={ch.channelName} loading="lazy" decoding="async" className="w-12 h-12 rounded-full object-cover" />
+                  {ch.user.avatarUrl && !failedAvatarUrls.has(ch.user.avatarUrl) ? (
+                    isNextImageSafeUrl(ch.user.avatarUrl) ? (
+                      <Image
+                        src={ch.user.avatarUrl}
+                        alt={ch.channelName}
+                        width={48}
+                        height={48}
+                        loading="lazy"
+                        className="w-12 h-12 rounded-full object-cover"
+                        onError={() => setFailedAvatarUrls((prev) => new Set(prev).add(ch.user.avatarUrl!))}
+                      />
+                    ) : (
+                      <img
+                        src={ch.user.avatarUrl}
+                        alt={ch.channelName}
+                        loading="lazy"
+                        decoding="async"
+                        onError={() => setFailedAvatarUrls((prev) => new Set(prev).add(ch.user.avatarUrl!))}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    )
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center text-violet-600 dark:text-violet-400 text-lg font-bold">
                       {ch.channelName[0]?.toUpperCase()}

@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { useNavigation } from '@/lib/store'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
@@ -295,14 +296,26 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
         {/* Channel avatar */}
         <div className="shrink-0 mt-0.5">
           {video.channel.user.avatarUrl && !avatarFailed ? (
-            <img
-              src={video.channel.user.avatarUrl}
-              alt={video.channel.channelName}
-              loading="lazy"
-              decoding="async"
-              onError={() => setAvatarFailed(true)}
-              className="w-6 h-6 rounded-full object-cover"
-            />
+            isNextImageSafeUrl(video.channel.user.avatarUrl) ? (
+              <Image
+                src={video.channel.user.avatarUrl}
+                alt={video.channel.channelName}
+                width={24}
+                height={24}
+                loading="lazy"
+                onError={() => setAvatarFailed(true)}
+                className="w-6 h-6 rounded-full object-cover"
+              />
+            ) : (
+              <img
+                src={video.channel.user.avatarUrl}
+                alt={video.channel.channelName}
+                loading="lazy"
+                decoding="async"
+                onError={() => setAvatarFailed(true)}
+                className="w-6 h-6 rounded-full object-cover"
+              />
+            )
           ) : (
             <div className="w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-[10px] font-bold">
               {video.channel.channelName[0]?.toUpperCase()}

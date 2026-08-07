@@ -33,7 +33,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-_No unreleased changes yet._
+### Changed
+- **Channel pictures and banners now load more efficiently.** Browsing channels, comments, search results, and creator shelves uses optimized image delivery where supported, while unusual external image hosts keep working normally and broken pictures fall back gracefully.
+
 
 ---
 

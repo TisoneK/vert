@@ -1,5 +1,8 @@
 'use client'
+import Image from 'next/image'
+import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { fetchWithRetry } from '@/lib/fetch-retry'
+import { useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
@@ -62,6 +65,7 @@ async function fetchVideos(): Promise<Video[]> {
 export function HomeFeed() {
   const { navigate } = useNavigation()
   const { user } = useAuth()
+  const [failedAvatarUrls, setFailedAvatarUrls] = useState<Set<string>>(new Set())
 
   // Shared ['categories'] cache; trending keyed with limit:12 so it doesn't
   // collide with TrendingPage's limit:20 query. "For You" only runs when
@@ -248,14 +252,27 @@ export function HomeFeed() {
                   onClick={() => navigate({ page: 'channel', channelId: ch.id })}
                   className="flex flex-col items-center gap-2 shrink-0 w-20 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2 rounded-lg"
                 >
-                  {ch.avatarUrl ? (
-                    <img
-                      src={ch.avatarUrl}
-                      alt={ch.channelName}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-16 h-16 rounded-full object-cover ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 transition-all"
-                    />
+                  {ch.avatarUrl && !failedAvatarUrls.has(ch.avatarUrl) ? (
+                    isNextImageSafeUrl(ch.avatarUrl) ? (
+                      <Image
+                        src={ch.avatarUrl}
+                        alt={ch.channelName}
+                        width={64}
+                        height={64}
+                        loading="lazy"
+                        className="w-16 h-16 rounded-full object-cover ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 transition-all"
+                        onError={() => setFailedAvatarUrls((prev) => new Set(prev).add(ch.avatarUrl!))}
+                      />
+                    ) : (
+                      <img
+                        src={ch.avatarUrl}
+                        alt={ch.channelName}
+                        loading="lazy"
+                        decoding="async"
+                        onError={() => setFailedAvatarUrls((prev) => new Set(prev).add(ch.avatarUrl!))}
+                        className="w-16 h-16 rounded-full object-cover ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 transition-all"
+                      />
+                    )
                   ) : (
                     <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-100 to-zinc-100 dark:from-violet-950/40 dark:to-zinc-800 flex items-center justify-center text-violet-600 dark:text-violet-400 text-xl font-bold ring-2 ring-zinc-100 dark:ring-zinc-800 group-hover:ring-violet-200 dark:group-hover:ring-violet-800 transition-all">
                       {ch.channelName[0]?.toUpperCase()}

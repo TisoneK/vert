@@ -17,7 +17,37 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ## [Unreleased]
 
-_No unreleased changes yet._
+### Changed
+
+#### Optimize remaining avatars and channel/profile banners safely
+
+**Files:** `src/lib/image-utils.ts`, `src/components/vert/VideoCard.tsx`,
+`SearchResults.tsx`, `CommentSection.tsx`, `Sidebar.tsx`, `HomeFeed.tsx`,
+`ChannelPage.tsx`, `ProfilePage.tsx`, `VideoDetail.tsx`
+
+Session 11 optimized high-volume video thumbnails with `next/image` but left
+avatars and banners as native images because they are lower-volume and can come
+from OAuth or user-provided hosts. Session 21 completes the safe portion of that
+work without turning unsupported remote hosts into runtime image errors.
+
+- Added `isNextImageSafeUrl`, which routes only HTTPS Google profile images and
+  Vercel Blob assets through Next's configured optimizer. Other valid HTTPS
+  sources continue through native `<img>` rendering, matching the API's broader
+  URL acceptance.
+- Migrated fixed-size avatars to `next/image` with explicit dimensions and
+  responsive banners to `fill`/`sizes` where the host is supported.
+- Added URL-keyed failure state across repeating lists and watch/channel
+  surfaces. Failed images now render existing initials/placeholders instead of
+  broken-image icons, and a changed URL can recover independently.
+- Kept the player error poster and local upload preview as native images because
+  they are adjacent to canvas/frame-capture or blob-preview behavior.
+
+**Verification:** `npx tsc --noEmit` passed; targeted ESLint reported 0 errors
+and 3 pre-existing warnings; `npx next build` passed and generated all 47 routes.
+
+---
+
+## [0.6.14] — 2026-08-05
 
 ---
 

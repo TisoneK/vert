@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth, useNavigation } from '@/lib/store'
@@ -8,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Settings, Save, BarChart3, Film } from 'lucide-react'
+import { Settings, Save, BarChart3 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { formatSubscribers } from '@/lib/utils-vert'
 
@@ -19,7 +21,7 @@ async function fetchChannel(channelId: string): Promise<Record<string, unknown>>
 }
 
 export function ProfilePage() {
-  const { user, setUser } = useAuth()
+  const { user } = useAuth()
   const { navigate } = useNavigation()
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -27,6 +29,7 @@ export function ProfilePage() {
   const [channelName, setChannelName] = useState('')
   const [description, setDescription] = useState('')
   const [saving, setSaving] = useState(false)
+  const [failedBannerUrl, setFailedBannerUrl] = useState<string | null>(null)
 
   // Shares the channel query shape with ChannelPage while keeping the
   // user-specific subscription state in its own cache entry. enabled gates on the
@@ -109,6 +112,9 @@ export function ProfilePage() {
     createdAt: string
   } | undefined
 
+  const bannerUrl = channel?.bannerUrl ?? null
+  const hasBanner = Boolean(bannerUrl && failedBannerUrl !== bannerUrl)
+
   const videos = (channelData?.videos as Array<{
     id: string
     title: string
@@ -156,13 +162,25 @@ export function ProfilePage() {
       {/* Profile header — only render the banner area when a custom banner
           exists. Without one, skip the 96-144px of dead space entirely and
           let the avatar sit at the top of the page. */}
-      {channel.bannerUrl ? (
+      {hasBanner ? (
         <div className="h-24 md:h-36 relative overflow-hidden">
-          <img
-            src={channel.bannerUrl}
-            alt={channel.channelName}
-            className="w-full h-full object-cover"
-          />
+          {bannerUrl && (isNextImageSafeUrl(bannerUrl) ? (
+            <Image
+              src={bannerUrl}
+              alt={channel.channelName}
+              fill
+              sizes="(max-width: 768px) 100vw, 1024px"
+              className="object-cover"
+              onError={() => setFailedBannerUrl(bannerUrl)}
+            />
+          ) : (
+            <img
+              src={bannerUrl}
+              alt={channel.channelName}
+              className="w-full h-full object-cover"
+              onError={() => setFailedBannerUrl(bannerUrl)}
+            />
+          ))}
         </div>
       ) : null}
 
@@ -173,8 +191,8 @@ export function ProfilePage() {
             side-by-side as before.
             When there's a banner, the avatar overlaps it via -mt-8.
             When there's no banner, no negative margin is needed. */}
-        <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${channel.bannerUrl ? '' : 'pt-2'}`}>
-          <div className={`shrink-0 self-start ${channel.bannerUrl ? '-mt-8' : ''}`}>
+        <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${hasBanner ? '' : 'pt-2'}`}>
+          <div className={`shrink-0 self-start ${hasBanner ? '-mt-8' : ''}`}>
             <div className="w-20 h-20 rounded-full bg-zinc-300 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-2xl font-bold border-4 border-white dark:border-zinc-900">
               {user.username[0]?.toUpperCase()}
             </div>

@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { videoDetailQueryOptions } from '@/lib/video-queries'
@@ -43,6 +45,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false)
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [failedChannelAvatarUrl, setFailedChannelAvatarUrl] = useState<string | null>(null)
 
   const { data, isLoading: loading } = useQuery(
     videoDetailQueryOptions(videoId, user?.id ?? 'anonymous'),
@@ -197,12 +200,24 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                 className="flex items-center gap-2 cursor-pointer min-w-0"
                 onClick={() => navigate({ page: 'channel', channelId: channel.id })}
               >
-                {channel.user.avatarUrl ? (
-                  <img
-                    src={channel.user.avatarUrl}
-                    alt={channel.channelName}
-                    className="w-9 h-9 rounded-full object-cover shrink-0"
-                  />
+                {channel.user.avatarUrl && failedChannelAvatarUrl !== channel.user.avatarUrl ? (
+                  isNextImageSafeUrl(channel.user.avatarUrl) ? (
+                    <Image
+                      src={channel.user.avatarUrl}
+                      alt={channel.channelName}
+                      width={36}
+                      height={36}
+                      className="w-9 h-9 rounded-full object-cover shrink-0"
+                      onError={() => setFailedChannelAvatarUrl(channel.user.avatarUrl)}
+                    />
+                  ) : (
+                    <img
+                      src={channel.user.avatarUrl}
+                      alt={channel.channelName}
+                      className="w-9 h-9 rounded-full object-cover shrink-0"
+                      onError={() => setFailedChannelAvatarUrl(channel.user.avatarUrl)}
+                    />
+                  )
                 ) : (
                   <div className="w-9 h-9 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-xs font-bold shrink-0">
                     {channel.channelName[0]?.toUpperCase()}

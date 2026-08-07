@@ -1,7 +1,10 @@
 'use client'
 
+import Image from 'next/image'
+import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
+import { useState } from 'react'
 import { VideoCard } from './VideoCard'
 import { SubscribeButton } from './SubscribeButton'
 import { ArrowLeft } from 'lucide-react'
@@ -21,6 +24,8 @@ async function fetchChannel(channelId: string): Promise<Record<string, unknown>>
 export function ChannelPage({ channelId }: ChannelPageProps) {
   const { navigate } = useNavigation()
   const { user } = useAuth()
+  const [failedBannerUrl, setFailedBannerUrl] = useState<string | null>(null)
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | null>(null)
   // Keyed on channelId; on error data is null -> "Channel not found" (same as
   // the old code, which left channelData null on a failed/404 fetch).
   const { data: channelData = null, isLoading: loading } = useQuery({
@@ -73,6 +78,8 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
     isSubscribed: boolean
   }
 
+  const hasBanner = Boolean(channel.bannerUrl && failedBannerUrl !== channel.bannerUrl)
+
   const videos = (channelData.videos as Array<{
     id: string
     title: string
@@ -90,13 +97,25 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
           Without one, there's no point allocating 96-144px of vertical space
           for an empty colored box. The "Back to feed" link moves to a normal
           inline position above the avatar instead (see below). */}
-      {channel.bannerUrl ? (
+      {channel.bannerUrl && failedBannerUrl !== channel.bannerUrl ? (
         <div className="h-24 md:h-36 relative overflow-hidden">
-          <img
-            src={channel.bannerUrl}
-            alt={channel.channelName}
-            className="w-full h-full object-cover"
-          />
+          {isNextImageSafeUrl(channel.bannerUrl) ? (
+            <Image
+              src={channel.bannerUrl}
+              alt={channel.channelName}
+              fill
+              sizes="(max-width: 768px) 100vw, 1024px"
+              className="object-cover"
+              onError={() => setFailedBannerUrl(channel.bannerUrl)}
+            />
+          ) : (
+            <img
+              src={channel.bannerUrl}
+              alt={channel.channelName}
+              className="w-full h-full object-cover"
+              onError={() => setFailedBannerUrl(channel.bannerUrl)}
+            />
+          )}
           <button
             onClick={() => navigate({ page: 'home' })}
             className="absolute top-3 left-3 flex items-center gap-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm px-2.5 py-1.5 rounded-full hover:bg-white dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-1"
@@ -124,14 +143,26 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
             360px viewport. On md+ they sit side-by-side as before.
             When there's a banner, the avatar overlaps it via -mt-8.
             When there's no banner, no negative margin is needed. */}
-        <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${channel.bannerUrl ? '' : 'pt-2'}`}>
-          <div className={`shrink-0 self-start ${channel.bannerUrl ? '-mt-8' : ''}`}>
-            {channel.user.avatarUrl ? (
-              <img
-                src={channel.user.avatarUrl}
-                alt={channel.channelName}
-                className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-zinc-900"
-              />
+        <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${hasBanner ? '' : 'pt-2'}`}>
+          <div className={`shrink-0 self-start ${hasBanner ? '-mt-8' : ''}`}>
+            {channel.user.avatarUrl && failedAvatarUrl !== channel.user.avatarUrl ? (
+              isNextImageSafeUrl(channel.user.avatarUrl) ? (
+                <Image
+                  src={channel.user.avatarUrl}
+                  alt={channel.channelName}
+                  width={80}
+                  height={80}
+                  className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-zinc-900"
+                  onError={() => setFailedAvatarUrl(channel.user.avatarUrl)}
+                />
+              ) : (
+                <img
+                  src={channel.user.avatarUrl}
+                  alt={channel.channelName}
+                  className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-zinc-900"
+                  onError={() => setFailedAvatarUrl(channel.user.avatarUrl)}
+                />
+              )
             ) : (
               <div className="w-20 h-20 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-2xl font-bold border-4 border-white dark:border-zinc-900">
                 {channel.channelName[0]?.toUpperCase()}
