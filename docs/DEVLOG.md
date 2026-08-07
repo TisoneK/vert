@@ -17,6 +17,12 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ## [Unreleased]
 
+_No unreleased changes yet._
+
+---
+
+## [0.6.16] — 2026-08-07
+
 ### Changed
 
 #### Desktop watch stage keeps portrait playback in view
@@ -91,10 +97,6 @@ work without turning unsupported remote hosts into runtime image errors.
 
 **Verification:** `npx tsc --noEmit` passed; targeted ESLint reported 0 errors
 and 3 pre-existing warnings; `npx next build` passed and generated all 47 routes.
-
----
-
-## [0.6.14] — 2026-08-05
 
 ---
 
