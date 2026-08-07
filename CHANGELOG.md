@@ -33,6 +33,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+_No unreleased changes yet._
+
+---
+
+## [0.6.15] — 2026-08-07
+
 ### Changed
 - **Channel pictures and banners now load more efficiently.** Browsing channels, comments, search results, and creator shelves uses optimized image delivery where supported, while unusual external image hosts keep working normally and broken pictures fall back gracefully.
 
@@ -335,7 +341,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.14...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.15...HEAD
+[0.6.15]: https://github.com/TisoneK/vert/releases/tag/v0.6.15
 [0.6.14]: https://github.com/TisoneK/vert/releases/tag/v0.6.14
 [0.6.13]: https://github.com/TisoneK/vert/releases/tag/v0.6.13
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12

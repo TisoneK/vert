@@ -17,6 +17,12 @@ Entries are grouped by version, matching `CHANGELOG.md`. Newest first.
 
 ## [Unreleased]
 
+_No unreleased changes yet._
+
+---
+
+## [0.6.15] — 2026-08-07
+
 ### Changed
 
 #### Optimize remaining avatars and channel/profile banners safely
