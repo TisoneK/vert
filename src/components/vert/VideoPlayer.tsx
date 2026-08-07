@@ -57,6 +57,7 @@ function heightToLabel(h: number): string {
 export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait', videoId }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const settingsButtonRef = useRef<HTMLButtonElement>(null)
   const hlsRef = useRef<Hls | null>(null)
 
   const [isPlaying, setIsPlaying] = useState(false)
@@ -328,6 +329,30 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       video.removeEventListener('timeupdate', onTimeUpdate)
     }
   }, [thumbnailUrl, videoId, videoUrl])
+
+  // Close the settings menu from Escape or when the user clicks outside it.
+  useEffect(() => {
+    if (!showSettings) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowSettings(false)
+        settingsButtonRef.current?.focus()
+      }
+    }
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Element && !event.target.closest('[data-video-settings]')) {
+        setShowSettings(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [showSettings])
 
   // --- Controls ---
   // Auto-hide controls after 3s of inactivity while playing. Without this
@@ -685,7 +710,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         </div>
 
-        <div className="flex items-center flex-nowrap gap-2 px-3 pb-2 pt-1 overflow-hidden">
+        <div className="flex items-center flex-nowrap gap-2 px-3 pb-2 pt-1">
           <button
             onClick={togglePlay}
             className="shrink-0 text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
@@ -705,7 +730,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             {/* Volume slider takes real width (64px) that a narrow portrait
                 player can't spare alongside play/time/settings/fullscreen —
                 drop it there and keep just the mute toggle. */}
-            {!(videoAspectRatio && videoAspectRatio < 1) && (
+            {format !== 'portrait' && !(videoAspectRatio && videoAspectRatio < 1) && (
               <input
                 type="range"
                 min="0"
@@ -726,16 +751,22 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           <div className="flex-1 min-w-0" />
 
           {/* Settings */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0" data-video-settings>
             <button
-              onClick={() => setShowSettings(!showSettings)}
+              ref={settingsButtonRef}
+              onClick={() => setShowSettings((visible) => !visible)}
+              aria-expanded={showSettings}
               className="text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
               aria-label="Settings"
             >
               <Settings className="h-5 w-5 sm:h-4 sm:w-4" />
             </button>
             {showSettings && (
-              <div className="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-2 z-50">
+              <div
+                role="group"
+                aria-label="Video settings"
+                className="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-2 z-50"
+              >
                 {/* Quality section — only shown when HLS levels are available */}
                 {qualityLevels.length > 0 ? (
                   <>

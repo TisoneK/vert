@@ -36,6 +36,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - **Portrait watch pages now use the desktop screen better.** The player stays readable on the left while Up Next gets its own scrollable rail on the right; phones keep the simpler stacked layout.
 
+### Fixed
+- **The video settings button now opens its controls reliably.** Speed and quality choices remain reachable on compact portrait players, and the menu can be dismissed with Escape or by clicking elsewhere.
+
 ---
 
 ## [0.6.15] — 2026-08-07

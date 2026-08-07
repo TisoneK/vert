@@ -40,6 +40,26 @@ service decision.
 passed; all 47 routes generated. Browser verification was blocked because the
 configured port 3000 was occupied by an unrelated LocalMind app.
 
+#### Make the video settings popup reachable on compact players
+
+**File:** `src/components/vert/VideoPlayer.tsx`
+
+The settings state and speed/quality handlers already existed, but the popup was
+rendered inside a flex control row with `overflow-hidden`. Its `bottom-full`
+position was therefore clipped, particularly on the narrow portrait player,
+which made the gear appear non-functional.
+
+Removed that clipping boundary, added an explicit open state, and kept the
+existing speed/HLS quality handlers. The popup now closes on Escape and outside
+pointer interaction, restores focus to the settings trigger on Escape, and uses
+native buttons inside a labeled group rather than incomplete ARIA menu roles.
+The portrait volume slider is omitted from the compact control row from the
+first render, before aspect-ratio metadata arrives.
+
+**Verification:** `npx tsc --noEmit`, targeted ESLint, `git diff --check`, and
+`npx next build` passed; all 47 routes generated. Browser verification remains
+blocked on this machine because port 3000 serves an unrelated LocalMind app.
+
 ---
 
 ## [0.6.15] — 2026-08-07
