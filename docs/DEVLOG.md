@@ -21,6 +21,40 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.18] — 2026-08-07
+
+### Changed
+
+#### Three-column watch layout with viewport-fitted playback
+
+**Files:** `src/components/vert/VideoDetail.tsx`,
+`src/components/vert/VideoPlayer.tsx`
+
+The desktop watch stage now uses three grid tracks: a left player column, a
+center column for title, channel/profile identity, actions, description,
+categories, and comments, and a right column for the provider-neutral
+Advertisement slot plus Up Next. The existing compact right-rail rendering
+was preserved for Up Next, while comments moved into the center reading flow.
+
+Portrait players use a desktop-only `calc(100dvh - 4rem)` stage. Their actual
+aspect ratio determines the width, bounded by the column and viewport, so a 9:16
+video remains fully visible without extending below the visible application
+area. Landscape and square media stay width-driven and do not reserve an
+unnecessary tall stage. The native media uses `object-contain` to preserve the
+full frame; the failed-video fallback applies the same portrait cap without a
+hard minimum that could overflow short screens. Mobile/tablet widths continue
+to use the normal stacked flow.
+
+The settings popup remains outside the player frame's `overflow-hidden` clip.
+No ad service or fake inventory was integrated.
+
+**Verification:** `npx tsc --noEmit`, targeted ESLint, `git diff --check`, and
+`npx next build` passed; all 47 routes generated. Browser smoke verification
+was attempted but port 3000 had no listener (`ERR_CONNECTION_REFUSED`), so no
+visual browser pass is claimed.
+
+---
+
 ## [0.6.17] — 2026-08-07
 
 ### Changed

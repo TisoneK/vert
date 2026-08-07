@@ -37,6 +37,14 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.18] — 2026-08-07
+
+### Changed
+- **Watch pages now use a comfortable three-part desktop layout.** The video stays on the left, the creator profile and comments sit in the middle, and Up Next stays on the right.
+- **Portrait videos now fit the visible screen height.** They keep their full shape without becoming taller than the page, while landscape videos continue using the available width.
+
+---
+
 ## [0.6.17] — 2026-08-07
 
 ### Changed
@@ -361,7 +369,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.17...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.18...HEAD
+[0.6.18]: https://github.com/TisoneK/vert/releases/tag/v0.6.18
 [0.6.17]: https://github.com/TisoneK/vert/releases/tag/v0.6.17
 [0.6.16]: https://github.com/TisoneK/vert/releases/tag/v0.6.16
 [0.6.15]: https://github.com/TisoneK/vert/releases/tag/v0.6.15

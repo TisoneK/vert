@@ -572,12 +572,14 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const isPortrait = format === 'portrait' || (videoAspectRatio !== null && videoAspectRatio < 1)
+
   // Error state — show a simple error message when video fails to load
   if (hasError) {
     return (
-      <div className={`w-full flex justify-center rounded-lg overflow-hidden p-0.5 ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mx-auto' : ''}`}>
+      <div className={`w-full flex justify-center rounded-lg overflow-hidden p-0.5 ${isPortrait ? 'lg:h-[calc(100dvh-4rem)] lg:max-h-[calc(100dvh-4rem)]' : ''}`}>
         <div
-          className="relative bg-zinc-900 overflow-hidden flex items-center justify-center w-full"
+          className={`relative bg-zinc-900 overflow-hidden flex items-center justify-center max-w-full max-h-full ${isPortrait ? 'w-full lg:h-full lg:w-auto' : 'w-full h-auto'}`}
           style={{
             aspectRatio: videoAspectRatio
           ? `${videoAspectRatio}`
@@ -586,7 +588,8 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             : format === 'square'
               ? '1/1'
               : '16/9',
-            minHeight: '200px',
+            maxWidth: '100%',
+            maxHeight: '100%',
           }}
         >
           {thumbnailUrl ? (
@@ -608,33 +611,22 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     : 0
 
   return (
-    // Outer wrapper: full-width on mobile so portrait video fills the screen
-    // like Shorts/Reels. On desktop, constrain portrait videos to ~380px so
-    // they don't get absurdly tall (a 9:16 video at 1024px wide would be
-    // 1820px tall). 380px gives a ~676px-tall player on desktop — tall but
-    // reasonable, and the freed-up right space is used for the Up Next queue
-    // on the watch page. Landscape/square videos stay full-width.
-    // NOTE: rounded-lg but NO overflow-hidden — the video has its own
-    // clipping wrapper, and the settings dropdown (bottom-full) must not
-    // be clipped on small players.
-    // p-0.5 adds 2px breathing room all around so the black player has a
-    // subtle gap from the surrounding page background.
-    <div className={`w-full flex justify-start rounded-lg p-0.5 ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:w-[clamp(280px,32vw,420px)] md:max-w-full md:mr-auto' : ''}`}>
+    // Mobile fills the available width. On desktop, portrait media uses the
+    // available viewport height as its sizing axis, while landscape/square
+    // media remains width-driven. This prevents a tall portrait frame from
+    // extending beyond the visible screen and leaves the full frame visible.
+    <div className={`w-full flex justify-center lg:justify-start rounded-lg p-0.5 ${isPortrait ? 'lg:h-[calc(100dvh-4rem)] lg:max-h-[calc(100dvh-4rem)]' : ''}`}>
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
       // The outline is hidden on focus to avoid visual clutter, but we keep
       // focus-visible:ring for accessibility when navigating with Tab.
       tabIndex={0}
-      className="relative bg-black group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
+      className={`relative bg-black group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2 w-full h-auto max-w-full max-h-full ${isPortrait ? 'lg:h-full lg:w-auto' : 'lg:w-full lg:h-auto'}`}
       style={{
-        // Portrait video sizing — matches YouTube Shorts / Reels behavior.
-        // We set aspectRatio from the actual video dimensions once metadata
-        // loads (videoAspectRatio). The width/height strategy differs by
-        // screen size and is handled via Tailwind classes on the parent
-        // wrapper (see the className on the outer div below) rather than
-        // inline styles, because CSS aspect-ratio + max-height + width:100%
-        // interact in confusing ways when set inline.
+        // Keep the full frame visible while fitting portrait and landscape
+        // media into the available desktop viewport. The 4rem allowance
+        // leaves room for the header and a little breathing room above/below.
         aspectRatio: videoAspectRatio
           ? `${videoAspectRatio}`
           : format === 'portrait'
@@ -642,7 +634,8 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
             : format === 'square'
               ? '1/1'
               : '16/9',
-        width: '100%',
+        maxWidth: '100%',
+        maxHeight: '100%',
       }}
     >
       {/* Video clipping wrapper — overflow-hidden here clips the video
@@ -660,7 +653,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           // See ADR-6 for the remaining transcoding/HLS architecture gap.
           preload="metadata"
           playsInline
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           // crossOrigin='anonymous' is required so we can capture frames to a
           // <canvas> without tainting it (for the auto-thumbnail backfill).
           // Vercel Blob sends Access-Control-Allow-Origin: * so this is safe.

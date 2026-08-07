@@ -134,20 +134,22 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
           on the right, matching the desktop pattern used by long-form watch
           pages while keeping portrait video readable. Mobile stacks both
           columns back into the normal page flow. */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6 p-4 md:p-6 lg:items-start">
-        {/* ============== LEFT COLUMN: fixed responsive player + video info ============== */}
-        <div className="min-w-0">
-          <div className="lg:sticky lg:top-4 lg:z-10 lg:self-start lg:bg-zinc-50 lg:dark:bg-zinc-950 lg:pb-3">
-            <div className="w-full flex justify-start">
-              <VideoPlayer
-                videoUrl={video.videoUrl as string}
-                thumbnailUrl={video.thumbnailUrl as string | null}
-                title={video.title as string}
-                format={format}
-                videoId={video.id as string}
-              />
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,0.85fr)_minmax(320px,1.45fr)_minmax(240px,320px)] gap-6 p-4 md:p-6 lg:items-start">
+        {/* ============== LEFT COLUMN: viewport-fitted player ============== */}
+        <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
+          <div className="w-full flex justify-center lg:justify-start">
+            <VideoPlayer
+              videoUrl={video.videoUrl as string}
+              thumbnailUrl={video.thumbnailUrl as string | null}
+              title={video.title as string}
+              format={format}
+              videoId={video.id as string}
+            />
           </div>
+        </div>
+
+        {/* ============== CENTER COLUMN: profile, details, and comments ============== */}
+        <div className="min-w-0">
           {/* ----------------------------------------------------------
               BLOCK 2: TITLE + TAGS (same semantic group — both
               describe what the video is)
@@ -316,18 +318,18 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
             </div>
           )}
 
+          <section className="hidden lg:block mt-6" aria-labelledby="watch-comments-heading">
+            <h2 id="watch-comments-heading" className="sr-only">Comments</h2>
+            <CommentSection videoId={video.id as string} />
+          </section>
         </div>
 
-        {/* ============== RIGHT COLUMN: ad slot + comments + Up Next ============== */}
+        {/* ============== RIGHT COLUMN: Advertisement + Up Next ============== */}
         <aside
           className="hidden lg:flex lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:flex-col lg:gap-5 lg:overflow-y-auto custom-scrollbar lg:pr-2"
-          aria-label="Watch page sidebar"
+          aria-label="Up next and advertisement"
         >
           <AdSlot headingId="watch-ad-heading-desktop" />
-          <section aria-labelledby="watch-comments-heading">
-            <h2 id="watch-comments-heading" className="sr-only">Comments</h2>
-            <CommentSection videoId={video.id as string} compact />
-          </section>
           <section aria-labelledby="watch-up-next-heading">
             <h2 id="watch-up-next-heading" className="sr-only">Up next</h2>
             <RelatedVideos videoId={videoId} compact />
@@ -338,8 +340,8 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
       {/* Mobile/tablet sidebar content follows the details without sticky or
           nested desktop rail behavior. */}
       <div className="lg:hidden px-4 md:px-6 pb-6 space-y-6">
-        <AdSlot headingId="watch-ad-heading-mobile" />
         <CommentSection videoId={video.id as string} />
+        <AdSlot headingId="watch-ad-heading-mobile" />
         <RelatedVideos videoId={videoId} />
       </div>
     </div>
