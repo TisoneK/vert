@@ -186,3 +186,12 @@ past entries — append corrections instead.
 - **Open items:** Browser verification on a free port/deployed URL; video transcoding/HLS architecture; test suite; Dependabot high-severity vulnerability.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-07-review.md
+---
+## 2026-08-07 — Session 24
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Align the watch-page video in a bounded responsive left stage and stack Advertisement, Comments, and Up Next in one desktop right rail, with mobile fallback.
+- **Commits:** pending — product/release/context commits are being closed out together.
+- **Outcome:** done — desktop uses a left-aligned bounded player and one sticky rail; mobile order is Advertisement → Comments → Up Next; comment pagination resets and stale responses are ignored.
+- **Open items:** Browser visual verification is blocked by the tool sandbox terminating background dev servers; video transcoding/HLS, test suite, and Dependabot remain separate backlog work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-07-session-24-review.md

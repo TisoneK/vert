@@ -283,3 +283,10 @@ if literally nothing slowed you down.
 - **Workaround / fix:** Used targeted reads and review agents to finish the existing diff, normalized nullable URLs, added fallback resilience, published a corrective version commit/tag, and recorded the port limitation for the next browser pass.
 - **Prevent next time:** On resume, inspect `git status` and the task lock before starting new work; verify package version and tag target together before publishing; use an auto-port dev server for browser validation when port 3000 is occupied.
 
+---
+## 2026-08-07 — Buffy / openai/gpt-5.6-luna (Session 24)
+- **Problem:** Browser verification could not connect even after LocalMind was stopped: the tool sandbox terminates detached/background dev servers when the launching command exits. An attempted extra-argument launch also created two untracked files, and a combined typecheck/lint command timed out.
+- **Cost:** Moderate — repeated server-launch attempts and one extra validation split; no product work was lost.
+- **Cause:** The available browser/tool process boundary does not preserve background children across agent commands, and the project dev script already owns its port arguments.
+- **Workaround / fix:** Removed only the generated `--hostname` and `127.0.0.1` artifacts, used the exact `npm run dev` script, separated TypeScript from targeted ESLint, and recorded browser verification as blocked rather than claiming a visual pass.
+- **Prevent next time:** Prefer a tool-managed persistent preview or deployed URL for browser checks; do not append arguments to this script because its `tee` pipeline forwards them as shell commands. Run typecheck and lint as separate commands when the environment has strict timeouts.

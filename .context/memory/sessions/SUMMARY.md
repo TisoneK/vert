@@ -56,5 +56,8 @@ records.
 - **2026-08-05 — Sessions 18–20** — Buffy / openai/gpt-5.6-luna — released **0.6.14**: desktop navigation is an on-demand overlay drawer, player progress is compact/inset, and Featured is a resilient non-duplicating card set. Typecheck/targeted lint/build passed; full ESLint timed out.
   Detail: .context/memory/reviews/2026-08-05-review-2.md
 ---
-- **2026-08-07 — Sessions 21–23** — Buffy / openai/gpt-5.6-luna — finished the interrupted remaining-image optimization, released `v0.6.15`, then shipped the left-aligned sticky desktop portrait watch stage/right Up Next rail and repaired the clipped settings popup, released `v0.6.16`. Browser pass awaits a free port because 3000 serves LocalMind.
+- **2026-08-07 — Sessions 21–23** — Buffy / openai/gpt-5.6-luna — finished the interrupted remaining-image optimization, released `v0.6.15`, then shipped the left-aligned sticky desktop portrait watch stage/right Up Next rail and repaired the clipped settings popup, released `v0.6.16`.
   Detail: .context/memory/reviews/2026-08-07-review.md
+---
+- **2026-08-07 — Session 24** — Buffy / openai/gpt-5.6-luna — released `v0.6.17`: bounded left player stage plus one desktop rail ordered Advertisement → Comments → Up Next, with the same mobile flow; compact lists avoid nested scrolling and comment requests ignore stale pages. Browser visual verification was blocked because the tool sandbox terminates detached dev servers.
+  Detail: .context/memory/reviews/2026-08-07-session-24-review.md

@@ -295,4 +295,11 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Context:** The player already had speed/quality state and handlers, but its popup was clipped by an `overflow-hidden` control row, making the settings gear appear non-functional on compact portrait players.
 - **Decision:** Remove the clipping ancestor, use a labeled group of native buttons, close on outside pointer/Escape, restore focus to the trigger on Escape, and omit the portrait volume slider before metadata is available.
 - **Consequences:** Existing speed/HLS quality behavior is exposed without duplicating logic. The popup keeps standard Tab/Enter button behavior instead of claiming a full ARIA menu model without arrow-key navigation.
+
+---
+## ADR-15: Fixed desktop watch stage with one contextual rail (2026-08-07)
+- **Status:** accepted
+- **Context:** The previous watch layout used a sticky player and related-video rail, but comments remained outside the desktop context column, there was no reserved ad slot, and compact lists could introduce nested scroll surfaces. Portrait videos also initially fell back to a landscape ratio before metadata arrived.
+- **Decision:** Use a bounded responsive desktop grid with the player left-aligned in the left column and a single sticky, independently scrollable right rail ordered Advertisement, Comments, and Up Next. Keep mobile/tablet in normal document flow with the same content order. Use the known video format for the initial aspect-ratio fallback. Keep the ad as a provider-neutral layout slot.
+- **Consequences:** Desktop users retain a readable portrait player while contextual content remains adjacent and discoverable. The rail has one clear scrollbar, while mobile avoids sticky/nested scrolling. Real ad delivery remains a separate service decision and must not be fabricated in the UI.
 ---
