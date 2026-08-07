@@ -37,6 +37,16 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.17] — 2026-08-07
+
+### Changed
+- **Watch pages now use the desktop screen more effectively.** Portrait videos stay at a comfortable size on the left, while Advertisement, Comments, and Up Next are neatly stacked beside them. Phones keep the same content in a simple vertical flow.
+
+### Fixed
+- **Watch-page side content no longer creates confusing nested scroll areas.** The desktop sidebar has one clear scroll surface, and switching videos or comment sorting no longer risks showing stale comment pages.
+
+---
+
 ## [0.6.16] — 2026-08-07
 
 ### Changed
@@ -351,7 +361,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.16...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.17...HEAD
+[0.6.17]: https://github.com/TisoneK/vert/releases/tag/v0.6.17
 [0.6.16]: https://github.com/TisoneK/vert/releases/tag/v0.6.16
 [0.6.15]: https://github.com/TisoneK/vert/releases/tag/v0.6.15
 [0.6.14]: https://github.com/TisoneK/vert/releases/tag/v0.6.14

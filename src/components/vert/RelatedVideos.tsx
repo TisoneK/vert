@@ -11,9 +11,10 @@ import { RelatedVideoSkeleton } from './Skeleton'
 
 interface RelatedVideosProps {
   videoId: string
+  compact?: boolean
 }
 
-export function RelatedVideos({ videoId }: RelatedVideosProps) {
+export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) {
   const { navigate } = useNavigation()
   const prefetchVideo = usePrefetchVideo()
   // Keyed on videoId so navigating between videos refetches the right list.
@@ -44,7 +45,7 @@ export function RelatedVideos({ videoId }: RelatedVideosProps) {
   return (
     <div>
       <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-3">Up Next</p>
-      <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar pr-1">
+      <div className={compact ? 'space-y-2 pr-1' : 'space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar pr-1'}>
         {videos.map((video) => (
           <div
             key={video.id}

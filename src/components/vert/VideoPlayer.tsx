@@ -579,7 +579,13 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         <div
           className="relative bg-zinc-900 overflow-hidden flex items-center justify-center w-full"
           style={{
-            aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+            aspectRatio: videoAspectRatio
+          ? `${videoAspectRatio}`
+          : format === 'portrait'
+            ? '9/16'
+            : format === 'square'
+              ? '1/1'
+              : '16/9',
             minHeight: '200px',
           }}
         >
@@ -613,7 +619,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     // be clipped on small players.
     // p-0.5 adds 2px breathing room all around so the black player has a
     // subtle gap from the surrounding page background.
-    <div className={`w-full flex justify-start rounded-lg p-0.5 ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:max-w-[380px] md:mr-auto' : ''}`}>
+    <div className={`w-full flex justify-start rounded-lg p-0.5 ${(videoAspectRatio && videoAspectRatio < 1) || format === 'portrait' ? 'md:w-[clamp(280px,32vw,420px)] md:max-w-full md:mr-auto' : ''}`}>
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
@@ -629,7 +635,13 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         // wrapper (see the className on the outer div below) rather than
         // inline styles, because CSS aspect-ratio + max-height + width:100%
         // interact in confusing ways when set inline.
-        aspectRatio: videoAspectRatio ? `${videoAspectRatio}` : '16/9',
+        aspectRatio: videoAspectRatio
+          ? `${videoAspectRatio}`
+          : format === 'portrait'
+            ? '9/16'
+            : format === 'square'
+              ? '1/1'
+              : '16/9',
         width: '100%',
       }}
     >

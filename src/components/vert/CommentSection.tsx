@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { fetchWithRetry } from '@/lib/fetch-retry'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/lib/store'
 import { timeAgo } from '@/lib/utils-vert'
 import { Button } from '@/components/ui/button'
@@ -26,11 +26,12 @@ interface Comment {
 
 interface CommentSectionProps {
   videoId: string
+  compact?: boolean
 }
 
 type SortOption = 'top' | 'newest'
 
-export function CommentSection({ videoId }: CommentSectionProps) {
+export function CommentSection({ videoId, compact = false }: CommentSectionProps) {
   const { user } = useAuth()
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
@@ -40,16 +41,16 @@ export function CommentSection({ videoId }: CommentSectionProps) {
   const [hasMore, setHasMore] = useState(false)
   const [sort, setSort] = useState<SortOption>('top')
   const [failedAvatarUrls, setFailedAvatarUrls] = useState<Set<string>>(new Set())
+  const commentRequestRef = useRef(0)
 
-  useEffect(() => {
-    fetchComments(1, true)
-  }, [videoId, sort])
-
-  async function fetchComments(pageNum: number, reset = false) {
+  const fetchComments = useCallback(async (pageNum: number, reset = false) => {
+    const requestId = ++commentRequestRef.current
+    if (reset) setPage(1)
     setLoading(true)
     try {
       const res = await fetchWithRetry(`/api/v1/videos/${videoId}/comments?page=${pageNum}&limit=20`)
       const data = await res.json()
+      if (requestId !== commentRequestRef.current) return
       if (reset) {
         setComments(data.comments)
       } else {
@@ -57,11 +58,19 @@ export function CommentSection({ videoId }: CommentSectionProps) {
       }
       setHasMore(pageNum < data.pagination.totalPages)
     } catch (error) {
-      console.error('Failed to fetch comments:', error)
+      if (requestId === commentRequestRef.current) {
+        console.error('Failed to fetch comments:', error)
+      }
     } finally {
-      setLoading(false)
+      if (requestId === commentRequestRef.current) setLoading(false)
     }
-  }
+  }, [videoId])
+
+  useEffect(() => {
+    // The fetch callback synchronizes remote comments and pagination state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchComments(1, true)
+  }, [fetchComments, sort])
 
   async function handleSubmit() {
     if (!newComment.trim() || !user) return
@@ -101,7 +110,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
   })
 
   return (
-    <div className="mt-6">
+    <div className={compact ? 'mt-0' : 'mt-6'}>
       {/* Header with count and sort */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -170,7 +179,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
           No comments yet. Be the first to say something.
         </p>
       ) : (
-        <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
+        <div className={compact ? 'space-y-4' : 'space-y-4 max-h-96 overflow-y-auto custom-scrollbar'}>
           {sortedComments.map((comment) => (
             <div key={comment.id} className="flex gap-3 group">
               <div className="shrink-0">

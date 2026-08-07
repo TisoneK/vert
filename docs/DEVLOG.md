@@ -21,6 +21,43 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.17] — 2026-08-07
+
+### Changed
+
+#### Fixed responsive watch stage with a single contextual rail
+
+**Files:** `src/components/vert/VideoDetail.tsx`,
+`src/components/vert/VideoPlayer.tsx`, `src/components/vert/CommentSection.tsx`,
+`src/components/vert/RelatedVideos.tsx`
+
+Reworked the watch view into a bounded desktop grid with the player in a
+responsive left stage and one sticky, independently scrollable right rail. The
+rail is ordered as a semantic Advertisement slot, compact Comments, and Up
+Next. The advertisement remains a layout placeholder only; no provider or
+invented inventory was integrated. Mobile and tablet widths use normal document
+flow and render the same content as Advertisement, Comments, then Up Next.
+
+Portrait players use the known format to select their initial `9/16` frame
+before media metadata arrives, while desktop widths use a bounded clamp rather
+than stretching a tall portrait video across the whole column. Related videos
+and compact comments no longer create nested list scroll areas inside the
+single desktop rail. Ad heading IDs are unique between desktop and mobile
+renderings for valid landmark labeling.
+
+Comment loading now resets pagination when the video or sort changes and ignores
+late responses from an older request, preventing stale comments or skipped
+pages after rapid navigation. The fetch effect has a narrow lint suppression
+because it intentionally synchronizes remote comment data and pagination state.
+
+**Verification:** `npx tsc --noEmit`, targeted ESLint for all four changed
+components, `git diff --check`, and `npx next build` passed. The browser check
+was attempted against port 3000, but the tool sandbox terminates background
+dev servers when their launching command exits, so Chrome could not connect;
+no visual pass is claimed.
+
+---
+
 ## [0.6.16] — 2026-08-07
 
 ### Changed

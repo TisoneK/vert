@@ -134,8 +134,8 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
           on the right, matching the desktop pattern used by long-form watch
           pages while keeping portrait video readable. Mobile stacks both
           columns back into the normal page flow. */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 p-4 md:p-6 lg:items-start">
-        {/* ============== LEFT COLUMN: sticky player + video info ============== */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6 p-4 md:p-6 lg:items-start">
+        {/* ============== LEFT COLUMN: fixed responsive player + video info ============== */}
         <div className="min-w-0">
           <div className="lg:sticky lg:top-4 lg:z-10 lg:self-start lg:bg-zinc-50 lg:dark:bg-zinc-950 lg:pb-3">
             <div className="w-full flex justify-start">
@@ -316,22 +316,48 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
             </div>
           )}
 
-          {/* Comments */}
-          <CommentSection videoId={video.id as string} />
-
         </div>
 
-        {/* ============== RIGHT COLUMN: Up Next queue (desktop) ============== */}
-        <aside className="hidden lg:block lg:sticky lg:top-4 min-h-0" aria-label="Up next">
-          <RelatedVideos videoId={videoId} />
+        {/* ============== RIGHT COLUMN: ad slot + comments + Up Next ============== */}
+        <aside
+          className="hidden lg:flex lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:flex-col lg:gap-5 lg:overflow-y-auto custom-scrollbar lg:pr-2"
+          aria-label="Watch page sidebar"
+        >
+          <AdSlot headingId="watch-ad-heading-desktop" />
+          <section aria-labelledby="watch-comments-heading">
+            <h2 id="watch-comments-heading" className="sr-only">Comments</h2>
+            <CommentSection videoId={video.id as string} compact />
+          </section>
+          <section aria-labelledby="watch-up-next-heading">
+            <h2 id="watch-up-next-heading" className="sr-only">Up next</h2>
+            <RelatedVideos videoId={videoId} compact />
+          </section>
         </aside>
       </div>
 
-      {/* On mobile/tablet the right rail follows the video details, preserving
-          the familiar single-column reading order. */}
-      <div className="lg:hidden px-4 md:px-6 pb-6">
+      {/* Mobile/tablet sidebar content follows the details without sticky or
+          nested desktop rail behavior. */}
+      <div className="lg:hidden px-4 md:px-6 pb-6 space-y-6">
+        <AdSlot headingId="watch-ad-heading-mobile" />
+        <CommentSection videoId={video.id as string} />
         <RelatedVideos videoId={videoId} />
       </div>
     </div>
+  )
+}
+
+function AdSlot({ headingId }: { headingId: string }) {
+  return (
+    <section
+      aria-labelledby={headingId}
+      className="min-h-24 rounded-xl border border-dashed border-zinc-300 bg-zinc-100/70 px-4 py-5 text-center dark:border-zinc-700 dark:bg-zinc-900/70"
+    >
+      <h2 id={headingId} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
+        Advertisement
+      </h2>
+      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+        Sponsored content will appear here
+      </p>
+    </section>
   )
 }
