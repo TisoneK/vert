@@ -290,3 +290,10 @@ if literally nothing slowed you down.
 - **Cause:** The available browser/tool process boundary does not preserve background children across agent commands, and the project dev script already owns its port arguments.
 - **Workaround / fix:** Removed only the generated `--hostname` and `127.0.0.1` artifacts, used the exact `npm run dev` script, separated TypeScript from targeted ESLint, and recorded browser verification as blocked rather than claiming a visual pass.
 - **Prevent next time:** Prefer a tool-managed persistent preview or deployed URL for browser checks; do not append arguments to this script because its `tee` pipeline forwards them as shell commands. Run typecheck and lint as separate commands when the environment has strict timeouts.
+---
+## 2026-08-07 — Buffy / openai/gpt-5.6-luna (Session 25)
+- **Problem:** Browser smoke verification could not run because port 3000 had no listener. One parallel typecheck initially hit a transient generated `.next/types/validator.ts` route-file race while the production build was running.
+- **Cost:** Minor — one browser attempt was unavailable and typecheck needed a sequential rerun.
+- **Cause:** The local tool environment does not keep a dev server running between commands, and parallel Next build/type generation can temporarily expose an incomplete generated route file.
+- **Workaround / fix:** Recorded the browser limitation honestly, reran typecheck sequentially after the build settled, and confirmed targeted lint/diff checks plus production build passed.
+- **Prevent next time:** Use a tool-managed persistent preview or deployed URL for browser checks; run generated-file-producing Next commands sequentially when typecheck is required.

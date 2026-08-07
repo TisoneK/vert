@@ -190,8 +190,17 @@ past entries — append corrections instead.
 ## 2026-08-07 — Session 24
 - **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** feature-engineer | **Core:** 0.5.0
 - **Task:** Align the watch-page video in a bounded responsive left stage and stack Advertisement, Comments, and Up Next in one desktop right rail, with mobile fallback.
-- **Commits:** pending — product/release/context commits are being closed out together.
+- **Commits:** `9a2bbbd` product/release, `e03e9ee` context; tag `v0.6.17`.
 - **Outcome:** done — desktop uses a left-aligned bounded player and one sticky rail; mobile order is Advertisement → Comments → Up Next; comment pagination resets and stale responses are ignored.
 - **Open items:** Browser visual verification is blocked by the tool sandbox terminating background dev servers; video transcoding/HLS, test suite, and Dependabot remain separate backlog work.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-07-session-24-review.md
+---
+## 2026-08-07 — Session 25
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Refine the watch page into three desktop columns: video left, profile/details/comments center, and Up Next right; fit portrait playback within the visible viewport height.
+- **Commits:** pending — product/release/context closeout in progress.
+- **Outcome:** done — three-column desktop composition, portrait-only `calc(100dvh - 4rem)` player stage, full-frame `object-contain`, landscape width-driven behavior, and mobile stacked fallback.
+- **Open items:** Browser smoke verification was blocked because port 3000 had no listener; video transcoding/HLS, test suite, and Dependabot remain separate backlog work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-07-session-25-review.md

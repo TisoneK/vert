@@ -303,3 +303,9 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Decision:** Use a bounded responsive desktop grid with the player left-aligned in the left column and a single sticky, independently scrollable right rail ordered Advertisement, Comments, and Up Next. Keep mobile/tablet in normal document flow with the same content order. Use the known video format for the initial aspect-ratio fallback. Keep the ad as a provider-neutral layout slot.
 - **Consequences:** Desktop users retain a readable portrait player while contextual content remains adjacent and discoverable. The rail has one clear scrollbar, while mobile avoids sticky/nested scrolling. Real ad delivery remains a separate service decision and must not be fabricated in the UI.
 ---
+---
+## ADR-16: Three-column watch composition with viewport-fitted player (2026-08-07)
+- **Status:** accepted
+- **Context:** The user refined the watch-page request so the video should occupy the left side, profile/details and comments should be in the middle, and Up Next should be on the right. Portrait playback was still too tall for the screen.
+- **Decision:** Use three bounded desktop grid tracks: player left, profile/details/comments center, and Advertisement/Up Next right. On desktop, portrait players use a `calc(100dvh - 4rem)` height stage and derive width from their aspect ratio; landscape/square media remains width-driven. Use `object-contain` so the complete frame stays visible. Keep mobile/tablet stacked.
+- **Consequences:** The desktop hierarchy matches the requested reading pattern and portrait content fits within the visible app viewport. Landscape media avoids an unnecessary blank height reservation. The player’s settings popup remains outside its clipping wrapper, and the ad remains a provider-neutral slot.

@@ -61,3 +61,6 @@ records.
 ---
 - **2026-08-07 — Session 24** — Buffy / openai/gpt-5.6-luna — released `v0.6.17`: bounded left player stage plus one desktop rail ordered Advertisement → Comments → Up Next, with the same mobile flow; compact lists avoid nested scrolling and comment requests ignore stale pages. Browser visual verification was blocked because the tool sandbox terminates detached dev servers.
   Detail: .context/memory/reviews/2026-08-07-session-24-review.md
+---
+- **2026-08-07 — Session 25** — Buffy / openai/gpt-5.6-luna — refined the watch page into three desktop columns (video left, profile/details/comments center, Up Next right) and capped portrait playback to the visible desktop viewport using `100dvh` while preserving the full frame. Browser smoke check was blocked because port 3000 had no listener.
+  Detail: .context/memory/reviews/2026-08-07-session-25-review.md
