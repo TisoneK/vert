@@ -275,3 +275,11 @@ if literally nothing slowed you down.
 - **Workaround / fix:** Ran targeted ESLint on every changed product file; it passed with 0 errors. Typecheck passed and `npx next build` completed successfully with all 47 routes.
 - **Prevent next time:** Run targeted lint and build/typecheck as separate commands first; only use full-repo lint when the environment provides a longer reliable foreground timeout, and never treat a timeout as a pass.
 
+---
+## 2026-08-07 — Buffy / openai/gpt-5.6-luna (Sessions 21–23)
+- **Problem:** The prior Session 21 image migration was interrupted with a dirty worktree; port 3000 was occupied by an unrelated LocalMind app, preventing browser verification of the watch layout/settings; the first v0.6.15 release bookkeeping also left `package.json` at 0.6.14 and required a safe tag correction.
+- **Cost:** Moderate — resumed and validated the incomplete image work before the requested sessions, repeated release/tag checks, and could not complete the browser pass.
+- **Cause:** Session interruption preserved source changes but not a completed context/release closeout; the local environment has a fixed port collision; release version bump was not included in the first bookkeeping commit.
+- **Workaround / fix:** Used targeted reads and review agents to finish the existing diff, normalized nullable URLs, added fallback resilience, published a corrective version commit/tag, and recorded the port limitation for the next browser pass.
+- **Prevent next time:** On resume, inspect `git status` and the task lock before starting new work; verify package version and tag target together before publishing; use an auto-port dev server for browser validation when port 3000 is occupied.
+

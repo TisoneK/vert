@@ -203,3 +203,9 @@ don't remove the line.
       null-src/`onError` fallback into one component so new content images get
       optimization + fallback for free. Deferred from Session 11 as scope creep. A
       refactor, not a feature.
+
+---
+- **2026-08-07 completion note:** Session 21 completed safe avatar and
+  channel/profile banner optimization (host-safe optimizer routing plus
+  URL-keyed fallbacks), released in `v0.6.15`. The VideoPlayer poster remains
+  intentionally native because it is adjacent to canvas frame capture.

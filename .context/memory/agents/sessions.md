@@ -177,3 +177,12 @@ past entries — append corrections instead.
 - **Open items:** Existing video transcoding/HLS architecture, test suite, remaining image optimization, and Dependabot high-severity vulnerability remain separate backlog work.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-05-review-2.md
+---
+## 2026-08-07 — Sessions 21–23
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** engineer | **Core:** 0.5.0
+- **Task:** Resume and finish remaining image optimization; then implement desktop portrait watch layout and repair the video settings popup as separate sequential sessions.
+- **Commits:** 6 product/release commits (`e921531`, `dc4bf6f`, `fc2815b`, `476d310`, `fb2d210`, `5952511`) plus this context commit; releases `v0.6.15` and `v0.6.16` pushed.
+- **Outcome:** done — remaining avatars/banners optimized with host-safe fallbacks; portrait player is left-aligned/sticky with an independently scrolling Up Next rail; settings popup is visible, keyboard-safe, and dismissible. Typecheck, targeted lint, and production builds passed.
+- **Open items:** Browser verification on a free port/deployed URL; video transcoding/HLS architecture; test suite; Dependabot high-severity vulnerability.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-07-review.md

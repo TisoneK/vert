@@ -274,4 +274,25 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Context:** The homepage had enough trending data for a collection but rendered only the first item as a bespoke hero. Sparse responses made the section look accidentally incomplete.
 - **Decision:** Render up to four standard video cards as Featured, fill sparse sets from latest feed data with a transparent `Featured picks` label, and remove Featured IDs from the lower Trending section.
 - **Consequences:** The homepage has consistent card density and no duplicate Featured/Trending items. Featured fallback content is clearly labeled rather than implying a curated editorial source.
+
+---
+## ADR-12: Host-safe remaining image optimization (2026-08-07)
+- **Status:** accepted
+- **Context:** Session 11 optimized thumbnails with `next/image`, but avatars and banners still used native images. The API accepts arbitrary HTTPS image URLs, while Next's optimizer only accepts configured remote hosts.
+- **Decision:** Route known HTTPS Google profile and Vercel Blob URLs through `next/image`; preserve native `<img>` rendering for other valid HTTPS sources. Add URL-keyed error fallbacks so failed images render initials/placeholders without affecting other list items.
+- **Consequences:** Known assets receive responsive optimization without rejecting existing OAuth/user-hosted images. Unsupported hosts do not gain optimizer transformations, and future host allowlist changes must update `isNextImageSafeUrl` and `next.config.ts` together.
+
+---
+## ADR-13: Desktop portrait watch stage (2026-08-07)
+- **Status:** accepted
+- **Context:** The app's single scroll viewport made a tall portrait player and contextual content compete for vertical space. Desktop platforms use a readable portrait stage with adjacent recommendations, while mobile stacks content.
+- **Decision:** Use a desktop two-column watch stage with the portrait player left-aligned and sticky within the existing app viewport; keep Up Next in a right rail with bounded independent scrolling; return to normal stacked flow below the desktop breakpoint.
+- **Consequences:** Portrait playback remains visible while users browse contextual content, and desktop horizontal space is used effectively. The sticky surface must remain opaque and below the app header; ads are not fabricated or integrated without a separate provider decision.
+
+---
+## ADR-14: Native-button settings popup (2026-08-07)
+- **Status:** accepted
+- **Context:** The player already had speed/quality state and handlers, but its popup was clipped by an `overflow-hidden` control row, making the settings gear appear non-functional on compact portrait players.
+- **Decision:** Remove the clipping ancestor, use a labeled group of native buttons, close on outside pointer/Escape, restore focus to the trigger on Escape, and omit the portrait volume slider before metadata is available.
+- **Consequences:** Existing speed/HLS quality behavior is exposed without duplicating logic. The popup keeps standard Tab/Enter button behavior instead of claiming a full ARIA menu model without arrow-key navigation.
 ---
