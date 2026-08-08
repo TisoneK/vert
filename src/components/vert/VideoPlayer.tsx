@@ -687,7 +687,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           aria-valuemax={100}
           aria-valuenow={progress}
           aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
-          className="h-1 hover:h-1.5 bg-zinc-700 cursor-pointer transition-all mx-3 mb-1 relative overflow-hidden rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+          className="h-1.5 hover:h-2 bg-zinc-700 cursor-pointer transition-all mx-3 mb-1 relative overflow-hidden rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
           onClick={handleProgressClick}
           onKeyDown={handleProgressKeyDown}
         >
@@ -708,22 +708,24 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </div>
         </div>
 
-        <div className="flex items-center flex-nowrap gap-2 px-3 pb-2 pt-1">
+        <div className="flex items-center flex-nowrap gap-1.5 px-3 pb-2 pt-1">
           <button
             onClick={togglePlay}
-            className="shrink-0 text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
+            className="shrink-0 min-h-10 min-w-10 flex items-center justify-center text-white hover:text-violet-400 transition-colors p-2"
             aria-label={isPlaying ? 'Pause' : 'Play'}
+            title={isPlaying ? 'Pause' : 'Play'}
           >
-            {isPlaying ? <Pause className="h-5 w-5 sm:h-4 sm:w-4" /> : <Play className="h-5 w-5 sm:h-4 sm:w-4" />}
+            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
           </button>
 
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={toggleMute}
-              className="text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
+              className="shrink-0 min-h-10 min-w-10 flex items-center justify-center text-white hover:text-violet-400 transition-colors p-2"
               aria-label={isMuted ? 'Unmute' : 'Mute'}
+              title={isMuted ? 'Unmute' : 'Mute'}
             >
-              {isMuted ? <VolumeX className="h-5 w-5 sm:h-4 sm:w-4" /> : <Volume2 className="h-5 w-5 sm:h-4 sm:w-4" />}
+              {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
             </button>
             {/* Volume slider takes real width (64px) that a narrow portrait
                 player can't spare alongside play/time/settings/fullscreen —
@@ -736,7 +738,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
                 step="0.05"
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="w-16 h-1 bg-zinc-600 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
+                className="hidden md:block w-16 h-1 bg-zinc-600 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
                 aria-label="Volume"
               />
             )}
@@ -754,10 +756,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
               ref={settingsButtonRef}
               onClick={() => setShowSettings((visible) => !visible)}
               aria-expanded={showSettings}
-              className="text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
+              className="shrink-0 min-h-10 min-w-10 flex items-center justify-center text-white hover:text-violet-400 transition-colors p-2"
               aria-label="Settings"
+              title="Settings"
             >
-              <Settings className="h-5 w-5 sm:h-4 sm:w-4" />
+              <Settings className="h-5 w-5" />
             </button>
             {showSettings && (
               <div
@@ -810,10 +813,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
 
           <button
             onClick={toggleFullscreen}
-            className="shrink-0 text-white hover:text-violet-400 transition-colors p-1.5 sm:p-1"
+            className="shrink-0 min-h-10 min-w-10 flex items-center justify-center text-white hover:text-violet-400 transition-colors p-2"
             aria-label="Fullscreen"
+            title="Fullscreen"
           >
-            <Maximize className="h-5 w-5 sm:h-4 sm:w-4" />
+            <Maximize className="h-5 w-5" />
           </button>
         </div>
       </div>

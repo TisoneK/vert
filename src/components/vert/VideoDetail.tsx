@@ -14,8 +14,14 @@ import { FlagDialog } from './FlagDialog'
 import { RelatedVideos } from './RelatedVideos'
 import { CategoryBadge } from './CategoryBadge'
 import { formatViews, formatSubscribers, timeAgo } from '@/lib/utils-vert'
-import { Share2, Bookmark, BookmarkCheck, Copy, Check, ChevronUp, ChevronDown } from 'lucide-react'
+import { Share2, Bookmark, BookmarkCheck, Copy, Check, ChevronUp, ChevronDown, MoreVertical, Flag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 interface VideoDetailProps {
   videoId: string
@@ -44,6 +50,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const queryClient = useQueryClient()
   const [descriptionExpanded, setDescriptionExpanded] = useState(false)
   const [showShareMenu, setShowShareMenu] = useState(false)
+  const [showReportMenu, setShowReportMenu] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
   const [failedChannelAvatarUrl, setFailedChannelAvatarUrl] = useState<string | null>(null)
   const [resolvedMedia, setResolvedMedia] = useState<{ videoId: string; sourceUrl: string; ratio: number } | null>(null)
@@ -177,7 +184,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               describe what the video is)
               ---------------------------------------------------------- */}
           <div className="mt-3">
-            <h1 className="text-base md:text-lg font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
+            <h1 className="text-lg md:text-xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight">
               {video.title as string}
             </h1>
             {/* Tags sit directly under the title as chips — they're part of
@@ -265,7 +272,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               />
               <button
                 onClick={toggleSave}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors active:scale-95 duration-100 shrink-0 ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors active:scale-95 duration-100 shrink-0 ${
                   isSaved
                     ? 'bg-zinc-100 dark:bg-zinc-800 text-violet-600'
                     : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700'
@@ -274,15 +281,17 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                 title={isSaved ? 'Remove from saved' : 'Save for later'}
               >
                 {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+                <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save'}</span>
               </button>
               <div className="relative shrink-0">
                 <button
                   onClick={() => setShowShareMenu(!showShareMenu)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors active:scale-95 duration-100"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-violet-50 text-violet-700 hover:bg-violet-100 dark:bg-violet-950/30 dark:text-violet-300 dark:hover:bg-violet-900/40 text-xs font-semibold transition-colors active:scale-95 duration-100"
                   aria-label="Share"
                   title="Share"
                 >
                   <Share2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Share</span>
                 </button>
                 {showShareMenu && (
                   <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-lg py-1 z-50">
@@ -296,7 +305,40 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                   </div>
                 )}
               </div>
-              <FlagDialog videoId={video.id as string} />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex min-h-9 min-w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-900 active:scale-95 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+                    aria-label="More video actions"
+                    title="More actions"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44">
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onSelect={() => {
+                      if (user) {
+                        setShowReportMenu(true)
+                      } else {
+                        navigate({ page: 'login' })
+                      }
+                    }}
+                  >
+                    <Flag className="h-4 w-4" />
+                    Report video
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {user && (
+                <FlagDialog
+                  videoId={video.id as string}
+                  trigger={null}
+                  open={showReportMenu}
+                  onOpenChange={setShowReportMenu}
+                />
+              )}
             </div>
           </div>
 
@@ -383,13 +425,13 @@ function AdSlot({ headingId }: { headingId: string }) {
   return (
     <section
       aria-labelledby={headingId}
-      className="min-h-24 rounded-xl border border-dashed border-zinc-300 bg-zinc-100/70 px-4 py-5 text-center dark:border-zinc-700 dark:bg-zinc-900/70"
+      className="min-h-20 rounded-lg border border-zinc-200/80 bg-zinc-50/50 px-3 py-4 text-center dark:border-zinc-800 dark:bg-zinc-900/40"
     >
       <h2 id={headingId} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
         Advertisement
       </h2>
-      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-        Sponsored content will appear here
+      <p className="mt-1 text-[11px] text-zinc-400 dark:text-zinc-500">
+        Reserved placement
       </p>
     </section>
   )

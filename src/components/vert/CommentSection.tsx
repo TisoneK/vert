@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { fetchWithRetry } from '@/lib/fetch-retry'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useAuth } from '@/lib/store'
+import { useAuth, useNavigation } from '@/lib/store'
 import { timeAgo } from '@/lib/utils-vert'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -33,6 +33,7 @@ type SortOption = 'top' | 'newest'
 
 export function CommentSection({ videoId, compact = false }: CommentSectionProps) {
   const { user } = useAuth()
+  const { navigate } = useNavigation()
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
   const [loading, setLoading] = useState(true)
@@ -143,7 +144,7 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 min-h-[60px] resize-none text-sm focus-visible:ring-violet-600"
+              className="bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 min-h-[60px] resize-none text-sm shadow-sm focus-visible:border-violet-500 focus-visible:ring-violet-600"
             />
             <div className="flex justify-end mt-2">
               <Button
@@ -165,9 +166,18 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
           </div>
         </div>
       ) : (
-        <p className={`text-sm text-zinc-500 dark:text-zinc-400 ${isEmpty ? 'mb-3' : 'mb-6'}`}>
-          Log in to add a comment.
-        </p>
+        <div className={`flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-900/60 ${isEmpty ? 'mb-3' : 'mb-6'}`}>
+          <p className="text-sm text-zinc-600 dark:text-zinc-300">
+            Join the conversation by signing in.
+          </p>
+          <Button
+            size="sm"
+            onClick={() => navigate({ page: 'login' })}
+            className="shrink-0 bg-violet-600 text-white hover:bg-violet-700"
+          >
+            Log in to comment
+          </Button>
+        </div>
       )}
 
       {/* Comments list */}
@@ -178,7 +188,7 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
           ))}
         </div>
       ) : sortedComments.length === 0 ? (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 pt-0.5 pb-2">
+        <p className="text-sm text-zinc-600 dark:text-zinc-300 pt-0.5 pb-2">
           Be the first to start the conversation.
         </p>
       ) : (

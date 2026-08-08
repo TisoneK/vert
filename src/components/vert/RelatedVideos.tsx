@@ -36,7 +36,10 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
   if (videos.length === 0) {
     return (
       <div>
-        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-3">Up Next</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Up Next</p>
+          <span className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500">More to watch</span>
+        </div>
         <p className="text-xs text-zinc-400 dark:text-zinc-500">No more videos yet.</p>
       </div>
     )
@@ -44,7 +47,10 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
 
   return (
     <div>
-      <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-3">Up Next</p>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Up Next</p>
+        <span className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500">More to watch</span>
+      </div>
       <div className={compact ? 'space-y-2 pr-1' : 'space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar pr-1'}>
         {videos.map((video) => (
           <div
@@ -62,7 +68,7 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
                 {video.thumbnailUrl ? (
                   <Image
                     src={video.thumbnailUrl}
-                    alt={video.title}
+                    alt={video.title || 'Untitled video'}
                     fill
                     sizes="128px"
                     className="object-cover transition-transform group-hover:scale-105 duration-200"
@@ -83,7 +89,7 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
             {/* Info */}
             <div className="flex-1 min-w-0 py-0.5">
               <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight group-hover:text-violet-600 transition-colors">
-                {video.title}
+                {video.title || 'Untitled video'}
               </h4>
               <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-1">
                 {video.channel.channelName}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useAuth, useNavigation } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +15,9 @@ import { Flag } from 'lucide-react'
 
 interface FlagDialogProps {
   videoId: string
+  trigger?: ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 const flagReasons = [
@@ -26,13 +29,15 @@ const flagReasons = [
   { value: 'other', label: 'Other' },
 ]
 
-export function FlagDialog({ videoId }: FlagDialogProps) {
+export function FlagDialog({ videoId, trigger, open: controlledOpen, onOpenChange }: FlagDialogProps) {
   const { user } = useAuth()
   const { navigate } = useNavigation()
   const [selectedReason, setSelectedReason] = useState('')
   const [loading, setLoading] = useState(false)
-  const [open, setOpen] = useState(false)
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
   const [success, setSuccess] = useState(false)
+  const open = controlledOpen ?? uncontrolledOpen
+  const setOpen = onOpenChange ?? setUncontrolledOpen
 
   const handleFlag = async () => {
     if (!selectedReason || !user) return
@@ -59,7 +64,8 @@ export function FlagDialog({ videoId }: FlagDialogProps) {
   }
 
   if (!user) {
-    return (
+    if (trigger === null) return null
+    return trigger ?? (
       <button
         onClick={() => navigate({ page: 'login' })}
         className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors active:scale-95 duration-100"
@@ -73,15 +79,19 @@ export function FlagDialog({ videoId }: FlagDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors active:scale-95 duration-100"
-          title="Report this video"
-          aria-label="Report"
-        >
-          <Flag className="h-4 w-4" />
-        </button>
-      </DialogTrigger>
+      {trigger !== null && (
+        <DialogTrigger asChild>
+          {trigger !== undefined ? trigger : (
+            <button
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors active:scale-95 duration-100"
+              title="Report this video"
+              aria-label="Report"
+            >
+              <Flag className="h-4 w-4" />
+            </button>
+          )}
+        </DialogTrigger>
+      )}
       <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
         <DialogHeader>
           <DialogTitle>Report Video</DialogTitle>
