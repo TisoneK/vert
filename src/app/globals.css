@@ -144,9 +144,9 @@
 }
 
 /* Desktop watch stage: the app shell reserves 56px for the header and the
-   watch grid reserves 24px above and below its content. Keeping this budget
-   in one place prevents the player from extending the main scroll container
-   and leaves the right rail with a predictable viewport-sized panel. */
+   compact watch grid reserves 12px above and below its content. Keeping this
+   budget in one place prevents the player from extending the main scroll
+   container and leaves the right rail with a predictable viewport-sized panel. */
 .watch-player-frame {
   --watch-player-ratio: 9 / 16;
   aspect-ratio: var(--watch-player-ratio);
@@ -155,14 +155,14 @@
 }
 @media (min-width: 1024px) {
   .watch-player-stage--portrait {
-    height: calc(100dvh - 104px);
-    max-height: calc(100dvh - 104px);
+    height: calc(100dvh - 84px);
+    max-height: calc(100dvh - 84px);
     align-items: flex-start;
   }
   .watch-player-frame--portrait {
     /* The stage keeps 2px padding on each side; subtract it from the
        height budget so the frame cannot create a tiny overflow scrollbar. */
-    width: min(100%, calc((100dvh - 108px) * var(--watch-player-ratio)));
+    width: min(100%, calc((100dvh - 88px) * var(--watch-player-ratio)));
     height: auto;
   }
   .watch-player-frame--wide {

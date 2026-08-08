@@ -37,6 +37,14 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.20] — 2026-08-08
+
+### Fixed
+- **Watch pages now use the available desktop space more efficiently.** The video sits closer to the edge and to the surrounding content instead of being surrounded by excessive empty margins.
+- **The tighter desktop layout keeps its viewport fit.** The player and Up Next rail remain aligned after the spacing reduction, while phones keep their comfortable spacing.
+
+---
+
 ## [0.6.19] — 2026-08-08
 
 ### Fixed
@@ -377,7 +385,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.19...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.20...HEAD
+[0.6.20]: https://github.com/TisoneK/vert/releases/tag/v0.6.20
 [0.6.19]: https://github.com/TisoneK/vert/releases/tag/v0.6.19
 [0.6.18]: https://github.com/TisoneK/vert/releases/tag/v0.6.18
 [0.6.17]: https://github.com/TisoneK/vert/releases/tag/v0.6.17

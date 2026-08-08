@@ -21,6 +21,33 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.20] — 2026-08-08
+
+### Changed
+
+#### Compact desktop watch spacing
+
+**Files:** `src/components/vert/VideoDetail.tsx`, `src/app/globals.css`
+
+The desktop watch grid previously retained the broader `p-4 md:p-6` and
+`gap-6` spacing at large widths, which left too much empty space around the
+player. The desktop override now uses 12px outer padding and a 16px column gap.
+The base mobile/tablet spacing is unchanged.
+
+Because the app shell's main viewport and the right rail share the same vertical
+budget, the portrait player stage and right-rail height were updated from
+`calc(100dvh - 104px)` to `calc(100dvh - 84px)`. The frame width calculation
+uses the matching inset-adjusted budget, so tightening the outer spacing does
+not introduce a new overflow or misalign the Advertisement/Up Next rail.
+
+**Verification:** TypeScript, targeted ESLint, `git diff --check`, and
+`npx next build` passed. Hosted smoke inspection of
+`https://vert-wine.vercel.app/watch/cmr3el1ie0001l80400phsk19` observed the
+compact player spacing, all watch-page surfaces, and no JavaScript console
+errors.
+
+---
+
 ## [0.6.19] — 2026-08-08
 
 ### Fixed

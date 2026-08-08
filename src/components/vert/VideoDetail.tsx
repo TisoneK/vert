@@ -130,10 +130,10 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   return (
     <div className="max-w-7xl mx-auto animate-vert-fade-in">
       {/* Desktop watch stage: the player stays in the left column while the
-          surrounding app viewport scrolls. The 104px desktop budget is the
-          56px header plus the grid's 24px top/bottom padding, so the player
-          cannot create a second page scrollbar. Mobile stacks normally. */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,0.85fr)_minmax(320px,1.45fr)_minmax(240px,320px)] gap-6 p-4 md:p-6 lg:items-start">
+          surrounding app viewport scrolls. The 84px desktop budget is the
+          56px header plus the grid's new 12px top/bottom padding, so the
+          player cannot create a second page scrollbar. Mobile stacks normally. */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,0.85fr)_minmax(320px,1.45fr)_minmax(240px,320px)] gap-6 p-4 md:p-6 lg:gap-4 lg:p-3 lg:items-start">
         {/* ============== LEFT COLUMN: viewport-fitted player ============== */}
         <div className="min-w-0 lg:sticky lg:top-0 lg:self-start">
           <div className="w-full flex justify-center lg:justify-start">
@@ -325,7 +325,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
 
         {/* ============== RIGHT COLUMN: fixed ad + scrolling Up Next ============== */}
         <aside
-          className="hidden lg:flex lg:sticky lg:top-0 lg:h-[calc(100dvh-104px)] lg:max-h-[calc(100dvh-104px)] lg:min-h-0 lg:flex-col lg:gap-5"
+          className="hidden lg:flex lg:sticky lg:top-0 lg:h-[calc(100dvh-84px)] lg:max-h-[calc(100dvh-84px)] lg:min-h-0 lg:flex-col lg:gap-5"
           aria-label="Up next and advertisement"
         >
           {/* Keep the ad outside the scrolling region, so it remains visible
