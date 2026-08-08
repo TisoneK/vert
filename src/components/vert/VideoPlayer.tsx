@@ -30,6 +30,8 @@ interface VideoPlayerProps {
   /** Video id — used for auto-backfilling a missing thumbnail. Optional
    *  because VideoPlayer is also used in contexts where the id isn't known. */
   videoId?: string
+  /** Reports the real media ratio so the surrounding watch layout can adapt. */
+  onAspectRatioChange?: (ratio: number) => void
 }
 
 type QualityLevel = {
@@ -54,7 +56,7 @@ function heightToLabel(h: number): string {
   return 'Source'
 }
 
-export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait', videoId }: VideoPlayerProps) {
+export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait', videoId, onAspectRatioChange }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const settingsButtonRef = useRef<HTMLButtonElement>(null)
@@ -127,7 +129,9 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       setIsBuffering(false)
       // Capture actual video dimensions for proper aspect ratio
       if (video.videoWidth > 0 && video.videoHeight > 0) {
-        setVideoAspectRatio(video.videoWidth / video.videoHeight)
+        const ratio = video.videoWidth / video.videoHeight
+        setVideoAspectRatio(ratio)
+        onAspectRatioChange?.(ratio)
       }
     }
     const onTimeUpdate = () => setCurrentTime(video.currentTime)
@@ -242,7 +246,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         hlsRef.current = null
       }
     }
-  }, [videoUrl])
+  }, [onAspectRatioChange, videoUrl])
 
   // --- Auto-backfill missing thumbnail ---
   // When a video has no thumbnail and the viewer is logged in, capture a

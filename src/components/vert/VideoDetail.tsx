@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { isNextImageSafeUrl } from '@/lib/image-utils'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { videoDetailQueryOptions } from '@/lib/video-queries'
 import { useNavigation, useAuth } from '@/lib/store'
@@ -46,12 +46,20 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
   const [failedChannelAvatarUrl, setFailedChannelAvatarUrl] = useState<string | null>(null)
+  const [resolvedMedia, setResolvedMedia] = useState<{ videoId: string; sourceUrl: string; ratio: number } | null>(null)
 
   const { data, isLoading: loading } = useQuery(
     videoDetailQueryOptions(videoId, user?.id ?? 'anonymous'),
   )
   const video = data?.video ?? null
   const userVote = data?.userVote ?? null
+  const currentVideoId = video?.id as string | undefined
+  const currentVideoUrl = video?.videoUrl as string | undefined
+  const handleAspectRatioChange = useCallback((ratio: number) => {
+    if (currentVideoId && currentVideoUrl) {
+      setResolvedMedia({ videoId: currentVideoId, sourceUrl: currentVideoUrl, ratio })
+    }
+  }, [currentVideoId, currentVideoUrl])
 
   const savedKey = ['video-saved', videoId, user?.id] as const
   const { data: isSaved = false } = useQuery({
@@ -125,30 +133,45 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const categories = (video.categories as Array<{ name: string; slug: string }>) || []
   const tags = (video.tags as Array<{ name: string; label: string }>) || []
   const format = (video.format as string) || 'portrait'
+  const resolvedAspectRatio = resolvedMedia &&
+    resolvedMedia.videoId === currentVideoId &&
+    resolvedMedia.sourceUrl === currentVideoUrl
+    ? resolvedMedia.ratio
+    : null
+  const isLandscape = resolvedAspectRatio !== null
+    ? resolvedAspectRatio > 1
+    : format === 'landscape'
   const description = video.description as string | null
 
   return (
     <div className="max-w-7xl mx-auto animate-vert-fade-in">
-      {/* Desktop watch stage: the player stays in the left column while the
-          surrounding app viewport scrolls. The 84px desktop budget is the
-          56px header plus the grid's new 12px top/bottom padding, so the
-          player cannot create a second page scrollbar. Mobile stacks normally. */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,0.85fr)_minmax(320px,1.45fr)_minmax(240px,320px)] gap-6 p-4 md:p-6 lg:gap-4 lg:p-3 lg:items-start">
-        {/* ============== LEFT COLUMN: viewport-fitted player ============== */}
-        <div className="min-w-0 lg:sticky lg:top-0 lg:self-start">
-          <div className="w-full flex justify-center lg:justify-start">
-            <VideoPlayer
-              videoUrl={video.videoUrl as string}
-              thumbnailUrl={video.thumbnailUrl as string | null}
-              title={video.title as string}
-              format={format}
-              videoId={video.id as string}
-            />
+      {/* Desktop watch stage: portrait and square media keep the three-column
+          composition, while landscape media gets a wider main column with
+          details/comments stacked beneath the player. The 84px desktop
+          budget is the 56px header plus the grid's 12px top/bottom padding,
+          so the player cannot create a second page scrollbar. Mobile stacks
+          normally for every format. */}
+      <div className={`grid grid-cols-1 ${isLandscape ? 'lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)]' : 'lg:grid-cols-[minmax(250px,0.85fr)_minmax(320px,1.45fr)_minmax(240px,320px)]'} gap-6 p-4 md:p-6 lg:gap-4 lg:p-3 lg:items-start`}>
+        {/* Landscape keeps player and details in one wide main column;
+            portrait/square expose both as separate desktop grid items. */}
+        <div className={`min-w-0 ${isLandscape ? 'lg:flex lg:flex-col lg:gap-6' : 'lg:contents'}`}>
+          {/* ============== PLAYER: viewport-fitted on portrait ============== */}
+          <div className={`min-w-0 ${isLandscape ? '' : 'lg:sticky lg:top-0 lg:self-start'}`}>
+            <div className="w-full flex justify-center lg:justify-start">
+              <VideoPlayer
+                key={video.id as string}
+                videoUrl={video.videoUrl as string}
+                thumbnailUrl={video.thumbnailUrl as string | null}
+                title={video.title as string}
+                format={format}
+                videoId={video.id as string}
+                onAspectRatioChange={handleAspectRatioChange}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* ============== CENTER COLUMN: profile, details, and comments ============== */}
-        <div className="min-w-0">
+          {/* ============== DETAILS: profile, details, and comments ============== */}
+          <div className="min-w-0">
           {/* ----------------------------------------------------------
               BLOCK 2: TITLE + TAGS (same semantic group — both
               describe what the video is)
@@ -322,6 +345,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
             <h2 id="watch-comments-heading" className="sr-only">Comments</h2>
             <CommentSection videoId={video.id as string} />
           </section>
+          </div>
         </div>
 
         {/* ============== RIGHT COLUMN: fixed ad + scrolling Up Next ============== */}
