@@ -37,6 +37,16 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.23] — 2026-08-08
+
+### Changed
+- **Watch-page actions are easier to scan and use.** Share and Save now explain themselves at a glance, while less-common reporting actions live behind a simple More menu.
+- **Comments invite participation more clearly.** Signed-out visitors can go straight to login, signed-in users get a stronger writing surface, and empty conversations keep their compact invitation.
+- **Video controls are easier to tap.** Playback, sound, settings, fullscreen, and seeking have roomier targets without overflowing compact players.
+- **The watch page feels calmer around discovery.** Advertisement space is quieter and Up Next has a clearer heading with a safe fallback for missing titles.
+
+---
+
 ## [0.6.22] — 2026-08-08
 
 ### Changed
@@ -403,7 +413,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.22...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.23...HEAD
+[0.6.23]: https://github.com/TisoneK/vert/releases/tag/v0.6.23
 [0.6.22]: https://github.com/TisoneK/vert/releases/tag/v0.6.22
 [0.6.21]: https://github.com/TisoneK/vert/releases/tag/v0.6.21
 [0.6.20]: https://github.com/TisoneK/vert/releases/tag/v0.6.20

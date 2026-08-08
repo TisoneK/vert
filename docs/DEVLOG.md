@@ -21,6 +21,46 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.23] — 2026-08-08
+
+### Changed
+
+#### Remaining watch-page UX polish
+
+**Files:** `src/components/vert/VideoPlayer.tsx`,
+`src/components/vert/VideoDetail.tsx`, `src/components/vert/CommentSection.tsx`,
+`src/components/vert/FlagDialog.tsx`, `src/components/vert/RelatedVideos.tsx`
+
+Completed the remaining safe watch-page improvements from the UX review in four
+sequential phases:
+
+- **Player controls:** enlarged the primary control targets and icons, added
+  explicit browser titles, thickened the seek target, and hid the volume slider
+  below the medium breakpoint to prevent overflow on compact landscape/square
+  players. Existing keyboard shortcuts and slider semantics remain unchanged.
+- **Comments:** logged-out visitors now get a real keyboard-accessible login CTA;
+  authenticated composers use a higher-contrast white/dark surface with stronger
+  borders and focus treatment. Empty-state copy and compact spacing remain intact.
+- **Actions:** the title is a stronger typographic anchor, Share receives the
+  primary violet treatment and a responsive label, Save gets a responsive label,
+  and Report moves into a Radix overflow menu. `FlagDialog` now supports a
+  controlled, triggerless mode so the existing report form is reused without
+  nesting a dialog trigger inside a dropdown item.
+- **Discovery/ad context:** the provider-neutral ad slot is visually quieter,
+  Up Next has a stronger section heading, and missing recommendation titles fall
+  back to `Untitled video` rather than rendering an empty card heading.
+
+No recommendation deduplication, generated metadata, real ad inventory, or
+broader Vert identity redesign was introduced; those remain product/content
+work rather than safe presentation fixes.
+
+**Verification:** `npx tsc --noEmit`, targeted ESLint for all five changed
+components, `git diff --check`, and `npx next build` passed. The production
+build generated all 47 routes without errors. Code review found no concrete
+responsive, focus, or dialog-lifecycle regression.
+
+---
+
 ## [0.6.22] — 2026-08-08
 
 ### Changed
