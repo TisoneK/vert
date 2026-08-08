@@ -54,12 +54,11 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
             onMouseEnter={() => prefetchVideo(video.id)}
             onTouchStart={() => prefetchVideo(video.id)}
           >
-            {/* Thumbnail — aspect ratio follows the video's format so
-                portrait videos show as portrait, not squished into 16:9.
-                The thumbnail width stays fixed at w-32; the height follows
-                from the aspect ratio. */}
+            {/* Desktop's compact rail uses a dense 16:9 preview so more
+                recommendations remain scannable above the fold. The normal
+                mobile/tablet list keeps the video's real format. */}
             <div className="relative w-32 shrink-0 rounded overflow-hidden bg-zinc-200 dark:bg-zinc-800">
-              <div className={`relative ${video.format === 'portrait' ? 'aspect-[9/16]' : video.format === 'square' ? 'aspect-square' : 'aspect-video'}`}>
+              <div className={`relative ${compact ? 'aspect-video' : video.format === 'portrait' ? 'aspect-[9/16]' : video.format === 'square' ? 'aspect-square' : 'aspect-video'}`}>
                 {video.thumbnailUrl ? (
                   <Image
                     src={video.thumbnailUrl}
