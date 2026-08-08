@@ -238,7 +238,6 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               <VoteButtons
                 videoId={video.id as string}
                 likeCount={video.likeCount as number}
-                dislikeCount={video.dislikeCount as number}
                 userVote={userVote}
               />
               <button
@@ -249,6 +248,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                     : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                 }`}
                 aria-label={isSaved ? 'Remove from saved' : 'Save for later'}
+                title={isSaved ? 'Remove from saved' : 'Save for later'}
               >
                 {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
               </button>
@@ -257,6 +257,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                   onClick={() => setShowShareMenu(!showShareMenu)}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors active:scale-95 duration-100"
                   aria-label="Share"
+                  title="Share"
                 >
                   <Share2 className="h-4 w-4" />
                 </button>

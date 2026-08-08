@@ -8,14 +8,12 @@ import { formatViews } from '@/lib/utils-vert'
 interface VoteButtonsProps {
   videoId: string
   likeCount: number
-  dislikeCount: number
   userVote: string | null
 }
 
-export function VoteButtons({ videoId, likeCount: initialLikes, dislikeCount: initialDislikes, userVote: initialVote }: VoteButtonsProps) {
+export function VoteButtons({ videoId, likeCount: initialLikes, userVote: initialVote }: VoteButtonsProps) {
   const { user } = useAuth()
   const [likeCount, setLikeCount] = useState(initialLikes)
-  const [dislikeCount, setDislikeCount] = useState(initialDislikes)
   const [userVote, setUserVote] = useState<string | null>(initialVote)
   const [loading, setLoading] = useState(false)
   const [animatingVote, setAnimatingVote] = useState<string | null>(null)
@@ -35,20 +33,16 @@ export function VoteButtons({ videoId, likeCount: initialLikes, dislikeCount: in
       if (data.action === 'removed') {
         setUserVote(null)
         if (voteType === 'like') setLikeCount((c) => c - 1)
-        else setDislikeCount((c) => c - 1)
       } else if (data.action === 'changed') {
         setUserVote(voteType)
         if (voteType === 'like') {
           setLikeCount((c) => c + 1)
-          setDislikeCount((c) => c - 1)
         } else {
-          setDislikeCount((c) => c + 1)
           setLikeCount((c) => c - 1)
         }
       } else if (data.action === 'created') {
         setUserVote(voteType)
         if (voteType === 'like') setLikeCount((c) => c + 1)
-        else setDislikeCount((c) => c + 1)
       }
     } catch (error) {
       console.error('Vote error:', error)
@@ -63,6 +57,8 @@ export function VoteButtons({ videoId, likeCount: initialLikes, dislikeCount: in
       <button
         onClick={() => handleVote('like')}
         disabled={loading || !user}
+        aria-label={user ? (userVote === 'like' ? 'Remove like' : 'Like video') : 'Log in to like this video'}
+        title={user ? (userVote === 'like' ? 'Remove like' : 'Like video') : 'Log in to like this video'}
         className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-colors active:scale-95 duration-100 ${
           animatingVote === 'like' ? 'animate-vote-pulse' : ''
         } ${
@@ -77,6 +73,8 @@ export function VoteButtons({ videoId, likeCount: initialLikes, dislikeCount: in
       <button
         onClick={() => handleVote('dislike')}
         disabled={loading || !user}
+        aria-label={user ? (userVote === 'dislike' ? 'Remove dislike' : 'Dislike video') : 'Log in to dislike this video'}
+        title={user ? (userVote === 'dislike' ? 'Remove dislike' : 'Dislike video') : 'Log in to dislike this video'}
         className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-sm font-medium transition-colors active:scale-95 duration-100 ${
           animatingVote === 'dislike' ? 'animate-vote-pulse' : ''
         } ${

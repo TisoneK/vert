@@ -108,13 +108,14 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
     if (sort === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     return 0 // 'top' - default order from API
   })
+  const isEmpty = !loading && sortedComments.length === 0
 
   return (
     <div className={compact ? 'mt-0' : 'mt-6'}>
       {/* Header with count and sort */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          {comments.length} Comment{comments.length !== 1 ? 's' : ''}
+          {comments.length > 0 ? `${comments.length} Comment${comments.length !== 1 ? 's' : ''}` : 'Comments'}
         </h3>
         <div className="relative">
           <select
@@ -131,7 +132,7 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
 
       {/* Add comment */}
       {user ? (
-        <div className="flex gap-3 mb-6">
+        <div className={`flex gap-3 ${isEmpty ? 'mb-3' : 'mb-6'}`}>
           <div className="shrink-0">
             <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-xs font-bold">
               {user.username[0]?.toUpperCase()}
@@ -164,7 +165,9 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
           </div>
         </div>
       ) : (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">Log in to add a comment.</p>
+        <p className={`text-sm text-zinc-500 dark:text-zinc-400 ${isEmpty ? 'mb-3' : 'mb-6'}`}>
+          Log in to add a comment.
+        </p>
       )}
 
       {/* Comments list */}
@@ -175,8 +178,8 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
           ))}
         </div>
       ) : sortedComments.length === 0 ? (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 py-4">
-          No comments yet. Be the first to say something.
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 pt-0.5 pb-2">
+          Be the first to start the conversation.
         </p>
       ) : (
         <div className={compact ? 'space-y-4' : 'space-y-4 max-h-96 overflow-y-auto custom-scrollbar'}>
