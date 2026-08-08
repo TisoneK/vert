@@ -21,6 +21,45 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.19] — 2026-08-08
+
+### Fixed
+
+#### Viewport-fitted player and independent Up Next rail
+
+**Files:** `src/components/vert/VideoDetail.tsx`,
+`src/components/vert/VideoPlayer.tsx`, `src/app/globals.css`
+
+The previous player budget used the full viewport minus only a small header
+allowance, while the app's `<main>` viewport is already reduced by the 56px
+header and the watch grid contributes 24px of top and bottom padding. The
+portrait stage now uses the shared desktop budget `calc(100dvh - 104px)` and
+subtracts its 4px inset when deriving the frame width from the actual media
+ratio. This keeps the player inside the app's existing scroll viewport instead
+of creating a second page scrollbar. The stage rules are desktop-only; below
+1024px the player returns to natural full-width document flow.
+
+Media metadata now overrides a stale format hint when deciding whether a
+portrait stage is needed. This prevents a landscape upload labeled portrait
+from reserving an unnecessarily tall dark area. The error fallback uses the
+same ratio and viewport-safe sizing.
+
+The desktop right rail is now a fixed-height flex column. Advertisement is a
+non-scrolling sibling at the top, while Up Next is a `min-h-0 flex-1` region
+with `overflow-y-auto` and `overscroll-contain`. Scrolling recommendations
+therefore does not move the ad or chain unexpectedly into the main page. The
+settings popup remains outside the media clipping wrapper.
+
+**Verification:** TypeScript, targeted ESLint, `git diff --check`, and
+`npx next build` passed; all 47 routes generated. The hosted root and public
+watch route (`https://vert-wine.vercel.app/watch/cmr3el1ie0001l80400phsk19`)
+loaded with the player, profile, comments, Up Next, Advertisement, and settings
+controls present and no critical console errors. Precise hosted scroll and
+bounding-rectangle interaction checks were blocked by the browser runner's
+malformed empty click/evaluate payloads; no measured geometry pass is claimed.
+
+---
+
 ## [0.6.18] — 2026-08-07
 
 ### Changed

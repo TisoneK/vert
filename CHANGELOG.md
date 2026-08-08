@@ -37,6 +37,14 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.19] — 2026-08-08
+
+### Fixed
+- **Portrait watch videos now fit the screen without adding an extra page scroll.** The player keeps its full shape and no longer leaves oversized dark space above or below the video.
+- **The Advertisement stays visible while browsing Up Next.** Recommendations now scroll in their own panel instead of moving the ad out of view.
+
+---
+
 ## [0.6.18] — 2026-08-07
 
 ### Changed
@@ -369,7 +377,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.18...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.19...HEAD
+[0.6.19]: https://github.com/TisoneK/vert/releases/tag/v0.6.19
 [0.6.18]: https://github.com/TisoneK/vert/releases/tag/v0.6.18
 [0.6.17]: https://github.com/TisoneK/vert/releases/tag/v0.6.17
 [0.6.16]: https://github.com/TisoneK/vert/releases/tag/v0.6.16

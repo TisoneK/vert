@@ -130,13 +130,12 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   return (
     <div className="max-w-7xl mx-auto animate-vert-fade-in">
       {/* Desktop watch stage: the player stays in the left column while the
-          surrounding app viewport scrolls. Up Next occupies a dedicated rail
-          on the right, matching the desktop pattern used by long-form watch
-          pages while keeping portrait video readable. Mobile stacks both
-          columns back into the normal page flow. */}
+          surrounding app viewport scrolls. The 104px desktop budget is the
+          56px header plus the grid's 24px top/bottom padding, so the player
+          cannot create a second page scrollbar. Mobile stacks normally. */}
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,0.85fr)_minmax(320px,1.45fr)_minmax(240px,320px)] gap-6 p-4 md:p-6 lg:items-start">
         {/* ============== LEFT COLUMN: viewport-fitted player ============== */}
-        <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
+        <div className="min-w-0 lg:sticky lg:top-0 lg:self-start">
           <div className="w-full flex justify-center lg:justify-start">
             <VideoPlayer
               videoUrl={video.videoUrl as string}
@@ -324,13 +323,20 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
           </section>
         </div>
 
-        {/* ============== RIGHT COLUMN: Advertisement + Up Next ============== */}
+        {/* ============== RIGHT COLUMN: fixed ad + scrolling Up Next ============== */}
         <aside
-          className="hidden lg:flex lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:flex-col lg:gap-5 lg:overflow-y-auto custom-scrollbar lg:pr-2"
+          className="hidden lg:flex lg:sticky lg:top-0 lg:h-[calc(100dvh-104px)] lg:max-h-[calc(100dvh-104px)] lg:min-h-0 lg:flex-col lg:gap-5"
           aria-label="Up next and advertisement"
         >
-          <AdSlot headingId="watch-ad-heading-desktop" />
-          <section aria-labelledby="watch-up-next-heading">
+          {/* Keep the ad outside the scrolling region, so it remains visible
+              while the recommendation list moves independently below it. */}
+          <div className="shrink-0">
+            <AdSlot headingId="watch-ad-heading-desktop" />
+          </div>
+          <section
+            aria-labelledby="watch-up-next-heading"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain custom-scrollbar pr-2"
+          >
             <h2 id="watch-up-next-heading" className="sr-only">Up next</h2>
             <RelatedVideos videoId={videoId} compact />
           </section>

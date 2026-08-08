@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, type CSSProperties } from 'react'
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Loader2 } from 'lucide-react'
 import Hls from 'hls.js'
 import { put } from '@vercel/blob/client'
@@ -572,25 +572,28 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  const isPortrait = format === 'portrait' || (videoAspectRatio !== null && videoAspectRatio < 1)
+  // Once metadata is available, trust the media's real dimensions over the
+  // database format hint. A mislabeled landscape source must not reserve a
+  // portrait-height stage (and a portrait source should still fit if its
+  // format hint was stale).
+
+  const playerRatio = videoAspectRatio ?? (
+    format === 'portrait' ? 9 / 16 : format === 'square' ? 1 : 16 / 9
+  )
+  const playerFrameStyle = {
+    '--watch-player-ratio': playerRatio,
+    aspectRatio: `${playerRatio}`,
+  } as CSSProperties
+
+  const isPortrait = videoAspectRatio !== null ? videoAspectRatio < 1 : format === 'portrait'
 
   // Error state — show a simple error message when video fails to load
   if (hasError) {
     return (
-      <div className={`w-full flex justify-center rounded-lg overflow-hidden p-0.5 ${isPortrait ? 'lg:h-[calc(100dvh-4rem)] lg:max-h-[calc(100dvh-4rem)]' : ''}`}>
+      <div className={`watch-player-stage w-full flex justify-center rounded-lg p-0.5 ${isPortrait ? 'watch-player-stage--portrait' : ''}`}>
         <div
-          className={`relative bg-zinc-900 overflow-hidden flex items-center justify-center max-w-full max-h-full ${isPortrait ? 'w-full lg:h-full lg:w-auto' : 'w-full h-auto'}`}
-          style={{
-            aspectRatio: videoAspectRatio
-          ? `${videoAspectRatio}`
-          : format === 'portrait'
-            ? '9/16'
-            : format === 'square'
-              ? '1/1'
-              : '16/9',
-            maxWidth: '100%',
-            maxHeight: '100%',
-          }}
+          className={`watch-player-frame relative bg-zinc-900 overflow-hidden flex items-center justify-center ${isPortrait ? 'watch-player-frame--portrait' : 'watch-player-frame--wide'}`}
+          style={playerFrameStyle}
         >
           {thumbnailUrl ? (
             <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover opacity-50" />
@@ -611,32 +614,18 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     : 0
 
   return (
-    // Mobile fills the available width. On desktop, portrait media uses the
-    // available viewport height as its sizing axis, while landscape/square
-    // media remains width-driven. This prevents a tall portrait frame from
-    // extending beyond the visible screen and leaves the full frame visible.
-    <div className={`w-full flex justify-center lg:justify-start rounded-lg p-0.5 ${isPortrait ? 'lg:h-[calc(100dvh-4rem)] lg:max-h-[calc(100dvh-4rem)]' : ''}`}>
+    // Mobile fills the available width. On desktop, the stage and frame use
+    // the same viewport budget, while the frame width is calculated from its
+    // aspect ratio. That prevents an empty dark stage above/below the video.
+    <div className={`watch-player-stage w-full flex justify-center lg:justify-start rounded-lg p-0.5 ${isPortrait ? 'watch-player-stage--portrait' : ''}`}>
     <div
       ref={containerRef}
       // tabIndex={0} makes the container focusable, enabling keyboard shortcuts.
       // The outline is hidden on focus to avoid visual clutter, but we keep
       // focus-visible:ring for accessibility when navigating with Tab.
       tabIndex={0}
-      className={`relative bg-black group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2 w-full h-auto max-w-full max-h-full ${isPortrait ? 'lg:h-full lg:w-auto' : 'lg:w-full lg:h-auto'}`}
-      style={{
-        // Keep the full frame visible while fitting portrait and landscape
-        // media into the available desktop viewport. The 4rem allowance
-        // leaves room for the header and a little breathing room above/below.
-        aspectRatio: videoAspectRatio
-          ? `${videoAspectRatio}`
-          : format === 'portrait'
-            ? '9/16'
-            : format === 'square'
-              ? '1/1'
-              : '16/9',
-        maxWidth: '100%',
-        maxHeight: '100%',
-      }}
+      className={`watch-player-frame relative bg-black group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2 ${isPortrait ? 'watch-player-frame--portrait' : 'watch-player-frame--wide'}`}
+      style={playerFrameStyle}
     >
       {/* Video clipping wrapper — overflow-hidden here clips the video
           corners to match the container's rounded-lg. We deliberately do
