@@ -297,3 +297,10 @@ if literally nothing slowed you down.
 - **Cause:** The local tool environment does not keep a dev server running between commands, and parallel Next build/type generation can temporarily expose an incomplete generated route file.
 - **Workaround / fix:** Recorded the browser limitation honestly, reran typecheck sequentially after the build settled, and confirmed targeted lint/diff checks plus production build passed.
 - **Prevent next time:** Use a tool-managed persistent preview or deployed URL for browser checks; run generated-file-producing Next commands sequentially when typecheck is required.
+---
+## 2026-08-08 — Buffy / openai/gpt-5.6-luna (Session 26)
+- **Problem:** The hosted browser runner loaded the site and public watch page, but repeated geometry/scroll attempts failed before inspection because the automation serialized empty `chrome-devtools` click/evaluate payloads (`uid`/`function` undefined).
+- **Cost:** Moderate — hosted smoke checks succeeded, but exact player bounds and independent-scroll movement could not be measured visually in this session.
+- **Cause:** Browser automation action serialization failed independently of the hosted application.
+- **Workaround / fix:** Used code review, CSS math inspection, typecheck, targeted lint, diff check, production build, and no-interaction hosted smoke checks; recorded the limitation rather than claiming a geometry pass.
+- **Prevent next time:** Prefer a browser run that supports direct URL/DOM inspection without emitting empty interaction calls, then capture player/rail bounding rectangles and scrollTop before and after a concrete Up Next scroll.

@@ -52,7 +52,7 @@ Generation rules for the bootstrapping agent:
 - **Project repository URL:** https://github.com/TisoneK/vert.git
 - **Project repo privacy:** Public _(verified 2026-07-14 — unauthenticated GitHub API returns 200)_
 - **Default branch:** main
-- **Live application:** N/A — deploys to Vercel (auto-redeploy on push to `main`); no public URL recorded yet
+- **Live application:** https://vert-wine.vercel.app/ — Vercel production deployment (auto-redeploy on push to `main`); hosted watch verification performed 2026-08-08
 - **Git identity:** Tisone Kironget `tisonkironget@gmail.com`
 - **Protocol:** vendored at `.context/core/` (version: see `.context/core/VERSION`)
 - **Package upstream (core updates + flaw back-ports):** https://github.com/TisoneK/.context.git

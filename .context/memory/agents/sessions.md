@@ -204,3 +204,12 @@ past entries — append corrections instead.
 - **Open items:** Browser smoke verification was blocked because port 3000 had no listener; video transcoding/HLS, test suite, and Dependabot remain separate backlog work.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-07-session-25-review.md
+---
+## 2026-08-08 — Session 26
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini (macOS 15.7.7) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Fit the desktop watch player to the app viewport, keep Advertisement visible while Up Next scrolls independently, and remove oversized dark player framing.
+- **Commits:** pending — product/release/context closeout in progress.
+- **Outcome:** done — desktop player uses a header/grid-aware viewport budget; the ad is outside the Up Next scroll region; mobile/tablet sizing returns to natural flow; real media metadata overrides stale format hints.
+- **Open items:** Precise hosted geometry/scroll interaction verification is blocked by malformed empty Chrome click/evaluate payloads; video transcoding/HLS, test suite, and Dependabot remain separate backlog work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-08-session-26-review.md

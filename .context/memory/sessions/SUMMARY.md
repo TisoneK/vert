@@ -64,3 +64,6 @@ records.
 ---
 - **2026-08-07 — Session 25** — Buffy / openai/gpt-5.6-luna — refined the watch page into three desktop columns (video left, profile/details/comments center, Up Next right) and capped portrait playback to the visible desktop viewport using `100dvh` while preserving the full frame. Browser smoke check was blocked because port 3000 had no listener.
   Detail: .context/memory/reviews/2026-08-07-session-25-review.md
+---
+- **2026-08-08 — Session 26** — Buffy / openai/gpt-5.6-luna — released the viewport-budgeted watch player and split the right rail into a fixed Advertisement plus independently scrolling Up Next. Mobile/tablet stage sizing returns to natural flow and stale format hints are overridden by media metadata. Hosted root/watch smoke loaded with required surfaces and no critical console errors; precise geometry interaction was blocked by malformed browser actions.
+  Detail: .context/memory/reviews/2026-08-08-session-26-review.md
