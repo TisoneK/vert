@@ -319,6 +319,14 @@ if literally nothing slowed you down.
 - **Workaround / fix:** Audited the existing diff against ADRs, committed interaction and recommendation-density phases independently, used bounded reads/targeted validation, then completed `0.6.21` release and context records.
 - **Prevent next time:** On any interrupted session, split the existing tree into product phases before editing; use targeted reads for large append-only memory files and verify release version/tag state before closeout.
 ---
+## 2026-08-08 — Buffy / openai/gpt-5.6-luna (Session 30)
+- **Problem:** A broad exact-string edit that added the visible Share label duplicated its `title` JSX attribute, which the first phase-specific review did not catch.
+- **Cost:** Low — the final typecheck caught it immediately before release.
+- **Cause:** The replacement targeted an existing attribute block while another replacement had already added the same attribute.
+- **Workaround / fix:** Read the combined JSX around the action row, removed the duplicate attribute, and reran the complete validation/build suite.
+- **Prevent next time:** After multiple same-file replacements, inspect the final rendered block before parallel review; use one consolidated replacement for closely related JSX attributes.
+
+---
 ## 2026-08-08 — Buffy / openai/gpt-5.6-luna (Session 29)
 - **Problem:** Making the outer watch grid follow actual media dimensions required a callback from `VideoPlayer`, and the first pass exposed a nullability error followed by a Rules-of-Hooks placement error during validation.
 - **Cost:** Low — the failures were caught before commit by typecheck/lint and fixed with a source-scoped resolved-ratio state plus a stable callback declared before early returns.

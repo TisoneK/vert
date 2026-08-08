@@ -240,3 +240,12 @@ past entries — append corrections instead.
 - **Open items:** Player control sizing, logged-out comment CTA, composer contrast, title-area density, Report hierarchy, ad/monetization presentation, Vert product identity, video transcoding/HLS, test suite, and Dependabot vulnerability remain separate work.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-08-session-29-review.md
+---
+## 2026-08-08 — Session 30
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Finish the remaining watch-page UX polish continuously in sequential phases after the format-aware desktop layout.
+- **Commits:** product `1e26bf5`; release/context closeout pending.
+- **Outcome:** done — player controls, comment login/composer, title/action hierarchy, Report overflow, ad restraint, and Up Next fallback shipped as `0.6.23`.
+- **Open items:** Dislike counts, generated metadata/deduplication, real ad inventory, broader Vert identity, video transcoding/HLS, test suite, and Dependabot vulnerability remain separate backlog/product work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-08-session-30-review.md

@@ -344,3 +344,10 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Consequences:** Landscape videos gain a larger, more readable player and a coherent primary-content column without changing the established portrait hierarchy or mobile/tablet behavior. The layout can shift once metadata resolves when stored format data is stale; this is preferable to permanently reserving the wrong composition. Recommendation placement, ad behavior, and external download tooling remain unchanged.
 
 ---
+## ADR-22: Sequential watch-page UX polish (2026-08-08)
+- **Status:** accepted
+- **Context:** After the format-aware desktop composition, the remaining reviews identified several safe interaction and hierarchy improvements: cramped player controls, passive logged-out comment copy, faint composer contrast, equal visual weight for Report, and a visually dominant provider-neutral ad placeholder.
+- **Decision:** Improve the existing watch-page interaction model without adding services or inventing content. Use larger player targets while hiding only the compact volume slider below `md`; provide a real logged-out login CTA and stronger composer focus/surface styling; give Share and Save responsive labels, move Report into a More overflow menu, and reuse `FlagDialog` through a controlled triggerless mode; quiet the ad slot and strengthen Up Next heading/fallback copy.
+- **Consequences:** Playback and commenting become more actionable across mouse, touch, keyboard, and assistive use; primary actions gain hierarchy while reporting remains discoverable; compact players avoid control overflow. The ad remains clearly a reserved provider-neutral slot. Dislike counts, generated metadata, recommendation deduplication, real ad inventory, and a broad Vert identity redesign remain separate product/content/service decisions.
+
+---
