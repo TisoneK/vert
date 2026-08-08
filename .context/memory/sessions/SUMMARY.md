@@ -67,3 +67,9 @@ records.
 ---
 - **2026-08-08 — Session 26** — Buffy / openai/gpt-5.6-luna — released the viewport-budgeted watch player and split the right rail into a fixed Advertisement plus independently scrolling Up Next. Mobile/tablet stage sizing returns to natural flow and stale format hints are overridden by media metadata. Hosted root/watch smoke loaded with required surfaces and no critical console errors; precise geometry interaction was blocked by malformed browser actions.
   Detail: .context/memory/reviews/2026-08-08-session-26-review.md
+---
+- **2026-08-08 — Session 27** — Buffy / openai/gpt-5.6-luna — tightened desktop watch spacing to 12px outer padding and a 16px column gap, preserving mobile/tablet spacing and updating the viewport budget. Hosted smoke observed the compact layout with no JavaScript errors.
+  Detail: .context/memory/reviews/2026-08-08-session-27-review.md
+---
+- **2026-08-08 — Session 28** — Buffy / openai/gpt-5.6-luna — resumed and completed the interrupted watch-page UX work in two product phases: compact comments/action guidance (`c622008`) and dense desktop Up Next previews (`95d792c`); published `0.6.21` with ADR-19/20. Hosted watch surfaces were present with no console errors; production build passed.
+  Detail: .context/memory/reviews/2026-08-08-session-27-review.md

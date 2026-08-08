@@ -315,3 +315,25 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Context:** The Session 25 player still exceeded the app's actual main viewport because its `100dvh` budget did not account for the 56px header and 24px watch-grid padding. Advertisement also shared the right rail's scroll context, so browsing Up Next could move the ad away.
 - **Decision:** Treat the app's desktop player budget as `100dvh - 104px` (header plus grid padding), subtract the stage inset when deriving portrait frame width, and apply the fixed-height stage only at the desktop breakpoint. Let real media metadata override stale format hints. Make the right rail a fixed-height flex column with a non-scrolling Advertisement sibling and a separate `min-h-0 flex-1 overflow-y-auto overscroll-contain` Up Next region. Keep mobile/tablet in natural document flow.
 - **Consequences:** Portrait playback no longer creates an extra page scrollbar or oversized dark framing, and the advertisement remains visible while recommendations scroll. The browser runner's precise hosted geometry pass remains blocked by malformed empty interaction payloads; layout correctness is covered by code review, typecheck, lint, diff check, and production build.
+---
+## ADR-18: Compact desktop watch spacing (2026-08-08)
+- **Status:** accepted
+- **Context:** After the viewport and rail fixes, the watch page still had excessive desktop whitespace around the player from broad grid padding and column gap.
+- **Decision:** At the desktop breakpoint only, use 12px grid padding and a 16px column gap. Keep mobile/tablet spacing unchanged. Update the shared player/right-rail viewport budget from `100dvh - 104px` to `100dvh - 84px`, and keep the 4px player inset accounted for in the frame calculation.
+- **Consequences:** The player sits closer to surrounding content and uses more available desktop width without changing the mobile reading flow or breaking viewport-fit behavior.
+
+---
+## ADR-19: Watch-page interaction clarity without action-model expansion (2026-08-08)
+- **Status:** accepted
+- **Context:** The UX reviews identified a large empty-state gap and weak discoverability for icon-only watch actions. They also suggested showing dislike counts and moving Report into an overflow menu, but neither suggestion was supported by product requirements or runtime evidence.
+- **Decision:** Keep the existing action model and improve its current affordances: use a compact invitation for empty comments, label the empty section as `Comments` rather than repeating a zero count, add browser titles and accessible labels to Save/Share, and explain the sign-in requirement for disabled vote controls. Do not add dislike counts or restructure Report without a separate product decision.
+- **Consequences:** Empty watch pages use less unexplained space and assistive/hover users receive clearer guidance while the restrained action hierarchy remains intact. Future action reorganization must be evaluated as an interaction-model change, not folded into spacing polish.
+
+---
+## ADR-20: Compact desktop Up Next previews (2026-08-08)
+- **Status:** accepted
+- **Context:** The desktop right rail has limited vertical space and the supplied reviews consistently noted that native portrait thumbnails expose too few recommendations above the fold. Mobile/tablet layouts have more natural document flow and benefit from preserving each video's actual format.
+- **Decision:** In the `compact` desktop Up Next variant only, use a consistent 16:9 preview frame with the existing cover behavior. Keep format-specific portrait, square, and landscape previews in the normal mobile/tablet variant.
+- **Consequences:** Desktop users can scan more recommendations at the cost of cropping portrait previews in that rail. The crop is intentional and must not be generalized to the mobile/tablet list without new evidence.
+
+---

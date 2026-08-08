@@ -213,3 +213,21 @@ past entries — append corrections instead.
 - **Open items:** Precise hosted geometry/scroll interaction verification is blocked by malformed empty Chrome click/evaluate payloads; video transcoding/HLS, test suite, and Dependabot remain separate backlog work.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-08-session-26-review.md
+---
+## 2026-08-08 — Session 27
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Reduce excess desktop spacing around the watch video container while preserving the three-column responsive layout.
+- **Commits:** pending — product/release/context closeout in progress.
+- **Outcome:** done — desktop grid uses 12px outer padding and 16px column gap; mobile/tablet spacing remains unchanged; player and right-rail viewport budgets stay aligned.
+- **Open items:** Existing video transcoding/HLS, test suite, and Dependabot vulnerability remain separate backlog work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-08-session-27-review.md
+---
+## 2026-08-08 — Session 28
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Resume and finish the interrupted Session 27 watch-page UX work in explicit product/release phases.
+- **Commits:** 4 — `c622008` and `95d792c` product phases, plus the `0.6.21` release and context closeout commits.
+- **Outcome:** done — compact comments/actions, dense desktop Up Next previews, release `0.6.21`, ADR-19/20, and full review/context closeout completed.
+- **Open items:** Existing video transcoding/HLS, test suite, Dependabot high-severity vulnerability, and any broader Report/action-menu redesign remain separate work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-08-session-27-review.md

@@ -304,3 +304,17 @@ if literally nothing slowed you down.
 - **Cause:** Browser automation action serialization failed independently of the hosted application.
 - **Workaround / fix:** Used code review, CSS math inspection, typecheck, targeted lint, diff check, production build, and no-interaction hosted smoke checks; recorded the limitation rather than claiming a geometry pass.
 - **Prevent next time:** Prefer a browser run that supports direct URL/DOM inspection without emitting empty interaction calls, then capture player/rail bounding rectangles and scrollTop before and after a concrete Up Next scroll.
+---
+## 2026-08-08 — Buffy / openai/gpt-5.6-luna (Session 27)
+- **Problem:** The watch spacing refinement required keeping the player and right rail's viewport math synchronized after reducing desktop grid padding.
+- **Cost:** Low — the spacing change was isolated and validation remained sequential and clean.
+- **Cause:** The previous `100dvh - 104px` budget encoded the old 24px top/bottom grid padding.
+- **Workaround / fix:** Changed the desktop grid to `lg:p-3 lg:gap-4` and updated the stage/rail budget to `100dvh - 84px` plus the inset-adjusted frame calculation; mobile/tablet rules were left unchanged.
+- **Prevent next time:** Keep the desktop spacing tokens and viewport budget documented together whenever the watch grid changes.
+---
+## 2026-08-08 — Buffy / openai/gpt-5.6-luna (Session 28)
+- **Problem:** Resuming the interrupted session required separating a mixed product/context diff and reconciling release metadata before closeout; large memory files also exceeded single-read limits.
+- **Cost:** Low — the pending work was preserved, and targeted reads plus separate product commits avoided rework.
+- **Cause:** The prior session stopped after writing context notes but before committing the product phases and release bookkeeping; context history files are intentionally append-only and large.
+- **Workaround / fix:** Audited the existing diff against ADRs, committed interaction and recommendation-density phases independently, used bounded reads/targeted validation, then completed `0.6.21` release and context records.
+- **Prevent next time:** On any interrupted session, split the existing tree into product phases before editing; use targeted reads for large append-only memory files and verify release version/tag state before closeout.
