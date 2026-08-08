@@ -37,6 +37,17 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.21] — 2026-08-08
+
+### Fixed
+- **Empty comment sections are more inviting.** The composer now sits closer to the conversation starter instead of leaving a large unexplained gap.
+- **Watch-page actions are easier to understand.** Save, share, like, dislike, and sign-in-required actions now provide clearer guidance when you hover or use assistive technology.
+
+### Changed
+- **Desktop Up Next shows more recommendations at a glance.** Compact previews use a consistent landscape frame on larger screens, while mobile and tablet previews keep their original video shapes.
+
+---
+
 ## [0.6.20] — 2026-08-08
 
 ### Fixed
@@ -385,7 +396,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.20...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.21...HEAD
+[0.6.21]: https://github.com/TisoneK/vert/releases/tag/v0.6.21
 [0.6.20]: https://github.com/TisoneK/vert/releases/tag/v0.6.20
 [0.6.19]: https://github.com/TisoneK/vert/releases/tag/v0.6.19
 [0.6.18]: https://github.com/TisoneK/vert/releases/tag/v0.6.18

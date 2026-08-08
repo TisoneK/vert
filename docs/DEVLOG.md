@@ -21,6 +21,58 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.21] — 2026-08-08
+
+### Changed
+
+#### Phase 1 — watch-page interaction and empty-state clarity
+
+**Files:** `src/components/vert/CommentSection.tsx`,
+`src/components/vert/VideoDetail.tsx`, `src/components/vert/VoteButtons.tsx`
+
+The empty comments state now uses the neutral `Comments` heading rather than
+repeating a zero count alongside an invitation. The composer/login prompt and
+empty-state copy use a shorter vertical rhythm, so a video with no comments
+reads as an intentional invitation rather than an oversized blank block.
+
+Save and Share retain their compact controls but now expose matching visible
+browser titles and accessible labels. Like/dislike controls provide an explicit
+login instruction when disabled for logged-out viewers, while authenticated
+labels reflect whether the current vote will be added or removed. The
+speculative dislike-count display was deliberately not retained: the supplied
+reviews did not establish it as a product requirement, and a count would add
+visual weight without a confirmed interaction decision.
+
+#### Phase 2 — dense desktop Up Next previews
+
+**File:** `src/components/vert/RelatedVideos.tsx`
+
+The compact desktop rail now uses a consistent 16:9 thumbnail frame so more
+recommendations remain scannable above the fold. This intentionally uses
+`object-cover` cropping for portrait thumbnails only in the compact desktop
+rail. The normal mobile/tablet list continues to derive its preview shape from
+the video's format, preserving the full portrait or square treatment where
+there is more room.
+
+#### Review conclusions and non-changes
+
+The related-video query already excludes the current video, returns each
+record's title, and orders valid ready videos by view count. The review images
+did not provide enough evidence to deduplicate distinct records by title or
+synthesize descriptions/tags, so neither behavior was introduced. The
+provider-neutral Advertisement slot remains fixed outside the Up Next scroll
+surface per ADR-17/18; moving or hiding it requires a separate monetization
+product decision.
+
+**Verification:** TypeScript, targeted ESLint, and `git diff --check` passed.
+A hosted smoke inspection confirmed the player, creator/Subscribe row, actions,
+comments, Advertisement, and Up Next surfaces with no JavaScript console
+errors. Precise hosted bounding-rectangle and scroll measurements remain
+unavailable because the browser interaction runner has previously emitted
+malformed empty action payloads.
+
+---
+
 ## [0.6.20] — 2026-08-08
 
 ### Changed
