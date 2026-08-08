@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.22] — 2026-08-08
+
+### Changed
+- **Landscape videos now get a wider desktop watch layout.** The player, video details, and comments share the main column while Advertisement and Up Next remain visible beside them. Portrait and square videos keep their focused three-column layout, and phones keep the same simple stacked flow.
+
+---
+
 ## [0.6.21] — 2026-08-08
 
 ### Fixed
@@ -396,7 +403,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.21...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.22...HEAD
+[0.6.22]: https://github.com/TisoneK/vert/releases/tag/v0.6.22
 [0.6.21]: https://github.com/TisoneK/vert/releases/tag/v0.6.21
 [0.6.20]: https://github.com/TisoneK/vert/releases/tag/v0.6.20
 [0.6.19]: https://github.com/TisoneK/vert/releases/tag/v0.6.19

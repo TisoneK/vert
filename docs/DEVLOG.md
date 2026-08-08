@@ -21,6 +21,42 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.22] — 2026-08-08
+
+### Changed
+
+#### Format-aware desktop watch composition
+
+**Files:** `src/components/vert/VideoDetail.tsx`,
+`src/components/vert/VideoPlayer.tsx`
+
+The desktop watch page now chooses its composition from the video's media
+format. Landscape media uses a two-column grid: a wide main column stacks the
+player, title/channel/actions, description, categories, and comments, while the
+existing right rail keeps Advertisement fixed and Up Next independently
+scrollable. Portrait and square media retain the existing three-column desktop
+composition so the portrait player stays visually focused beside details and
+the contextual rail.
+
+Mobile and tablet behavior is unchanged: every format returns to normal
+single-column document flow. The layout initially uses the database format, then
+lets `VideoPlayer` report actual media dimensions from `loadedmetadata`; the
+player is keyed by video ID and the resolved ratio is scoped to both ID and
+source URL so stale metadata cannot leak across video navigation or source
+replacement.
+
+This is intentionally a composition change, not a recommendation or ad-model
+change. Up Next remains in the right rail, RelatedVideos is not moved below the
+comments, and no download UI is added because that control belongs to an
+external browser tool.
+
+**Verification:** `npx tsc --noEmit`, targeted ESLint for `VideoDetail.tsx` and
+`VideoPlayer.tsx`, `git diff --check`, and `npx next build` all passed. The
+production build generated the full route set without errors. Code review found
+no concrete responsive or navigation regression.
+
+---
+
 ## [0.6.21] — 2026-08-08
 
 ### Changed
