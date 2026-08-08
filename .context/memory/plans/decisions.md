@@ -337,3 +337,10 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Consequences:** Desktop users can scan more recommendations at the cost of cropping portrait previews in that rail. The crop is intentional and must not be generalized to the mobile/tablet list without new evidence.
 
 ---
+## ADR-21: Format-aware desktop watch composition (2026-08-08)
+- **Status:** accepted
+- **Context:** The three-column desktop watch composition is well suited to portrait media, but it constrains landscape video unnecessarily and leaves the player/details relationship less coherent. The player already resolves actual media dimensions after metadata loads, so the outer layout must be able to correct stale database format hints too.
+- **Decision:** Use the database format as the initial desktop fallback. For landscape media, switch to a two-column desktop grid with a wide main column stacking the player, details, and comments, plus the existing Advertisement/Up Next rail. Keep portrait and square media in the existing three-column desktop composition. Report the actual media ratio from `VideoPlayer` after `loadedmetadata`, scope the resolved ratio to video ID and source URL, and key the player by video ID. Keep all formats in natural single-column flow below the desktop breakpoint.
+- **Consequences:** Landscape videos gain a larger, more readable player and a coherent primary-content column without changing the established portrait hierarchy or mobile/tablet behavior. The layout can shift once metadata resolves when stored format data is stale; this is preferable to permanently reserving the wrong composition. Recommendation placement, ad behavior, and external download tooling remain unchanged.
+
+---

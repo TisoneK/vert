@@ -73,3 +73,6 @@ records.
 ---
 - **2026-08-08 — Session 28** — Buffy / openai/gpt-5.6-luna — resumed and completed the interrupted watch-page UX work in two product phases: compact comments/action guidance (`c622008`) and dense desktop Up Next previews (`95d792c`); published `0.6.21` with ADR-19/20. Hosted watch surfaces were present with no console errors; production build passed.
   Detail: .context/memory/reviews/2026-08-08-session-27-review.md
+---
+- **2026-08-08 — Session 29** — Buffy / openai/gpt-5.6-luna — added format-aware desktop watch composition (`53a213b`): landscape media now gets a wide player/details/comments column beside the existing Advertisement/Up Next rail, while portrait/square and mobile/tablet layouts remain unchanged. Published `0.6.22`; typecheck, targeted lint, diff check, and production build passed.
+  Detail: .context/memory/reviews/2026-08-08-session-29-review.md

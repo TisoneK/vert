@@ -318,3 +318,10 @@ if literally nothing slowed you down.
 - **Cause:** The prior session stopped after writing context notes but before committing the product phases and release bookkeeping; context history files are intentionally append-only and large.
 - **Workaround / fix:** Audited the existing diff against ADRs, committed interaction and recommendation-density phases independently, used bounded reads/targeted validation, then completed `0.6.21` release and context records.
 - **Prevent next time:** On any interrupted session, split the existing tree into product phases before editing; use targeted reads for large append-only memory files and verify release version/tag state before closeout.
+---
+## 2026-08-08 — Buffy / openai/gpt-5.6-luna (Session 29)
+- **Problem:** Making the outer watch grid follow actual media dimensions required a callback from `VideoPlayer`, and the first pass exposed a nullability error followed by a Rules-of-Hooks placement error during validation.
+- **Cost:** Low — the failures were caught before commit by typecheck/lint and fixed with a source-scoped resolved-ratio state plus a stable callback declared before early returns.
+- **Cause:** The initial layout change considered only database format, then the metadata correction was added incrementally without immediately re-running the hook-order checks.
+- **Workaround / fix:** Keyed the player by video ID, scoped resolved media to video ID/source URL, moved the callback above conditional returns, and aligned its dependencies to stable primitive fields. Final typecheck, targeted lint, diff check, and build all passed.
+- **Prevent next time:** When lifting child-resolved media state into a parent, design the callback lifecycle and hook placement together before the first validation run.

@@ -231,3 +231,12 @@ past entries — append corrections instead.
 - **Open items:** Existing video transcoding/HLS, test suite, Dependabot high-severity vulnerability, and any broader Report/action-menu redesign remain separate work.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-08-session-27-review.md
+---
+## 2026-08-08 — Session 29
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Add a format-aware desktop watch composition before resuming the remaining UX polish phases.
+- **Commits:** 2 — `53a213b` product layout, followed by release/context closeout commits.
+- **Outcome:** done — landscape media uses a wide main column with details/comments beneath the player and the existing Advertisement/Up Next rail; portrait/square and mobile/tablet behavior remain preserved; release `0.6.22` documented.
+- **Open items:** Player control sizing, logged-out comment CTA, composer contrast, title-area density, Report hierarchy, ad/monetization presentation, Vert product identity, video transcoding/HLS, test suite, and Dependabot vulnerability remain separate work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-08-session-29-review.md
