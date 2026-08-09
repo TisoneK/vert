@@ -37,6 +37,14 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.24] — 2026-08-08
+
+### Changed
+- **Light mode now has clearer visual hierarchy.** The page uses a soft canvas, brighter elevated surfaces, stronger boundaries, and subtle depth so sections are easier to distinguish without making the interface feel heavy.
+- **Watch pages are easier to scan in light mode.** Video details, comments, Advertisement, and Up Next now read as intentional groups while phones keep the same simple flow.
+
+---
+
 ## [0.6.23] — 2026-08-08
 
 ### Changed
@@ -413,7 +421,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.23...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.24...HEAD
+[0.6.24]: https://github.com/TisoneK/vert/releases/tag/v0.6.24
 [0.6.23]: https://github.com/TisoneK/vert/releases/tag/v0.6.23
 [0.6.22]: https://github.com/TisoneK/vert/releases/tag/v0.6.22
 [0.6.21]: https://github.com/TisoneK/vert/releases/tag/v0.6.21

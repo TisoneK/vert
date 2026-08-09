@@ -21,6 +21,38 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.24] — 2026-08-08
+
+### Changed
+
+#### Light-mode surface hierarchy
+
+**Files:** `src/app/globals.css`, `src/components/vert/VertApp.tsx`,
+`src/components/vert/Header.tsx`, `src/components/vert/VideoDetail.tsx`,
+`src/components/vert/CommentSection.tsx`, `src/components/vert/RelatedVideos.tsx`
+
+The light theme previously used pure white for both the application canvas and
+most content surfaces, with very faint borders. That made grouping and elevation
+less legible than the established dark palette. The root light tokens now use a
+soft off-white canvas, brighter card/popover surfaces, slightly deeper muted
+surfaces, and stronger border/input contrast. The existing dark tokens are
+unchanged.
+
+The app shell and header now reinforce that separation with a light canvas,
+header elevation, and a defined search field. On the watch page, the desktop
+content grid is a white elevated surface; the description, comments login CTA,
+Advertisement slot, and compact Up Next items use clearer borders and restrained
+shadows. Metadata and reserved-placement copy also use more readable light-mode
+contrast. The responsive composition, player sizing, dark-mode palette, and
+mobile/tablet document flow remain unchanged.
+
+**Verification:** `npx tsc --noEmit`, targeted ESLint for all changed TSX
+components, `git diff --check`, and `npx next build` passed. The production
+build generated all 47 routes. Code review found no concrete responsive,
+dark-mode, or accessibility regression.
+
+---
+
 ## [0.6.23] — 2026-08-08
 
 ### Changed
