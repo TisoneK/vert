@@ -21,6 +21,35 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.25] — 2026-08-08
+
+### Changed
+
+#### Responsive volume disclosure
+
+**File:** `src/components/vert/VideoPlayer.tsx`
+
+Replaced the always-inline desktop-only volume range input with an anchored
+volume popover. Desktop pointer hover and keyboard focus reveal the range
+control above the speaker without consuming control-bar width, preserving the
+compact portrait player's overflow guard. The speaker remains the mute toggle
+for mouse and keyboard users.
+
+Touch and pen input use an intentional two-step interaction: the first tap on
+an audible player opens the volume control, the second tap on the speaker mutes;
+when muted, tapping the speaker immediately restores the last audible volume.
+Tapping elsewhere dismisses the touch popover. Slider changes synchronize both
+React state and the native media element, including restoration from a zero
+volume position. The existing keyboard volume shortcuts remain available, and
+focus-within reveals the control overlay for keyboard navigation.
+
+**Verification:** `npx tsc --noEmit`, targeted ESLint for `VideoPlayer.tsx`,
+`git diff --check`, and `npx next build` passed. The production build
+generated all 47 routes. Code review found no concrete interaction,
+accessibility, or compact-layout blocker.
+
+---
+
 ## [0.6.24] — 2026-08-08
 
 ### Changed

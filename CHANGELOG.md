@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.6.25] — 2026-08-08
+
+### Changed
+- **Volume controls are easier to use on every device.** Hover or focus the speaker on desktop to adjust volume, while mobile users can tap to reveal the control and tap again to mute or unmute.
+
+---
+
 ## [0.6.24] — 2026-08-08
 
 ### Changed
@@ -421,7 +428,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.24...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.25...HEAD
+[0.6.25]: https://github.com/TisoneK/vert/releases/tag/v0.6.25
 [0.6.24]: https://github.com/TisoneK/vert/releases/tag/v0.6.24
 [0.6.23]: https://github.com/TisoneK/vert/releases/tag/v0.6.23
 [0.6.22]: https://github.com/TisoneK/vert/releases/tag/v0.6.22
