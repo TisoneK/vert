@@ -349,5 +349,11 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Context:** After the format-aware desktop composition, the remaining reviews identified several safe interaction and hierarchy improvements: cramped player controls, passive logged-out comment copy, faint composer contrast, equal visual weight for Report, and a visually dominant provider-neutral ad placeholder.
 - **Decision:** Improve the existing watch-page interaction model without adding services or inventing content. Use larger player targets while hiding only the compact volume slider below `md`; provide a real logged-out login CTA and stronger composer focus/surface styling; give Share and Save responsive labels, move Report into a More overflow menu, and reuse `FlagDialog` through a controlled triggerless mode; quiet the ad slot and strengthen Up Next heading/fallback copy.
 - **Consequences:** Playback and commenting become more actionable across mouse, touch, keyboard, and assistive use; primary actions gain hierarchy while reporting remains discoverable; compact players avoid control overflow. The ad remains clearly a reserved provider-neutral slot. Dislike counts, generated metadata, recommendation deduplication, real ad inventory, and a broad Vert identity redesign remain separate product/content/service decisions.
+---
+## ADR-23: Light-mode surface hierarchy (2026-08-08)
+- **Status:** accepted
+- **Context:** Dark mode had a clear surface ladder, while light mode placed the application canvas and most content surfaces close to pure white with faint boundaries. The result made grouping, elevation, and hierarchy harder to read and gave the interface a prototype-like quality.
+- **Decision:** Keep the existing restrained visual language but give light mode a soft off-white application canvas, bright white elevated surfaces, stronger border/input contrast, and restrained shadows. Apply the treatment to the shell/header and watch-page detail, comments CTA, Advertisement, and Up Next groups. Leave dark-mode tokens and responsive composition unchanged.
+- **Consequences:** Light mode gains clearer structure and scanability without introducing a new brand palette or changing mobile/tablet flow. Shadows remain deliberately subtle, and no artificial card treatment is added where it would not create meaningful grouping.
 
 ---

@@ -333,3 +333,10 @@ if literally nothing slowed you down.
 - **Cause:** The initial layout change considered only database format, then the metadata correction was added incrementally without immediately re-running the hook-order checks.
 - **Workaround / fix:** Keyed the player by video ID, scoped resolved media to video ID/source URL, moved the callback above conditional returns, and aligned its dependencies to stable primitive fields. Final typecheck, targeted lint, diff check, and build all passed.
 - **Prevent next time:** When lifting child-resolved media state into a parent, design the callback lifecycle and hook placement together before the first validation run.
+---
+## 2026-08-08 — Buffy / openai/gpt-5.6-luna (Session 31)
+- **Problem:** The initial light-mode change touched several surfaces, making it easy to accidentally add decorative classes without meaningful visual effect or leave low-contrast microcopy unchanged.
+- **Cost:** Low — review caught the ineffective card radius and faint Advertisement text before closeout.
+- **Cause:** Surface refinements were applied across mixed component contexts rather than from a single shared surface token.
+- **Workaround / fix:** Used the shared light theme tokens for the global ladder, then reviewed each watch surface for actual boundary/elevation impact and corrected the ad contrast.
+- **Prevent next time:** Pair every visual class addition with a specific surface or boundary, and check small supporting text against the new background before release.

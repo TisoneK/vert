@@ -249,3 +249,12 @@ past entries — append corrections instead.
 - **Open items:** Dislike counts, generated metadata/deduplication, real ad inventory, broader Vert identity, video transcoding/HLS, test suite, and Dependabot vulnerability remain separate backlog/product work.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-08-session-30-review.md
+---
+## 2026-08-08 — Session 31
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Restore clear visual hierarchy in light mode without regressing dark mode or responsive watch layouts.
+- **Commits:** product, release, and context closeout pending.
+- **Outcome:** done — light mode now uses a soft canvas, brighter elevated surfaces, clearer borders, subtle depth, and stronger watch-page grouping; release `0.6.24` prepared.
+- **Open items:** Real ad inventory, broader Vert identity, video transcoding/HLS, test suite, and Dependabot vulnerability remain separate backlog/product work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-08-session-31-review.md

@@ -79,3 +79,6 @@ records.
 ---
 - **2026-08-08 — Session 30** — Buffy / openai/gpt-5.6-luna — completed the remaining watch-page UX sweep: roomier player controls, actionable comment login/composer states, stronger title/actions, Report overflow, quieter ad placeholder, and Up Next fallback. Published `0.6.23`; typecheck, targeted lint, diff check, and production build passed.
   Detail: .context/memory/reviews/2026-08-08-session-30-review.md
+---
+- **2026-08-08 — Session 31** — Buffy / openai/gpt-5.6-luna — restored light-mode hierarchy with a soft canvas, brighter content surfaces, clearer borders, subtle elevation, and stronger watch-page grouping while preserving dark mode and responsive layouts. Prepared `0.6.24`; typecheck, targeted lint, diff check, and production build passed.
+  Detail: .context/memory/reviews/2026-08-08-session-31-review.md
