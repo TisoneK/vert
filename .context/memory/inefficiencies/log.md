@@ -340,3 +340,10 @@ if literally nothing slowed you down.
 - **Cause:** Surface refinements were applied across mixed component contexts rather than from a single shared surface token.
 - **Workaround / fix:** Used the shared light theme tokens for the global ladder, then reviewed each watch surface for actual boundary/elevation impact and corrected the ad contrast.
 - **Prevent next time:** Pair every visual class addition with a specific surface or boundary, and check small supporting text against the new background before release.
+---
+## 2026-08-08 — Buffy / openai/gpt-5.6-luna (Session 32)
+- **Problem:** The volume disclosure change exposed lifecycle edge cases across hover, touch, auto-hide, zero-volume restoration, and keyboard focus.
+- **Cost:** Low — targeted review caught each state issue before release.
+- **Cause:** The existing player had separate React visibility state and native media mute/volume state, while touch needed a disclosure mode without hover.
+- **Workaround / fix:** Added explicit hover/focus/touch state, outside dismissal, last-audible-volume restoration, native mute synchronization, and focus-within control reveal; reran typecheck, lint, diff check, and build after each correction.
+- **Prevent next time:** Model the interaction state table before editing media controls: pointer type × disclosure state × mute/volume state × auto-hide lifecycle.

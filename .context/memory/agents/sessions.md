@@ -258,3 +258,12 @@ past entries — append corrections instead.
 - **Open items:** Real ad inventory, broader Vert identity, video transcoding/HLS, test suite, and Dependabot vulnerability remain separate backlog/product work.
 - **Notes:** none
 - **Report:** .context/memory/reviews/2026-08-08-session-31-review.md
+---
+## 2026-08-08 — Session 32
+- **Agent:** Buffy | **Model:** openai/gpt-5.6-luna | **Platform:** Baos-Mac-mini | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Add responsive hover/tap volume disclosure to the video player while preserving mute behavior and compact-player safety.
+- **Commits:** product, release, and context closeout pending.
+- **Outcome:** done — desktop hover/focus reveals an anchored volume slider; touch/pen uses tap-to-open, second tap mute, and muted-tap restore; zero-volume and keyboard-focus behavior are synchronized and accessible; release `0.6.25` prepared.
+- **Open items:** Real ad inventory, broader Vert identity, video transcoding/HLS, test suite, and Dependabot vulnerability remain separate backlog/product work.
+- **Notes:** none
+- **Report:** .context/memory/reviews/2026-08-08-session-32-review.md

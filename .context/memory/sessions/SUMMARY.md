@@ -82,3 +82,6 @@ records.
 ---
 - **2026-08-08 — Session 31** — Buffy / openai/gpt-5.6-luna — restored light-mode hierarchy with a soft canvas, brighter content surfaces, clearer borders, subtle elevation, and stronger watch-page grouping while preserving dark mode and responsive layouts. Prepared `0.6.24`; typecheck, targeted lint, diff check, and production build passed.
   Detail: .context/memory/reviews/2026-08-08-session-31-review.md
+---
+- **2026-08-08 — Session 32** — Buffy / openai/gpt-5.6-luna — added responsive volume disclosure: desktop hover/focus reveals an anchored slider, touch/pen opens it on first tap, the next speaker tap mutes, and a muted tap restores the last audible volume. Published `0.6.25`; typecheck, targeted lint, diff check, and production build passed.
+  Detail: .context/memory/reviews/2026-08-08-session-32-review.md

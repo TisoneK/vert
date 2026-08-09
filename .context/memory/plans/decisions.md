@@ -355,5 +355,11 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Context:** Dark mode had a clear surface ladder, while light mode placed the application canvas and most content surfaces close to pure white with faint boundaries. The result made grouping, elevation, and hierarchy harder to read and gave the interface a prototype-like quality.
 - **Decision:** Keep the existing restrained visual language but give light mode a soft off-white application canvas, bright white elevated surfaces, stronger border/input contrast, and restrained shadows. Apply the treatment to the shell/header and watch-page detail, comments CTA, Advertisement, and Up Next groups. Leave dark-mode tokens and responsive composition unchanged.
 - **Consequences:** Light mode gains clearer structure and scanability without introducing a new brand palette or changing mobile/tablet flow. Shadows remain deliberately subtle, and no artificial card treatment is added where it would not create meaningful grouping.
+---
+## ADR-24: Responsive volume disclosure (2026-08-08)
+- **Status:** accepted
+- **Context:** The player had a desktop-only inline volume range input for non-portrait formats, while compact portrait players had no adjustable volume surface and touch users had no hover equivalent. The control row could not grow permanently without risking overflow.
+- **Decision:** Keep the speaker as the mute control, but render the range input in an anchored popover above it. Reveal the popover on desktop hover or keyboard focus. On touch/pen input, use the first tap on an audible player to open the popover, the second speaker tap to mute, and a tap while muted to restore the last audible volume. Dismiss explicit touch disclosure when tapping elsewhere. Synchronize slider changes with both React state and the native media element, and reveal the overall control bar on keyboard focus.
+- **Consequences:** Volume adjustment is discoverable on desktop, usable on mobile, and safe for narrow players because it does not consume control-row width. Existing keyboard shortcuts, playback controls, settings, and format-aware sizing remain unchanged.
 
 ---
