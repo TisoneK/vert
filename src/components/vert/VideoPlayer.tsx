@@ -65,6 +65,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(1)
+  const lastAudibleVolumeRef = useRef(1)
   const [hasError, setHasError] = useState(false)
   const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
@@ -86,6 +87,12 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   // opacity-100` for desktop and `controlsVisible ? 'opacity-100' : ...`
   // for mobile. The controls auto-hide after 3s of playback inactivity.
   const [controlsVisible, setControlsVisible] = useState(false)
+  // Desktop reveals the volume popover while the control is hovered or focused;
+  // touch devices open it on the first tap because they have no hover state.
+  const [volumePopoverOpen, setVolumePopoverOpen] = useState(false)
+  const [volumeHovered, setVolumeHovered] = useState(false)
+  const [volumeFocused, setVolumeFocused] = useState(false)
+  const lastVolumePointerTypeRef = useRef<string | null>(null)
 
   // Quality state — real values, populated from hls.js levels or the video element
   const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([])
@@ -358,6 +365,21 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     }
   }, [showSettings])
 
+  // Touch has no hover boundary, so dismiss an explicitly opened volume
+  // popover when the user taps anywhere outside the volume control itself.
+  useEffect(() => {
+    if (!volumePopoverOpen) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Element && !event.target.closest('[data-video-volume]')) {
+        setVolumePopoverOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [volumePopoverOpen])
+
   // --- Controls ---
   // Auto-hide controls after 3s of inactivity while playing. Without this
   // the controls overlay would stay visible forever on mobile after a tap.
@@ -369,10 +391,12 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     if (!controlsVisible || !isPlaying) return
     const id = setTimeout(() => {
       // Don't hide if the settings menu is open — that would trap the user.
-      if (!showSettings) setControlsVisible(false)
+      if (!showSettings && !volumeFocused && !volumePopoverOpen) {
+        setControlsVisible(false)
+      }
     }, 3000)
     return () => clearTimeout(id)
-  }, [controlsVisible, isPlaying, showSettings])
+  }, [controlsVisible, isPlaying, showSettings, volumeFocused, volumePopoverOpen])
 
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return
@@ -389,14 +413,46 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
   // play/pause button in the center overlay already handles that and doing
   // both makes the UI feel jumpy.
   const handleContainerTap = useCallback(() => {
+    // A tap outside the volume control dismisses its mobile popover before
+    // toggling the normal player controls visibility.
+    setVolumePopoverOpen(false)
     setControlsVisible((v) => !v)
   }, [])
 
   const toggleMute = useCallback(() => {
     if (!videoRef.current) return
-    videoRef.current.muted = !isMuted
-    setIsMuted(!isMuted)
-  }, [isMuted])
+
+    if (isMuted) {
+      // Restoring from a zero-volume slider position needs a non-zero native
+      // volume as well as muted=false, otherwise the icon changes but audio
+      // remains silent.
+      const restoredVolume = volume > 0 ? volume : lastAudibleVolumeRef.current
+      videoRef.current.volume = restoredVolume
+      videoRef.current.muted = false
+      setVolume(restoredVolume)
+      setIsMuted(false)
+      return
+    }
+
+    if (volume > 0) lastAudibleVolumeRef.current = volume
+    videoRef.current.muted = true
+    setIsMuted(true)
+  }, [isMuted, volume])
+
+  const handleVolumeButtonClick = () => {
+    // On touch, the first tap opens the slider and the next tap on the same
+    // speaker toggles mute. Desktop and keyboard activation preserve the
+    // familiar speaker-button mute behavior.
+    if (lastVolumePointerTypeRef.current === 'touch' || lastVolumePointerTypeRef.current === 'pen') {
+      if (!volumePopoverOpen && !isMuted) {
+        setVolumePopoverOpen(true)
+        setControlsVisible(true)
+        return
+      }
+      setVolumePopoverOpen(false)
+    }
+    toggleMute()
+  }
 
   const toggleFullscreen = useCallback(() => {
     if (!containerRef.current) return
@@ -523,6 +579,8 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     setVolume(vol)
     if (videoRef.current) {
       videoRef.current.volume = vol
+      videoRef.current.muted = vol === 0
+      if (vol > 0) lastAudibleVolumeRef.current = vol
       setIsMuted(vol === 0)
     }
   }
@@ -676,7 +734,7 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-200 ${
           controlsVisible
             ? 'opacity-100 pointer-events-auto'
-            : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto'
+            : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto'
         }`}
       >
         <div
@@ -719,29 +777,64 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           </button>
 
           <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              onClick={toggleMute}
-              className="shrink-0 min-h-10 min-w-10 flex items-center justify-center text-white hover:text-violet-400 transition-colors p-2"
-              aria-label={isMuted ? 'Unmute' : 'Mute'}
-              title={isMuted ? 'Unmute' : 'Mute'}
+            <div
+              data-video-volume
+              className="relative shrink-0"
+              onMouseEnter={() => setVolumeHovered(true)}
+              onMouseLeave={() => setVolumeHovered(false)}
+              onFocus={() => setVolumeFocused(true)}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  setVolumeFocused(false)
+                }
+              }}
+              onPointerDown={(event) => {
+                lastVolumePointerTypeRef.current = event.pointerType
+              }}
             >
-              {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-            </button>
-            {/* Volume slider takes real width (64px) that a narrow portrait
-                player can't spare alongside play/time/settings/fullscreen —
-                drop it there and keep just the mute toggle. */}
-            {format !== 'portrait' && !(videoAspectRatio && videoAspectRatio < 1) && (
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={isMuted ? 0 : volume}
-                onChange={handleVolumeChange}
-                className="hidden md:block w-16 h-1 bg-zinc-600 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
-                aria-label="Volume"
-              />
-            )}
+              <button
+                onClick={(event) => {
+                  event.stopPropagation()
+                  handleVolumeButtonClick()
+                }}
+                onKeyDown={() => {
+                  lastVolumePointerTypeRef.current = 'keyboard'
+                }}
+                className="shrink-0 min-h-10 min-w-10 flex items-center justify-center text-white hover:text-violet-400 transition-colors p-2"
+                aria-label={isMuted ? 'Unmute' : 'Mute'}
+                aria-expanded={volumePopoverOpen || volumeHovered || volumeFocused}
+                aria-controls="video-volume-control"
+                title={isMuted ? 'Unmute' : 'Mute'}
+              >
+                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+              </button>
+              {/* The slider is an overlay rather than a flex-row child, so it
+                  can appear above the speaker on compact portrait players
+                  without pushing time/settings/fullscreen out of the frame. */}
+              <div
+                id="video-volume-control"
+                className={`absolute bottom-full left-1/2 z-50 mb-2 w-28 -translate-x-1/2 rounded-lg border border-white/15 bg-zinc-950/95 px-3 py-2 shadow-lg backdrop-blur-sm transition-all duration-150 ${
+                  volumePopoverOpen || volumeHovered || volumeFocused
+                    ? 'pointer-events-auto translate-y-0 opacity-100'
+                    : 'pointer-events-none translate-y-1 opacity-0'
+                }`}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <label htmlFor="video-volume-range" className="sr-only">Volume</label>
+                <input
+                  id="video-volume-range"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={isMuted ? 0 : volume}
+                  onChange={handleVolumeChange}
+                  className="block w-full h-1.5 bg-zinc-600 rounded-full appearance-none cursor-pointer accent-violet-500 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
+                  aria-label="Volume"
+                />
+              </div>
+            </div>
           </div>
 
           <span className="shrink-0 whitespace-nowrap text-[11px] sm:text-xs text-zinc-300 font-mono">
