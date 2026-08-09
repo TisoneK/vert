@@ -57,7 +57,7 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer, sideba
   }
 
   return (
-    <header className="shrink-0 z-50 h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
+    <header className="shrink-0 z-50 h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700 shadow-sm dark:shadow-none">
       <div className="flex items-center justify-between h-full px-4 gap-3">
         {/* Left: Burger + Logo */}
         <div className="flex items-center gap-2 shrink-0">
@@ -94,7 +94,7 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer, sideba
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search videos, creators, tags…"
-                className="w-full pl-9 pr-4 py-2 bg-zinc-100 dark:bg-zinc-800 rounded-full text-base md:text-sm text-zinc-600 dark:text-zinc-300 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-600 transition-colors"
+                className="w-full pl-9 pr-4 py-2 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-transparent rounded-full text-base md:text-sm text-zinc-700 dark:text-zinc-300 placeholder:text-zinc-500 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-600 transition-colors"
               />
             </div>
           </form>
@@ -232,7 +232,7 @@ export function Header({ onLogout, onToggleSidebar, onToggleMobileDrawer, sideba
 
       {/* Mobile search overlay */}
       {showMobileSearch && (
-        <div className="md:hidden border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 animate-vert-fade-in">
+        <div className="md:hidden border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 shadow-sm dark:shadow-none animate-vert-fade-in">
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 dark:text-zinc-400" />

@@ -158,7 +158,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
           budget is the 56px header plus the grid's 12px top/bottom padding,
           so the player cannot create a second page scrollbar. Mobile stacks
           normally for every format. */}
-      <div className={`grid grid-cols-1 ${isLandscape ? 'lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)]' : 'lg:grid-cols-[minmax(250px,0.85fr)_minmax(320px,1.45fr)_minmax(240px,320px)]'} gap-6 p-4 md:p-6 lg:gap-4 lg:p-3 lg:items-start`}>
+      <div className={`grid grid-cols-1 ${isLandscape ? 'lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)]' : 'lg:grid-cols-[minmax(250px,0.85fr)_minmax(320px,1.45fr)_minmax(240px,320px)]'} gap-6 p-4 md:p-6 lg:gap-4 lg:p-3 lg:items-start lg:rounded-2xl lg:border lg:border-zinc-200 lg:bg-white lg:shadow-sm dark:lg:border-zinc-800 dark:lg:bg-zinc-900 dark:lg:shadow-none`}>
         {/* Landscape keeps player and details in one wide main column;
             portrait/square expose both as separate desktop grid items. */}
         <div className={`min-w-0 ${isLandscape ? 'lg:flex lg:flex-col lg:gap-6' : 'lg:contents'}`}>
@@ -208,7 +208,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               BLOCK 3: STATS (views/time) — quiet supporting metadata,
               smaller and muted so it doesn't compete with the title.
               ---------------------------------------------------------- */}
-          <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500 mt-1.5">
+          <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-500 mt-1.5">
             <span>{formatViews(video.viewCount as number)} views</span>
             <span>·</span>
             <span>{timeAgo(video.createdAt as string)}</span>
@@ -349,7 +349,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
               they're part of the "about this video" semantic group.
               ---------------------------------------------------------- */}
           {(description || categories.length > 0) && (
-            <div className="mt-4 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-700">
+            <div className="mt-4 p-3 bg-white dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-sm dark:shadow-none">
               {description && (
                 <>
                   <p className={`text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap ${!descriptionExpanded && description.length > 100 ? 'line-clamp-2' : ''}`}>
@@ -383,7 +383,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
             </div>
           )}
 
-          <section className="hidden lg:block mt-6" aria-labelledby="watch-comments-heading">
+          <section className="hidden lg:block mt-6 border-t border-zinc-200 dark:border-zinc-700 pt-5" aria-labelledby="watch-comments-heading">
             <h2 id="watch-comments-heading" className="sr-only">Comments</h2>
             <CommentSection videoId={video.id as string} />
           </section>
@@ -425,12 +425,12 @@ function AdSlot({ headingId }: { headingId: string }) {
   return (
     <section
       aria-labelledby={headingId}
-      className="min-h-20 rounded-lg border border-zinc-200/80 bg-zinc-50/50 px-3 py-4 text-center dark:border-zinc-800 dark:bg-zinc-900/40"
+      className="min-h-20 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-4 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900/40 dark:shadow-none"
     >
-      <h2 id={headingId} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
+      <h2 id={headingId} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
         Advertisement
       </h2>
-      <p className="mt-1 text-[11px] text-zinc-400 dark:text-zinc-500">
+      <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-500">
         Reserved placement
       </p>
     </section>

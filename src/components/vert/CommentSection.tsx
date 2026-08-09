@@ -166,7 +166,7 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
           </div>
         </div>
       ) : (
-        <div className={`flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-900/60 ${isEmpty ? 'mb-3' : 'mb-6'}`}>
+        <div className={`flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900/60 dark:shadow-none ${isEmpty ? 'mb-3' : 'mb-6'}`}>
           <p className="text-sm text-zinc-600 dark:text-zinc-300">
             Join the conversation by signing in.
           </p>
@@ -232,7 +232,7 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
                     {timeAgo(comment.createdAt)}
                   </span>
                 </div>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-0.5">{comment.content}</p>
+                <p className="text-sm text-zinc-700 dark:text-zinc-400 mt-0.5">{comment.content}</p>
               </div>
               {user && (user.id === comment.user.id || user.role === 'admin') && (
                 <button

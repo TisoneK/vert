@@ -45,7 +45,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.975 0 0);
   --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
@@ -53,15 +53,15 @@
   --popover-foreground: oklch(0.15 0 0);
   --primary: oklch(0.606 0.25 292);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.95 0 0);
+  --secondary: oklch(0.94 0 0);
   --secondary-foreground: oklch(0.15 0 0);
-  --muted: oklch(0.95 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.95 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.42 0 0);
+  --accent: oklch(0.94 0 0);
   --accent-foreground: oklch(0.15 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0 0 0 / 10%);
-  --input: oklch(0 0 0 / 15%);
+  --border: oklch(0.2 0 0 / 12%);
+  --input: oklch(0.2 0 0 / 16%);
   --ring: oklch(0.606 0.25 292);
   --chart-1: oklch(0.606 0.25 292);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -297,8 +297,8 @@
   --vert-text-primary: #18181b;
   --vert-text-secondary: #52525b;
   --vert-text-tertiary: #71717a;
-  --vert-border-default: rgba(0,0,0,0.06);
-  --vert-border-subtle: rgba(0,0,0,0.03);
+  --vert-border-default: rgba(0,0,0,0.10);
+  --vert-border-subtle: rgba(0,0,0,0.05);
   --vert-brand: #7c3aed;
   --vert-brand-hover: #6d28d9;
   --vert-danger: #ef4444;

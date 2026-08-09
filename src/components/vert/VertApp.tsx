@@ -132,7 +132,7 @@ export function VertApp() {
   // the distracting app shell visible behind the auth modal.
   if (!user && (currentView.page === 'login' || currentView.page === 'signup')) {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
         {currentView.page === 'login' ? <LoginForm /> : <SignupForm />}
       </div>
     )
@@ -141,7 +141,7 @@ export function VertApp() {
   // The contact page is another deep link that doesn't require auth.
   if (!user && currentView.page === 'contact') {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
         <header className="border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
           <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
             <button
@@ -180,7 +180,7 @@ export function VertApp() {
   // The changelog page is a public deep link — no auth required.
   if (!user && currentView.page === 'changelog') {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">
         <header className="border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
           <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
             <button
@@ -287,7 +287,7 @@ export function VertApp() {
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 flex flex-col">
+    <div className="h-screen overflow-hidden bg-zinc-100 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 flex flex-col">
       <Header
         onLogout={handleLogout}
         sidebarOpen={!sidebarCollapsed}

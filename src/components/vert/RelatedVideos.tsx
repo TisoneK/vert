@@ -55,7 +55,7 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
         {videos.map((video) => (
           <div
             key={video.id}
-            className="flex gap-2 cursor-pointer group p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="flex gap-2 cursor-pointer group rounded-xl border border-zinc-200 bg-white p-2 shadow-sm hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none dark:hover:border-zinc-700 dark:hover:bg-zinc-800 transition-all"
             onClick={() => navigate({ page: 'video', videoId: video.id })}
             onMouseEnter={() => prefetchVideo(video.id)}
             onTouchStart={() => prefetchVideo(video.id)}
