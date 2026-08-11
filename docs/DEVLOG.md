@@ -21,6 +21,47 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.5] — 2026-08-11
+
+### Changed
+
+#### Search matches tags & categories; CSP header; upload error hygiene (review [L5]/[L13]/[L12])
+
+**Files:** `src/app/api/v1/videos/route.ts`, `next.config.ts`,
+`src/app/api/v1/upload/route.ts`.
+
+- **[L5] Search now matches tags and category names.** The `?search=` filter's
+  `OR` clause previously covered only title, description, and channel name, so
+  e.g. "music" returned nothing even when videos were tagged `#music` or filed
+  under the Music category. Added nested-relation branches for tag name/label
+  and category name (case-insensitive).
+- **[L13] Added a Content-Security-Policy header.** Conservative by design:
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval'` (Next injects inline
+  bootstrap scripts + the layout's inline no-flash theme script; the value here
+  is blocking *external* script hosts), `frame-ancestors 'none'`, `object-src
+  'none'`, `base-uri 'self'`, while `img-src`/`media-src`/`connect-src` stay
+  permissive over `https:` so user avatars (arbitrary hosts per ADR-12), Vercel
+  Blob media, HLS segment fetches, and Google OAuth keep working.
+- **[L12] Upload token-generation failures no longer return the raw error**
+  `details` to the client — logged server-side, generic message + code returned.
+
+**Not changed (assessed, deliberately skipped):** [L3] Trending category chips
+are already `shrink-0` inside an `overflow-x-auto` scroller with a fade — the
+apparent clip is the scroll affordance, not a bug. [L4] ExplorePage already
+splits full-color "with videos" categories from a muted "More categories"
+section — empties are already de-emphasized. [L10] the Advertisement placeholder
+is a deliberate provider-neutral slot (ADR-15/22). [L2]/[L8]/[L9] (hero spacing,
+header inconsistency, mobile-header density) are subjective design calls →
+backlog. [L6] thumbnail blur-up needs generated `blurDataURL` for remote images
+→ backlog. [L11] bulk console-log removal is low-value churn → backlog.
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint (0 errors),
+`npx next build` (exit 0). On the deploy: search "music" returns results, the CSP
+header is present, and the app (images, video playback, navigation) works with no
+CSP console violations.
+
+---
+
 ## [0.7.4] — 2026-08-11
 
 ### Fixed
@@ -1956,7 +1997,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.4...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.5...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

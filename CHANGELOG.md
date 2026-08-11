@@ -37,6 +37,14 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.5] — 2026-08-11
+
+### Changed
+- **Search now finds videos by their topics and categories too.** Searching a word like "music" now also turns up videos tagged with or filed under that topic, not just ones with it in the title.
+- **Added an extra layer of security.** The site now uses stricter rules about what code and content browsers are allowed to run, reducing the risk from malicious scripts.
+
+---
+
 ## [0.7.4] — 2026-08-11
 
 ### Fixed
@@ -464,7 +472,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.4...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.5...HEAD
+[0.7.5]: https://github.com/TisoneK/vert/releases/tag/v0.7.5
 [0.7.4]: https://github.com/TisoneK/vert/releases/tag/v0.7.4
 [0.7.3]: https://github.com/TisoneK/vert/releases/tag/v0.7.3
 [0.7.2]: https://github.com/TisoneK/vert/releases/tag/v0.7.2

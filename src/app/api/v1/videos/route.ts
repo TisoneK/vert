@@ -27,13 +27,28 @@ export async function GET(req: NextRequest) {
     }
 
     if (search) {
-      // Search video title + description, OR channel name (case-insensitive).
-      // The channel name match uses a nested relation filter — Prisma
-      // translates this to a JOIN with a LIKE clause.
+      // Search video title + description, channel name, AND tag/category names
+      // (all case-insensitive). Without the tag/category branches, a query like
+      // "music" returned nothing even when videos were tagged #music or filed
+      // under the Music category (review 2026-08-11 [L5]). Nested relation
+      // filters translate to JOINs with LIKE clauses.
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
         { channel: { channelName: { contains: search, mode: 'insensitive' } } },
+        {
+          tags: {
+            some: {
+              tag: {
+                OR: [
+                  { name: { contains: search, mode: 'insensitive' } },
+                  { label: { contains: search, mode: 'insensitive' } },
+                ],
+              },
+            },
+          },
+        },
+        { categories: { some: { category: { name: { contains: search, mode: 'insensitive' } } } } },
       ]
     }
 

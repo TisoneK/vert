@@ -67,6 +67,33 @@ const nextConfig: NextConfig = {
           // Permissions-Policy: disable camera/microphone/geolocation APIs the
           // app doesn't use, so a compromised script can't silently turn them on.
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          // Content-Security-Policy: a defense-in-depth layer against injected
+          // scripts and clickjacking (review 2026-08-11 [L13]). Deliberately
+          // conservative so it doesn't break existing behavior:
+          //   - script-src is locked to same-origin + inline/eval. Next.js
+          //     injects inline bootstrap scripts and the root layout ships an
+          //     inline no-flash theme script, so 'unsafe-inline' is required
+          //     until a nonce-based setup is introduced; the real value here is
+          //     blocking scripts from *external* hosts.
+          //   - img-src/media-src/connect-src stay permissive over https: so
+          //     user-provided avatars (arbitrary hosts, see ADR-12), Vercel Blob
+          //     media, HLS segment fetches, and Google OAuth keep working.
+          //   - frame-ancestors 'none' mirrors X-Frame-Options for modern UAs.
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https:",
+              "media-src 'self' blob: https:",
+              "font-src 'self' data:",
+              "connect-src 'self' https:",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "object-src 'none'",
+            ].join("; "),
+          },
         ],
       },
     ];

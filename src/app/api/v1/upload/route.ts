@@ -95,14 +95,14 @@ export async function GET(req: NextRequest) {
       pathname,
     })
   } catch (err) {
-    // Return the ACTUAL error so we can debug — don't swallow it
+    // Log the actual error server-side for debugging, but don't leak the raw
+    // internal message to the client (review 2026-08-11 [L12]).
     const errorMsg = err instanceof Error ? err.message : String(err)
     console.error('Failed to generate Blob client token:', errorMsg)
 
     return NextResponse.json(
       {
         error: 'Failed to generate upload token',
-        details: errorMsg,
         code: 'BLOB_TOKEN_GENERATION_FAILED',
       },
       { status: 500 }
