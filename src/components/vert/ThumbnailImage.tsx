@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Play } from 'lucide-react'
 
 /**
@@ -29,6 +29,12 @@ export function ThumbnailImage({
   const [failed, setFailed] = useState(false)
   const show = src && !failed
 
+  // Cached images can already be `complete` before React attaches `onLoad`,
+  // which would leave them stuck at opacity-0. Mark loaded on mount in that case.
+  const imgRef = useCallback((node: HTMLImageElement | null) => {
+    if (node?.complete && node.naturalWidth > 0) setLoaded(true)
+  }, [])
+
   if (!show) {
     return (
       <div className="absolute inset-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800">
@@ -43,6 +49,7 @@ export function ThumbnailImage({
         <div className="absolute inset-0 animate-pulse bg-zinc-200 dark:bg-zinc-800" aria-hidden />
       )}
       <Image
+        ref={imgRef}
         src={src}
         alt={alt}
         fill

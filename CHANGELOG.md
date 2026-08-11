@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.7] — 2026-08-11
+
+### Fixed
+- **Thumbnails now reliably appear, even when already cached.** A follow-up to the previous loading improvement so a returning-visitor's cached thumbnails never get stuck hidden.
+
+---
+
 ## [0.7.6] — 2026-08-11
 
 ### Fixed
@@ -479,7 +486,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.6...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.7...HEAD
+[0.7.7]: https://github.com/TisoneK/vert/releases/tag/v0.7.7
 [0.7.6]: https://github.com/TisoneK/vert/releases/tag/v0.7.6
 [0.7.5]: https://github.com/TisoneK/vert/releases/tag/v0.7.5
 [0.7.4]: https://github.com/TisoneK/vert/releases/tag/v0.7.4

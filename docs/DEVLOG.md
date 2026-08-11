@@ -21,6 +21,31 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.7] — 2026-08-11
+
+### Fixed
+
+#### Harden thumbnail load-state for cached images
+
+**Files:** `src/components/vert/ThumbnailImage.tsx`, `VideoCard.tsx`.
+
+The 0.7.6 skeleton uses `opacity-0` until `onLoad` fires. A **cached** image can
+already be `complete` before React attaches `onLoad`, so the handler never fires
+and the thumbnail would stay stuck invisible. Added a `ref` callback on the
+`next/image` that checks `node.complete && node.naturalWidth > 0` on mount and
+marks it loaded immediately in that case. Belt-and-suspenders with `onLoad` for
+the non-cached path.
+
+**Why now:** verified live that the fade works on a fresh load, but the cached
+path couldn't be reproduced in the browser tool (it parks image decode when
+unfocused), so the guard was added defensively rather than left unverifiable on
+the primary surface.
+
+**Verification:** `npx tsc --noEmit` (0 errors — `next/image` accepts the `ref`),
+targeted ESLint (0 errors), `npx next build` (exit 0).
+
+---
+
 ## [0.7.6] — 2026-08-11
 
 ### Fixed
@@ -2024,7 +2049,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.6...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.7...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

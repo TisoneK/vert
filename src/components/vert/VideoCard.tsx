@@ -8,7 +8,7 @@ import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { CategoryBadge } from './CategoryBadge'
 import { PlaylistPicker } from './PlaylistPicker'
 import { Play, Smartphone, Monitor, Square, MoreVertical, ListVideo, Bookmark } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 interface VideoCardProps {
   video: {
@@ -109,6 +109,12 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
     navigate({ page: 'video', videoId: video.id })
   }
 
+  // Cached images can already be `complete` before React attaches `onLoad`,
+  // which would leave the thumbnail stuck at opacity-0. Catch that on mount.
+  const thumbRef = useCallback((node: HTMLImageElement | null) => {
+    if (node?.complete && node.naturalWidth > 0) setThumbnailLoaded(true)
+  }, [])
+
   return (
     <div
       // h-full + flex flex-col so cards in the same grid row stretch to equal
@@ -134,6 +140,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 ${showThumbnail && !thumbnailLoaded ? 'animate-pulse' : ''}`}>
         {showThumbnail ? (
           <Image
+            ref={thumbRef}
             src={video.thumbnailUrl!}
             alt={video.title}
             fill
