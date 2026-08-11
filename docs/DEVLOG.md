@@ -21,6 +21,32 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.3] — 2026-08-11
+
+### Changed
+
+#### Stronger password policy (review [M4])
+
+**Files:** `src/components/vert/SignupForm.tsx`, `src/app/api/auth/register/route.ts`.
+
+Raised the minimum password length from 6 to 8 on both the client form and the
+server register route (kept in sync), and updated the placeholder/error copy.
+Added a small server-side common-password blocklist (a no-dependency Set of the
+passwords that dominate credential-stuffing lists — `password`, `12345678`,
+`qwerty123`, etc., matched case-insensitively) that returns a 400 with a
+"too common" message. This is a cheap guard, not a substitute for a breach-corpus
+(HaveIBeenPwned) check, which remains a backlog item.
+
+Not in scope (still infra-blocked, documented in backlog): password reset (M3,
+needs an email provider) and moving the rate limiter to a shared KV store (M2,
+needs Vercel KV/Upstash credentials).
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint (0 errors),
+`npx next build` (exit 0). Live 400s for a 6-char and a common password confirmed
+on the deploy after push.
+
+---
+
 ## [0.7.2] — 2026-08-11
 
 ### Fixed
@@ -1910,7 +1936,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.2...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.3...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

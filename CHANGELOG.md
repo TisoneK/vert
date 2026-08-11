@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.3] — 2026-08-11
+
+### Changed
+- **New accounts now need a slightly stronger password.** Passwords must be at least 8 characters, and a handful of very common, easily-guessed passwords are no longer allowed — a small step to keep accounts safer.
+
+---
+
 ## [0.7.2] — 2026-08-11
 
 ### Fixed
@@ -450,7 +457,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.2...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.3...HEAD
+[0.7.3]: https://github.com/TisoneK/vert/releases/tag/v0.7.3
 [0.7.2]: https://github.com/TisoneK/vert/releases/tag/v0.7.2
 [0.7.1]: https://github.com/TisoneK/vert/releases/tag/v0.7.1
 [0.7.0]: https://github.com/TisoneK/vert/releases/tag/v0.7.0

@@ -63,15 +63,31 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
+        { error: 'Password must be at least 8 characters' },
         { status: 400 }
       )
     }
     if (password.length > 200) {
       return NextResponse.json(
         { error: 'Password is too long (max 200 characters)' },
+        { status: 400 }
+      )
+    }
+
+    // Reject the most common weak passwords outright — a cheap, no-dependency
+    // guard against the passwords that dominate credential-stuffing lists.
+    // (Not a substitute for a breach-corpus check — see backlog.)
+    const COMMON_PASSWORDS = new Set([
+      'password', 'password1', 'password123', '12345678', '123456789',
+      '1234567890', 'qwerty123', 'qwertyuiop', 'iloveyou', 'admin123',
+      'letmein', 'welcome1', 'password!', 'passw0rd', '11111111', '00000000',
+      'abc12345', 'football', 'baseball', 'sunshine', 'princess', 'dragon123',
+    ])
+    if (COMMON_PASSWORDS.has(password.toLowerCase())) {
+      return NextResponse.json(
+        { error: 'That password is too common — please choose a stronger one' },
         { status: 400 }
       )
     }
