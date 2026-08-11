@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { relatedVideosQueryOptions } from '@/lib/video-queries'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
-import { useNavigation } from '@/lib/store'
+import { useNavigation, viewToPath } from '@/lib/store'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { Play } from 'lucide-react'
 import { RelatedVideoSkeleton } from './Skeleton'
@@ -53,10 +53,18 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
       </div>
       <div className={compact ? 'space-y-2 pr-1' : 'space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar pr-1'}>
         {videos.map((video) => (
-          <div
+          <a
             key={video.id}
-            className="flex gap-2 cursor-pointer group rounded-xl border border-zinc-200 bg-white p-2 shadow-sm hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none dark:hover:border-zinc-700 dark:hover:bg-zinc-800 transition-all"
-            onClick={() => navigate({ page: 'video', videoId: video.id })}
+            // Real <a href> so Up Next rows are crawlable, keyboard-focusable,
+            // and support open-in-new-tab; plain left-clicks drive the SPA
+            // nav, modified clicks fall through to the browser. See ADR-26.
+            href={viewToPath({ page: 'video', videoId: video.id })}
+            className="flex gap-2 group rounded-xl border border-zinc-200 bg-white p-2 shadow-sm hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none dark:hover:border-zinc-700 dark:hover:bg-zinc-800 transition-all"
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+              e.preventDefault()
+              navigate({ page: 'video', videoId: video.id })
+            }}
             onMouseEnter={() => prefetchVideo(video.id)}
             onTouchStart={() => prefetchVideo(video.id)}
           >
@@ -98,7 +106,7 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
                 {formatViews(video.viewCount)} views · {timeAgo(video.createdAt)}
               </p>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>

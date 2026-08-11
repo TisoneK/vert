@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.1] — 2026-08-11
+
+### Changed
+- **Video cards are now proper links.** You can open a video in a new tab (middle-click or ⌘/Ctrl-click), copy its link, and reach it with the keyboard — everywhere videos are listed. Normal clicks work exactly as before.
+
+---
+
 ## [0.7.0] — 2026-08-11
 
 ### Added
@@ -436,7 +443,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/TisoneK/vert/releases/tag/v0.7.1
 [0.7.0]: https://github.com/TisoneK/vert/releases/tag/v0.7.0
 [0.6.25]: https://github.com/TisoneK/vert/releases/tag/v0.6.25
 [0.6.24]: https://github.com/TisoneK/vert/releases/tag/v0.6.24

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { isNextImageSafeUrl } from '@/lib/image-utils'
-import { useNavigation } from '@/lib/store'
+import { useNavigation, viewToPath } from '@/lib/store'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { CategoryBadge } from './CategoryBadge'
@@ -95,6 +95,18 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
   const format = video.format || 'portrait'
   const aspectClass = format === 'landscape' ? 'aspect-video' : format === 'square' ? 'aspect-square' : 'aspect-[9/16]'
   const showThumbnail = video.thumbnailUrl && !thumbnailFailed
+  const watchHref = viewToPath({ page: 'video', videoId: video.id })
+
+  // The card's primary target is a real <a href> (the stretched link below),
+  // so it's crawlable, keyboard-focusable, and supports open-in-new-tab /
+  // copy-link. For a plain left-click we preventDefault and drive the Zustand
+  // SPA navigation; modified clicks (⌘/ctrl/shift/middle) fall through to the
+  // browser's native new-tab/window behavior. See .context ADR-26.
+  const handleNav = (e: React.MouseEvent) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+    e.preventDefault()
+    navigate({ page: 'video', videoId: video.id })
+  }
 
   return (
     <div
@@ -103,13 +115,14 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       // title is shorter than a card with a 2-line title next to it, making
       // the grid look ragged. The thumbnail keeps its aspect ratio; the info
       // section grows to fill the remaining space.
+      // `relative` anchors the stretched-link overlay (the title <a>'s
+      // ::after) to the whole card; nested controls sit above it with z-index.
       // Landscape cards span the full row on phones (col-span-2 in the
       // 2-column mobile grids) — at half width a 16:9 thumbnail is too small
       // to read, the original complaint behind v0.6.4's full-width cards.
       // Portrait/square cards stay 2-up for browse density. md:col-span-1
       // restores normal flow in the 4/5-column desktop grids.
-      className={`group cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 h-full flex flex-col ${format === 'landscape' ? 'col-span-2 md:col-span-1' : ''}`}
-      onClick={() => navigate({ page: 'video', videoId: video.id })}
+      className={`group relative shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 h-full flex flex-col ${format === 'landscape' ? 'col-span-2 md:col-span-1' : ''}`}
       // Pre-fetch the watch page's data on hover/touch intent so the click
       // renders from cache instead of a loading skeleton. See .context ADR-3.
       onMouseEnter={() => prefetchVideo(video.id)}
@@ -176,7 +189,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
                 everything else (playlist, share, not interested, report)
                 stays in the overflow since the card is too narrow in a
                 dense grid for a full 3-button row. */}
-            <div ref={mobileMenuRef} className="md:hidden absolute top-1.5 right-1.5 flex items-center gap-1">
+            <div ref={mobileMenuRef} className="md:hidden absolute top-1.5 right-1.5 z-20 flex items-center gap-1">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -231,7 +244,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
               )}
             </div>
             {/* Desktop: hover-reveal */}
-            <div ref={desktopMenuRef} className="hidden md:flex items-center gap-1 absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div ref={desktopMenuRef} className="hidden md:flex items-center gap-1 absolute top-1.5 right-1.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -324,15 +337,26 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight">
-            {video.title}
-          </h3>
+          {/* Stretched-link: this <a> carries the real href and, via its
+              inset-0 ::after overlay, makes the whole card a single crawlable,
+              keyboard-focusable click target. Controls below sit above it with
+              relative z-10. See .context ADR-26. */}
+          <a
+            href={watchHref}
+            onClick={handleNav}
+            onFocus={() => prefetchVideo(video.id)}
+            className="block rounded-sm after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600"
+          >
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight">
+              {video.title}
+            </h3>
+          </a>
           <button
             onClick={(e) => {
               e.stopPropagation()
               navigate({ page: 'channel', channelId: video.channel.id })
             }}
-            className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors mt-0.5 block"
+            className="relative z-10 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors mt-0.5 block"
           >
             {video.channel.channelName}
           </button>
@@ -352,7 +376,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
                     e.stopPropagation()
                     navigate({ page: 'tag', slug: tag.name })
                   }}
-                  className="text-[10px] text-violet-600 hover:text-violet-800 hover:underline font-medium transition-colors"
+                  className="relative z-10 text-[10px] text-violet-600 hover:text-violet-800 hover:underline font-medium transition-colors"
                 >
                   {tag.label}
                 </button>

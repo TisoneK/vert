@@ -21,6 +21,43 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.1] — 2026-08-11
+
+### Changed
+
+#### Content cards navigate via real anchors (ADR-26)
+
+**Files:** `src/components/vert/VideoCard.tsx`, `RelatedVideos.tsx`, `LandingPage.tsx`.
+
+Content cards were `<div onClick>` with zero `<a>` anchors, so they weren't
+crawlable, keyboard-focusable, or open-in-new-tab-able (nav is a Zustand store +
+`history.pushState`, so URLs were shareable but the cards themselves weren't
+links). Made the primary click target a real `<a href={viewToPath(...)}>`:
+
+- **VideoCard** — used the stretched-link pattern: the title is an `<a>` whose
+  `after:absolute after:inset-0` overlay makes the whole card a single
+  focusable/crawlable target, while the nested channel/tag/context-menu controls
+  sit above it (`relative z-10` / `z-20`) so they stay independently clickable.
+  Card root switched from `cursor-pointer`+`onClick` to `relative` (prefetch
+  hover/touch handlers stay on the root; added `onFocus` prefetch on the anchor).
+- **RelatedVideos** + **LandingPage trending cards** — no nested interactive
+  children, so the whole row/card became an `<a>` directly. On LandingPage (the
+  logged-out crawl entry point) the "See all" link and Popular-tags chips also
+  became anchors via a shared `spaLink(view)` helper.
+
+Every anchor's onClick does the modified-click guard
+(`meta/ctrl/shift/alt/button!==0` → fall through to native new-tab/window) then
+`preventDefault()` + `navigate(view)`, preserving the SPA navigation for plain
+left-clicks. Closes the backlog "prefetch on keyboard focus" follow-up (cards
+are now focusable, so `onFocus` prefetch is wired on VideoCard).
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint on the three
+files (0 errors), `npx next build` (exit 0, 49/49 static pages — the metadata/
+sitemap DB-error fallbacks fire harmlessly against the no-DB build). Live anchor
+hrefs confirmed on the deploy after push.
+
+---
+
 ## [0.7.0] — 2026-08-11
 
 ### Added
@@ -1842,7 +1879,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.1...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

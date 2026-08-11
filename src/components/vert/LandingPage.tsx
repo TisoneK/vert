@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { useNavigation } from '@/lib/store'
+import { useNavigation, viewToPath, type View } from '@/lib/store'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { Button } from '@/components/ui/button'
 import { Play, Hash } from 'lucide-react'
@@ -27,6 +27,19 @@ export function LandingPage() {
   const prefetchVideo = usePrefetchVideo()
   const [trending, setTrending] = useState<Video[]>([])
   const [tags, setTags] = useState<Tag[]>([])
+
+  // Real <a href> for internal links so the logged-out landing page (the
+  // crawl entry point) is followable by search engines and supports
+  // open-in-new-tab, while plain left-clicks still drive the SPA nav.
+  // See .context ADR-26.
+  const spaLink = (view: View) => ({
+    href: viewToPath(view),
+    onClick: (e: React.MouseEvent) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+      e.preventDefault()
+      navigate(view)
+    },
+  })
 
   useEffect(() => {
     fetch('/api/v1/trending?limit=6')
@@ -79,18 +92,18 @@ export function LandingPage() {
           <section className="mt-10">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Trending</h2>
-              <button
-                onClick={() => navigate({ page: 'trending' })}
+              <a
+                {...spaLink({ page: 'trending' })}
                 className="text-xs text-violet-600 hover:text-violet-700 font-medium"
               >
                 See all
-              </button>
+              </a>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {trending.map((v) => (
-                <div
+                <a
                   key={v.id}
-                  onClick={() => navigate({ page: 'video', videoId: v.id })}
+                  {...spaLink({ page: 'video', videoId: v.id })}
                   // Warm the watch page's data on hover/touch intent — same
                   // pre-fetch as the main VideoCard (see .context ADR-3).
                   onMouseEnter={() => prefetchVideo(v.id)}
@@ -99,7 +112,7 @@ export function LandingPage() {
                   // equal height regardless of title length. Without this, a
                   // card with a 1-line title is shorter than one with a 2-line
                   // title, making the grid look ragged.
-                  className="cursor-pointer group h-full flex flex-col"
+                  className="group h-full flex flex-col"
                 >
                   <div className="aspect-[9/16] rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 relative">
                     {v.thumbnailUrl ? (
@@ -120,7 +133,7 @@ export function LandingPage() {
                     {v.title}
                   </h3>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{v.channel.channelName}</p>
-                </div>
+                </a>
               ))}
             </div>
           </section>
@@ -132,14 +145,14 @@ export function LandingPage() {
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Popular tags</h2>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (
-                <button
+                <a
                   key={tag.id}
-                  onClick={() => navigate({ page: 'tag', slug: tag.name })}
+                  {...spaLink({ page: 'tag', slug: tag.name })}
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-xs font-medium transition-colors"
                 >
                   <Hash className="h-3 w-3" />
                   {tag.name}
-                </button>
+                </a>
               ))}
             </div>
           </section>
