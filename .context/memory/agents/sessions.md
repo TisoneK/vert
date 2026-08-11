@@ -276,3 +276,12 @@ past entries — append corrections instead.
 - **Open items:** tasks/backlog.md — H1 (share/SEO metadata, ADR-25), M1 (real anchor links, ADR-26), H2 (contact integrity, ADR-27), M2 (KV rate limiter, ADR-28), M3/M4 (password reset/strength), L1 (theme-aware 404/500, ADR-29), L2–L13 polish batch. Prior architectural backlog (video transcoding/HLS, infinite scroll, code-split) unchanged. User actions still pending: email provider (password reset + contact), Sentry DSN, GitHub Actions billing, branch protection.
 - **Notes:** none — durable facts promoted to ADR-25…29, the review report, and system/ (ai-models + environments browser-pane note).
 - **Report:** .context/memory/reviews/2026-08-11-review.md
+---
+## 2026-08-11 — Session 34
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Implement review [H1]/[L7] — SEO & shareability (ADR-25). First of the grouped autonomous implementation sessions (S34…S39) from the 2026-08-11 review. Owner approved implementing the "proposed" ADRs this turn.
+- **Commits:** 1 product (`4e63b6d`, tag `v0.7.0`) + context (this) — released `0.7.0`.
+- **Outcome:** done + **live-verified**. Content routes (watch/channel/category/tag) now export `generateMetadata` (per-item title/og:image/og:video/canonical/twitter large-image, DB-error fallback); added `site-metadata.ts`, `sitemap.ts`, `robots.ts` (removed static `public/robots.txt`), `metadataBase`. tsc 0 / eslint 0 / `next build` exit 0. Live deploy confirmed: `/watch/<id>` → `<title>Floor · TisoneK</title>` + real og:image/og:video/summary_large_image; `/robots.txt` + `/sitemap.xml` serve. ADR-25 accepted/shipped; backlog [H1] checked.
+- **Open items:** S35–S39 pending (real links, contact integrity, auth hardening, theme error pages, UX polish). M2 (rate-limit KV) + M3 (password reset) remain infra-blocked (KV creds / email provider).
+- **Notes:** none — facts in ADR-25 UPDATE + 2026-08-11-implementation.md.
+- **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 34)

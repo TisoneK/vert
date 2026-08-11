@@ -213,8 +213,9 @@ don't remove the line.
 ---
 _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md, ADR-25…29)._
 
-- [ ] **[H1] Per-route share + SEO metadata (generateMetadata) + sitemap/robots** (added
-      2026-08-11 by Claude Code) — content routes (`watch/[id]`, `channel/[id]`,
+- [x] **[H1] Per-route share + SEO metadata (generateMetadata) + sitemap/robots** — DONE
+      2026-08-11 (Session 34), `0.7.0`, commit `4e63b6d`, tag `v0.7.0`. ADR-25 shipped.
+      (added 2026-08-11 by Claude Code) — content routes (`watch/[id]`, `channel/[id]`,
       `category/[slug]`, `tag/[slug]`) are thin `'use client'` shells with no `generateMetadata`;
       the only metadata is global in `src/app/layout.tsx`. Prod `/watch/<id>` returns
       `<title>Vert</title>`, no `og:image`/`og:video`, `twitter:card=summary`, and the video

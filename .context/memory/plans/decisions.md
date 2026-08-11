@@ -393,6 +393,15 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   media (fall back to site defaults). Pairs with ADR-26 (real links) — metadata without
   crawlable links is half a fix. Future agents: new content routes must export
   `generateMetadata`; keep the sitemap generator in sync when adding public entity types.
+- **UPDATE 2026-08-11 (Session 34) — accepted + shipped (`0.7.0`, commit `4e63b6d`, tag
+  `v0.7.0`).** Owner approved implementation. Delivered exactly as decided: `watch/[id]`,
+  `channel/[id]`, `category/[slug]`, `tag/[slug]` converted from `'use client'` shells to
+  server components exporting async `generateMetadata` (narrow `select` lookups, try/catch →
+  `FALLBACK_METADATA`); shared `src/lib/site-metadata.ts` (SITE_URL resolution, `absoluteUrl`,
+  `clampDescription`, fallback); `metadataBase` set in root layout; `app/sitemap.ts` +
+  `app/robots.ts` added, `public/robots.txt` removed. tsc 0 / eslint 0 / `next build` exit 0
+  (build output: `/robots.txt` + `/sitemap.xml` generated; content routes now `ƒ`). Live OG
+  output on the deploy confirmed post-push.
 
 ---
 ## ADR-26: Content cards navigate via real anchors, not `div onClick` (2026-08-11)

@@ -52,3 +52,6 @@ live in ADR-3/4/5/7/8 and the corresponding reviews/. -->
 ---
 - **2026-08-11 — Session 33** — Claude Code / claude-opus-4-8 — research/review sweep (NO code changes). Comprehensive live-site + codebase audit ("every visible mistake"). Top findings: watch/channel/category pages ship **no per-item share/SEO metadata** (all `'use client'`, no `generateMetadata` → blank social cards, no crawl) and content cards navigate via **`div onClick` with zero `<a>` anchors** (no crawl/keyboard/new-tab); Contact form **fakes success**; rate limiter is **per-instance in-memory** (weak on serverless). Recorded **ADR-25…29** + backlog (H1,H2,M1–M4,L1–L13). Positives verified: strong register validation, admin-gated debug-db, aria-labeled player.
   Detail: .context/memory/reviews/2026-08-11-review.md
+---
+- **2026-08-11 — Session 34** — Claude Code / claude-opus-4-8 — implemented review [H1] (ADR-25): per-route `generateMetadata` (watch/channel/category/tag) + `sitemap.ts` + `robots.ts` + `metadataBase`; content routes are now server components. Released **0.7.0** (`4e63b6d`, `v0.7.0`). **Live-verified**: `/watch/<id>` ships real og:title/image/video + summary_large_image; robots+sitemap serve. First of the grouped S34–S39 implementation run.
+  Detail: .context/memory/reviews/2026-08-11-implementation.md
