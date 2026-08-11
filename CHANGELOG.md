@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.4] — 2026-08-11
+
+### Fixed
+- **The "page not found" and error screens now respect dark mode.** In dark mode they no longer flash a bright white page.
+
+---
+
 ## [0.7.3] — 2026-08-11
 
 ### Changed
@@ -457,7 +464,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.3...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.4...HEAD
+[0.7.4]: https://github.com/TisoneK/vert/releases/tag/v0.7.4
 [0.7.3]: https://github.com/TisoneK/vert/releases/tag/v0.7.3
 [0.7.2]: https://github.com/TisoneK/vert/releases/tag/v0.7.2
 [0.7.1]: https://github.com/TisoneK/vert/releases/tag/v0.7.1

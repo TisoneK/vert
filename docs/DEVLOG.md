@@ -21,6 +21,26 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.4] — 2026-08-11
+
+### Fixed
+
+#### Theme-aware 404 / 500 pages (ADR-29, review [L1])
+
+**Files:** `src/app/not-found.tsx`, `src/app/error.tsx`.
+
+Both top-level pages hard-coded `bg-white` / `text-zinc-900` with no `dark:`
+variants, so a dark-mode user hit a bright white page. They render inside the
+root layout (which sets the `.dark` class via the no-flash script), so adding
+`dark:` variants (`dark:bg-zinc-950`, `dark:text-zinc-100/400`, and dark
+border/hover tokens on the error page's "Go home" button) is sufficient — no
+structural change.
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint (0 errors),
+`npx next build` (exit 0). Live dark-mode 404 background confirmed after push.
+
+---
+
 ## [0.7.3] — 2026-08-11
 
 ### Changed
@@ -1936,7 +1956,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.3...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.4...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
