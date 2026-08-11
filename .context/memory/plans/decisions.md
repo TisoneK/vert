@@ -431,6 +431,15 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   SPA navigation is unchanged for normal clicks. Closes the backlog "Prefetch on keyboard
   focus" blocker (cards gain focus, so `onFocus={prefetchVideo}` becomes wireable). Future
   agents: new content cards use an `<a href={viewToPath(...)}>` root, not `div onClick`.
+- **UPDATE 2026-08-11 (Session 35) — accepted + shipped (`0.7.1`, commit `45eccc2`, tag
+  `v0.7.1`).** VideoCard used the stretched-link pattern (title `<a>` with `after:inset-0`
+  overlay; nested channel/tag/context-menu controls raised to `relative z-10`/`z-20`);
+  RelatedVideos + LandingPage cards became `<a>` directly (no nested interactives). LandingPage
+  "See all" + tag chips also anchored via a shared `spaLink(view)` helper. All onClicks do the
+  modified-click guard → `preventDefault()` + `navigate`. Added `onFocus` prefetch to VideoCard
+  (closes the prefetch-on-focus backlog item). tsc 0 / eslint 0 / `next build` exit 0.
+  **Live-verified**: landing page renders 6 `a[href^="/watch/"]`, 5 `a[href^="/tag/"]`, and an
+  anchored "See all".
 
 ---
 ## ADR-27: Contact form must not fake a successful send (2026-08-11)

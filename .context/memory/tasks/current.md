@@ -1,11 +1,11 @@
 # Current Task (overwrite each session)
 
 - **Status:** in-progress
-- **Session:** 35 (2026-08-11)
+- **Session:** 36 (2026-08-11)
 - **Agent:** Claude Code / claude-opus-4-8 (local, Baos-Mac-mini)
-- **Role:** feature-engineer — implementing ADR-26 (owner approved this turn)
-- **Task:** Crawlable/accessible navigation — content cards render as real `<a href>`
-  (VideoCard, RelatedVideos, LandingPage) with onClick → preventDefault + navigate (keeps
-  zustand SPA nav, adds crawl/keyboard/open-in-new-tab). Resolve nested-button issue.
-  Implements review 2026-08-11 [M1], ADR-26.
+- **Role:** feature-engineer — implementing ADR-27 (owner approved this turn)
+- **Task:** Contact-form integrity — the form must not fake a delivered success. No email
+  infra and DB schema changes need approval, so implement the honest-copy path: replace the
+  simulated `setTimeout` "Message sent" with a real contact channel (mailto/visible address)
+  and remove the false confirmation. Implements review 2026-08-11 [H2], ADR-27.
 - **Part of:** autonomous grouped implementation of the 2026-08-11 review (S34…S39).

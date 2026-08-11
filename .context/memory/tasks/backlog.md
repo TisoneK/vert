@@ -148,7 +148,8 @@ don't remove the line.
       component would DRY this up and make "new image → correct defaults"
       automatic. Deferred from Session 9 as scope creep. Low priority; a refactor,
       not a feature.
-- [ ] **Prefetch on keyboard focus** (added 2026-08-04 by Claude Code) — the
+- [x] **Prefetch on keyboard focus** — DONE 2026-08-11 (Session 35, commit `45eccc2`): VideoCard's
+      title is now a focusable `<a>` with `onFocus={() => prefetchVideo(id)}`. (added 2026-08-04 by Claude Code) — the
       Session-8 pre-fetch fires on `onMouseEnter`/`onTouchStart` but NOT `onFocus`,
       because `VideoCard`'s root is a non-focusable `<div onClick>` (existing
       pattern across the app). If cards ever gain `tabIndex`/`role="button"` for
@@ -224,7 +225,10 @@ _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md
       thumbnail/og:video/`summary_large_image`), plus `app/sitemap.ts` + `app/robots.ts`
       (supersede static `public/robots.txt`). **Design = ADR-25 (proposed — needs owner OK).**
       Highest-leverage fix for the "share" value prop.
-- [ ] **[M1] Content cards as real anchors, not `div onClick`** (added 2026-08-11 by Claude
+- [x] **[M1] Content cards as real anchors, not `div onClick`** — DONE 2026-08-11 (Session 35),
+      `0.7.1`, commit `45eccc2`, tag `v0.7.1`. ADR-26 shipped; live-verified (6 watch anchors +
+      5 tag anchors on the landing page). Also closed the prefetch-on-focus follow-up.
+      (added 2026-08-11 by Claude
       Code) — `VideoCard.tsx:100` root is `<div cursor-pointer onClick>`; 0 `<a>` on content
       pages → not crawlable, not keyboard-focusable, no open-in-new-tab/copy-link; nested
       `<button>`s inside the click div (a11y anti-pattern). Make the primary target

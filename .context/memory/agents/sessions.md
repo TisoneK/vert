@@ -285,3 +285,12 @@ past entries — append corrections instead.
 - **Open items:** S35–S39 pending (real links, contact integrity, auth hardening, theme error pages, UX polish). M2 (rate-limit KV) + M3 (password reset) remain infra-blocked (KV creds / email provider).
 - **Notes:** none — facts in ADR-25 UPDATE + 2026-08-11-implementation.md.
 - **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 34)
+---
+## 2026-08-11 — Session 35
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Implement review [M1] — content cards as real anchors (ADR-26). Second of the grouped autonomous implementation sessions.
+- **Commits:** 1 product (`45eccc2`, tag `v0.7.1`) + context (this) — released `0.7.1`.
+- **Outcome:** done + **live-verified**. VideoCard stretched-link (`<a>` title + inset-0 overlay, nested controls raised z-10/z-20); RelatedVideos + LandingPage cards → `<a>` directly; LandingPage "See all"+tag chips anchored via `spaLink()`; modified-click guard preserves SPA nav; `onFocus` prefetch added. tsc 0 / eslint 0 / `next build` exit 0. Live: landing renders 6 `a[href^="/watch/"]` + 5 tag anchors + anchored See-all. ADR-26 accepted/shipped; backlog [M1] + prefetch-on-focus checked.
+- **Open items:** S36–S39 pending (contact integrity, auth hardening, theme error pages, UX polish). M2/M3 infra-blocked.
+- **Notes:** none — facts in ADR-26 UPDATE + 2026-08-11-implementation.md.
+- **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 35)

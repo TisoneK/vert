@@ -35,3 +35,21 @@ serve correctly with real video URLs. ADR-25 → accepted/shipped.
 
 **Note:** `generateMetadata` adds one narrow DB read per content-route request. Acceptable;
 revisit with cache tags if it shows up in DB load.
+
+---
+
+## Session 35 — Crawlable/accessible links (ADR-26, review [M1]) — SHIPPED `0.7.1`
+
+**What shipped (commit `45eccc2`, tag `v0.7.1`):**
+- **VideoCard** — stretched-link pattern: title wrapped in `<a href={viewToPath(...)}>` whose
+  `after:absolute after:inset-0` overlay makes the whole card one crawlable, keyboard-focusable
+  target; nested channel/tag/context-menu controls raised above it (`relative z-10`, wrappers
+  `z-20`). Root switched from `cursor-pointer`+`onClick` to `relative`. Added `onFocus` prefetch.
+- **RelatedVideos** + **LandingPage** trending cards became `<a>` directly (no nested
+  interactives). LandingPage "See all" + tag chips anchored via a shared `spaLink(view)` helper.
+- Every onClick: modified-click guard (`meta/ctrl/shift/alt/button!==0` → native) then
+  `preventDefault()` + `navigate()`, preserving SPA nav for plain left-clicks.
+
+**Verification:** tsc 0 / eslint 0 / `next build` exit 0. **Live-verified**: landing page renders
+6 `a[href^="/watch/"]` (sample `/watch/cmr3el1ie…`), 5 `a[href^="/tag/"]`, anchored "See all".
+ADR-26 accepted/shipped; backlog [M1] + "prefetch on keyboard focus" both checked.
