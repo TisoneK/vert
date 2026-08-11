@@ -14,19 +14,31 @@ export function ContactPage() {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim() || !email.trim() || !message.trim()) return
 
     setLoading(true)
+    setError('')
     try {
-      // TODO: wire to a real endpoint (e.g. /api/v1/contact) once email
-      // infrastructure is set up. For now the form just simulates submission.
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      setSubmitted(true)
-    } catch (error) {
-      console.error('Contact form error:', error)
+      // Real submission — the endpoint validates, rate-limits, and captures the
+      // message server-side (see /api/v1/contact). We only show the success
+      // state on a genuine 2xx so the confirmation is truthful. (ADR-27)
+      const res = await fetch('/api/v1/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message }),
+      })
+      if (res.ok) {
+        setSubmitted(true)
+      } else {
+        const data = await res.json().catch(() => ({}))
+        setError(data.error || 'Could not send your message. Please try again.')
+      }
+    } catch {
+      setError('Could not send your message. Please check your connection and try again.')
     } finally {
       setLoading(false)
     }
@@ -38,7 +50,7 @@ export function ContactPage() {
         <CheckCircle2 className="h-10 w-10 text-zinc-900 dark:text-zinc-100 mb-4" />
         <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Message sent</h1>
         <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-2 text-center max-w-sm">
-          Thanks for reaching out. We&apos;ll get back to you by email.
+          Thanks for reaching out — we&apos;ve received your message and will follow up if it needs a reply.
         </p>
         <Button
           variant="outline"
@@ -106,6 +118,12 @@ export function ContactPage() {
             className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 min-h-[120px] resize-none text-sm focus-visible:ring-violet-600"
           />
         </div>
+
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40 rounded-lg p-3">
+            <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+          </div>
+        )}
 
         <Button
           type="submit"

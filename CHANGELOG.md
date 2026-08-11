@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.2] — 2026-08-11
+
+### Fixed
+- **The contact form now actually sends your message.** Before, it showed "Message sent" without delivering anything. Now your message is really submitted, you only see the confirmation when it genuinely goes through, and you get a clear error if something fails.
+
+---
+
 ## [0.7.1] — 2026-08-11
 
 ### Changed
@@ -443,7 +450,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/TisoneK/vert/releases/tag/v0.7.2
 [0.7.1]: https://github.com/TisoneK/vert/releases/tag/v0.7.1
 [0.7.0]: https://github.com/TisoneK/vert/releases/tag/v0.7.0
 [0.6.25]: https://github.com/TisoneK/vert/releases/tag/v0.6.25

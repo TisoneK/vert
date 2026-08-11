@@ -21,6 +21,37 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.2] — 2026-08-11
+
+### Fixed
+
+#### Contact form no longer fakes success (ADR-27)
+
+**Files:** `src/app/api/v1/contact/route.ts` (new), `src/components/vert/ContactPage.tsx`,
+`src/lib/rate-limit.ts`, `.env.example`.
+
+`ContactPage` previously did `await new Promise(r => setTimeout(r, 800))` and
+then showed "Message sent — we'll get back to you by email" while sending
+nothing (review [H2]). Added a real `POST /api/v1/contact`: validates
+name/email/message (non-string guards, email regex, length caps), rate-limits
+by IP (new `contact` tier: 5/min), and **captures the message to the server log**
+(readable in Vercel logs). If `CONTACT_WEBHOOK_URL` is set it also forwards the
+message to that webhook (best-effort, non-blocking) so the owner can wire
+Slack/Discord/email later with no code change. No new DB table (schema changes
+need owner approval) and no email provider required.
+
+`ContactPage` now POSTs to the endpoint and shows the success state only on a
+real 2xx; failures surface an inline error. Success copy changed from the
+unkeepable "we'll get back to you by email" to "we've received your message and
+will follow up if it needs a reply." Documented `CONTACT_WEBHOOK_URL` (and the
+`NEXT_PUBLIC_SITE_URL` from 0.7.0) in `.env.example`.
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint (0 errors),
+`npx next build` (exit 0, `/api/v1/contact` registered). Live 200/400 responses
+confirmed on the deploy after push.
+
+---
+
 ## [0.7.1] — 2026-08-11
 
 ### Changed
@@ -1879,7 +1910,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.2...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

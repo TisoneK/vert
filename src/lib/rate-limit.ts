@@ -140,4 +140,6 @@ export const RATE_LIMITS = {
   vote: { limit: 60, windowSeconds: 60, scope: 'vote' },
   /** Generic read: 120 per minute per IP — well above any human rate. */
   read: { limit: 120, windowSeconds: 60, scope: 'read' },
+  /** Contact form: 5 messages per minute per IP — blocks form spam. */
+  contact: { limit: 5, windowSeconds: 60, scope: 'contact' },
 } as const
