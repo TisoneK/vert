@@ -209,3 +209,59 @@ don't remove the line.
   channel/profile banner optimization (host-safe optimizer routing plus
   URL-keyed fallbacks), released in `v0.6.15`. The VideoPlayer poster remains
   intentionally native because it is adjacent to canvas frame capture.
+
+---
+_Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md, ADR-25…29)._
+
+- [ ] **[H1] Per-route share + SEO metadata (generateMetadata) + sitemap/robots** (added
+      2026-08-11 by Claude Code) — content routes (`watch/[id]`, `channel/[id]`,
+      `category/[slug]`, `tag/[slug]`) are thin `'use client'` shells with no `generateMetadata`;
+      the only metadata is global in `src/app/layout.tsx`. Prod `/watch/<id>` returns
+      `<title>Vert</title>`, no `og:image`/`og:video`, `twitter:card=summary`, and the video
+      title is absent from server HTML → blank social cards + no SEO. Add async
+      `generateMetadata` per content route (direct `db` lookup → title/description/og:image=
+      thumbnail/og:video/`summary_large_image`), plus `app/sitemap.ts` + `app/robots.ts`
+      (supersede static `public/robots.txt`). **Design = ADR-25 (proposed — needs owner OK).**
+      Highest-leverage fix for the "share" value prop.
+- [ ] **[M1] Content cards as real anchors, not `div onClick`** (added 2026-08-11 by Claude
+      Code) — `VideoCard.tsx:100` root is `<div cursor-pointer onClick>`; 0 `<a>` on content
+      pages → not crawlable, not keyboard-focusable, no open-in-new-tab/copy-link; nested
+      `<button>`s inside the click div (a11y anti-pattern). Make the primary target
+      `<a href={viewToPath(...)} onClick={e=>{e.preventDefault();navigate(...)}}>` (keeps zustand
+      nav, lets modified-clicks fall through). Same for `RelatedVideos` + `LandingPage` cards.
+      Unblocks the "prefetch on keyboard focus" item. **Design = ADR-26 (proposed).**
+- [ ] **[H2] Contact form fakes success** (added 2026-08-11 by Claude Code) —
+      `ContactPage.tsx` handleSubmit `setTimeout(800)` → "Message sent, we'll get back to you by
+      email" but sends nothing (TODO in code). Either add real `POST /api/v1/contact`
+      (persist/forward) or replace with honest copy; never show delivered-success for a no-op.
+      **Design = ADR-27 (accepted).** Shares the email-provider dependency with password reset.
+- [ ] **[M2] Rate limiting is per-instance in-memory (ineffective on serverless)** (added
+      2026-08-11 by Claude Code) — `src/lib/rate-limit.ts` module-level `Map`; assumes
+      single-instance but prod is Vercel serverless (multi-instance + cold starts) so
+      login/signup throttles reset per instance. Move store to Vercel KV / Upstash behind the
+      same `rateLimit()` interface (atomic INCR+TTL); keep in-memory as local-dev fallback.
+      **Design = ADR-28 (proposed — needs KV/creds).**
+- [ ] **[M3] Password reset / "Forgot password?" flow** (added 2026-08-11 by Claude Code) —
+      LoginForm has no reset link; no reset route exists (only authenticated
+      `/api/v1/auth/change-password`). Email/password users who forget are locked out. Needs an
+      email provider (the long-standing user-action blocker). Build: request-reset route
+      (rate-limited, token emailed) + reset-confirm route + LoginForm link.
+- [ ] **[M4] Strengthen password policy** (added 2026-08-11 by Claude Code) — min is 6 chars
+      (`SignupForm.tsx:34` + `register/route.ts:66`), no strength/breach check. Raise to 8+ and
+      consider a common-password/breach check. Update both client + server + the placeholder copy.
+- [ ] **[L1] Theme-aware 404/500 pages** (added 2026-08-11 by Claude Code) — `not-found.tsx` +
+      `error.tsx` hard-code `bg-white`/`text-zinc-900`, no `dark:` → white page in dark mode.
+      Use theme-aware tokens. **Design = ADR-29 (accepted).** Safe one-file-each fix.
+- [ ] **[L2–L13] Polish batch from the 2026-08-11 review** (added 2026-08-11 by Claude Code) —
+      independent low-severity items, each small: **L2** Trending #1 hero wastes desktop
+      horizontal space (portrait thumb in a wide gray box); **L3** Trending category chips clip
+      "Travel"; **L4** empty categories (Art/Comedy/Food/Music/News/Other/Travel) shown as equal
+      filters resolve to "No videos yet" — hide/grey until populated; **L5** search matches
+      titles only ("music" → no results despite `music` tag/Music category) — index
+      tags/categories/channel names; **L6** thumbnails flash gray (add `next/image`
+      `placeholder="blur"`); **L7** `twitter:card=summary` → `summary_large_image` (folds into
+      ADR-25); **L8** header inconsistency (landing has no search bar, app does); **L9** crowded
+      mobile header at 375px; **L10** "ADVERTISEMENT — Reserved placement" visible on public
+      watch pages reads unfinished; **L11** ~97 `console.*` in `src/` — audit for detail leaks;
+      **L12** `upload/route.ts:105` returns raw `details:errorMsg` on token-gen failure; **L13**
+      no Content-Security-Policy header (X-Frame-Options + HSTS are set). See review for detail.

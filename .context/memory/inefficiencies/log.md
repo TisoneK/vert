@@ -347,3 +347,23 @@ if literally nothing slowed you down.
 - **Cause:** The existing player had separate React visibility state and native media mute/volume state, while touch needed a disclosure mode without hover.
 - **Workaround / fix:** Added explicit hover/focus/touch state, outside dismissal, last-audible-volume restoration, native mute synchronization, and focus-within control reveal; reran typecheck, lint, diff check, and build after each correction.
 - **Prevent next time:** Model the interaction state table before editing media controls: pointer type × disclosure state × mute/volume state × auto-hide lifecycle.
+
+---
+## 2026-08-11 — Claude Code / claude-opus-4-8 (Session 33)
+- **Problem:** Two minor browser-pane snags during the live-site research sweep: (1) a few
+  `mcp__Claude_Browser__computer` click actions timed out with "Browser pane is currently
+  hidden," and (2) after toggling dark mode the screenshot kept rendering light even though the
+  DOM `<html>` class had flipped to `dark` and computed `body` bg was near-black — the hidden/
+  unfocused pane doesn't always repaint the screenshot.
+- **Cost:** Minor — a couple of retries + one moment of "did the toggle work?" before I
+  confirmed via computed styles instead of the screenshot.
+- **Cause:** The in-app Claude Browser pane throttles/parks rendering when not focused; screenshot
+  reflects the last painted frame, not necessarily current DOM state.
+- **Workaround / fix:** For state that matters, read it via `javascript_tool` (DOM class,
+  `getComputedStyle`, `fetch()` of the server HTML) rather than trusting the screenshot;
+  re-screenshot / take a fresh action to recover from a "pane hidden" timeout.
+- **Prevent next time:** Recorded in `system/environments.md` (Baos-Mac-mini browser-pane note):
+  the Claude Browser pane works well against the LIVE deploy for research, but prefer JS-driven
+  inspection over pixel screenshots for anything state-dependent (theme, video playback, metadata).
+  Otherwise a smooth session — the pane reached the deployed site with no dev server, which was
+  faster than the port-3000/dev-server dance prior sessions hit.

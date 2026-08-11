@@ -19,45 +19,9 @@ records.
   Detail: .context/memory/sessions/YYYY-MM-DD-N/notes.md (or "summary only").
 -->
 
----
-- **2026-07-21 — Session 5** — Claude Code / claude-opus-4-8 — context sync 0.2.0→0.3.0 + delivered the CI deploy gate (`.github/workflows/ci.yml`: tsc + next build hard gates, eslint advisory); env-gated the destructive ops endpoints (`ENABLE_OPS_ENDPOINTS`).
-  Detail: summary only.
----
-- **2026-07-22 — Session 6** — Claude Code / claude-opus-4-8 — completed the react-query migration (fetch-in-effect → `useQuery`/`useInfiniteQuery`, mutations → `setQueryData`, polling → `refetchInterval`); **eslint 35 → 0 errors**; CI lint flipped to blocking.
-  Detail: summary only.
----
-- **2026-08-01 — Session 7** — Buffy / deepseek-v4-flash — context sync: updated vendored core 0.3.0 → **0.5.0** (Windows `context-sync.ps1` + session-scoped `memory/sessions/` module), regenerated kickoff.md/AGENTS.md, adopted the sessions module.
-  Detail: .context/memory/sessions/2026-08-01-7/notes.md
----
-- **2026-08-04 — Session 8** — Claude Code / claude-opus-4-8 — shipped the hover/touch **Pre-fetch** feature (react-query cache warming on VideoCard/RelatedVideos/LandingPage; navigation is a zustand store, not next/link). Verified live: hover→prefetch, click→cache hit, 0 skeletons. eslint 0 errors. **ADR-3.** Next feature: Lazy Loading (backlogged).
-  Detail: summary only (facts in ADR-3 + 2026-08-04-feature-review.md).
----
-- **2026-08-04 — Session 9** — Claude Code / claude-opus-4-8 — shipped **Lazy Loading (images)**: native `loading="lazy"`+`decoding="async"` on the 12 list/grid `<img>` sites; hero/LCP images left eager. Asked the user to pick the scope (images vs infinite-scroll vs code-split → images). Verified render-level (attrs in live DOM). eslint 0 errors. **ADR-4.** Both requested features now done.
-  Detail: summary only (facts in ADR-4 + 2026-08-04-feature-review-2.md).
----
-- **2026-08-04 — Session 10** — Claude Code / claude-opus-4-8 — investigation (no code). User's "5-min cold load" is NOT the prefetch/lazy features (verified) — it's **large unoptimized media on the live site**: 445KB PNG thumbnails via plain `<img>` (no next/image) + raw progressive videos (a 20MB `.mov`). Motivated the Image Optimization feature (Session 11).
-  Detail: summary only (facts in the Session 10 sessions.md entry).
----
-- **2026-08-04 — Session 11** — Claude Code / claude-opus-4-8 — shipped **Image Optimization**: thumbnails via `next/image` (AVIF/WebP + per-device resize; heroes `priority`). Real 445KB PNG → **29KB AVIF (−93%)**, verified on live media. Chose next/image over upload-time sharp (direct-to-blob uploads have no server hook). eslint 0 errors. **ADR-5.** Video load still open (backlog).
-  Detail: summary only (facts in ADR-5 + 2026-08-04-feature-review-3.md).
----
-- **2026-08-04 — Session 12** — Buffy / openai/gpt-5.6-luna — resumed the interrupted Video Optimization task; completed the safe `preload="metadata"` + `playsInline` mitigation for progressive uploads, corrected the hint-vs-guarantee wording, and explicitly left transcoding/HLS/provider selection as architectural backlog. Product commit `879510e`; validation: tsc, lint, build clean.
-  Detail: .context/memory/sessions/2026-08-04-12/notes.md
----
-- **2026-08-04 — Session 13** — Buffy / openai/gpt-5.6-luna — corrected release bookkeeping: pushed features were moved from `[Unreleased]` into `0.6.11`, `package.json` was bumped, annotated tag `v0.6.11` was pushed, and a fresh `[Unreleased]` section was left for future work. **ADR-7:** pushing to `main` is a production release for changelog purposes.
-  Detail: summary only (facts in `.context/memory/reviews/2026-08-04-release-review.md`).
----
-- **2026-08-04 — Session 14** — Buffy / openai/gpt-5.6-luna — fixed watch-page UX: subscriber count now appears once, logged-out visitors get an outline `Subscribe` CTA, subscription state is viewer-scoped, the player uses `object-cover`, and the spinner is shown only during active playback buffering. Released as `0.6.12` (`05cb8ff`, `v0.6.12`). **ADR-8.**
-  Detail: .context/memory/reviews/2026-08-04-watch-page-review.md
----
-- **2026-08-05 — Sessions 15–17** — Buffy / openai/gpt-5.6-luna — fixed hidden scroll affordances, bounded progress indicators, and blocked video control interactions; released as **0.6.13** (`33a87c5`, `35a6bc6`, `4a90f2d`, release `032e4dd`, tag `v0.6.13`). Validation: typecheck/build pass, lint 0 errors/19 warnings.
-  Detail: .context/memory/reviews/2026-08-05-review.md
----
-- **2026-08-05 — Sessions 18–20** — Buffy / openai/gpt-5.6-luna — released **0.6.14**: desktop navigation is an on-demand overlay drawer, player progress is compact/inset, and Featured is a resilient non-duplicating card set. Typecheck/targeted lint/build passed; full ESLint timed out.
-  Detail: .context/memory/reviews/2026-08-05-review-2.md
----
-- **2026-08-07 — Sessions 21–23** — Buffy / openai/gpt-5.6-luna — finished the interrupted remaining-image optimization, released `v0.6.15`, then shipped the left-aligned sticky desktop portrait watch stage/right Up Next rail and repaired the clipped settings popup, released `v0.6.16`.
-  Detail: .context/memory/reviews/2026-08-07-review.md
+<!-- Sessions 5–23 pruned 2026-08-11 (Session 33) to keep this working summary
+recent — all remain in agents/sessions.md (permanent), and their durable facts
+live in ADR-3/4/5/7/8 and the corresponding reviews/. -->
 ---
 - **2026-08-07 — Session 24** — Buffy / openai/gpt-5.6-luna — released `v0.6.17`: bounded left player stage plus one desktop rail ordered Advertisement → Comments → Up Next, with the same mobile flow; compact lists avoid nested scrolling and comment requests ignore stale pages. Browser visual verification was blocked because the tool sandbox terminates detached dev servers.
   Detail: .context/memory/reviews/2026-08-07-session-24-review.md
@@ -85,3 +49,6 @@ records.
 ---
 - **2026-08-08 — Session 32** — Buffy / openai/gpt-5.6-luna — added responsive volume disclosure: desktop hover/focus reveals an anchored slider, touch/pen opens it on first tap, the next speaker tap mutes, and a muted tap restores the last audible volume. Published `0.6.25`; typecheck, targeted lint, diff check, and production build passed.
   Detail: .context/memory/reviews/2026-08-08-session-32-review.md
+---
+- **2026-08-11 — Session 33** — Claude Code / claude-opus-4-8 — research/review sweep (NO code changes). Comprehensive live-site + codebase audit ("every visible mistake"). Top findings: watch/channel/category pages ship **no per-item share/SEO metadata** (all `'use client'`, no `generateMetadata` → blank social cards, no crawl) and content cards navigate via **`div onClick` with zero `<a>` anchors** (no crawl/keyboard/new-tab); Contact form **fakes success**; rate limiter is **per-instance in-memory** (weak on serverless). Recorded **ADR-25…29** + backlog (H1,H2,M1–M4,L1–L13). Positives verified: strong register validation, admin-gated debug-db, aria-labeled player.
+  Detail: .context/memory/reviews/2026-08-11-review.md

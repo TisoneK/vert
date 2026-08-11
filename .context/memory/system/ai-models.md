@@ -13,7 +13,7 @@ accordingly).
 
 | Agent | Model | First seen | Last seen | Sessions |
 |---|---|---|---|---|
-| Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-08-04 | 6 |
+| Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-08-11 | 7 |
 | Claude Code | claude-fable-5 | 2026-07-14 | 2026-07-14 | 2 |
 | Buffy | deepseek-v4-flash | 2026-08-01 | 2026-08-01 | 1 |
 | Buffy | openai/gpt-5.6-luna | 2026-08-04 | 2026-08-08 | 11 |
@@ -33,6 +33,7 @@ accordingly).
 - **Buffy / openai/gpt-5.6-luna:** Sessions 18–20 completed a sequential navigation/player/homepage UX batch, used review-driven accessibility and sparse-data checks, and released it as `v0.6.14`. Targeted lint and production build passed; full-repo ESLint timed out in the local tool environment. (2026-08-05)
 - **Buffy / openai/gpt-5.6-luna:** Sessions 21–23 resumed an interrupted image migration without discarding work, used host-safe fallbacks, researched desktop portrait-video patterns, implemented the sticky left player/right rail layout, and repaired the clipped settings popup. Review-driven checks caught nullable URL, clipping, and incomplete ARIA issues before release; targeted lint/typecheck/build passed. Browser verification was blocked by an unrelated app on port 3000. (2026-08-07)
 - **Buffy / openai/gpt-5.6-luna:** Session 28 resumed the dirty Session 27 tree without discarding work, separated the watch-page polish into two product commits, rejected unsupported title-deduplication/dislike-count changes, and completed release/context bookkeeping. Typecheck, targeted lint, production build, and hosted no-interaction smoke passed; precise geometry interaction remains tool-limited. (2026-08-08)
+- **Claude Code / claude-opus-4-8:** Session 33 (research/review, no code changes) — comprehensive live-site + codebase sweep against the LIVE deploy, producing ADR-25…29 + backlog. NEW capability datapoint: the in-app **Claude Browser pane** (`mcp__Claude_Browser__*`, distinct from the prior sessions' chrome-devtools runner) worked well against the deployed URL — coordinate clicks mostly registered, `javascript_tool`/`get_page_text`/`read_page`/`resize_window` all reliable; page/video content and per-page `<head>` metadata were inspectable via `fetch()`+DOM. Occasional `computer` click timed out with "Browser pane is currently hidden" — retry/screenshot recovered. Preferred JS-driven DOM/metadata inspection over pixel clicks for evidence, consistent with the standing browser-pane guidance. (2026-08-11)
 
 Concrete, evidence-based capabilities and limits — things demonstrated
 in this repo's sessions, not marketing claims or self-assessment.

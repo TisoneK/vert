@@ -363,3 +363,118 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Consequences:** Volume adjustment is discoverable on desktop, usable on mobile, and safe for narrow players because it does not consume control-row width. Existing keyboard shortcuts, playback controls, settings, and format-aware sizing remain unchanged.
 
 ---
+## ADR-25: Server-generated per-route share/SEO metadata + sitemap/robots (2026-08-11)
+- **Status:** proposed (Session 33 research — architectural; awaiting owner approval to implement)
+- **Context:** The whole app is client-rendered: every route file is a thin `'use client'`
+  shell rendering `<VertApp/>`, and the only `Metadata` is the global one in
+  `src/app/layout.tsx` (no `generateMetadata` anywhere). Verified in production: `/watch/<id>`
+  returns `<title>Vert</title>`, the generic description, no `og:image`/`og:video`,
+  `twitter:card=summary`, and the video title is absent from the server HTML. So shared links
+  render blank social cards and crawlers index nothing — directly undercutting the "share
+  portrait video" value prop. The watch page already carries a code comment acknowledging the
+  gap. See review 2026-08-11 [H1], [L7].
+- **Decision:** Split the thin route shells so that content routes (`watch/[id]`,
+  `channel/[id]`, `category/[slug]`, `tag/[slug]`) export an async `generateMetadata({params})`
+  that does a direct DB lookup (via the lazy `db` singleton) and returns per-item `title`,
+  `description`, `openGraph` (with `og:image` = the video thumbnail, `og:type=video.other`,
+  and `og:video` where available), and `twitter:card='summary_large_image'` (or
+  `player` with `twitter:player` for inline preview). `<VertApp/>` still renders the
+  interactive client view underneath — this is a metadata/head addition, not a full SSR
+  rewrite of the app. Add `app/sitemap.ts` (enumerate public videos/channels/categories) and
+  `app/robots.ts` (reference the sitemap), superseding the static `public/robots.txt`.
+- **Alternatives considered:** (a) Full SSR/RSC rewrite of the feed/watch views — rejected as
+  far larger scope than the problem; metadata generation is separable from interactivity.
+  (b) Client-side `document.title`/meta updates — rejected: social scrapers and crawlers read
+  the initial server HTML, not post-hydration DOM. (c) Leaving `public/robots.txt` as-is —
+  rejected: it invites crawlers to pages with no server content.
+- **Consequences:** Shared links get real titles/thumbnails/inline players; content becomes
+  crawlable and indexable. Cost: each content route now runs a DB query at request time for
+  metadata (cache with `revalidate`/tags). Requires the metadata query to tolerate missing
+  media (fall back to site defaults). Pairs with ADR-26 (real links) — metadata without
+  crawlable links is half a fix. Future agents: new content routes must export
+  `generateMetadata`; keep the sitemap generator in sync when adding public entity types.
+
+---
+## ADR-26: Content cards navigate via real anchors, not `div onClick` (2026-08-11)
+- **Status:** proposed (Session 33 research — awaiting owner approval to implement)
+- **Context:** `VideoCard`'s root is `<div className="cursor-pointer" onClick={navigate}>`
+  (`VideoCard.tsx:100`) with **zero `<a>` anchors** on content pages. Navigation works via the
+  zustand store + `history.pushState` (`store.ts`), so URLs are shareable — but the cards are
+  not crawlable (crawlers don't execute onClick), not keyboard-focusable/activatable (the div
+  has no `tabIndex`/`role`), and offer no middle-click/⌘-click/open-in-new-tab/copy-link. Real
+  `<button>`s (channel name, tags, context menu) are nested **inside** the clickable div — an
+  interactive-nesting a11y anti-pattern. See review 2026-08-11 [M1].
+- **Decision:** Render the card's primary click target as a real anchor:
+  `<a href={viewToPath({page:'video',videoId})} onClick={e => { e.preventDefault(); navigate(...) }}>`.
+  This keeps the existing zustand SPA navigation (preventDefault + `navigate`) while giving the
+  browser a real href for crawl, keyboard focus/Enter, hover URL preview, and modified-click
+  open-in-new-tab (let un-modified left-clicks call `navigate`; let ⌘/ctrl/middle-click fall
+  through to native). Apply the same pattern to `RelatedVideos` "Up Next" rows and
+  `LandingPage` trending cards. Resolve interactive nesting by moving the nested buttons out of
+  the anchor's flow (siblings/overlay) or converting the card to a link-with-overlaid-controls
+  layout. `viewToPath` (already in `store.ts`) is the single source for hrefs.
+- **Alternatives considered:** (a) Adding `role="link"` + `tabIndex` + keydown to the div —
+  rejected: reimplements anchor semantics badly and still isn't crawlable. (b) `next/link` —
+  works, but the app deliberately navigates via zustand (ADR-3 context), so a plain `<a>` +
+  preventDefault preserves that model with less churn. (c) Leave as-is — rejected: crawl +
+  keyboard access are core to a public video platform.
+- **Consequences:** Cards become crawlable, keyboard-accessible, and open-in-new-tab-able while
+  SPA navigation is unchanged for normal clicks. Closes the backlog "Prefetch on keyboard
+  focus" blocker (cards gain focus, so `onFocus={prefetchVideo}` becomes wireable). Future
+  agents: new content cards use an `<a href={viewToPath(...)}>` root, not `div onClick`.
+
+---
+## ADR-27: Contact form must not fake a successful send (2026-08-11)
+- **Status:** accepted
+- **Context:** `ContactPage.tsx` `handleSubmit` does `setTimeout(800)` then renders "Message
+  sent — We'll get back to you by email," but nothing is transmitted (`// TODO: wire to a real
+  endpoint … the form just simulates submission`). The user is told, falsely, that a bug report
+  or question was delivered. See review 2026-08-11 [H2].
+- **Decision:** A delivered-success state must reflect an actual delivery. Until email
+  infrastructure exists, either (a) add a real `POST /api/v1/contact` that persists the message
+  (DB row) and/or forwards it, and only then show "Message sent"; or (b) replace the form with
+  honest copy (e.g., a mailto/contact address) and no simulated success. Never show a
+  "delivered" confirmation for a no-op. This is a correctness/integrity call, not a design
+  preference — hence accepted rather than proposed.
+- **Consequences:** Users get truthful feedback. Option (a) needs a storage/forwarding
+  decision (shares the email-provider dependency already tracked for password reset). Whichever
+  path, remove the `setTimeout` simulation. Future agents: no UI may claim an external side
+  effect (sent/saved/submitted) that the code does not actually perform.
+
+---
+## ADR-28: Serverless-correct rate limiting via a shared store (2026-08-11)
+- **Status:** proposed (Session 33 research — needs infra decision/credentials)
+- **Context:** `src/lib/rate-limit.ts` is a module-level in-memory `Map`; its comment assumes
+  a "single-instance" v1. The production target is **Vercel serverless** — multi-instance,
+  cold-starting — so `login` (10/min/IP) and `signup` (5/min/IP) counters are per-instance and
+  reset frequently, making brute-force / account-spam protection much weaker than it appears.
+  See review 2026-08-11 [M2].
+- **Decision:** Move the rate-limit store behind a shared backend — **Vercel KV or Upstash
+  Redis** — keeping the existing `rateLimit(req, config, key)` interface (the file already
+  documents this as the intended migration). Use an atomic INCR + TTL per fixed window. Keep
+  the in-memory implementation as a local-dev fallback when no KV env var is present, so local
+  work needs no external service.
+- **Alternatives considered:** (a) Keep in-memory — rejected: does not survive multi-instance/
+  cold-start. (b) Edge middleware with a durable store — heavier; the per-route call sites
+  already exist and just need a shared store. (c) A hosted WAF/rate-limit product — out of
+  scope for now.
+- **Consequences:** Auth/upload/mutation throttles become effective across instances. Adds a
+  KV dependency + credentials (env var) and a small per-request latency on limited routes.
+  Future agents: don't rely on the in-memory limiter for any prod security guarantee until this
+  lands; treat it as best-effort/local only.
+
+---
+## ADR-29: Theme-complete top-level pages (404/500) (2026-08-11)
+- **Status:** accepted
+- **Context:** `not-found.tsx` and `error.tsx` render outside the themed `<VertApp/>` shell and
+  hard-code `bg-white` / `text-zinc-900` with no `dark:` variants, so a dark-mode user hits a
+  white flash/page. The rest of the app is theme-aware (ADR-23). See review 2026-08-11 [L1].
+- **Decision:** Any top-level route rendered outside the app shell (404, 500, and future
+  standalone pages) must use theme-aware tokens (`bg-background`/`text-foreground` or explicit
+  `dark:` variants) so it honors the stored theme. Since these render before/around React and
+  next-themes, rely on the same `.dark`-class signal the `layout.tsx` no-flash script sets.
+- **Consequences:** Error/404 pages match the user's theme instead of forcing light. Trivial,
+  low-risk, reversible — accepted. Future agents: new top-level/standalone pages are built
+  theme-aware from the start.
+
+---
