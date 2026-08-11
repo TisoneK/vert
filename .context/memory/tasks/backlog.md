@@ -256,7 +256,11 @@ _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md
       `/api/v1/auth/change-password`). Email/password users who forget are locked out. Needs an
       email provider (the long-standing user-action blocker). Build: request-reset route
       (rate-limited, token emailed) + reset-confirm route + LoginForm link.
-- [ ] **[M4] Strengthen password policy** (added 2026-08-11 by Claude Code) — min is 6 chars
+- [x] **[M4] Strengthen password policy** — DONE 2026-08-11 (Session 37), `0.7.3`, commit
+      `0d2083b`, tag `v0.7.3`. Min raised 6→8 (client+server+copy) + a no-dependency
+      common-password blocklist server-side. Live-verified (400 for 6-char + for "password123").
+      Follow-up (still open): a real breach-corpus (HaveIBeenPwned k-anonymity) check.
+      (added 2026-08-11 by Claude Code) — min is 6 chars
       (`SignupForm.tsx:34` + `register/route.ts:66`), no strength/breach check. Raise to 8+ and
       consider a common-password/breach check. Update both client + server + the placeholder copy.
 - [ ] **[L1] Theme-aware 404/500 pages** (added 2026-08-11 by Claude Code) — `not-found.tsx` +

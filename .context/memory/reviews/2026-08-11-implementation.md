@@ -74,3 +74,20 @@ table. Implemented ADR-27 option (a) within those bounds.
 **Live-verified**: empty→400, bad email→400 (`"Please enter a valid email address"`),
 valid→`{"ok":true}` 200. ADR-27 accepted/shipped; backlog [H2] checked. Follow-up when email
 infra lands: upgrade log-capture → real email (webhook hook already in place).
+
+---
+
+## Session 37 — Auth hardening (review [M4]) — SHIPPED `0.7.3`
+
+**What shipped (commit `0d2083b`, tag `v0.7.3`):**
+- Password minimum raised 6 → 8 on both `SignupForm` (client) and `register/route.ts` (server),
+  kept in sync; placeholder/error copy updated.
+- Added a no-dependency server-side common-password blocklist (a `Set` of the passwords that
+  dominate credential-stuffing lists, matched case-insensitively) → 400 "too common".
+
+**Not done (infra-blocked, still in backlog):** M3 password reset (needs email provider), M2
+rate-limit KV (needs Vercel KV/Upstash credentials), and a breach-corpus (HaveIBeenPwned) check.
+
+**Verification:** tsc 0 / eslint 0 / `next build` exit 0. **Live-verified**: 6-char password →
+400 "must be at least 8 characters"; `password123` → 400 "too common" (both reject before any
+account is created). Backlog [M4] checked.

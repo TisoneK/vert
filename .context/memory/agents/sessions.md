@@ -303,3 +303,12 @@ past entries — append corrections instead.
 - **Open items:** S37–S39 pending (auth hardening, theme error pages, UX polish). M2 (rate-limit KV), M3 (password reset) + this session's email-delivery upgrade remain infra-blocked (KV creds / email provider).
 - **Notes:** none — facts in ADR-27 UPDATE + 2026-08-11-implementation.md.
 - **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 36)
+---
+## 2026-08-11 — Session 37
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Implement review [M4] — stronger password policy. Fourth of the grouped autonomous implementation sessions.
+- **Commits:** 1 product (`0d2083b`, tag `v0.7.3`) + context (this) — released `0.7.3`.
+- **Outcome:** done + **live-verified**. Password min raised 6→8 (client + server + copy) plus a no-dependency server-side common-password blocklist. tsc 0 / eslint 0 / build exit 0. Live: 6-char→400 "at least 8", `password123`→400 "too common". Backlog [M4] checked. (No ADR — plain backlog item.)
+- **Open items:** S38–S39 pending (theme error pages, UX polish). Still infra-blocked: M2 rate-limit KV (KV creds), M3 password reset (email provider), breach-corpus password check, contact email delivery.
+- **Notes:** none — facts in 2026-08-11-implementation.md.
+- **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 37)
