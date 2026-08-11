@@ -91,3 +91,14 @@ rate-limit KV (needs Vercel KV/Upstash credentials), and a breach-corpus (HaveIB
 **Verification:** tsc 0 / eslint 0 / `next build` exit 0. **Live-verified**: 6-char password →
 400 "must be at least 8 characters"; `password123` → 400 "too common" (both reject before any
 account is created). Backlog [M4] checked.
+
+---
+
+## Session 38 — Theme-aware 404/500 (ADR-29, review [L1]) — SHIPPED `0.7.4`
+
+**What shipped (commit `57635df`, tag `v0.7.4`):** added `dark:` variants to `not-found.tsx`
+and `error.tsx` (`dark:bg-zinc-950`, `dark:text-zinc-100/400`, dark border/hover on the error
+page's "Go home" button). Both render inside the themed root layout, so no structural change.
+
+**Verification:** tsc 0 / eslint 0 / `next build` exit 0. **Live-verified**: the served 404 HTML
+now contains `dark:bg-zinc-950`. ADR-29 shipped; backlog [L1] checked.

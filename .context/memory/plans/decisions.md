@@ -504,5 +504,10 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
 - **Consequences:** Error/404 pages match the user's theme instead of forcing light. Trivial,
   low-risk, reversible — accepted. Future agents: new top-level/standalone pages are built
   theme-aware from the start.
+- **UPDATE 2026-08-11 (Session 38) — shipped (`0.7.4`, commit `57635df`, tag `v0.7.4`).**
+  Added `dark:` variants to `not-found.tsx` + `error.tsx` (`dark:bg-zinc-950`,
+  `dark:text-zinc-100/400`, dark border/hover on the error "Go home" button); both render inside
+  the themed layout so no structural change was needed. tsc 0 / eslint 0 / build exit 0.
+  Live-verified: served 404 HTML contains `dark:bg-zinc-950`.
 
 ---

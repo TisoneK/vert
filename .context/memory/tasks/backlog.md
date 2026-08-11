@@ -263,7 +263,9 @@ _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md
       (added 2026-08-11 by Claude Code) — min is 6 chars
       (`SignupForm.tsx:34` + `register/route.ts:66`), no strength/breach check. Raise to 8+ and
       consider a common-password/breach check. Update both client + server + the placeholder copy.
-- [ ] **[L1] Theme-aware 404/500 pages** (added 2026-08-11 by Claude Code) — `not-found.tsx` +
+- [x] **[L1] Theme-aware 404/500 pages** — DONE 2026-08-11 (Session 38), `0.7.4`, commit
+      `57635df`, tag `v0.7.4`. ADR-29 shipped; live-verified (`dark:bg-zinc-950` in served HTML).
+      (added 2026-08-11 by Claude Code) — `not-found.tsx` +
       `error.tsx` hard-code `bg-white`/`text-zinc-900`, no `dark:` → white page in dark mode.
       Use theme-aware tokens. **Design = ADR-29 (accepted).** Safe one-file-each fix.
 - [ ] **[L2–L13] Polish batch from the 2026-08-11 review** (added 2026-08-11 by Claude Code) —

@@ -56,6 +56,9 @@ live in ADR-3/4/5/7/8 and the corresponding reviews/. -->
 - **2026-08-11 — Session 34** — Claude Code / claude-opus-4-8 — implemented review [H1] (ADR-25): per-route `generateMetadata` (watch/channel/category/tag) + `sitemap.ts` + `robots.ts` + `metadataBase`; content routes are now server components. Released **0.7.0** (`4e63b6d`, `v0.7.0`). **Live-verified**: `/watch/<id>` ships real og:title/image/video + summary_large_image; robots+sitemap serve. First of the grouped S34–S39 implementation run.
   Detail: .context/memory/reviews/2026-08-11-implementation.md
 ---
+- **2026-08-11 — Session 38** — Claude Code / claude-opus-4-8 — implemented review [L1] (ADR-29): theme-aware 404/500 pages (`dark:` variants). Released **0.7.4** (`57635df`, `v0.7.4`). Live-verified (`dark:bg-zinc-950` in served 404 HTML).
+  Detail: .context/memory/reviews/2026-08-11-implementation.md
+---
 - **2026-08-11 — Session 37** — Claude Code / claude-opus-4-8 — implemented review [M4]: password min raised 6→8 (client+server+copy) + no-dependency common-password blocklist. Released **0.7.3** (`0d2083b`, `v0.7.3`). Live-verified (400 for short + common). M2/M3 remain infra-blocked.
   Detail: .context/memory/reviews/2026-08-11-implementation.md
 ---
