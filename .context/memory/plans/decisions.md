@@ -458,6 +458,16 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   decision (shares the email-provider dependency already tracked for password reset). Whichever
   path, remove the `setTimeout` simulation. Future agents: no UI may claim an external side
   effect (sent/saved/submitted) that the code does not actually perform.
+- **UPDATE 2026-08-11 (Session 36) — accepted + shipped (`0.7.2`, commit `8183ed9`, tag
+  `v0.7.2`).** Implemented option (a) within the no-schema / no-email-infra constraints: added
+  `POST /api/v1/contact` (validate + `contact` rate-limit tier 5/min + capture to server log +
+  optional `CONTACT_WEBHOOK_URL` best-effort forward — no new DB table). `ContactPage` POSTs
+  for real and shows success only on a 2xx; inline error on failure; success copy changed from
+  the unkeepable "we'll get back to you by email" to "we've received your message and will
+  follow up if it needs a reply." `setTimeout` simulation removed. Documented
+  `CONTACT_WEBHOOK_URL` + `NEXT_PUBLIC_SITE_URL` in `.env.example`. tsc 0 / eslint 0 / build
+  exit 0. **Live-verified**: empty→400, bad email→400, valid→`{ok:true}` 200. When an email
+  provider lands, upgrade capture→email; the webhook hook is already in place.
 
 ---
 ## ADR-28: Serverless-correct rate limiting via a shared store (2026-08-11)

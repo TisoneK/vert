@@ -294,3 +294,12 @@ past entries — append corrections instead.
 - **Open items:** S36–S39 pending (contact integrity, auth hardening, theme error pages, UX polish). M2/M3 infra-blocked.
 - **Notes:** none — facts in ADR-26 UPDATE + 2026-08-11-implementation.md.
 - **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 35)
+---
+## 2026-08-11 — Session 36
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Implement review [H2] — contact-form integrity (ADR-27). Third of the grouped autonomous implementation sessions.
+- **Commits:** 1 product (`8183ed9`, tag `v0.7.2`) + context (this) — released `0.7.2`.
+- **Outcome:** done + **live-verified**. New `POST /api/v1/contact` (validate + `contact` rate-limit 5/min + server-log capture + optional `CONTACT_WEBHOOK_URL` forward; no DB table — schema approval not needed); ContactPage POSTs for real, success only on 2xx, truthful copy, inline errors; removed the `setTimeout` fake. Documented env vars. tsc 0 / eslint 0 / build exit 0. Live: empty→400, bad email→400, valid→`{ok:true}` 200. ADR-27 accepted/shipped; backlog [H2] checked.
+- **Open items:** S37–S39 pending (auth hardening, theme error pages, UX polish). M2 (rate-limit KV), M3 (password reset) + this session's email-delivery upgrade remain infra-blocked (KV creds / email provider).
+- **Notes:** none — facts in ADR-27 UPDATE + 2026-08-11-implementation.md.
+- **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 36)

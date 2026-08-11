@@ -53,3 +53,24 @@ revisit with cache tags if it shows up in DB load.
 **Verification:** tsc 0 / eslint 0 / `next build` exit 0. **Live-verified**: landing page renders
 6 `a[href^="/watch/"]` (sample `/watch/cmr3el1ie…`), 5 `a[href^="/tag/"]`, anchored "See all".
 ADR-26 accepted/shipped; backlog [M1] + "prefetch on keyboard focus" both checked.
+
+---
+
+## Session 36 — Contact-form integrity (ADR-27, review [H2]) — SHIPPED `0.7.2`
+
+**Constraints:** no email provider, and DB schema changes need owner approval — so no Contact
+table. Implemented ADR-27 option (a) within those bounds.
+
+**What shipped (commit `8183ed9`, tag `v0.7.2`):**
+- New `POST /api/v1/contact` — validates name/email/message (non-string guards, email regex,
+  length caps), rate-limited by IP (new `contact` tier, 5/min), **captures the message to the
+  server log** (Vercel logs), and forwards to `CONTACT_WEBHOOK_URL` if set (best-effort).
+- `ContactPage` POSTs for real and shows success only on a 2xx; inline error on failure.
+  Success copy changed from "we'll get back to you by email" → "we've received your message and
+  will follow up if it needs a reply." Removed the `setTimeout` simulation.
+- Documented `CONTACT_WEBHOOK_URL` + `NEXT_PUBLIC_SITE_URL` in `.env.example`.
+
+**Verification:** tsc 0 / eslint 0 / `next build` exit 0 (`/api/v1/contact` registered).
+**Live-verified**: empty→400, bad email→400 (`"Please enter a valid email address"`),
+valid→`{"ok":true}` 200. ADR-27 accepted/shipped; backlog [H2] checked. Follow-up when email
+infra lands: upgrade log-capture → real email (webhook hook already in place).

@@ -235,7 +235,12 @@ _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md
       `<a href={viewToPath(...)} onClick={e=>{e.preventDefault();navigate(...)}}>` (keeps zustand
       nav, lets modified-clicks fall through). Same for `RelatedVideos` + `LandingPage` cards.
       Unblocks the "prefetch on keyboard focus" item. **Design = ADR-26 (proposed).**
-- [ ] **[H2] Contact form fakes success** (added 2026-08-11 by Claude Code) —
+- [x] **[H2] Contact form fakes success** — DONE 2026-08-11 (Session 36), `0.7.2`, commit
+      `8183ed9`, tag `v0.7.2`. ADR-27 shipped: real `POST /api/v1/contact` (validate + rate-limit
+      + server-log capture + optional `CONTACT_WEBHOOK_URL` forward); UI shows success only on
+      2xx; truthful copy. Live-verified (400/400/200). Follow-up when email infra lands: upgrade
+      log-capture → email delivery (webhook hook already present).
+      (added 2026-08-11 by Claude Code) —
       `ContactPage.tsx` handleSubmit `setTimeout(800)` → "Message sent, we'll get back to you by
       email" but sends nothing (TODO in code). Either add real `POST /api/v1/contact`
       (persist/forward) or replace with honest copy; never show delivered-success for a no-op.
