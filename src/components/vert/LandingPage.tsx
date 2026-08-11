@@ -1,11 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useNavigation, viewToPath, type View } from '@/lib/store'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { Button } from '@/components/ui/button'
-import { Play, Hash } from 'lucide-react'
+import { Hash } from 'lucide-react'
+import { ThumbnailImage } from './ThumbnailImage'
 
 interface Video {
   id: string
@@ -115,19 +115,12 @@ export function LandingPage() {
                   className="group h-full flex flex-col"
                 >
                   <div className="aspect-[9/16] rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 relative">
-                    {v.thumbnailUrl ? (
-                      <Image
-                        src={v.thumbnailUrl}
-                        alt={v.title}
-                        fill
-                        sizes="(max-width: 768px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800">
-                        <Play className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
-                      </div>
-                    )}
+                    <ThumbnailImage
+                      src={v.thumbnailUrl}
+                      alt={v.title}
+                      sizes="(max-width: 768px) 50vw, 33vw"
+                      imgClassName="group-hover:scale-[1.02]"
+                    />
                   </div>
                   <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mt-2 line-clamp-2 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors">
                     {v.title}

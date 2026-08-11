@@ -1,13 +1,12 @@
 'use client'
 
-import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { relatedVideosQueryOptions } from '@/lib/video-queries'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { useNavigation, viewToPath } from '@/lib/store'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
-import { Play } from 'lucide-react'
 import { RelatedVideoSkeleton } from './Skeleton'
+import { ThumbnailImage } from './ThumbnailImage'
 
 interface RelatedVideosProps {
   videoId: string
@@ -73,19 +72,13 @@ export function RelatedVideos({ videoId, compact = false }: RelatedVideosProps) 
                 mobile/tablet list keeps the video's real format. */}
             <div className="relative w-32 shrink-0 rounded overflow-hidden bg-zinc-200 dark:bg-zinc-800">
               <div className={`relative ${compact ? 'aspect-video' : video.format === 'portrait' ? 'aspect-[9/16]' : video.format === 'square' ? 'aspect-square' : 'aspect-video'}`}>
-                {video.thumbnailUrl ? (
-                  <Image
-                    src={video.thumbnailUrl}
-                    alt={video.title || 'Untitled video'}
-                    fill
-                    sizes="128px"
-                    className="object-cover transition-transform group-hover:scale-105 duration-200"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
-                    <Play className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-                  </div>
-                )}
+                <ThumbnailImage
+                  src={video.thumbnailUrl}
+                  alt={video.title || 'Untitled video'}
+                  sizes="128px"
+                  iconClassName="h-5 w-5"
+                  imgClassName="group-hover:scale-105"
+                />
               </div>
               {video.durationSeconds && (
                 <div className="absolute bottom-1 right-1 bg-zinc-900/80 text-white text-[10px] font-medium px-1 py-0.5 rounded">

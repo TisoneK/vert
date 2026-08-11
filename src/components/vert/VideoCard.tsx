@@ -63,6 +63,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
   const [showMenu, setShowMenu] = useState(false)
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false)
   const [thumbnailFailed, setThumbnailFailed] = useState(false)
+  const [thumbnailLoaded, setThumbnailLoaded] = useState(false)
   const [avatarFailed, setAvatarFailed] = useState(false)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const desktopMenuRef = useRef<HTMLDivElement>(null)
@@ -128,8 +129,9 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       onMouseEnter={() => prefetchVideo(video.id)}
       onTouchStart={() => prefetchVideo(video.id)}
     >
-      {/* Thumbnail container */}
-      <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800`}>
+      {/* Thumbnail container — pulses as a skeleton until the image decodes so
+          the card doesn't flash a flat empty gray box on load (review [P1]). */}
+      <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 ${showThumbnail && !thumbnailLoaded ? 'animate-pulse' : ''}`}>
         {showThumbnail ? (
           <Image
             src={video.thumbnailUrl!}
@@ -140,7 +142,9 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
             // full-resolution source. See .context ADR-5.
             sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
             onError={() => setThumbnailFailed(true)}
-            className="object-cover transition-transform group-hover:scale-105 duration-200"
+            onLoad={() => setThumbnailLoaded(true)}
+            // Fade in on decode (opacity) instead of popping in over the gray.
+            className={`object-cover transition duration-300 group-hover:scale-105 ${thumbnailLoaded ? 'opacity-100' : 'opacity-0'}`}
           />
         ) : (
           <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">

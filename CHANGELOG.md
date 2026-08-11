@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.6] — 2026-08-11
+
+### Fixed
+- **Video thumbnails now load more gracefully.** Instead of flashing empty gray boxes while images load, cards show a gentle loading shimmer and the picture fades in — most noticeable on the home screen.
+
+---
+
 ## [0.7.5] — 2026-08-11
 
 ### Changed
@@ -472,7 +479,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.5...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.6...HEAD
+[0.7.6]: https://github.com/TisoneK/vert/releases/tag/v0.7.6
 [0.7.5]: https://github.com/TisoneK/vert/releases/tag/v0.7.5
 [0.7.4]: https://github.com/TisoneK/vert/releases/tag/v0.7.4
 [0.7.3]: https://github.com/TisoneK/vert/releases/tag/v0.7.3

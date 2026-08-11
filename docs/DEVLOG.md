@@ -21,6 +21,33 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.6] — 2026-08-11
+
+### Fixed
+
+#### Thumbnail loading skeletons — no more flash-of-empty-gray (review [P1])
+
+**Files:** `src/components/vert/ThumbnailImage.tsx` (new), `VideoCard.tsx`,
+`LandingPage.tsx`, `RelatedVideos.tsx`.
+
+`next/image` thumbnails had no placeholder, so cards rendered as flat gray boxes
+until the image decoded — on the mobile home the whole above-the-fold was empty
+gray on load (production-feel review [P1]). Added a load-state skeleton: the
+thumbnail container pulses (`animate-pulse`) while the image is decoding, and the
+image fades in (`opacity` transition) on `onLoad`.
+
+Introduced a shared `<ThumbnailImage>` (next/image `fill` + skeleton + fade +
+`onError` Play-icon fallback) used by `LandingPage` trending cards and
+`RelatedVideos` Up Next rows (both dropped their inline `Image`/`Play`). `VideoCard`
+got the same skeleton/fade inline (its thumbnail container carries extra overlays —
+duration/format/progress/context-menu — so it kept its own block). This also
+partially addresses the long-standing shared-`<Thumbnail>` backlog note.
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint (0 errors),
+`npx next build` (exit 0). Loading skeleton + fade confirmed on the deploy.
+
+---
+
 ## [0.7.5] — 2026-08-11
 
 ### Changed
@@ -1997,7 +2024,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.5...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.6...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
