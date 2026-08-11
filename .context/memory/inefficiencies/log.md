@@ -388,3 +388,19 @@ if literally nothing slowed you down.
 - **Prevent next time:** For a multi-release run, budget ~1–2 min per session for the build and
   ~1 min for deploy propagation. Prefer `curl` for anything in the server HTML/headers; reserve
   the browser pane for client-rendered checks and expect a wake-up screenshot after an idle gap.
+
+---
+## 2026-08-11 — Claude Code / claude-opus-4-8 (Session 40)
+- **Problem:** In the browser pane, `window.scrollTo(...)` via `javascript_tool` did NOT repaint
+  the screenshot — after a programmatic scroll the screenshot came back blank/whitespace even
+  though the DOM was scrolled. Cost me two blank screenshots trying to capture the landing's
+  lower sections (tags/CTA/footer).
+- **Cost:** Minor — a couple of wasted screenshots.
+- **Cause:** The pane parks/does not repaint after a JS-driven scroll when unfocused (same
+  throttling family as the "pane hidden" timeouts).
+- **Workaround / fix:** For off-screen content, use `get_page_text` / `read_page` (returns the
+  content regardless of scroll) instead of scroll-then-screenshot, or use the `computer`
+  `scroll` action (which drives the pane properly) rather than `window.scrollTo`.
+- **Prevent next time:** Recorded here — to read below-the-fold content in the browser pane,
+  prefer `get_page_text`/`read_page`, or `computer{action:"scroll"}`; don't rely on
+  `window.scrollTo` + screenshot.

@@ -330,3 +330,12 @@ past entries — append corrections instead.
 - **Open items:** **All review High + actionable Medium findings now closed.** Remaining = owner-service-blocked (M2 rate-limit KV, M3 password reset, contact email delivery, breach-corpus check) + deferred design polish (L2/L6/L8/L9/L11) — all in tasks/backlog.md.
 - **Notes:** none — facts in 2026-08-11-implementation.md (§ Session 39 + Run summary 34–39).
 - **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 39)
+---
+## 2026-08-11 — Session 40
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** engineer (research/review — no code changes) | **Core:** 0.5.0
+- **Task:** Fresh live-site UX research pass — "what makes Vert feel like a prototype vs a production product" (after the S34–S39 fixes).
+- **Commits:** 1 (this `chore(context)` — memory only).
+- **Outcome:** done. Dominant signal = **seeded content**: one-creator catalog (TisoneK) + scraped watermarked TikToks, seed-scale counts (40 views / 1 subscriber / 0 likes), placeholder "T" avatars, TikTok-hashtag tags, auto-verified badge — mostly a content/data fix, not code. UI/polish gaps: P1 thumbnail flash-of-empty-gray (whole mobile above-the-fold is gray boxes on load), P2 watch-page empty white void on desktop, P3 "ADVERTISEMENT — Reserved placement" stub, P4/P5 bare hero + trending hero dead-space, P6 a 404 console error on watch. Missing production chrome: C1 no Terms/Privacy pages (footer only Changelog/Contact), thin footer, minimal branding, no onboarding. Shell is production-grade; contents + last-10% polish read as prototype.
+- **Open items:** backlog P1–P6 + C1 + content-realism item. No code changed.
+- **Notes:** none — findings in the report.
+- **Report:** .context/memory/reviews/2026-08-11-production-feel-review.md

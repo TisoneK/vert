@@ -59,6 +59,9 @@ live in ADR-3/4/5/7/8 and the corresponding reviews/. -->
 - **2026-08-11 — Session 39** — Claude Code / claude-opus-4-8 — implemented review polish batch: L5 (search matches tags/categories), L13 (conservative non-breaking CSP header), L12 (upload error hygiene); L3/L4/L10 were already-handled false positives. Released **0.7.5** (`7533cb9`, `v0.7.5`). Live-verified. **Closes the S34–S39 run**: all review High + actionable Medium findings shipped across 0.7.0–0.7.5; only owner-service-blocked (M2/M3/email/breach) + deferred design polish remain.
   Detail: .context/memory/reviews/2026-08-11-implementation.md
 ---
+- **2026-08-11 — Session 40** — Claude Code / claude-opus-4-8 — research (no code): live-site "prototype vs production" pass. Dominant signal = **seeded content** (one creator, scraped watermarked clips, seed-scale counts, placeholder "T" avatars, auto-verified badge — content fix, not code). Polish gaps: P1 thumbnail flash-of-empty-gray (mobile above-the-fold all gray on load), P2 watch-page empty desktop void, P3 ad "Reserved placement" stub; missing C1 Terms/Privacy pages. Shell is production-grade; contents + last-10% polish read as prototype.
+  Detail: .context/memory/reviews/2026-08-11-production-feel-review.md
+---
 - **2026-08-11 — Session 38** — Claude Code / claude-opus-4-8 — implemented review [L1] (ADR-29): theme-aware 404/500 pages (`dark:` variants). Released **0.7.4** (`57635df`, `v0.7.4`). Live-verified (`dark:bg-zinc-950` in served 404 HTML).
   Detail: .context/memory/reviews/2026-08-11-implementation.md
 ---

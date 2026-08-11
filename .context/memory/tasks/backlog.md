@@ -305,3 +305,43 @@ _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md
       provider); **contact email delivery** — upgrade the `/api/v1/contact` log-capture to real
       email once a provider exists (webhook hook already in place); a **breach-corpus
       (HaveIBeenPwned) password check** to complement the min-8 + common-password blocklist.
+
+---
+_Appended 2026-08-11 (Session 40, production-feel research — see
+`reviews/2026-08-11-production-feel-review.md`)._
+
+- [ ] **[P1] Thumbnail placeholder to kill the flash-of-empty-gray** (added 2026-08-11 by Claude
+      Code) — `next/image` thumbnails have no skeleton/blur, so cards render as blank gray boxes
+      until decode; on the **mobile home the whole above-the-fold is empty gray** on load.
+      Add a shimmer/skeleton over the image container (VideoCard/LandingPage/RelatedVideos) or
+      `next/image` `placeholder="blur"` + a generated tiny `blurDataURL`. Highest-impact visible
+      polish. (Same as prior [L6].)
+- [ ] **[P2] Watch page: large empty white void on desktop when content is sparse** (added
+      2026-08-11 by Claude Code) — below the (usually empty) comments the lower-left is dead white
+      space while the ad box floats alone in the right rail. Constrain the column / pull Up Next
+      or related content to fill on desktop / denser empty-comments state so the page looks
+      finished, not unfinished.
+- [ ] **[P3] Hide the "ADVERTISEMENT — Reserved placement" stub until there's real inventory**
+      (added 2026-08-11 by Claude Code) — the labelled empty ad box on every watch page reads as
+      unfinished to first-time visitors. Collapsing it to nothing looks more finished than a
+      labelled empty slot. (Provider-neutral by ADR-15/22 — this is a "hide when empty" tweak, not
+      a monetization decision.)
+- [ ] **[C1] Add Terms of Service + Privacy Policy pages (and footer links)** (added 2026-08-11 by
+      Claude Code) — a public product with accounts, uploads, and comments needs ToS + Privacy at
+      minimum (consider content guidelines / DMCA given reposted content). Footer currently has
+      only Changelog + Contact. **Biggest "not production" signal after seed content.** Needs the
+      owner to provide/approve legal copy; the routes + footer links are the code part.
+- [ ] **[P4/P5] Landing hero polish** (added 2026-08-11 by Claude Code) — P4: the hero has no CTA
+      button (only top-right nav) and lots of whitespace before Trending — add a primary CTA. P5:
+      Trending #1 hero is a single portrait thumb centered in a wide gray box with big empty sides
+      on desktop (same as prior [L2]). Design decisions.
+- [ ] **[P6] A 404 console error fires on the watch page** (added 2026-08-11 by Claude Code) — one
+      incidental resource 404s on load (no broken `<img>`, poster is set). Harmless but a polish
+      tell; track down the request and silence it.
+- [ ] **Content / seed-data realism (owner, mostly non-code)** (added 2026-08-11 by Claude Code) —
+      the dominant prototype signal: catalog is essentially one creator (TisoneK) + scraped TikToks
+      with visible third-party watermarks (e.g. "SR / Suleiman Reports"), seed-scale counts (40
+      views, 1 subscriber, 0 likes), placeholder "T" avatars everywhere, TikTok-hashtag "popular
+      tags", and an auto-"verified" badge on a 1-subscriber channel. Needs real/rights-cleared
+      content from several creators, real avatars, plausible numbers, and gating the verified badge.
+      Also a content-rights liability (watermarked reposts on a public site).
