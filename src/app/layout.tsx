@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import { Providers } from "./providers";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site-metadata";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,16 +17,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vert",
-  description: "Watch and share portrait video.",
+  // metadataBase lets Next resolve relative OG/Twitter image URLs and
+  // canonical links against the real site origin. Per-route generateMetadata
+  // (watch/channel/category/tag) supplies the per-item title/description/
+  // og:image/og:video; this is the site-level default + template. See ADR-25.
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    template: `%s`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   icons: {
     // "V" on a violet rounded square — brand mark
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237c3aed' rx='20' width='100' height='100'/><text x='50' y='72' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='system-ui,sans-serif'>V</text></svg>",
   },
   openGraph: {
-    title: "Vert",
-    description: "Watch and share portrait video.",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     type: "website",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+  },
+  twitter: {
+    card: "summary",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
   },
 };
 

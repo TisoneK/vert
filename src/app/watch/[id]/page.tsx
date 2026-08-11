@@ -1,27 +1,79 @@
-'use client'
-
+import type { Metadata } from 'next'
 import { VertApp } from '@/components/vert/VertApp'
+import { db } from '@/lib/db'
+import {
+  SITE_NAME,
+  absoluteUrl,
+  clampDescription,
+  FALLBACK_METADATA,
+} from '@/lib/site-metadata'
 
 /**
- * /watch/[id] — deep-linkable video page.
+ * /watch/[id] — deep-linkable, shareable video page.
  *
- * The actual video rendering happens inside <VertApp />, which on mount
- * parses window.location and sets the Zustand navigation store to
- * { page: 'video', videoId: <id> }.
- *
- * This page exists primarily so that:
- *   1. The URL is shareable (a user can copy-paste /watch/<id> and it works)
- *   2. SEO crawlers see a distinct URL per video
- *   3. Browser back/forward works (handled in VertApp via popstate)
- *
- * We use 'use client' because the entire VertApp is client-side rendered
- * (Zustand store + NextAuth session fetch). A future SSR pass could populate
- * OpenGraph metadata here using the [id] param + a direct DB lookup.
+ * This is a SERVER component so it can export `generateMetadata`: shared links
+ * (iMessage/WhatsApp/Slack/X) and crawlers read the initial server HTML, not the
+ * post-hydration DOM, so per-video OpenGraph/Twitter tags must be emitted here.
+ * The interactive view still renders inside the client <VertApp/>, which parses
+ * window.location and drives the Zustand navigation store. See .context ADR-25.
  */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  try {
+    const video = await db.video.findUnique({
+      where: { id },
+      select: {
+        title: true,
+        description: true,
+        thumbnailUrl: true,
+        videoUrl: true,
+        isRemoved: true,
+        channel: { select: { channelName: true } },
+      },
+    })
+
+    if (!video || video.isRemoved) return FALLBACK_METADATA
+
+    const title = `${video.title} · ${video.channel.channelName}`
+    const description = clampDescription(
+      video.description || `${video.title} — watch on ${SITE_NAME}.`
+    )
+    const canonical = absoluteUrl(`/watch/${id}`)
+    const images = video.thumbnailUrl ? [{ url: video.thumbnailUrl }] : undefined
+
+    return {
+      title,
+      description,
+      alternates: { canonical },
+      openGraph: {
+        title,
+        description,
+        type: 'video.other',
+        url: canonical,
+        siteName: SITE_NAME,
+        images,
+        videos: video.videoUrl ? [{ url: video.videoUrl }] : undefined,
+      },
+      twitter: {
+        card: images ? 'summary_large_image' : 'summary',
+        title,
+        description,
+        images: video.thumbnailUrl ? [video.thumbnailUrl] : undefined,
+      },
+    }
+  } catch {
+    // A DB hiccup must not 500 the page — fall back to valid site-level tags.
+    return FALLBACK_METADATA
+  }
+}
+
 export default function WatchPage({ params }: { params: Promise<{ id: string }> }) {
-  // We don't actually need to read params client-side — VertApp parses
-  // window.location directly. But we await params so Next.js knows this is
-  // a dynamic route and doesn't try to statically generate it.
+  // VertApp parses window.location directly; we await params only so Next
+  // treats this as a dynamic route.
   void params
   return <VertApp />
 }

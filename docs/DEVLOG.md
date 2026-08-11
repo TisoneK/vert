@@ -21,6 +21,51 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.0] — 2026-08-11
+
+### Added
+
+#### Per-route share/SEO metadata + dynamic sitemap & robots (ADR-25)
+
+**Files:** `src/lib/site-metadata.ts` (new), `src/app/sitemap.ts` (new),
+`src/app/robots.ts` (new), `src/app/layout.tsx`, `src/app/watch/[id]/page.tsx`,
+`src/app/channel/[id]/page.tsx`, `src/app/category/[slug]/page.tsx`,
+`src/app/tag/[slug]/page.tsx`; removed `public/robots.txt`.
+
+The whole app is client-navigated (`<VertApp/>` + Zustand), so every deep route
+was a thin `'use client'` shell and the only `Metadata` was the global one in
+`layout.tsx`. Result (verified in prod): `/watch/<id>` returned `<title>Vert`,
+no `og:image`/`og:video`, and the video title was absent from the server HTML —
+blank social cards and nothing for crawlers.
+
+Converted the four content routes (`watch/[id]`, `channel/[id]`,
+`category/[slug]`, `tag/[slug]`) from `'use client'` shells to **server
+components** that export async `generateMetadata`. Each does a narrow
+`select`-only Prisma lookup and returns per-item `title`, `description`,
+`openGraph` (`og:image` = thumbnail/banner/avatar, `og:video` = video URL,
+`og:type` = `video.other`/`profile`/`website`), a canonical link, and
+`twitter` (`summary_large_image` when an image exists). The interactive view
+still renders inside the client `<VertApp/>` underneath — this is a head/metadata
+addition, not a full SSR rewrite. Every lookup is wrapped so a DB hiccup falls
+back to valid site-level tags (`FALLBACK_METADATA`) instead of 500-ing the page.
+
+Added a shared `site-metadata.ts` (canonical `SITE_URL` from
+`NEXT_PUBLIC_SITE_URL` → `VERCEL_PROJECT_PRODUCTION_URL` → production fallback,
+`absoluteUrl`, `clampDescription`) and set `metadataBase` in the root layout so
+relative OG/canonical URLs resolve. Added `app/sitemap.ts` (static routes +
+public videos/channels/categories/tags, each query guarded, capped at 5000/type,
+hourly revalidate) and `app/robots.ts` (allow public, disallow api/account
+surfaces, reference the sitemap at the correct origin), replacing the static
+`public/robots.txt`.
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint on all changed
+files (0 errors), `npx next build` (exit 0) — build output confirms
+`/robots.txt` + `/sitemap.xml` generate and `watch|channel|category|tag` routes
+are now server-rendered (`ƒ`). Live per-item OG output confirmed on the deploy
+after push (real DB required — the local build has no DB and returns fallback).
+
+---
+
 ## [0.6.25] — 2026-08-08
 
 ### Changed
@@ -1797,7 +1842,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.12...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.0...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

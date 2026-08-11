@@ -37,6 +37,14 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.0] — 2026-08-11
+
+### Added
+- **Shared video links now show a real preview.** When you share a video, channel, or topic link, it now shows the title, a thumbnail, and a short description instead of a blank card — so people can see what they're about to open in messages and social posts.
+- **Vert is now easier to find in search engines.** Each video, channel, and topic now has its own proper page details, and the site tells search engines where to find them.
+
+---
+
 ## [0.6.25] — 2026-08-08
 
 ### Changed
@@ -428,7 +436,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.6.25...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/TisoneK/vert/releases/tag/v0.7.0
 [0.6.25]: https://github.com/TisoneK/vert/releases/tag/v0.6.25
 [0.6.24]: https://github.com/TisoneK/vert/releases/tag/v0.6.24
 [0.6.23]: https://github.com/TisoneK/vert/releases/tag/v0.6.23
