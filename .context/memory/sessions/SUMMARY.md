@@ -56,6 +56,9 @@ live in ADR-3/4/5/7/8 and the corresponding reviews/. -->
 - **2026-08-11 — Session 34** — Claude Code / claude-opus-4-8 — implemented review [H1] (ADR-25): per-route `generateMetadata` (watch/channel/category/tag) + `sitemap.ts` + `robots.ts` + `metadataBase`; content routes are now server components. Released **0.7.0** (`4e63b6d`, `v0.7.0`). **Live-verified**: `/watch/<id>` ships real og:title/image/video + summary_large_image; robots+sitemap serve. First of the grouped S34–S39 implementation run.
   Detail: .context/memory/reviews/2026-08-11-implementation.md
 ---
+- **2026-08-11 — Session 39** — Claude Code / claude-opus-4-8 — implemented review polish batch: L5 (search matches tags/categories), L13 (conservative non-breaking CSP header), L12 (upload error hygiene); L3/L4/L10 were already-handled false positives. Released **0.7.5** (`7533cb9`, `v0.7.5`). Live-verified. **Closes the S34–S39 run**: all review High + actionable Medium findings shipped across 0.7.0–0.7.5; only owner-service-blocked (M2/M3/email/breach) + deferred design polish remain.
+  Detail: .context/memory/reviews/2026-08-11-implementation.md
+---
 - **2026-08-11 — Session 38** — Claude Code / claude-opus-4-8 — implemented review [L1] (ADR-29): theme-aware 404/500 pages (`dark:` variants). Released **0.7.4** (`57635df`, `v0.7.4`). Live-verified (`dark:bg-zinc-950` in served 404 HTML).
   Detail: .context/memory/reviews/2026-08-11-implementation.md
 ---

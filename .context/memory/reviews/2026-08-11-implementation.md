@@ -102,3 +102,48 @@ page's "Go home" button). Both render inside the themed root layout, so no struc
 
 **Verification:** tsc 0 / eslint 0 / `next build` exit 0. **Live-verified**: the served 404 HTML
 now contains `dark:bg-zinc-950`. ADR-29 shipped; backlog [L1] checked.
+
+---
+
+## Session 39 — UX polish batch (review [L2–L13]) — SHIPPED `0.7.5`
+
+**Shipped (commit `7533cb9`, tag `v0.7.5`):**
+- **[L5]** Search `?search=` now also matches tag name/label and category name (nested-relation
+  OR branches), so "music" finds videos tagged `#music` / in the Music category.
+- **[L13]** Added a conservative Content-Security-Policy header — `script-src`/`frame-ancestors`/
+  `object-src`/`base-uri` locked down, `img-src`/`media-src`/`connect-src` permissive over
+  `https:` so user avatars, Blob media, HLS, and OAuth keep working.
+- **[L12]** Upload token-generation failures no longer return the raw error `details` to clients.
+
+**Assessed as already-handled / not a bug (review false positives):** L3 (Trending chips are
+`shrink-0` in an `overflow-x-auto` fade scroller — the "clip" is the scroll affordance), L4
+(ExplorePage already splits full-color "with videos" from a muted "More categories" section),
+L10 (the Advertisement placeholder is a deliberate provider-neutral slot per ADR-15/22).
+
+**Deferred (design/infra judgment, backlogged):** L2 (hero spacing), L6 (blur placeholder needs
+generated blurDataURL), L8/L9 (header design), L11 (console audit).
+
+**Verification:** tsc 0 / eslint 0 / `next build` exit 0. **Live-verified**: search "music" →
+1 result; CSP header present; app loads under CSP with 6/6 images loaded, video `readyState:4`
+no error, 6 watch anchors, and **no CSP console violations**. Backlog batch checked.
+
+---
+
+## Run summary (Sessions 34–39)
+
+Implemented the actionable findings of the 2026-08-11 review as 6 grouped, self-contained,
+autonomous sessions — each built, released, and **live-verified** on the deploy:
+
+| # | Release | What | Verified live |
+|---|---|---|---|
+| 34 | 0.7.0 | Per-route share/SEO metadata + sitemap + robots (ADR-25) | og:title/image/video, robots+sitemap |
+| 35 | 0.7.1 | Content cards as real anchors (ADR-26) | 6 watch + 5 tag anchors |
+| 36 | 0.7.2 | Real contact endpoint, no fake success (ADR-27) | 400/400/200 |
+| 37 | 0.7.3 | Password min 8 + common-password blocklist (M4) | 400 short + 400 common |
+| 38 | 0.7.4 | Theme-aware 404/500 (ADR-29) | dark class in served HTML |
+| 39 | 0.7.5 | Search tags/categories + CSP + upload hygiene (L5/L13/L12) | search hit, CSP non-breaking |
+
+ADR-25/26/27/29 → accepted+shipped; ADR-28 (rate-limit KV) remains proposed (infra-blocked).
+**Both High + both actionable Medium (M1/M4) findings closed.** Remaining open work is
+owner-service-blocked (M2 KV, M3 email, breach check, contact email) or deferred design polish —
+all in `tasks/backlog.md`. tsc/eslint/build stayed green throughout (eslint baseline still 0).

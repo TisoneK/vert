@@ -367,3 +367,24 @@ if literally nothing slowed you down.
   inspection over pixel screenshots for anything state-dependent (theme, video playback, metadata).
   Otherwise a smooth session — the pane reached the deployed site with no dev server, which was
   faster than the port-3000/dev-server dance prior sessions hit.
+
+---
+## 2026-08-11 — Claude Code / claude-opus-4-8 (Sessions 34–39, implementation run)
+- **Problem:** Two minor recurring frictions across the 6-session autonomous implementation run:
+  (1) `next build` takes ~80s–2min here and timed out once at the default 120s (had to re-run
+  with a longer timeout); running it per session (needed to honestly claim "build passes") was
+  the dominant time cost. (2) The Claude Browser pane intermittently went "hidden"/stuck mid-JS
+  (timed out), needing a screenshot to wake it before re-running the check — and a just-pushed
+  Vercel deploy served the OLD JS bundle for ~30–60s, so the first live DOM check after a push
+  showed stale anchors/behavior (a `?v=` cache-buster + a short poll fixed it).
+- **Cost:** Low–moderate — a handful of extra build re-runs and browser retries; no rework, no
+  wrong conclusions (each live check was re-run until it reflected the new deploy).
+- **Cause:** Cold Next builds are slow on this machine; Vercel deploy propagation lag; the
+  browser pane parks rendering when unfocused.
+- **Workaround / fix:** Run `next build` with `timeout: 420000`. After any push, `sleep ~45–55s`
+  before the live check and use a `?cachebuster` query so the browser fetches the new bundle;
+  verify server-HTML facts (og tags, robots, CSP header, dark class) with `curl` (fast, reliable)
+  and only use the browser pane for client-rendered DOM (anchors, images, video state).
+- **Prevent next time:** For a multi-release run, budget ~1–2 min per session for the build and
+  ~1 min for deploy propagation. Prefer `curl` for anything in the server HTML/headers; reserve
+  the browser pane for client-rendered checks and expect a wake-up screenshot after an idle gap.

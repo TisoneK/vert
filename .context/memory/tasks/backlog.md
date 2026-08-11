@@ -268,7 +268,15 @@ _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md
       (added 2026-08-11 by Claude Code) — `not-found.tsx` +
       `error.tsx` hard-code `bg-white`/`text-zinc-900`, no `dark:` → white page in dark mode.
       Use theme-aware tokens. **Design = ADR-29 (accepted).** Safe one-file-each fix.
-- [ ] **[L2–L13] Polish batch from the 2026-08-11 review** (added 2026-08-11 by Claude Code) —
+- [~] **[L2–L13] Polish batch from the 2026-08-11 review** — PARTIALLY DONE 2026-08-11
+      (Session 39), `0.7.5`, commit `7533cb9`, tag `v0.7.5`. **Shipped:** L5 (search now matches
+      tag/category names — live-verified "music" returns results), L12 (upload no longer leaks
+      raw error `details`), L13 (conservative CSP header — live-verified non-breaking: images +
+      video + anchors all load, no violations). **Already-handled / not a bug:** L3 (Trending
+      chips are `shrink-0` in an `overflow-x-auto` fade scroller), L4 (ExplorePage already splits
+      full-color vs muted "More categories"), L10 (ad slot is a deliberate provider-neutral slot,
+      ADR-15/22). **Deferred → see the new item below.** (added 2026-08-11 by Claude Code) —
+
       independent low-severity items, each small: **L2** Trending #1 hero wastes desktop
       horizontal space (portrait thumb in a wide gray box); **L3** Trending category chips clip
       "Travel"; **L4** empty categories (Art/Comedy/Food/Music/News/Other/Travel) shown as equal
@@ -281,3 +289,19 @@ _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md
       watch pages reads unfinished; **L11** ~97 `console.*` in `src/` — audit for detail leaks;
       **L12** `upload/route.ts:105` returns raw `details:errorMsg` on token-gen failure; **L13**
       no Content-Security-Policy header (X-Frame-Options + HSTS are set). See review for detail.
+- [ ] **Deferred polish from the 2026-08-11 review (design/infra judgment)** (added 2026-08-11
+      by Claude Code, Session 39) — the subset of [L2–L13] intentionally NOT auto-implemented,
+      each needing a design decision or infra, not a safe mechanical fix: **L2** Trending #1 hero
+      wastes desktop horizontal space (a single portrait thumb in a wide box) — needs a layout
+      design pass; **L6** thumbnail gray-flash → `next/image` `placeholder="blur"` needs a
+      generated `blurDataURL` per remote image (no pipeline yet); **L8** header inconsistency
+      (logged-out landing has no search bar, in-app header does) — nav design decision; **L9**
+      crowded mobile header at 375px — design decision; **L11** ~97 `console.*` in `src/` — a
+      considered audit (keep legit error logs, drop noise), low value. Pick up individually if
+      desired.
+- [ ] **Infra-blocked review items (need owner-provided services)** (added 2026-08-11 by Claude
+      Code, Session 37/39) — **[M2]** move the rate limiter off per-instance in-memory to Vercel
+      KV / Upstash (ADR-28, needs KV creds); **[M3]** password-reset flow (needs an email
+      provider); **contact email delivery** — upgrade the `/api/v1/contact` log-capture to real
+      email once a provider exists (webhook hook already in place); a **breach-corpus
+      (HaveIBeenPwned) password check** to complement the min-8 + common-password blocklist.

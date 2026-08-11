@@ -1,11 +1,12 @@
 # Current Task (overwrite each session)
 
-- **Status:** in-progress
-- **Session:** 39 (2026-08-11)
-- **Agent:** Claude Code / claude-opus-4-8 (local, Baos-Mac-mini)
-- **Role:** feature-engineer
-- **Task:** UX polish batch — the safe, low-risk visible items from review 2026-08-11
-  [L2–L13]: L4 hide empty categories, L5 search also matches tags/categories, L13 add a
-  Content-Security-Policy header, L11 audit noisy console logs. (L2/L3/L6/L8/L9/L10 assessed;
-  implement the clearly-safe subset, backlog the rest with rationale.)
-- **Part of:** autonomous grouped implementation of the 2026-08-11 review (S34…S39) — final group.
+Holds exactly one task — the one being worked on right now. Set it at
+session start (Step 3), clear it at session end (Step 15). If a prior
+session died mid-task, check its session entry and backlog before starting.
+
+- **Status:** idle — no active task
+
+_(Sessions 34–39 on 2026-08-11 implemented the actionable findings of the
+2026-08-11 review as grouped releases 0.7.0–0.7.5, all live-verified. Remaining
+review items are owner-service-blocked or deferred design polish — see
+tasks/backlog.md.)_

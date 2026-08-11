@@ -321,3 +321,12 @@ past entries — append corrections instead.
 - **Open items:** S39 pending (UX polish batch L2–L13 safe items). Still infra-blocked: M2 rate-limit KV, M3 password reset, breach check, contact email delivery.
 - **Notes:** none — facts in ADR-29 UPDATE + 2026-08-11-implementation.md.
 - **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 38)
+---
+## 2026-08-11 — Session 39
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Implement review polish batch [L2–L13] — final of the grouped autonomous implementation sessions (S34–S39).
+- **Commits:** 1 product (`7533cb9`, tag `v0.7.5`) + context (this) — released `0.7.5`.
+- **Outcome:** done + **live-verified**. Shipped L5 (search matches tags/categories), L13 (conservative CSP header), L12 (upload error hygiene). Assessed L3/L4/L10 as already-handled/deliberate (review false positives). Deferred L2/L6/L8/L9/L11 (design/infra) → new backlog items. tsc 0 / eslint 0 / build exit 0. Live: search "music"→1 result; CSP present + non-breaking (6/6 images, video readyState 4, 6 watch anchors, no CSP violations). Bonus: confirmed the deployed watch tab title now reads "Floor · TisoneK" (S34 metadata live).
+- **Open items:** **All review High + actionable Medium findings now closed.** Remaining = owner-service-blocked (M2 rate-limit KV, M3 password reset, contact email delivery, breach-corpus check) + deferred design polish (L2/L6/L8/L9/L11) — all in tasks/backlog.md.
+- **Notes:** none — facts in 2026-08-11-implementation.md (§ Session 39 + Run summary 34–39).
+- **Report:** .context/memory/reviews/2026-08-11-implementation.md (§ Session 39)
