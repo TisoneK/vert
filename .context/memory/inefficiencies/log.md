@@ -404,3 +404,30 @@ if literally nothing slowed you down.
 - **Prevent next time:** Recorded here — to read below-the-fold content in the browser pane,
   prefer `get_page_text`/`read_page`, or `computer{action:"scroll"}`; don't rely on
   `window.scrollTo` + screenshot.
+
+---
+## 2026-08-11 — Claude Code / claude-opus-4-8 (Session 41)
+- **Problem:** Two compounding environment failures late in a long day of work: (1) `npx next
+  build` timed out THREE times (7–8 min each) where earlier same-session builds took ~90s–2min —
+  the machine was under heavy memory pressure (`top`: ~27M RAM unused, 1.9G compressor); (2) the
+  Claude Browser pane became unresponsive / "not compositing frames" / closed, so live pixel-level
+  verification (checking computed `opacity`) was unreliable. Separately, a design mistake cost two
+  extra releases: the first thumbnail-skeleton cut hid the image with `opacity-0` until `onLoad`,
+  which live testing showed leaves images stuck invisible when the load event doesn't fire.
+- **Cost:** Moderate — ~25 min lost to build timeouts + process cleanup; 3 releases (0.7.6/7/8)
+  for one feature because the fragile approach had to be reworked (though catching it via live
+  verification was the system working as intended).
+- **Cause:** Accumulated memory pressure over a long multi-build session (browser pane + repeated
+  Next builds + Vercel-side nothing); and a genuinely fragile UI pattern (opacity-gated image
+  visibility depending on an event that isn't guaranteed to fire).
+- **Workaround / fix:** Killed stray `next build` procs; when the local build still wouldn't
+  complete, relied on `tsc`+`eslint` locally + **Vercel's cloud build** as the real build gate
+  (confirmed the deploy shipped by curling the changelog API for the new version) + code
+  correctness. For the UI bug: reworked to a skeleton-underlay-behind-always-visible-image pattern
+  (ADR-30) that is correct-by-construction (no opacity gate).
+- **Prevent next time:** When local `next build` times out and `tsc`/`eslint` are green, don't
+  keep retrying into a memory wall — push and let Vercel build, then verify the deploy shipped via
+  `curl https://vert-wine.vercel.app/api/v1/changelog` (reports the version from CHANGELOG.md) and
+  behavior via curl of server HTML/headers. Recorded a note in the production-polish report. For
+  image placeholders, never gate visibility on `onLoad`/`opacity-0` — skeleton BEHIND an
+  always-visible image (ADR-30).

@@ -339,3 +339,12 @@ past entries — append corrections instead.
 - **Open items:** backlog P1–P6 + C1 + content-realism item. No code changed.
 - **Notes:** none — findings in the report.
 - **Report:** .context/memory/reviews/2026-08-11-production-feel-review.md
+---
+## 2026-08-11 — Session 41
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Implement production-feel review [P1] — thumbnail loading skeletons. First of the code-fixable production-polish subset (P1, P3, P2, C1) the owner approved ("Go ahead").
+- **Commits:** 3 product (`673eba3` 0.7.6, `2388627` 0.7.7, `8e33f6c` 0.7.8; tags v0.7.6/7/8) + context (this).
+- **Outcome:** done + deployed. Shared `<ThumbnailImage>` + VideoCard inline: skeleton underlay behind an always-visible image so cards never flash empty gray (ADR-30). **Iterated 0.7.6→0.7.8**: live verification caught the initial opacity-0-until-onLoad approach leaving images stuck invisible when the load event doesn't fire (throttled tab/bfcache); reworked to never JS-hide the image. tsc 0 / eslint 0 on all. **0.7.8 local `next build` blocked by machine memory pressure (3× timeout)**; Vercel cloud build + deploy confirmed (changelog API reports 0.7.8). Backlog [P1] checked; ADR-30 recorded.
+- **Open items:** S42 (P3 hide empty ad stub + P2 watch-page void), S43 (C1 Terms/Privacy pages + footer) pending. Machine memory pressure makes local builds unreliable — lean on Vercel + curl.
+- **Notes:** none — facts in ADR-30 + 2026-08-11-production-polish.md.
+- **Report:** .context/memory/reviews/2026-08-11-production-polish.md (§ Session 41)

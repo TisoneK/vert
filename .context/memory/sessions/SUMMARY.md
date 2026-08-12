@@ -62,6 +62,9 @@ live in ADR-3/4/5/7/8 and the corresponding reviews/. -->
 - **2026-08-11 — Session 40** — Claude Code / claude-opus-4-8 — research (no code): live-site "prototype vs production" pass. Dominant signal = **seeded content** (one creator, scraped watermarked clips, seed-scale counts, placeholder "T" avatars, auto-verified badge — content fix, not code). Polish gaps: P1 thumbnail flash-of-empty-gray (mobile above-the-fold all gray on load), P2 watch-page empty desktop void, P3 ad "Reserved placement" stub; missing C1 Terms/Privacy pages. Shell is production-grade; contents + last-10% polish read as prototype.
   Detail: .context/memory/reviews/2026-08-11-production-feel-review.md
 ---
+- **2026-08-11 — Session 41** — Claude Code / claude-opus-4-8 — implemented production-feel [P1]: thumbnail loading skeletons (shared `<ThumbnailImage>` + VideoCard). Skeleton underlay behind an always-visible image (ADR-30) — live verification caught + fixed an opacity-0-stuck-invisible bug across 0.7.6→**0.7.8**. Local build blocked by machine memory pressure; Vercel cloud build + deploy confirmed. First of the production-polish subset (S41 P1, S42 P2/P3, S43 C1).
+  Detail: .context/memory/reviews/2026-08-11-production-polish.md
+---
 - **2026-08-11 — Session 38** — Claude Code / claude-opus-4-8 — implemented review [L1] (ADR-29): theme-aware 404/500 pages (`dark:` variants). Released **0.7.4** (`57635df`, `v0.7.4`). Live-verified (`dark:bg-zinc-950` in served 404 HTML).
   Detail: .context/memory/reviews/2026-08-11-implementation.md
 ---

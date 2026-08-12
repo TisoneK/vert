@@ -511,3 +511,25 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   Live-verified: served 404 HTML contains `dark:bg-zinc-950`.
 
 ---
+## ADR-30: Thumbnail loading = skeleton underlay behind an always-visible image (2026-08-11)
+- **Status:** accepted
+- **Context:** Card thumbnails (`next/image`) had no placeholder, so grids flashed flat empty
+  gray boxes until decode — worst on the mobile home (production-feel review [P1]). The first
+  implementation (0.7.6/0.7.7) hid the image with `opacity-0` until `onLoad` fired, with a `ref`
+  guard for the already-complete-at-mount (cached) case. **Live verification caught a real
+  failure:** an image can be decoded (`complete && naturalWidth>0`) yet stay `opacity:0` because
+  the `load` event doesn't always fire (throttled/background tab, bfcache restore) and the ref
+  guard doesn't cover "completes later without a load event" → invisible thumbnails.
+- **Decision:** Never hide the image with JS. The pulsing skeleton is an **absolute underlay**
+  behind an always-`opacity-100` `<Image>`; the `<img>` is transparent until the browser paints
+  its pixels, so the skeleton shows through while loading and the image paints over it when ready
+  — with zero dependency on `onLoad`. `onLoad`/`ref` only unmount the (already-covered) skeleton
+  for cleanliness. Shared `<ThumbnailImage>` implements this for LandingPage + RelatedVideos;
+  `VideoCard` uses the same structure inline (its container carries extra overlays). Shipped
+  `0.7.8` (superseding `0.7.6`/`0.7.7`).
+- **Consequences:** Thumbnails can never get stuck invisible; the loading state reads as an
+  intentional shimmer, not a dead box. Future agents: for any image placeholder, put the skeleton
+  BEHIND an always-visible image — do NOT gate image visibility on `onLoad`/`opacity-0`. Do not
+  reintroduce the opacity-toggle pattern.
+
+---

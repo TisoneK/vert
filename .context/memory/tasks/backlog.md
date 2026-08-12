@@ -310,7 +310,13 @@ _Appended 2026-08-11 (Session 33, research sweep — review 2026-08-11-review.md
 _Appended 2026-08-11 (Session 40, production-feel research — see
 `reviews/2026-08-11-production-feel-review.md`)._
 
-- [ ] **[P1] Thumbnail placeholder to kill the flash-of-empty-gray** (added 2026-08-11 by Claude
+- [x] **[P1] Thumbnail placeholder to kill the flash-of-empty-gray** — DONE 2026-08-11 (Session
+      41), shipped `0.7.6`→`0.7.8` (final `0.7.8`, commit `8e33f6c`, tag `v0.7.8`). Shared
+      `<ThumbnailImage>` + VideoCard inline: pulsing skeleton underlay behind an always-visible
+      image (ADR-30 — never opacity-hide the image). Vercel cloud build + deploy confirmed (local
+      build blocked by machine memory pressure). Also partially closes the shared-`<Thumbnail>`
+      refactor note.
+      (added 2026-08-11 by Claude
       Code) — `next/image` thumbnails have no skeleton/blur, so cards render as blank gray boxes
       until decode; on the **mobile home the whole above-the-fold is empty gray** on load.
       Add a shimmer/skeleton over the image container (VideoCard/LandingPage/RelatedVideos) or
