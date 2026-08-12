@@ -21,6 +21,44 @@ _No unreleased changes yet._
 
 ---
 
+## [0.9.0] — 2026-08-12
+
+### Added / Changed
+
+#### Watch-page playback: autoplay, auto-advance, persistent volume (ADR-31)
+
+**Files:** `src/lib/store.ts` (new `usePlayerPrefs`), `src/components/vert/VideoPlayer.tsx`,
+`src/components/vert/VideoDetail.tsx`.
+
+Reworked watch-page playback per a user request:
+
+- **Autoplay on open.** `VideoPlayer` gained an `autoPlay` prop (VideoDetail passes
+  it). On `canplay` it calls `play()`; navigation is a client-side SPA transition
+  so the originating card click is a user gesture in the same document and
+  autoplay-with-sound is usually allowed. If the browser blocks it (e.g. a direct
+  page load), it mutes and retries — a **transient** fallback that is NOT written
+  to the persisted preference. Clicking any Up Next video opens a new watch page
+  that autoplays the same way (also covers the "click Up Next → play" ask).
+- **Auto-advance / loop-if-last.** `VideoPlayer` gained `loop` + `onEnded`.
+  VideoDetail reads the shared `['related-videos', videoId]` query, computes the
+  next video, and passes `loop={!nextVideo}` + `onEnded={() => navigate(next)}`.
+  So a finished video advances to the next Up Next video, or loops natively when
+  there is none (owner-chosen behavior).
+- **Persistent volume/mute.** New `usePlayerPrefs` zustand store (localStorage-
+  backed) holds `volume` + `muted`. `VideoPlayer` seeds its state from
+  `getState()` on mount (it remounts per video via `key`) and writes every
+  explicit volume/mute change back, so the level carries across videos and
+  reloads instead of resetting to full volume.
+- **Poster-first.** The `<video poster>` (thumbnail) already renders immediately;
+  autoplay then starts as soon as `canplay` fires, independently of the Up Next /
+  comments queries, which keep their own skeletons.
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint (0 errors),
+`npx next build` (exit 0). Behavior verified on the deploy (autoplay, volume
+persistence across navigations, auto-advance).
+
+---
+
 ## [0.8.0] — 2026-08-11
 
 ### Added
@@ -2141,7 +2179,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.9.0...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

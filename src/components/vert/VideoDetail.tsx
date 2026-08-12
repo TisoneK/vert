@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { videoDetailQueryOptions } from '@/lib/video-queries'
+import { videoDetailQueryOptions, relatedVideosQueryOptions } from '@/lib/video-queries'
 import { useNavigation, useAuth } from '@/lib/store'
 import { VideoPlayer } from './VideoPlayer'
 import { VoteButtons } from './VoteButtons'
@@ -64,6 +64,11 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   const { data, isLoading: loading } = useQuery(
     videoDetailQueryOptions(videoId, user?.id ?? 'anonymous'),
   )
+  // Shares the ['related-videos', videoId] cache with RelatedVideos (same key →
+  // one fetch). Used to pick the video to auto-advance to when the current one
+  // ends. See ADR-31.
+  const { data: relatedVideos } = useQuery(relatedVideosQueryOptions(videoId))
+  const nextVideo = relatedVideos?.find((v) => v.id !== videoId) ?? null
   const video = data?.video ?? null
   const userVote = data?.userVote ?? null
   const currentVideoId = video?.id as string | undefined
@@ -179,6 +184,11 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                 format={format}
                 videoId={video.id as string}
                 onAspectRatioChange={handleAspectRatioChange}
+                // Autoplay on open; when the video ends, auto-advance to the
+                // next Up Next video, or loop if there is no next. See ADR-31.
+                autoPlay
+                loop={!nextVideo}
+                onEnded={nextVideo ? () => navigate({ page: 'video', videoId: nextVideo.id }) : undefined}
               />
             </div>
           </div>

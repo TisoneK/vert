@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback, type CSSProperties } from 're
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Loader2 } from 'lucide-react'
 import Hls from 'hls.js'
 import { put } from '@vercel/blob/client'
+import { usePlayerPrefs } from '@/lib/store'
 
 /**
  * Keyboard shortcuts for the video player:
@@ -32,6 +33,14 @@ interface VideoPlayerProps {
   videoId?: string
   /** Reports the real media ratio so the surrounding watch layout can adapt. */
   onAspectRatioChange?: (ratio: number) => void
+  /** Start playback automatically on load. Autoplay-with-sound is attempted
+   *  first; if the browser blocks it, playback falls back to muted. See ADR-31. */
+  autoPlay?: boolean
+  /** Loop the video when it ends (used when there is no next video to advance to). */
+  loop?: boolean
+  /** Called when the video ends (used to auto-advance to the next video). Not
+   *  fired when `loop` is true, since a looping video never ends. */
+  onEnded?: () => void
 }
 
 type QualityLevel = {
@@ -56,16 +65,19 @@ function heightToLabel(h: number): string {
   return 'Source'
 }
 
-export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait', videoId, onAspectRatioChange }: VideoPlayerProps) {
+export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait', videoId, onAspectRatioChange, autoPlay = false, loop = false, onEnded }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const settingsButtonRef = useRef<HTMLButtonElement>(null)
   const hlsRef = useRef<Hls | null>(null)
 
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
-  const [volume, setVolume] = useState(1)
-  const lastAudibleVolumeRef = useRef(1)
+  // Seed volume/mute from the persisted player preference so the level the
+  // viewer set on a previous video carries over (see ADR-31). getState() reads
+  // the latest value without subscribing (this component remounts per video).
+  const [isMuted, setIsMuted] = useState(() => usePlayerPrefs.getState().muted)
+  const [volume, setVolume] = useState(() => usePlayerPrefs.getState().volume)
+  const lastAudibleVolumeRef = useRef(usePlayerPrefs.getState().volume || 1)
   const [hasError, setHasError] = useState(false)
   const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
@@ -143,11 +155,31 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     }
     const onTimeUpdate = () => setCurrentTime(video.currentTime)
 
+    // Autoplay once there's enough data to start. Try with sound first (a
+    // click on a video card is a user gesture in this same SPA document, so the
+    // browser usually allows it); if it's blocked (e.g. a direct page load),
+    // fall back to muted playback. The fallback mute is transient — it is NOT
+    // written to the persisted preference. See ADR-31.
+    let autoplayTried = false
+    const tryAutoplay = () => {
+      if (!autoPlay || autoplayTried) return
+      autoplayTried = true
+      const el = videoRef.current
+      if (!el) return
+      el.play().catch(() => {
+        el.muted = true
+        setIsMuted(true)
+        el.play().catch(() => {
+          // Still blocked — leave the play affordance for a manual start.
+        })
+      })
+    }
+
     // Buffering events — `waiting` fires when playback stalls waiting for
     // data, `playing` and `canplay` fire when enough data is available to
     // resume. `canplay` also covers the initial load (first frame ready).
     const onWaiting = () => setIsBuffering(true)
-    const onCanPlay = () => setIsBuffering(false)
+    const onCanPlay = () => { setIsBuffering(false); tryAutoplay() }
     const onPlaying = () => setIsBuffering(false)
 
     // Buffer progress — the `progress` event fires periodically as the browser
@@ -253,7 +285,17 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
         hlsRef.current = null
       }
     }
-  }, [onAspectRatioChange, videoUrl])
+  }, [onAspectRatioChange, videoUrl, autoPlay])
+
+  // Keep the media element's volume/mute synced with state, and apply the
+  // persisted preference on mount so a new video starts at the viewer's level
+  // instead of full volume (ADR-31).
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    v.volume = volume
+    v.muted = isMuted
+  }, [volume, isMuted])
 
   // --- Auto-backfill missing thumbnail ---
   // When a video has no thumbnail and the viewer is logged in, capture a
@@ -431,12 +473,15 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       videoRef.current.muted = false
       setVolume(restoredVolume)
       setIsMuted(false)
+      usePlayerPrefs.getState().setVolume(restoredVolume)
+      usePlayerPrefs.getState().setMuted(false)
       return
     }
 
     if (volume > 0) lastAudibleVolumeRef.current = volume
     videoRef.current.muted = true
     setIsMuted(true)
+    usePlayerPrefs.getState().setMuted(true)
   }, [isMuted, volume])
 
   const handleVolumeButtonClick = () => {
@@ -475,7 +520,11 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
     const newVol = Math.max(0, Math.min(1, volume + delta))
     setVolume(newVol)
     videoRef.current.volume = newVol
+    videoRef.current.muted = newVol === 0
     setIsMuted(newVol === 0)
+    if (newVol > 0) lastAudibleVolumeRef.current = newVol
+    usePlayerPrefs.getState().setVolume(newVol)
+    usePlayerPrefs.getState().setMuted(newVol === 0)
   }, [volume])
 
   const jumpToPercent = useCallback((percent: number) => {
@@ -583,6 +632,8 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       if (vol > 0) lastAudibleVolumeRef.current = vol
       setIsMuted(vol === 0)
     }
+    usePlayerPrefs.getState().setVolume(vol)
+    usePlayerPrefs.getState().setMuted(vol === 0)
   }
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -704,6 +755,8 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
           // See ADR-6 for the remaining transcoding/HLS architecture gap.
           preload="metadata"
           playsInline
+          loop={loop}
+          onEnded={onEnded}
           className="w-full h-full object-contain"
           // crossOrigin='anonymous' is required so we can capture frames to a
           // <canvas> without tainting it (for the auto-thumbnail backfill).

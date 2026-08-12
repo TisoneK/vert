@@ -203,3 +203,52 @@ export const useAuth = create<AuthStore>((set) => ({
   setLoading: (isLoading) => set({ isLoading: isLoading }),
   clearUser: () => set({ user: null }),
 }))
+
+// Player preferences — the volume level and mute state persist across videos
+// (and reloads) so the level a viewer sets carries over instead of resetting to
+// full volume on every new video. Backed by localStorage. See ADR-31.
+interface PlayerPrefsStore {
+  volume: number
+  muted: boolean
+  setVolume: (volume: number) => void
+  setMuted: (muted: boolean) => void
+}
+
+const PLAYER_PREFS_KEY = 'vert:player-prefs'
+
+function loadPlayerPrefs(): { volume: number; muted: boolean } {
+  if (typeof window === 'undefined') return { volume: 1, muted: false }
+  try {
+    const raw = window.localStorage.getItem(PLAYER_PREFS_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw) as { volume?: unknown; muted?: unknown }
+      const volume = typeof parsed.volume === 'number' ? Math.min(1, Math.max(0, parsed.volume)) : 1
+      const muted = typeof parsed.muted === 'boolean' ? parsed.muted : false
+      return { volume, muted }
+    }
+  } catch {
+    // Corrupt/blocked storage — fall back to defaults.
+  }
+  return { volume: 1, muted: false }
+}
+
+function savePlayerPrefs(volume: number, muted: boolean) {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(PLAYER_PREFS_KEY, JSON.stringify({ volume, muted }))
+  } catch {
+    // Storage unavailable (private mode / quota) — preference just won't persist.
+  }
+}
+
+export const usePlayerPrefs = create<PlayerPrefsStore>((set) => ({
+  ...loadPlayerPrefs(),
+  setVolume: (volume) => set((s) => {
+    savePlayerPrefs(volume, s.muted)
+    return { volume }
+  }),
+  setMuted: (muted) => set((s) => {
+    savePlayerPrefs(s.volume, muted)
+    return { muted }
+  }),
+}))

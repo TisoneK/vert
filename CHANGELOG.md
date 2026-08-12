@@ -37,6 +37,15 @@ _No unreleased changes yet._
 
 ---
 
+## [0.9.0] — 2026-08-12
+
+### Changed
+- **Videos now play automatically.** When you open a video it starts playing right away — no need to press play — and the same happens when you pick something from Up Next.
+- **Up Next plays automatically.** When a video finishes, the next one starts on its own. If there's nothing up next, the video simply replays.
+- **Your volume now sticks.** Set the volume (or mute) once and it stays that way for the next videos, instead of jumping back to full volume every time.
+
+---
+
 ## [0.8.0] — 2026-08-11
 
 ### Added
@@ -507,7 +516,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/TisoneK/vert/releases/tag/v0.9.0
 [0.8.0]: https://github.com/TisoneK/vert/releases/tag/v0.8.0
 [0.7.9]: https://github.com/TisoneK/vert/releases/tag/v0.7.9
 [0.7.8]: https://github.com/TisoneK/vert/releases/tag/v0.7.8
