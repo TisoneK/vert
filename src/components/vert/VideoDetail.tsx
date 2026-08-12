@@ -23,6 +23,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
+// Only render the ad placement when ads are actually enabled. Off by default,
+// so production doesn't show an empty "Reserved placement" stub that reads as
+// unfinished (production-feel review [P3]). Flip NEXT_PUBLIC_ADS_ENABLED=true
+// once there is real ad inventory to serve.
+const ADS_ENABLED = process.env.NEXT_PUBLIC_ADS_ENABLED === 'true'
+
 interface VideoDetailProps {
   videoId: string
 }
@@ -396,10 +402,13 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
           aria-label="Up next and advertisement"
         >
           {/* Keep the ad outside the scrolling region, so it remains visible
-              while the recommendation list moves independently below it. */}
-          <div className="shrink-0">
-            <AdSlot headingId="watch-ad-heading-desktop" />
-          </div>
+              while the recommendation list moves independently below it. Only
+              rendered when ads are enabled (review [P3]). */}
+          {ADS_ENABLED && (
+            <div className="shrink-0">
+              <AdSlot headingId="watch-ad-heading-desktop" />
+            </div>
+          )}
           <section
             aria-labelledby="watch-up-next-heading"
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain custom-scrollbar pr-2"
@@ -414,7 +423,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
           nested desktop rail behavior. */}
       <div className="lg:hidden px-4 md:px-6 pb-6 space-y-6">
         <CommentSection videoId={video.id as string} />
-        <AdSlot headingId="watch-ad-heading-mobile" />
+        {ADS_ENABLED && <AdSlot headingId="watch-ad-heading-mobile" />}
         <RelatedVideos videoId={videoId} />
       </div>
     </div>

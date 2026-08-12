@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.9] — 2026-08-11
+
+### Changed
+- **Removed the empty "Advertisement" placeholder from watch pages.** Until there are real ads to show, the reserved ad box no longer appears, so the page looks finished instead of showing a blank slot.
+
+---
+
 ## [0.7.8] — 2026-08-11
 
 ### Fixed
@@ -493,7 +500,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.8...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.9...HEAD
+[0.7.9]: https://github.com/TisoneK/vert/releases/tag/v0.7.9
 [0.7.8]: https://github.com/TisoneK/vert/releases/tag/v0.7.8
 [0.7.7]: https://github.com/TisoneK/vert/releases/tag/v0.7.7
 [0.7.6]: https://github.com/TisoneK/vert/releases/tag/v0.7.6

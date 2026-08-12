@@ -21,6 +21,34 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.9] — 2026-08-11
+
+### Changed
+
+#### Hide the empty ad placement until ads are real (review [P3])
+
+**Files:** `src/components/vert/VideoDetail.tsx`, `.env.example`.
+
+The watch page showed an "Advertisement — Reserved placement" box on every video
+(desktop right rail + mobile), which reads as an unfinished stub to a first-time
+visitor. Gated the `AdSlot` behind a module-level `ADS_ENABLED =
+process.env.NEXT_PUBLIC_ADS_ENABLED === 'true'` (off by default): both the desktop
+wrapper and the mobile slot are conditionally rendered, so nothing (and no stray
+gap) shows unless ads are turned on. The slot code is retained for when there's
+real inventory — flip `NEXT_PUBLIC_ADS_ENABLED=true`. Documented in `.env.example`.
+
+As a side benefit this addresses part of [P2]: with the ad gone by default, the
+desktop right rail is just Up Next (no lone floating box). The larger [P2] empty
+desktop void below sparse comments is a grid-layout change that needs visual
+iteration and is deferred (see backlog) — the dev environment currently can't
+build/verify reliably (machine memory pressure).
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint (0 errors). Local
+`next build` still blocked by machine memory pressure — relying on Vercel's cloud
+build (confirmed via the deployed changelog API) as in 0.7.8.
+
+---
+
 ## [0.7.8] — 2026-08-11
 
 ### Fixed
@@ -2080,7 +2108,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.8...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.9...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
