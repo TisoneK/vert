@@ -135,24 +135,31 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       onMouseEnter={() => prefetchVideo(video.id)}
       onTouchStart={() => prefetchVideo(video.id)}
     >
-      {/* Thumbnail container — pulses as a skeleton until the image decodes so
-          the card doesn't flash a flat empty gray box on load (review [P1]). */}
-      <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 ${showThumbnail && !thumbnailLoaded ? 'animate-pulse' : ''}`}>
+      {/* Thumbnail container */}
+      <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800`}>
         {showThumbnail ? (
-          <Image
-            ref={thumbRef}
-            src={video.thumbnailUrl!}
-            alt={video.title}
-            fill
-            // Cards render 2-up on phones, 3-up on tablet, 4–5-up on desktop —
-            // tell the optimizer so it serves a right-sized AVIF/WebP, not the
-            // full-resolution source. See .context ADR-5.
-            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
-            onError={() => setThumbnailFailed(true)}
-            onLoad={() => setThumbnailLoaded(true)}
-            // Fade in on decode (opacity) instead of popping in over the gray.
-            className={`object-cover transition duration-300 group-hover:scale-105 ${thumbnailLoaded ? 'opacity-100' : 'opacity-0'}`}
-          />
+          <>
+            {/* Skeleton underlay: pulses behind the always-visible image until
+                the image paints over it, so the card never flashes a flat empty
+                gray box (review [P1]) and never gets stuck invisible if the
+                image's load event doesn't fire. */}
+            {!thumbnailLoaded && (
+              <div className="absolute inset-0 animate-pulse bg-zinc-200 dark:bg-zinc-800" aria-hidden />
+            )}
+            <Image
+              ref={thumbRef}
+              src={video.thumbnailUrl!}
+              alt={video.title}
+              fill
+              // Cards render 2-up on phones, 3-up on tablet, 4–5-up on desktop —
+              // tell the optimizer so it serves a right-sized AVIF/WebP, not the
+              // full-resolution source. See .context ADR-5.
+              sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
+              onError={() => setThumbnailFailed(true)}
+              onLoad={() => setThumbnailLoaded(true)}
+              className="object-cover transition-transform group-hover:scale-105 duration-200"
+            />
+          </>
         ) : (
           <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
             <Play className="h-8 w-8 text-zinc-500 dark:text-zinc-400" />

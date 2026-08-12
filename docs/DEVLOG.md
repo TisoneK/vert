@@ -21,6 +21,37 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.8] — 2026-08-11
+
+### Fixed
+
+#### Thumbnail skeleton reworked as an underlay (never hides the image)
+
+**Files:** `src/components/vert/ThumbnailImage.tsx`, `VideoCard.tsx`.
+
+The 0.7.6/0.7.7 approach hid the image with `opacity-0` until `onLoad` fired.
+**Live verification caught a real failure mode:** on the deploy, thumbnails could
+end up decoded (`complete && naturalWidth>0`) yet stuck at `opacity: 0` — the
+`load` event doesn't always fire (throttled/background tab, bfcache restore), and
+the 0.7.7 `ref` guard only covers the already-complete-at-mount case, not "completes
+later without a load event." Result: invisible thumbnails.
+
+Reworked so the **image is never hidden by JS**. The pulsing skeleton is now an
+absolute underlay *behind* an always-`opacity-100` `<Image>`: the `<img>` is
+transparent until the browser paints its pixels, so the skeleton shows through
+while loading and the image paints over it when ready — with zero dependency on
+`onLoad`. `onLoad`/`ref` now only unmount the (already-covered) skeleton for
+cleanliness; if they never fire, the image is still visible.
+
+**Verification:** `npx tsc --noEmit` (0 errors) and targeted ESLint (0 errors)
+pass. **The local `npx next build` could NOT be completed this session** — the dev
+machine hit heavy memory pressure (~27M RAM unused, 1.9G compressor) and the build
+timed out three times (8-min limit); the identical-shape files built clean at
+0.7.6/0.7.7 minutes earlier. Relied on Vercel's cloud build + live verification of
+the rendered result instead of claiming a local build.
+
+---
+
 ## [0.7.7] — 2026-08-11
 
 ### Fixed
@@ -2049,7 +2080,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.7...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.8...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10

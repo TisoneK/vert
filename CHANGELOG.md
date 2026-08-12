@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.7.8] — 2026-08-11
+
+### Fixed
+- **Thumbnails always show up now.** Reworked the loading behavior so a video's picture can never get stuck hidden behind its loading placeholder — the image simply appears over the shimmer as soon as it's ready.
+
+---
+
 ## [0.7.7] — 2026-08-11
 
 ### Fixed
@@ -486,7 +493,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.7...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.8...HEAD
+[0.7.8]: https://github.com/TisoneK/vert/releases/tag/v0.7.8
 [0.7.7]: https://github.com/TisoneK/vert/releases/tag/v0.7.7
 [0.7.6]: https://github.com/TisoneK/vert/releases/tag/v0.7.6
 [0.7.5]: https://github.com/TisoneK/vert/releases/tag/v0.7.5

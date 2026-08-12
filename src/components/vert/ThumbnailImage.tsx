@@ -43,6 +43,13 @@ export function ThumbnailImage({
     )
   }
 
+  // The skeleton is an underlay BEHIND an always-visible image. The <img> is
+  // transparent until the browser paints its pixels, so the pulsing skeleton
+  // shows through while loading and the image paints over it when ready — with
+  // no dependency on `onLoad` firing. (An opacity-0-until-onLoad approach leaves
+  // the thumbnail stuck invisible whenever the load event doesn't fire — e.g. a
+  // throttled/background tab or a bfcache restore.) `onLoad`/`ref` here only
+  // remove the now-covered skeleton for cleanliness.
   return (
     <>
       {!loaded && (
@@ -56,7 +63,7 @@ export function ThumbnailImage({
         sizes={sizes}
         onError={() => setFailed(true)}
         onLoad={() => setLoaded(true)}
-        className={`object-cover transition duration-300 ${loaded ? 'opacity-100' : 'opacity-0'} ${imgClassName}`}
+        className={`object-cover ${imgClassName}`}
       />
     </>
   )
