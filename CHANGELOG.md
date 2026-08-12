@@ -37,6 +37,13 @@ _No unreleased changes yet._
 
 ---
 
+## [0.8.0] — 2026-08-11
+
+### Added
+- **Added Terms of Service and Privacy Policy pages.** You can now read Vert's terms and privacy policy — linked from the footer and from the sign-up screen — so it's clear how the service works and how your information is handled.
+
+---
+
 ## [0.7.9] — 2026-08-11
 
 ### Changed
@@ -500,7 +507,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.9...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/TisoneK/vert/releases/tag/v0.8.0
 [0.7.9]: https://github.com/TisoneK/vert/releases/tag/v0.7.9
 [0.7.8]: https://github.com/TisoneK/vert/releases/tag/v0.7.8
 [0.7.7]: https://github.com/TisoneK/vert/releases/tag/v0.7.7

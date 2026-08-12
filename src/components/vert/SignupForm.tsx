@@ -222,6 +222,12 @@ export function SignupForm() {
           </Button>
         </form>
 
+        <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+          By creating an account you agree to our{' '}
+          <a href="/terms" className="text-violet-600 hover:underline">Terms</a> and{' '}
+          <a href="/privacy" className="text-violet-600 hover:underline">Privacy Policy</a>.
+        </p>
+
         <div className="mt-6 text-center">
           <p className="text-zinc-500 dark:text-zinc-400 text-sm">
             Already have an account?{' '}

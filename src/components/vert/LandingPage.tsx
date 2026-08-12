@@ -188,6 +188,19 @@ export function LandingPage() {
             >
               Contact
             </button>
+            {/* Standalone server-rendered routes — plain anchors, not SPA nav. */}
+            <a
+              href="/terms"
+              className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            >
+              Terms
+            </a>
+            <a
+              href="/privacy"
+              className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            >
+              Privacy
+            </a>
           </div>
         </div>
       </footer>

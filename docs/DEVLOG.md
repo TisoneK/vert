@@ -21,6 +21,39 @@ _No unreleased changes yet._
 
 ---
 
+## [0.8.0] — 2026-08-11
+
+### Added
+
+#### Terms of Service + Privacy Policy pages (review [C1])
+
+**Files:** `src/app/terms/page.tsx` (new), `src/app/privacy/page.tsx` (new),
+`src/components/vert/LegalPageShell.tsx` (new), `src/components/vert/LandingPage.tsx`,
+`src/components/vert/SignupForm.tsx`, `src/app/sitemap.ts`.
+
+The footer previously had only Changelog + Contact — no legal pages, which is the
+clearest "not production" gap for an app with accounts, uploads, and comments.
+Added `/terms` and `/privacy` as **server-rendered standalone routes** (each with
+`generateMetadata`, theme-aware, real `<a>` links, crawlable) via a shared
+`LegalPageShell` (server component — plain markup, no client hooks; same
+dark-mode approach as not-found/error). Linked them from the landing footer
+(plain anchors, not SPA nav) and added a "By creating an account you agree to
+our Terms and Privacy Policy" line to the signup form. Added both to the sitemap.
+
+The policy copy is standard and accurate to how the app actually behaves (account
+email/username, Google OAuth basic profile, uploaded content, essential auth
+cookies, no data sale, account deletion, password hashing + HTTPS). **It is a
+baseline draft — the owner should have it reviewed by counsel and set specifics
+(operating entity, governing-law jurisdiction) before public launch.** No fake
+entity/address/specifics were invented.
+
+**Verification:** `npx tsc --noEmit` (0 errors), targeted ESLint (0 errors). Local
+`next build` blocked by machine memory pressure — but these are server-rendered
+routes, so verified on the deploy by `curl`ing `/terms` and `/privacy` (200 + real
+content) after Vercel's cloud build.
+
+---
+
 ## [0.7.9] — 2026-08-11
 
 ### Changed
@@ -2108,7 +2141,7 @@ Home feed, trending, explore, categories, search, watch, channel, history, saved
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.7.9...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.8.0...HEAD
 [0.6.12]: https://github.com/TisoneK/vert/releases/tag/v0.6.12
 [0.6.11]: https://github.com/TisoneK/vert/releases/tag/v0.6.11
 [0.6.10]: https://github.com/TisoneK/vert/releases/tag/v0.6.10
