@@ -1,13 +1,13 @@
 # Current Task (overwrite each session)
 
-- **Status:** in-progress
-- **Session:** 43 (2026-08-11)
-- **Agent:** Claude Code / claude-opus-4-8 (local, Baos-Mac-mini)
-- **Role:** feature-engineer
-- **Task:** C1 — add Terms of Service + Privacy Policy pages (server-rendered routes, crawlable,
-  theme-aware) + footer links (landing footer) + a "by signing up you agree…" note on signup.
-  Draft content accurate to the app's behavior; owner must review with counsel before launch.
-  Implements production-feel review [C1].
-- **Part of:** production-polish run (S41 P1 done, S42 P3 done / P2 deferred, S43 C1).
-- **Env note:** local `next build` blocked by machine memory pressure — rely on tsc+eslint +
-  Vercel cloud build; legal pages are server-rendered so verify via `curl /terms` and `/privacy`.
+Holds exactly one task — the one being worked on right now. Set it at
+session start (Step 3), clear it at session end (Step 15). If a prior
+session died mid-task, check its session entry and backlog before starting.
+
+- **Status:** idle — no active task
+
+_(Sessions 41–43 on 2026-08-11 implemented the code-fixable production-polish
+subset: P1 thumbnail skeletons (0.7.6→0.7.8), P3 hide ad stub (0.7.9), C1 Terms +
+Privacy pages (0.8.0). P2 watch-void deferred. See
+reviews/2026-08-11-production-polish.md. Machine memory pressure made local
+builds/browser unreliable — Vercel cloud build + curl were the verification path.)_

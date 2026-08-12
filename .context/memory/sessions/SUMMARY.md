@@ -68,6 +68,9 @@ live in ADR-3/4/5/7/8 and the corresponding reviews/. -->
 - **2026-08-11 — Session 42** — Claude Code / claude-opus-4-8 — production-feel [P3]: gated the watch-page ad `AdSlot` behind `NEXT_PUBLIC_ADS_ENABLED` (off by default) so the empty "Reserved placement" stub is gone. Released **0.7.9** (`68d17cd`, `v0.7.9`, Vercel-built — local build blocked by memory pressure). [P2] void deferred (needs visual iteration; degraded env).
   Detail: .context/memory/reviews/2026-08-11-production-polish.md
 ---
+- **2026-08-11 — Session 43** — Claude Code / claude-opus-4-8 — production-feel [C1]: added server-rendered `/terms` + `/privacy` (shared `LegalPageShell`, crawlable, in sitemap) + footer/signup links. Released **0.8.0** (`04b8cdd`, `v0.8.0`), **curl-verified** (both 200 + real content). ⚠️ owner must legal-review copy. **Closes production-polish subset (S41–43)**: P1 thumbnails + P3 ad stub + C1 legal shipped; P2 void deferred. Whole run fought machine memory pressure (local builds/browser unreliable → leaned on Vercel + curl).
+  Detail: .context/memory/reviews/2026-08-11-production-polish.md
+---
 - **2026-08-11 — Session 38** — Claude Code / claude-opus-4-8 — implemented review [L1] (ADR-29): theme-aware 404/500 pages (`dark:` variants). Released **0.7.4** (`57635df`, `v0.7.4`). Live-verified (`dark:bg-zinc-950` in served 404 HTML).
   Detail: .context/memory/reviews/2026-08-11-implementation.md
 ---

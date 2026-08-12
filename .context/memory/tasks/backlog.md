@@ -338,11 +338,14 @@ _Appended 2026-08-11 (Session 40, production-feel research — see
       not rendered) + Vercel deploy confirmed; live DOM check blocked by degraded browser pane.
       (added 2026-08-11 by Claude Code) — the labelled empty ad box on every watch page reads as
       unfinished to first-time visitors.
-- [ ] **[C1] Add Terms of Service + Privacy Policy pages (and footer links)** (added 2026-08-11 by
-      Claude Code) — a public product with accounts, uploads, and comments needs ToS + Privacy at
-      minimum (consider content guidelines / DMCA given reposted content). Footer currently has
-      only Changelog + Contact. **Biggest "not production" signal after seed content.** Needs the
-      owner to provide/approve legal copy; the routes + footer links are the code part.
+- [x] **[C1] Add Terms of Service + Privacy Policy pages (and footer links)** — DONE 2026-08-11
+      (Session 43), `0.8.0`, commit `04b8cdd`, tag `v0.8.0`. Server-rendered `/terms` + `/privacy`
+      (generateMetadata, theme-aware, crawlable) via shared `LegalPageShell`; linked from landing
+      footer + signup agreement line; added to sitemap. **Live-verified via curl** (both 200 with
+      real content; in sitemap). ⚠️ **Owner follow-up:** the policy copy is a baseline draft
+      accurate to app behavior — have it reviewed by counsel and set the operating entity +
+      governing-law jurisdiction before public launch. Consider adding content guidelines / DMCA
+      given reposted content. (added 2026-08-11 by Claude Code)
 - [ ] **[P4/P5] Landing hero polish** (added 2026-08-11 by Claude Code) — P4: the hero has no CTA
       button (only top-right nav) and lots of whitespace before Trending — add a primary CTA. P5:
       Trending #1 hero is a single portrait thumb centered in a wide gray box with big empty sides

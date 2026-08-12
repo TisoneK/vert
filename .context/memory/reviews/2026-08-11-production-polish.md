@@ -56,3 +56,42 @@ reliably. Left in backlog with a clear note.
 (timeout). Correct-by-construction: `NEXT_PUBLIC_ADS_ENABLED` is unset in Vercel → `ADS_ENABLED`
 false → `AdSlot` not rendered. Vercel cloud build + deploy confirmed (changelog API reports
 0.7.9). Live DOM confirmation blocked by the unresponsive browser pane.
+
+---
+
+## Session 43 — Terms + Privacy pages (review [C1]) — SHIPPED `0.8.0`
+
+**Shipped (commit `04b8cdd`, tag `v0.8.0`):** added `/terms` and `/privacy` as server-rendered
+standalone routes (each with `generateMetadata`, theme-aware, real `<a>` links, crawlable) via a
+shared server-component `LegalPageShell`. Linked from the landing footer (plain anchors) + a "By
+creating an account you agree to our Terms and Privacy Policy" line on the signup form. Added both
+to the sitemap. Policy copy is standard and accurate to the app's actual behavior (email/username,
+Google OAuth basic profile, uploaded content, essential auth cookies, no data sale, account
+deletion, password hashing + HTTPS); no fake entity/address invented.
+
+**⚠️ Owner follow-up (flagged):** the copy is a baseline draft — have it reviewed by counsel and
+set the operating entity + governing-law jurisdiction before public launch; consider content
+guidelines / DMCA given the reposted content.
+
+**Verification:** tsc 0 / eslint 0. Server-rendered, so **live-verified via curl**: `/terms` and
+`/privacy` both return 200 with correct titles + real content, and both appear in `/sitemap.xml`.
+(Vercel cloud build; local build blocked by memory pressure.)
+
+---
+
+## Run summary (Sessions 41–43) — production-polish subset
+
+| # | Release(s) | What | Status |
+|---|---|---|---|
+| 41 | 0.7.6→0.7.8 | [P1] thumbnail loading skeletons (underlay, ADR-30) | done + deployed |
+| 42 | 0.7.9 | [P3] hide empty ad stub (flag, off by default) | done + deployed |
+| 42 | — | [P2] watch-page empty desktop void | **deferred** (needs visual iteration; degraded env) |
+| 43 | 0.8.0 | [C1] Terms + Privacy pages + footer/signup links + sitemap | done + curl-verified |
+
+**Environment caveat this run:** the dev machine was under heavy memory pressure — local
+`next build` timed out repeatedly and the browser pane became unresponsive. Adapted by leaning on
+`tsc`+`eslint` locally, **Vercel's cloud build** as the build gate (confirmed each deploy via the
+changelog API / curl), and `curl` for server-rendered verification. Client-rendered visual checks
+(P1 pixel fade, P3 ad DOM) were verified by code correctness + successful deploy rather than the
+degraded pane. Owner action outstanding: legal-review the policy copy; the seed-content realism
+and [P2] void remain in backlog.

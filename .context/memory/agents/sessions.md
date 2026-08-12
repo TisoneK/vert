@@ -357,3 +357,12 @@ past entries — append corrections instead.
 - **Open items:** S43 (C1 Terms/Privacy pages + footer) pending — server-rendered, so curl-verifiable even in the degraded env. [P2] void deferred in backlog.
 - **Notes:** none — facts in 2026-08-11-production-polish.md.
 - **Report:** .context/memory/reviews/2026-08-11-production-polish.md (§ Session 42)
+---
+## 2026-08-11 — Session 43
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Implement production-feel review [C1] — Terms of Service + Privacy Policy pages. Final of the production-polish subset (S41–S43).
+- **Commits:** 1 product (`04b8cdd`, tag `v0.8.0`) + context (this) — released `0.8.0`.
+- **Outcome:** done + **curl-verified live**. Added server-rendered `/terms` + `/privacy` (generateMetadata, theme-aware, crawlable) via shared `LegalPageShell`; landing-footer links + signup agreement line; added to sitemap. Both return 200 with real content and are in the sitemap. ⚠️ Owner must legal-review the baseline copy + set entity/jurisdiction before launch. tsc 0 / eslint 0; local build blocked by machine memory pressure; Vercel cloud build + deploy confirmed.
+- **Open items:** production-polish subset complete (P1, P3, C1 shipped; P2 void deferred — needs visual iteration + healthy env). Outstanding: content-realism (owner), [P2] void, legal-review of policy copy. Machine memory pressure made local builds/browser unreliable all run.
+- **Notes:** none — facts in 2026-08-11-production-polish.md (§ Session 43 + Run summary 41–43).
+- **Report:** .context/memory/reviews/2026-08-11-production-polish.md (§ Session 43)
