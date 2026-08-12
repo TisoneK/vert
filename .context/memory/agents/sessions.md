@@ -366,3 +366,12 @@ past entries — append corrections instead.
 - **Open items:** production-polish subset complete (P1, P3, C1 shipped; P2 void deferred — needs visual iteration + healthy env). Outstanding: content-realism (owner), [P2] void, legal-review of policy copy. Machine memory pressure made local builds/browser unreliable all run.
 - **Notes:** none — facts in 2026-08-11-production-polish.md (§ Session 43 + Run summary 41–43).
 - **Report:** .context/memory/reviews/2026-08-11-production-polish.md (§ Session 43)
+---
+## 2026-08-12 — Session 44
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Watch-page playback (user request): autoplay on open, auto-advance to Up Next on end (loop if last), autoplay on Up Next click, persistent volume/mute, poster-first.
+- **Commits:** 1 product (`1fa5c10`, tag `v0.9.0`) + context (this) — released `0.9.0`.
+- **Outcome:** done + **live-verified**. Asked one clarification (advance vs loop → advance-if-next/loop-if-last). New `usePlayerPrefs` store (localStorage) persists volume/mute; `VideoPlayer` gained `autoPlay` (sound-first, muted fallback, transient), `loop`, `onEnded`; `VideoDetail` computes nextVideo from the shared related query → `loop={!nextVideo}` + `onEnded=navigate(next)`. tsc 0 / eslint 0 / `next build` exit 0 (machine memory recovered, 14s). Live: autoplay `paused:false` w/ sound; volume 0.25 persisted across reload; end → auto-advanced to next `/watch/<id>`; loop:false with a next. Design = ADR-31.
+- **Open items:** none for this task. Prior backlog unchanged (content realism, [P2] watch void, legal review of policy copy, infra-blocked M2/M3).
+- **Notes:** none — facts in ADR-31 + 2026-08-12-playback-review.md.
+- **Report:** .context/memory/reviews/2026-08-12-playback-review.md

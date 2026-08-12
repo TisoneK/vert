@@ -13,7 +13,7 @@ accordingly).
 
 | Agent | Model | First seen | Last seen | Sessions |
 |---|---|---|---|---|
-| Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-08-11 | 13 |
+| Claude Code | claude-opus-4-8 | 2026-07-11 | 2026-08-12 | 14 |
 | Claude Code | claude-fable-5 | 2026-07-14 | 2026-07-14 | 2 |
 | Buffy | deepseek-v4-flash | 2026-08-01 | 2026-08-01 | 1 |
 | Buffy | openai/gpt-5.6-luna | 2026-08-04 | 2026-08-08 | 11 |

@@ -431,3 +431,20 @@ if literally nothing slowed you down.
   behavior via curl of server HTML/headers. Recorded a note in the production-polish report. For
   image placeholders, never gate visibility on `onLoad`/`opacity-0` — skeleton BEHIND an
   always-visible image (ADR-30).
+
+---
+## 2026-08-12 — Claude Code / claude-opus-4-8 (Session 44)
+- **Problem:** Almost none — noting the contrast for future sessions. The machine memory pressure
+  from 2026-08-11 (Sessions 41–43: local `next build` timing out, browser pane dying) had cleared
+  by 2026-08-12 (`top`: ~1061M unused vs ~25M the day before — likely an overnight restart), so the
+  local build ran in 14s and the browser pane was responsive for full live verification. One minor
+  transient: a `javascript_tool` `document.querySelector('video')` returned null once mid-navigation
+  (pane re-render timing) — a wait-for-element retry loop fixed it.
+- **Cost:** Negligible — one retried browser query.
+- **Cause:** Yesterday's pressure was transient machine state, not the project. The null-video
+  query hit during a client re-render.
+- **Workaround / fix:** Always wrap browser-pane DOM checks in a short wait-for-element loop
+  (already the habit); re-checked and it resolved.
+- **Prevent next time:** If a future session hits build timeouts again, first check `top`
+  PhysMem — if RAM is exhausted (single-digit MB unused), suggest the user restart rather than
+  fighting it; a restart fully restored build+browser here.

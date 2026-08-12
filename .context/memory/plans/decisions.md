@@ -533,3 +533,37 @@ relitigating them. To reverse one, append a new ADR that supersedes it.
   reintroduce the opacity-toggle pattern.
 
 ---
+## ADR-31: Watch-page playback — autoplay, auto-advance (loop if last), persistent volume (2026-08-12)
+- **Status:** accepted
+- **Context:** User request: clicking a video should autoplay (no click-to-play); Up Next should
+  auto-open/auto-play when a video ends; clicking any Up Next item should autoplay; volume/mute
+  should persist across videos in a session (resetting to full volume each video was disruptive);
+  and the thumbnail should show first with the video playing immediately, independent of the
+  other watch-page skeletons. Two points conflicted on "video ended" (auto-advance vs loop);
+  the owner chose **advance-if-next, loop-if-last**.
+- **Decision:**
+  - **Autoplay** via a `VideoPlayer` `autoPlay` prop. On `canplay`, call `play()`; since
+    navigation is a client-side SPA transition, the originating card click is a user gesture in
+    the same document, so autoplay-with-sound is usually allowed. If blocked (e.g. direct page
+    load), mute and retry — a **transient** fallback that is NOT written to the persisted
+    preference (so the next video tries sound again).
+  - **Auto-advance / loop:** `VideoPlayer` gets `loop` + `onEnded`. `VideoDetail` reads the shared
+    `['related-videos', videoId]` query, computes `nextVideo`, and passes `loop={!nextVideo}` +
+    `onEnded={() => navigate(next)}`. Native `loop` handles the no-next case seamlessly; `onEnded`
+    advances otherwise. (A looping video never fires `ended`, so the two never collide.)
+  - **Persistent volume/mute:** new `usePlayerPrefs` zustand store (localStorage-backed, key
+    `vert:player-prefs`). `VideoPlayer` seeds its local volume/mute from `getState()` on mount (it
+    remounts per video via `key`) and writes every EXPLICIT user change back. The autoplay-fallback
+    mute deliberately does not write to the store.
+  - **Poster-first:** the `<video poster>` already renders immediately; autoplay starts on
+    `canplay`, independent of the Up Next / comments queries (which keep their own skeletons).
+- **Consequences:** Continuous, TikTok/YouTube-style playback with the viewer's volume respected.
+  Verified live (0.9.0): autoplay (paused:false), volume 0.25 persisted across reload, auto-advance
+  on end (navigates to next), loop:false when a next exists. Trade-offs: on a direct page load with
+  no prior gesture, playback starts muted until the viewer unmutes (browser policy — unavoidable).
+  If `related` hasn't loaded when a very short video ends, it briefly loops until `related`
+  resolves, then advances on the next end (acceptable; related is usually prefetched). Future
+  agents: `VideoPlayer` volume/mute is owned by `usePlayerPrefs` — persist explicit changes there,
+  never persist the transient autoplay-fallback mute.
+
+---
