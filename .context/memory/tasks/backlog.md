@@ -324,14 +324,20 @@ _Appended 2026-08-11 (Session 40, production-feel research — see
       polish. (Same as prior [L6].)
 - [ ] **[P2] Watch page: large empty white void on desktop when content is sparse** (added
       2026-08-11 by Claude Code) — below the (usually empty) comments the lower-left is dead white
-      space while the ad box floats alone in the right rail. Constrain the column / pull Up Next
-      or related content to fill on desktop / denser empty-comments state so the page looks
-      finished, not unfinished.
-- [ ] **[P3] Hide the "ADVERTISEMENT — Reserved placement" stub until there's real inventory**
+      space. NOTE (Session 42): the "ad floating alone in the rail" half is resolved by [P3]
+      (0.7.9 hides the ad by default). The remaining void is a desktop grid-height change
+      (portrait player column is `100dvh-84px` tall while the center comments column is short) that
+      needs visual iteration to get right — **deferred**: the dev environment couldn't build or
+      visually verify reliably this session (machine memory pressure). Pick up when the browser
+      pane / local build is healthy: constrain the center column height or pull Up Next/related to
+      fill the desktop space, and verify against a sparse (empty-comments) video.
+- [x] **[P3] Hide the "ADVERTISEMENT — Reserved placement" stub until there's real inventory** —
+      DONE 2026-08-11 (Session 42), `0.7.9`, commit `68d17cd`, tag `v0.7.9`. Gated `AdSlot` behind
+      `NEXT_PUBLIC_ADS_ENABLED` (off by default; documented in `.env.example`); both desktop +
+      mobile call sites conditionally rendered. Correct-by-construction (flag unset in Vercel →
+      not rendered) + Vercel deploy confirmed; live DOM check blocked by degraded browser pane.
       (added 2026-08-11 by Claude Code) — the labelled empty ad box on every watch page reads as
-      unfinished to first-time visitors. Collapsing it to nothing looks more finished than a
-      labelled empty slot. (Provider-neutral by ADR-15/22 — this is a "hide when empty" tweak, not
-      a monetization decision.)
+      unfinished to first-time visitors.
 - [ ] **[C1] Add Terms of Service + Privacy Policy pages (and footer links)** (added 2026-08-11 by
       Claude Code) — a public product with accounts, uploads, and comments needs ToS + Privacy at
       minimum (consider content guidelines / DMCA given reposted content). Footer currently has

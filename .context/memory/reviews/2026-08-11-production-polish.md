@@ -37,3 +37,22 @@ verified by code correctness (no opacity gate) + successful cloud build + deploy
 **Note for the next session:** the machine is under memory pressure — local `next build` is
 unreliable; prefer tsc+eslint locally and let Vercel's cloud build be the build gate, verifying
 behavior via curl (server HTML/headers) and the browser pane when it's responsive.
+
+---
+
+## Session 42 — Watch-page ad stub (review [P3]; [P2] deferred) — SHIPPED `0.7.9`
+
+**Shipped (commit `68d17cd`, tag `v0.7.9`):** [P3] gated the watch-page `AdSlot` behind
+`NEXT_PUBLIC_ADS_ENABLED` (off by default; documented in `.env.example`). Both desktop-rail and
+mobile call sites are conditionally rendered, so the "Advertisement — Reserved placement" stub —
+and its layout gap — no longer show unless ads are turned on. Side benefit: the desktop right rail
+is now just Up Next (no lone floating box), which resolves part of [P2].
+
+**Deferred:** [P2] the larger empty desktop void below sparse comments is a grid-height change
+needing visual iteration; the degraded environment (memory pressure) couldn't build/verify layout
+reliably. Left in backlog with a clear note.
+
+**Verification:** tsc 0 / eslint 0. Local `next build` again blocked by machine memory pressure
+(timeout). Correct-by-construction: `NEXT_PUBLIC_ADS_ENABLED` is unset in Vercel → `ADS_ENABLED`
+false → `AdSlot` not rendered. Vercel cloud build + deploy confirmed (changelog API reports
+0.7.9). Live DOM confirmation blocked by the unresponsive browser pane.

@@ -348,3 +348,12 @@ past entries — append corrections instead.
 - **Open items:** S42 (P3 hide empty ad stub + P2 watch-page void), S43 (C1 Terms/Privacy pages + footer) pending. Machine memory pressure makes local builds unreliable — lean on Vercel + curl.
 - **Notes:** none — facts in ADR-30 + 2026-08-11-production-polish.md.
 - **Report:** .context/memory/reviews/2026-08-11-production-polish.md (§ Session 41)
+---
+## 2026-08-11 — Session 42
+- **Agent:** Claude Code | **Model:** claude-opus-4-8 | **Platform:** Baos-Mac-mini (macOS 15.7.7, Darwin 24.6.0) | **Role:** feature-engineer | **Core:** 0.5.0
+- **Task:** Implement production-feel review [P3] (hide empty ad stub) + [P2] (watch void). Second of the production-polish subset.
+- **Commits:** 1 product (`68d17cd`, tag `v0.7.9`) + context (this).
+- **Outcome:** [P3] done + deployed — gated `AdSlot` behind `NEXT_PUBLIC_ADS_ENABLED` (off by default), both call sites; ad stub gone by default (also resolves the "lone rail box" part of [P2]). [P2] void **deferred** — grid-height change needing visual iteration the degraded environment can't verify. tsc 0 / eslint 0; local `next build` blocked by machine memory pressure again; Vercel cloud build + deploy confirmed (changelog API reports 0.7.9); live DOM check blocked by unresponsive browser pane (correct-by-construction: flag unset → not rendered).
+- **Open items:** S43 (C1 Terms/Privacy pages + footer) pending — server-rendered, so curl-verifiable even in the degraded env. [P2] void deferred in backlog.
+- **Notes:** none — facts in 2026-08-11-production-polish.md.
+- **Report:** .context/memory/reviews/2026-08-11-production-polish.md (§ Session 42)
