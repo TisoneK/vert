@@ -85,3 +85,6 @@ live in ADR-3/4/5/7/8 and the corresponding reviews/. -->
 ---
 - **2026-08-11 — Session 35** — Claude Code / claude-opus-4-8 — implemented review [M1] (ADR-26): content cards render real `<a href>` (VideoCard stretched-link; RelatedVideos + LandingPage direct anchors + tag/See-all links), modified-click guard keeps SPA nav, `onFocus` prefetch added. Released **0.7.1** (`45eccc2`, `v0.7.1`). Live-verified: 6 watch anchors + 5 tag anchors on landing.
   Detail: .context/memory/reviews/2026-08-11-implementation.md
+---
+- **2026-08-17 — Session 45** — Buffy / deepseek-v4-pro — "sync .context": updated vendored core 0.5.0 → 0.8.0 (`dd22b4b`) — collaboration event trail (`context-collab`), lifecycle command gates (`context-gates`), schema updates; regenerated `.context/kickoff.md` + root `AGENTS.md` from new templates (`fd37863`); initialized `gates.conf` with `bun run lint` / `bun run build`; verify + checkpoint pass. Pushed. GitHub dependabot: 1 high alert on default branch (new).
+  Detail: none (sync-only)

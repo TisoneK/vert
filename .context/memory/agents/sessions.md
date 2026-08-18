@@ -375,3 +375,11 @@ past entries — append corrections instead.
 - **Open items:** none for this task. Prior backlog unchanged (content realism, [P2] watch void, legal review of policy copy, infra-blocked M2/M3).
 - **Notes:** none — facts in ADR-31 + 2026-08-12-playback-review.md.
 - **Report:** .context/memory/reviews/2026-08-12-playback-review.md
+---
+## 2026-08-17 — Session 45
+- **Agent:** Buffy (Freebuff) | **Model:** deepseek-v4-pro | **Platform:** Baos-Mac-mini (macOS, Darwin) | **Role:** maintainer | **Core:** 0.8.0
+- **Task:** "sync .context" — update the vendored core.
+- **Commits:** 2 context (`dd22b4b` update core to 0.8.0, `fd37863` regenerate kickoff.md) — pushed to main.
+- **Outcome:** done. `context-sync verify` OK (0.5.0); `status` found 0.8.0 (same MAJOR) → `update`. Read 0.6.0–0.8.0 changelog (collaboration event trail `context-collab`, lifecycle gates `context-gates`, schema updates — single-agent mode unchanged). Regenerated `.context/kickoff.md` + root `AGENTS.md` from the new templates (facts re-verified: remote, git identity, live URL). Initialized `memory/workflows/gates.conf` (mode=hybrid) with `pre-commit|bun run lint` + `integration|bun run build` (no typecheck/test scripts exist yet). `context-gates checkpoint` + `verify` pass on 0.8.0. GitHub surfaced 1 high dependabot alert on the default branch (new finding for the owner).
+- **Open items:** dependabot alert (https://github.com/TisoneK/vert/security/dependabot/6); prior backlog unchanged (content realism, [P2] watch void, legal review of policy copy, infra-blocked M2/M3).
+- **Notes:** none — sync-only session, no session notes dir.
