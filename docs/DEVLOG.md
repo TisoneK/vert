@@ -21,6 +21,60 @@ _No unreleased changes yet._
 
 ---
 
+## [0.9.1] — 2026-09-02
+
+### Security
+
+#### Dependency security patching (audit 30 → 8, all remaining unpatched upstream)
+
+**Files:** `package.json`, `bun.lock`.
+
+`bun audit --production` baseline on 0.9.0: **30 vulnerabilities (1 critical,
+15 high, 14 moderate)**. Direct bumps + version overrides applied:
+
+- **`next` 16.2.9 → 16.3.4** — resolves 9 advisories (SSRF in rewrites,
+  middleware bypass w/ Turbopack, DoS in Server Actions, cache-confusion
+  family, image-optimizer DoS).
+- **`next-auth` 4.24.14 → 4.24.15** — resolves the **critical** homoglyph-@
+  email-normalizer bypass (GHSA-7rqj-j65f-68wh) plus the `getToken()`
+  uncaught-exception (high) and OAuth state/nonce/PKCE cookie-binding
+  (moderate) advisories. This was GitHub's high-severity dependabot alert on
+  the default branch (Session 45 finding).
+- **`sharp` 0.34.5 → 0.35.4** — resolves inherited libvips CVEs (GHSA-f88m-g3jw-g9cj).
+- **Overrides added:** `js-yaml@^4.3.0` (quadratic-CPU advisories, via
+  @mdxeditor/eslintrc), `nanoid@^3.3.16` (insecure-generator loops, via
+  postcss), `postcss@^8.5.23` (source-map path traversal), `undici@^6.28.0`
+  (desync/CRLF/cookie injection, via @vercel/blob).
+
+**Remaining 8 (4 high, 4 moderate) — not actionable:** `lodash`/`lodash-es`
+(no patched release exists; transitive via recharts/@reactuses/core, and the
+app never calls `_.template`/`_.unset`/`_.omit`), and `deepmerge-ts`/`defu`
+(dev-only Prisma CLI chain, no runtime exposure). Re-check when upstreams
+release fixes.
+
+#### Cross-platform build script
+
+**Files:** `scripts/standalone-copy.mjs` (new), `package.json`, commit `42040f7`.
+
+The build script's trailing `cp -r` steps (standalone static + public assets)
+are POSIX-only; on Windows the Next.js compile finished then the script
+failed on the last line. Replaced with `scripts/standalone-copy.mjs`
+(`fs.cpSync`, recursive) — identical behavior on Linux CI/Vercel.
+
+**Local env note (Windows machine):** `.env.local` (Vercel CLI pull) carried
+`NEXTAUTH_URL=""` and `NEXTAUTH_SECRET=""` as *empty strings*; next-auth's
+module init parses that as an invalid URL and `next build`'s prerender pass
+dies with `ERR_INVALID_URL` at `next-auth/react` import time. Setting real
+dev values (`http://localhost:3000` + a generated secret) fixed it — prior
+machines simply had the vars unset, so this never surfaced before.
+
+**Verification:** `tsc --noEmit` 0 errors; `eslint .` 0 errors / 16 warnings
+(pre-existing); `bun run build` full Next compile of all 52 routes OK +
+standalone copy verified; audit after: 8 vulns (all unpatched upstream, see
+above).
+
+---
+
 ## [0.9.0] — 2026-08-12
 
 ### Added / Changed

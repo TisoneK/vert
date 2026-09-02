@@ -37,6 +37,20 @@ _No unreleased changes yet._
 
 ---
 
+## [0.9.1] — 2026-09-02
+
+### Security
+- **Updated the building blocks of the app to fix security issues.** Several
+  underlying software libraries the app runs on published security fixes —
+  including one critical fix in the sign-in system. All available fixes are
+  now applied. Nothing about how Vert looks or works has changed.
+
+### Fixed
+- **Fixed local production builds on Windows.** Developers building the app
+  on Windows no longer hit a failure at the very end of the build.
+
+---
+
 ## [0.9.0] — 2026-08-12
 
 ### Changed
@@ -516,7 +530,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/TisoneK/vert/releases/tag/v0.9.1
 [0.9.0]: https://github.com/TisoneK/vert/releases/tag/v0.9.0
 [0.8.0]: https://github.com/TisoneK/vert/releases/tag/v0.8.0
 [0.7.9]: https://github.com/TisoneK/vert/releases/tag/v0.7.9
