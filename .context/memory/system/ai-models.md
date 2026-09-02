@@ -17,6 +17,8 @@ accordingly).
 | Claude Code | claude-fable-5 | 2026-07-14 | 2026-07-14 | 2 |
 | Buffy | deepseek-v4-flash | 2026-08-01 | 2026-08-01 | 1 |
 | Buffy | openai/gpt-5.6-luna | 2026-08-04 | 2026-08-08 | 11 |
+| Buffy | deepseek-v4-pro | 2026-08-17 | 2026-08-17 | 1 |
+| ZCode | glm-5.3-flash | 2026-09-02 | 2026-09-02 | 1 |
 
 ## Observations
 
@@ -35,6 +37,7 @@ accordingly).
 - **Buffy / openai/gpt-5.6-luna:** Session 28 resumed the dirty Session 27 tree without discarding work, separated the watch-page polish into two product commits, rejected unsupported title-deduplication/dislike-count changes, and completed release/context bookkeeping. Typecheck, targeted lint, production build, and hosted no-interaction smoke passed; precise geometry interaction remains tool-limited. (2026-08-08)
 - **Claude Code / claude-opus-4-8:** Session 33 (research/review, no code changes) — comprehensive live-site + codebase sweep against the LIVE deploy, producing ADR-25…29 + backlog. NEW capability datapoint: the in-app **Claude Browser pane** (`mcp__Claude_Browser__*`, distinct from the prior sessions' chrome-devtools runner) worked well against the deployed URL — coordinate clicks mostly registered, `javascript_tool`/`get_page_text`/`read_page`/`resize_window` all reliable; page/video content and per-page `<head>` metadata were inspectable via `fetch()`+DOM. Occasional `computer` click timed out with "Browser pane is currently hidden" — retry/screenshot recovered. Preferred JS-driven DOM/metadata inspection over pixel clicks for evidence, consistent with the standing browser-pane guidance. (2026-08-11)
 - **Claude Code / claude-opus-4-8:** Sessions 34–39 (one autonomous run) — implemented the 2026-08-11 review as 6 grouped, self-contained sessions, each built + released (0.7.0→0.7.5, tagged) + **live-verified on the deploy** before moving on, with no user prompts between sessions. Shipped ADR-25/26/27/29 + M4 + polish (L5/L12/L13). Demonstrated: end-to-end feature-engineer loop (code → tsc/eslint/`next build` → release bookkeeping per ADR-7 → push+tag → live curl/browser verification → per-session `.context` closeout) sustained across a long multi-release run while keeping eslint at 0. Used `curl` for server-HTML/header facts and the browser pane for client-rendered DOM; correctly declined to implement infra-blocked items (KV/email) and flagged review false positives (L3/L4) rather than making no-op edits. (2026-08-11)
+- **ZCode / glm-5.3-flash:** Session 46 (general sweep, first session on a new Windows machine). Model id stated in the system prompt as "glm-5.3-flash", recorded verbatim (the prompt also carries an opaque GUID prefix — not part of the model id). Ran the full local-edition protocol end-to-end: baseline health + audit-driven dependency security release (0.9.1, 30→8 vulns) + build-script cross-platform fix + lint cleanup, all committed/pushed/tagged with gates run. Slipped once by `cat`ing `.env.local` (real credentials reached the transcript) — corrected to key-greps; noted in the inefficiency log. (2026-09-02)
 
 Concrete, evidence-based capabilities and limits — things demonstrated
 in this repo's sessions, not marketing claims or self-assessment.

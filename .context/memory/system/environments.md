@@ -30,7 +30,13 @@ block (and its "last verified" date) every time you run on it again.
 -->
 
 ---
-## Baos-Mac-mini (last verified 2026-08-11)
+## Tison-Windows (last verified 2026-09-02)
+- **Identify by:** Windows 11 (win32 build 26200), user `tison`, workspace `C:\Users\tison\Dev\vert`
+- **OS:** Windows 11 (10.0.26200)
+- **Runtimes:** node v24.13.0, npm 11.12.1, bun 1.3.13, pwsh installed (Windows PowerShell 5.1 has execution-policy-blocked scripts — use `pwsh`)
+- **Package manager:** **bun** (`bun.lock` tracked; unlike Baos-Mac-mini, bun IS installed here). No `package-lock.json`.
+- **Verified commands:** `bun install` (964 pkgs, prisma generate OK); `bun run lint` (eslint, ~40s); `node_modules/.bin/tsc --noEmit` (NOT `npx tsc` — that resolves to a bogus "tsc" stub package here); `bun run build` (full prisma generate + next build + standalone copy, works after 0.9.1's `scripts/standalone-copy.mjs` replaced POSIX-only `cp -r`); `npx next dev -p <free-port>` (run directly — port 3000 is held by an unrelated node.exe, don't kill it, and don't append args to the dev script); `sh .context/core/bin/context-gates run pre-commit` (works in Git Bash); remote Prisma Postgres (db.prisma.io, via `.env.local`) WORKS — DB-backed flows are testable on this machine.
+- **Quirks:** (1) `context-sync verify` FALSE-FAILS here: git `core.autocrlf=true` checks `.context/core/` out as CRLF while MANIFEST.sha256 hashes LF → every file "FAILED". Do NOT rollback (re-checkout reproduces CRLF); verify by hashing git blobs (`git show HEAD:.context/core/<path> | sha256sum`) — logged as a protocol flaw. (2) `.env.local` is a Vercel CLI pull that contained `NEXTAUTH_URL=""` / `NEXTAUTH_SECRET=""` as empty strings — that breaks `next build` prerender with `ERR_INVALID_URL` in next-auth module init (vars unset = fine, empty string = broken); fixed locally with real values 2026-09-02. Don't `cat` this file — it holds real DB credentials; grep keys only. (3) `gh` CLI not installed; GitHub API rate-limited from this IP without auth.
 - **Identify by:** hostname `Baos-Mac-mini.local`, `$USER=bao`, workspace `/Users/bao/Code/vert`
 - **OS:** macOS 15.7.7 (Darwin 24.6.0, build 24G720)
 - **Runtimes:** node v24.17.0, npm 11.13.0

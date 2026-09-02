@@ -383,3 +383,12 @@ past entries — append corrections instead.
 - **Outcome:** done. `context-sync verify` OK (0.5.0); `status` found 0.8.0 (same MAJOR) → `update`. Read 0.6.0–0.8.0 changelog (collaboration event trail `context-collab`, lifecycle gates `context-gates`, schema updates — single-agent mode unchanged). Regenerated `.context/kickoff.md` + root `AGENTS.md` from the new templates (facts re-verified: remote, git identity, live URL). Initialized `memory/workflows/gates.conf` (mode=hybrid) with `pre-commit|bun run lint` + `integration|bun run build` (no typecheck/test scripts exist yet). `context-gates checkpoint` + `verify` pass on 0.8.0. GitHub surfaced 1 high dependabot alert on the default branch (new finding for the owner).
 - **Open items:** dependabot alert (https://github.com/TisoneK/vert/security/dependabot/6); prior backlog unchanged (content realism, [P2] watch void, legal review of policy copy, infra-blocked M2/M3).
 - **Notes:** none — sync-only session, no session notes dir.
+---
+## 2026-09-02 — Session 46
+- **Agent:** ZCode | **Model:** glm-5.3-flash | **Platform:** Tison-Windows (Windows 11, win32 build 26200) | **Role:** engineer | **Core:** 0.8.0
+- **Task:** "Analyze" — general sweep (standing target) on a NEW Windows machine: baseline health, review, fix safe issues.
+- **Commits:** 3 product (`42040f7` build: cross-platform standalone copy, `4c93773` fix(security): dependency patching, `d9bea7d` chore(lint): 11 warnings cleared; tag `v0.9.1`) + context (this).
+- **Outcome:** done. `bun audit --production` baseline **30 vulns (1 critical: next-auth homoglyph-@ bypass)** → **8** (all unpatched upstream or dev-only Prisma-CLI chain): bumped next 16.2.9→16.3.4, next-auth 4.24.14→4.24.15 (closes the S45 dependabot high alert), sharp 0.34.5→0.35.4; overrides js-yaml/nanoid/postcss/undici. Build script's POSIX-only `cp -r` → `scripts/standalone-copy.mjs` (Windows local builds now complete). Lint 16→3 warnings (rest deliberate). tsc 0 errors; full `bun run build` OK (52 routes); dev-server smoke on :3100 passed incl. real-blob AVIF conversion (sharp runtime verified). First-run env traps recorded in environments.md; CRLF verify false-fail logged as a flaw.
+- **Open items:** new backlog item — re-check lodash/lodash-es/deepmerge-ts/defu when upstreams release fixes; dependabot PRs partially superseded by 0.9.1. Prior backlog unchanged.
+- **Notes:** none — facts in the review + environments.md.
+- **Report:** .context/memory/reviews/2026-09-02-review.md

@@ -40,3 +40,25 @@ Friction caused by the `.context/` system or the protocol itself. See
   guidance, and a Local-repo-path Pre-Flight field. The Desktop copy handed to
   this session was corrected in lockstep. Reported and fixed in the same
   session (Session 1). See package `flaws/log.md`, 2026-07-11.
+
+---
+## 2026-09-02 — ZCode / glm-5.3-flash (Session 46)
+- **Flaw:** `context-sync verify` (both the POSIX sh script and the .ps1 port)
+  false-fails on Windows checkouts where git `core.autocrlf=true` and the
+  package ships no `.gitattributes`: `.context/core/` is checked out with CRLF
+  line endings while `MANIFEST.sha256` hashes the LF blobs, so EVERY file
+  reports FAILED ("CORE INTEGRITY FAILURE") even though the tree is pristine.
+- **Symptom:** exit 3 + a prescription to run `context-sync rollback` — which
+  cannot help, because git re-checkout reproduces CRLF and the tool would
+  loop false-failing; the agent must hand-verify integrity by hashing
+  `git show HEAD:<path>` blobs against the manifest (all 44 entries OK here).
+- **Root cause:** manifest verification compares on-disk bytes without
+  line-ending normalization, and the package doesn't pin line endings for its
+  own vendored files; the kickoff's "verify fails → rollback" step assumes the
+  only possible cause is real corruption.
+- **Suggested fix:** ship a package-root `.gitattributes` with
+  `.context/core/** text eol=lf` so every platform checks core out byte-identical
+  to the manifest; and/or normalize CRLF→LF inside the verify hashing; and add
+  a Windows note to the kickoff Step 1 ("verify failure on Windows with a clean
+  tree = CRLF artifact; verify via git blobs; do NOT rollback").
+- **Status:** open

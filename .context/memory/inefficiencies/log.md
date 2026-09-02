@@ -448,3 +448,31 @@ if literally nothing slowed you down.
 - **Prevent next time:** If a future session hits build timeouts again, first check `top`
   PhysMem — if RAM is exhausted (single-digit MB unused), suggest the user restart rather than
   fighting it; a restart fully restored build+browser here.
+
+---
+## 2026-09-02 — ZCode / glm-5.3-flash (Session 46, first run on Tison-Windows)
+- **Problem:** Cluster of Windows first-run frictions: (a) `context-sync verify`
+  reported CORE INTEGRITY FAILURE on a pristine, git-clean tree (see flaws log —
+  CRLF checkout artifact); (b) `npx tsc --noEmit` ran a bogus deprecated "tsc"
+  stub package from the npm registry instead of the local TypeScript binary;
+  (c) port 3000 is held by an unrelated node.exe on this machine; (d) `next
+  build` prerender died with ERR_INVALID_URL because `.env.local` (a Vercel CLI
+  pull) carried `NEXTAUTH_URL=""`/`NEXTAUTH_SECRET=""` as EMPTY STRINGS, which
+  next-auth's module init parses as a URL (other machines had the vars unset —
+  that's why it never surfaced); (e) I ran `cat .env.local` and printed real
+  DB credentials into the transcript before catching myself — protocol slip
+  ("never echo secrets"); should have grepped key names only.
+- **Cost:** Moderate — ~6–8 extra tool calls + one failed build cycle + one
+  flawed publish (b), all on session setup.
+- **Cause:** New machine not covered by environments.md; repo scripts/env
+  assumptions inherited from macOS; lazy `cat` of an env file.
+- **Workaround / fix:** (a) hash git blobs against the manifest instead of disk
+  files; (b) use `node_modules/.bin/tsc`; (c) run `npx next dev -p <free>`;
+  (d) set real dev values in `.env.local` locally; (e) no undo for the
+  transcript — flagged honestly here and in ai-models.md; the values are
+  dev-environment credentials the user controls, no secret values were copied
+  into any tracked file (verified: staged diffs contain none).
+- **Prevent next time:** Read the Tison-Windows block in
+  `system/environments.md` FIRST on this machine. Any agent, any machine:
+  never `cat` env files — `grep '^[A-Z_]*=' file | cut -d= -f1` for keys, or
+  read the `.env.example` docs instead.

@@ -360,3 +360,18 @@ _Appended 2026-08-11 (Session 40, production-feel research — see
       tags", and an auto-"verified" badge on a 1-subscriber channel. Needs real/rights-cleared
       content from several creators, real avatars, plausible numbers, and gating the verified badge.
       Also a content-rights liability (watermarked reposts on a public site).
+
+---
+- [ ] **Re-check unpatched dependency advisories** (added 2026-09-02 by ZCode) — after
+      0.9.1 (`4c93773`), `bun audit --production` still reports 8 findings (4 high,
+      4 moderate) with NO fixed upstream release: `lodash`/`lodash-es` (code injection
+      via `_.template` + prototype pollution in `_.unset`/`_.omit`; range ends at the
+      current latest so an override cannot fix it; transitive via
+      recharts/@reactuses/core; the app never calls the affected APIs) and
+      `deepmerge-ts` (<8.0.0, major fix) + `defu` (<=6.1.4) in the dev-only Prisma CLI
+      chain (no runtime request surface — do not force a major override inside the
+      Prisma toolchain). Action: re-run `bun audit` when recharts/lodash/prisma release
+      new versions; add overrides when fixed versions exist. Related: the open
+      dependabot branches (npm_and_yarn/patch-and-minor, actions/cache-6,
+      actions/checkout-7) are partially superseded by 0.9.1 — owner may close/refresh
+      those PRs.
