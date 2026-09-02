@@ -69,7 +69,6 @@ export function CommentSection({ videoId, compact = false }: CommentSectionProps
 
   useEffect(() => {
     // The fetch callback synchronizes remote comments and pagination state.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchComments(1, true)
   }, [fetchComments, sort])
 

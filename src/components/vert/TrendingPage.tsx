@@ -7,8 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { Flame, Play } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { formatViews, timeAgo } from '@/lib/utils-vert'
+import { formatViews } from '@/lib/utils-vert'
 import { CardSkeleton } from './Skeleton'
 
 interface Video {

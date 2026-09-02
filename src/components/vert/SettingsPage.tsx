@@ -36,11 +36,9 @@ export function SettingsPage() {
 
   if (!user) return null
 
-  const isOAuthUser = !user.email?.includes('@vert.com') && user.email?.includes('@gmail')
-  // Better: check if the user has a passwordHash. We don't expose that
-  // in the session, so we use a heuristic: OAuth users typically have
-  // gmail.com emails. The API will give a clear error if they try to
-  // change a password they don't have.
+  // Password change availability is enforced server-side by passwordHash;
+  // the session payload deliberately doesn't expose it, and a local
+  // email heuristic can't be authoritative.
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault()

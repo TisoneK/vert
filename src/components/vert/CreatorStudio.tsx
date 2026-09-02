@@ -10,7 +10,6 @@ import {
   ThumbsUp,
   Users,
   Film,
-  MessageSquare,
   Calendar,
   Activity,
 } from 'lucide-react'

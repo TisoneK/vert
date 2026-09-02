@@ -10,7 +10,7 @@ import { db } from '@/lib/db'
  * thumbnail of the first video in the playlist, or null if empty) so
  * the UI can render a preview card without a second fetch.
  */
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const { getCurrentUser } = await import('@/lib/auth-helpers')
     const user = await getCurrentUser()

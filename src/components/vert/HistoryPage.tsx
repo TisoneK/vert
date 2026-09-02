@@ -3,7 +3,6 @@
 import Image from 'next/image'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useAuth } from '@/lib/store'
-import { VideoCard } from './VideoCard'
 import { Button } from '@/components/ui/button'
 import { Clock, Trash2, X, Play } from 'lucide-react'
 import { timeAgo, formatViews, formatDuration } from '@/lib/utils-vert'

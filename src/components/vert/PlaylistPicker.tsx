@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { ListVideo, Plus, Check, Loader2, X } from 'lucide-react'
+import { ListVideo, Plus, Check, Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface PlaylistPickerProps {

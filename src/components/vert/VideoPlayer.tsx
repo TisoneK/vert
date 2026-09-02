@@ -256,7 +256,6 @@ export function VideoPlayer({ videoUrl, thumbnailUrl, title, format = 'portrait'
       // keep it here for clarity when the URL is the first one mounted.
       // External-system (HTMLMediaElement) setup sync — same rationale as the
       // disable above; gated on a stable per-URL branch, no cascading renders.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQualityLevels([])
       video.src = videoUrl
       // Once metadata loads, label the quality based on the actual video height

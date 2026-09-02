@@ -98,7 +98,6 @@ function Carousel({
     // One-time sync of the initial scroll state from the embla API (an
     // external system). Subsequent updates come from the select/reInit
     // listeners below, so this init read can't cause cascading renders.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     onSelect(api)
     api.on("reInit", onSelect)
     api.on("select", onSelect)

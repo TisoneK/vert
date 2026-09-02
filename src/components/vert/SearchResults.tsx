@@ -8,7 +8,7 @@ import { useNavigation } from '@/lib/store'
 import { VideoCard } from './VideoCard'
 import { CardSkeleton } from './Skeleton'
 import { Search, SlidersHorizontal, Users, Film, Smartphone, Monitor, Square } from 'lucide-react'
-import { formatViews, formatSubscribers } from '@/lib/utils-vert'
+import { formatSubscribers } from '@/lib/utils-vert'
 
 interface SearchResultsProps {
   query: string
@@ -262,7 +262,7 @@ export function SearchResults({ query }: SearchResultsProps) {
             ))}
           </div>
         ) : query ? (
-          <EmptyState query={query} type="videos" />
+          <EmptyState type="videos" />
         ) : (
           <TypeSomethingState />
         )
@@ -319,7 +319,7 @@ export function SearchResults({ query }: SearchResultsProps) {
             ))}
           </div>
         ) : query ? (
-          <EmptyState query={query} type="channels" />
+          <EmptyState type="channels" />
         ) : (
           <TypeSomethingState />
         )
@@ -328,7 +328,7 @@ export function SearchResults({ query }: SearchResultsProps) {
   )
 }
 
-function EmptyState({ query, type }: { query: string; type: 'videos' | 'channels' }) {
+function EmptyState({ type }: { type: 'videos' | 'channels' }) {
   return (
     <div className="flex flex-col items-center justify-center py-20">
       <div className="w-14 h-14 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
