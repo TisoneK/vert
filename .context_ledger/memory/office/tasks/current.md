@@ -5,11 +5,33 @@ session start (protocol Step 3), clear it at session end (Step 15). If
 a prior session died mid-task, check its session entry and backlog
 before starting.
 
-- **Status:** idle — no active task
+- **Status:** in progress — Ada (S002), 2026-09-15
 
-_(2026-09-15, this office's first session: core 0.8.0 → 1.1.3 major
-migration — office architecture + `.context_ledger/` rename, entry points
-regenerated, office-001 closed with 41 sessions frozen and open work
-re-seeded (backlog B-2026-09-15-1..17, ADR digests). Also landed the
-owner's seed-history dedupe (`3978fc0`). See
-office/reviews/2026-09-15-core-migration.md.)_
+**Task:** Diagnose the Vercel production deployment failure (owner
+forwarded the failure email for commit b7f8cc7).
+
+**State:** b7f8cc7 itself is memory-only (5 `.context/` files) — not the
+culprit. Bisecting GitHub commit statuses: last green Vercel build was
+7f44b71 (2026-08-17, v0.9.0); failures start with 4c93773 (2026-09-02,
+"fix(security): patch dependency vulnerabilities, release 0.9.1") and
+every push since then has failed. Production is serving the stale 0.9.0
+build — the 0.9.1 security patches are undelivered. Local verification
+at 6154c87: `bun install --frozen-lockfile` reports in-sync (no
+changes, 917 installs), full `bunx next build` +
+`node scripts/standalone-copy.mjs` exits 0 with all routes, sharp 0.35
+has linux-x64 binaries with engines `>=20.9`, and the new nanoid/undici
+overrides satisfy every consumer range in `bun.lock` — no resolver
+conflict. GitHub Actions cannot help (job never starts — account
+billing lock, tracked in backlog). No Docker/WSL on this machine for a
+Linux repro. The exact Vercel error lives only in the deployment logs
+(`npx vercel inspect <id> --logs`), which need the owner's Vercel
+credential — none exists in `memory/secrets/` on this machine.
+
+**Blocker:** Waiting on the supervisor for either (a) the build-log
+text from the failing deployment's page, or (b) a Vercel token dropped
+at `memory/secrets/vercel-token` (line 1 = value, never committed) so
+the logs can be pulled here. Fallback if neither arrives: bisect by
+redeploying the last-good dependency set (revert `package.json` +
+`bun.lock` to their 82946c3 content) to isolate toolchain drift vs. the
+0.9.1 sweep — needs owner's go-ahead since it rolls the production
+deploy back to 0.9.0.
