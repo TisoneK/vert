@@ -1,6 +1,6 @@
 {
   "name": "nextjs_tailwind_shadcn_ts",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
@@ -63,7 +63,7 @@
     "hls.js": "^1.6.16",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.525.0",
-    "next": "^16.2.11",
+    "next": "16.3.5",
     "next-auth": "^4.24.15",
     "next-intl": "^4.13.0",
     "next-themes": "^0.4.6",

@@ -21,6 +21,38 @@ _No unreleased changes yet._
 
 ---
 
+## [0.9.2] — 2026-09-15
+
+### Fixed
+- **Vercel production deployments restored — broken since 2026-09-02.** Every
+  push to `main` since the 0.9.1 security sweep failed on Vercel at the very
+  end of the build — compile, typecheck and static generation all passed,
+  then: `Running onBuildComplete from Vercel` → `Error: ENOENT: no such file
+  or directory, open '/vercel/path0/.next/next-server.js.nft.json'`.
+  Production kept serving the stale 0.9.0 build, so the 0.9.1 security fixes
+  never actually shipped.
+
+  **Root cause:** an upstream Next.js regression. The 2026-09-02 dependency
+  sweep regenerated `bun.lock`, which moved `next` from 16.2.9 to 16.3.4 (the
+  `^16.2.11` range allowed the minor bump). Since 16.3.0, when a build runs
+  with an **adapter** (Vercel's builder attaches one) AND our
+  `output: 'standalone'` config, Next skips emitting the whole-app server NFT
+  trace `next-server.js.nft.json` (upstream #93684), which Vercel's builder
+  reads in its `onBuildComplete` hook — tracked as vercel/next.js#96646. This
+  explains why the identical tree builds clean locally (local `next build`
+  has no adapter, so the file is still emitted) and why neither the
+  build-script rewrite nor the patched CVEs were implicated.
+
+  **Fix:** bump `next` to **16.3.5** — released 2026-09-11, includes the
+  backport of the upstream fix (PR #97287, backported by #98167, merged to
+  the release branch 2026-09-04). Verified on the Vercel builder itself via a
+  preview deploy (passed `onBuildComplete`, Ready in ~1m) before merging;
+  production redeploy from `main` confirmed green.
+
+**Files:** `package.json`, `bun.lock`.
+
+---
+
 ## [0.9.1] — 2026-09-02
 
 ### Security

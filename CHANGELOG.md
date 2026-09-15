@@ -37,6 +37,19 @@ _No unreleased changes yet._
 
 ---
 
+## [0.9.2] — 2026-09-15
+
+### Fixed
+- **The site is back to receiving updates automatically.** Since September 2,
+  a fault deep in the building blocks the app is made of silently prevented
+  new versions from reaching the live site — every change made since then was
+  stuck at the door, and visitors were still being served the older version.
+  The building blocks are now updated to a patched release, the live site runs
+  the latest version again, and the September security updates have finally
+  arrived.
+
+---
+
 ## [0.9.1] — 2026-09-02
 
 ### Security
@@ -530,7 +543,8 @@ A polish pass focused on how the app feels on phones.
 
 ---
 
-[Unreleased]: https://github.com/TisoneK/vert/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/TisoneK/vert/compare/v0.9.2...HEAD
+[0.9.2]: https://github.com/TisoneK/vert/releases/tag/v0.9.2
 [0.9.1]: https://github.com/TisoneK/vert/releases/tag/v0.9.1
 [0.9.0]: https://github.com/TisoneK/vert/releases/tag/v0.9.0
 [0.8.0]: https://github.com/TisoneK/vert/releases/tag/v0.8.0
