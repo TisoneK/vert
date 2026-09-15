@@ -375,3 +375,9 @@ _Appended 2026-08-11 (Session 40, production-feel research — see
       dependabot branches (npm_and_yarn/patch-and-minor, actions/cache-6,
       actions/checkout-7) are partially superseded by 0.9.1 — owner may close/refresh
       those PRs.
+
+- [ ] **Core update available: 0.8.0 → 1.1.2 (MAJOR)** (added 2026-09-15 by ZCode) —
+      `context-sync status` found the upstream package at `../.context` at core
+      1.1.2. MAJOR bump: read the CHANGELOG entries since 0.8.0, then run
+      `context-sync update --major` only with the owner's go-ahead (per kickoff
+      Step 1).

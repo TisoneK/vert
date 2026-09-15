@@ -55,3 +55,6 @@ live in ADR-3/4/5/7/8, ADR-19…22, ADR-25…31 and the corresponding reviews/. 
 ---
 - **2026-09-02 — Session 46** — ZCode / glm-5.3-flash — general sweep on a NEW Windows machine. **Dependency security release 0.9.1** (`4c93773`, `v0.9.1`): audit 30 vulns (1 critical next-auth) → 8 (unpatched upstream/dev-only) via next 16.3.4, next-auth 4.24.15, sharp 0.35.4 + 4 overrides; closes the S45 dependabot alert. Also: cross-platform build script (`42040f7`, replaces POSIX-only `cp -r`), lint 16→3 warnings (`d9bea7d`). tsc/build/dev-server smoke all green (sharp AVIF verified). Windows env traps recorded in environments.md; context-sync CRLF verify false-fail logged as a flaw.
   Detail: .context/memory/reviews/2026-09-02-review.md
+---
+- **2026-09-15 — Session 47** — ZCode / qwen3.8-flash — branch protection on `main` (GitHub notice): force-push + deletion blocked, admin enforcement ON, via GitHub REST API with the local GCM credential; PR/status checks left off to preserve direct-push workflow. CRLF verify false-fail re-hit (S46 flaw) — 44/44 core blobs hand-verified clean. Core 1.1.2 (MAJOR) found upstream → backlog.
+  Detail: .context/memory/reviews/2026-09-15-branch-protection.md
