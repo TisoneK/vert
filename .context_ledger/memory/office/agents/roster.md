@@ -49,7 +49,7 @@ is your stable session tag.
 
 | Name | Codename | Model | Doing | Status | Status detail |
 |------|----------|-------|-------|--------|---------------|
-| Ada | S002 | qwen3.8-flash | Diagnosing Vercel production deploy failures (streak since 2026-09-02, commit 4c93773) | Blocked | Main tree verified healthy locally; need Vercel build logs — waiting on owner for token or pasted logs |
+| Ada | S002 | qwen3.8-flash | Vercel deploy outage investigation | Done | Shipped: 0.9.2 — next bumped to 16.3.5 (upstream #96646 regression), production deploys green after 13 days, v0.9.2 tagged |
 
 **Keep your Status cells current — that is what the board is for.** The
 next live worker reads it to know at a glance what a peer has finished,

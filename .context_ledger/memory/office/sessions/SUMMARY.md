@@ -30,3 +30,4 @@ records.
 - A removed summary line MUST have a corresponding permanent entry in
   agents/sessions.md — never delete the only record of a session.
 -->
+- 2026-09-15 — Ada (S002, qwen3.8-flash): Vercel deploy outage repaired — root cause next 16.3.0–16.3.4 + standalone/adapter NFT regression (upstream #96646); bumped to 16.3.5, released v0.9.2, production deploy green after 13 days. Key discovery: caret-range lock drift is invisible locally — verify deploys on the real builder.

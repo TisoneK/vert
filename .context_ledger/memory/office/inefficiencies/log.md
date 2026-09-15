@@ -39,3 +39,10 @@ names them), and roll-up candidates.
 - **Upstream:** candidate  ← add this line ONLY for protocol-level friction
   worth a core fix; omit entirely for project-local friction.
 -->
+---
+## 2026-09-15 — Ada / qwen3.8-flash
+- **Problem:** ~40 min spent ruling out plausible build-break causes (sharp 0.35 platform binaries, nanoid/undici override conflicts, lockfile drift) by reasoning + registry/lockfile greps — because the failing Vercel build logs were unreadable: no Vercel CLI on the machine, no `VERCEL_TOKEN`, no `~/.vercel` creds.
+- **Cost:** one dead-end hypothesis chain + one owner round-trip (forwarding the failure emails) before logs were reachable.
+- **Cause:** the deploy platform's failure state lives only in its logs; the repo's memory recorded the Vercel auto-deploy fact but never how to read those logs from this machine.
+- **Workaround / fix:** `npx -y vercel login <owner-email>` (device flow — owner clicks the printed URL), then `npx -y vercel inspect <deploy-url> --logs` gives the full build log. The failed deployment id also appears in each commit's GitHub `Vercel` status description (`npx vercel inspect dpl_... --logs`).
+- **Prevent next time:** environments.md (DESKTOP-3LRR8MD block) now records the device-flow + inspect --logs commands and the CLI-persistence quirk, so the next agent reads logs first instead of bisecting hypotheses.
