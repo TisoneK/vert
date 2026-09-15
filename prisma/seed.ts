@@ -344,8 +344,13 @@ async function main() {
 
   // Create watch history for user1
   const user1 = users[0]
+  const watchedVideoIds = new Set<string>()
   for (let i = 0; i < 8; i++) {
-    const video = allVideos[Math.floor(Math.random() * allVideos.length)]
+    let video: typeof allVideos[0]
+    do {
+      video = allVideos[Math.floor(Math.random() * allVideos.length)]
+    } while (watchedVideoIds.has(video.id))
+    watchedVideoIds.add(video.id)
     const daysAgo = Math.floor(Math.random() * 14)
     const watchedAt = new Date()
     watchedAt.setDate(watchedAt.getDate() - daysAgo)
