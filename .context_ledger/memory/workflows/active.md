@@ -6,12 +6,12 @@ user changes the rules; note the change in your session entry.
 
 <!-- TEMPLATE — replace everything below this comment:
 - **Protocol:** by agent type — local agents → .context_ledger/core/rules/ai-engineering-protocol-local.md; cloud/sandbox agents → .context_ledger/core/rules/ai-engineering-protocol.md
-  <!-- ALWAYS record it exactly like that — "by agent type", naming BOTH.
+  (ALWAYS record it exactly like that — "by agent type", naming BOTH.
   NEVER record only the edition YOU happen to be: the next agent on this
   project may be the other type, will read this field as binding, and
   will inherit your platform's behavior (a local agent doing cloud PAT
   dances, or a cloud agent skipping its clone). The edition is a
-  per-agent-type fact, not a project fact. -->
+  per-agent-type fact, not a project fact.)
 - **Protocol location:** on disk — vendored in `.context_ledger/core/` (no network fetch needed; version in `.context_ledger/core/VERSION`, last verified in `../core.lock`)
 - **Package upstream (for flaw back-ports + core updates):** <https://github.com/TisoneK/context-ledger.git or fork/mirror URL>
 - **Since:** YYYY-MM-DD
@@ -30,7 +30,7 @@ user changes the rules; note the change in your session entry.
 - **Protocol:** by agent type — local agents → `.context_ledger/core/rules/ai-engineering-protocol-local.md`; cloud/sandbox agents → `.context_ledger/core/rules/ai-engineering-protocol.md`
 - **Protocol location:** on disk — vendored in `.context_ledger/core/` (no network fetch needed; version in `.context_ledger/core/VERSION`, last verified in `../core.lock`)
 - **Package upstream (for flaw back-ports + core updates):** https://github.com/TisoneK/context-ledger.git
-- **Since:** 2026-07-11 (migrated to vendored core 0.2.0 on 2026-07-15; major migration to the office architecture + `.context_ledger/` rename on 2026-09-15, core 1.1.3)
+- **Since:** 2026-07-11 (migrated to vendored core 0.2.0 on 2026-07-15; major migration to the office architecture + `.context_ledger/` rename on 2026-09-15, core 1.1.3; major migration to the six-phase kickoff + `STATE.md` digest on 2026-09-18, core 2.0.1)
 - **Default role:** engineer (full-scope) — unless a session hands over a role overlay from `.context_ledger/core/roles/`
 - **Scope:** discovery + review + fix all safe issues
 - **Target:** general sweep (session default; a chat-message target overrides)

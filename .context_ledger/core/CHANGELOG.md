@@ -10,6 +10,155 @@ bump MINOR; wording and fixes bump PATCH.
 
 ---
 
+## 2.0.1 — 2026-09-18
+
+**A live bootstrap test of 2.0.0 (fresh scratch project, not just the unit
+fixtures) found two bugs in what it shipped.** `ledger-state generate`'s
+`field()`/`Get-Field` helper had no `<!-- -->` comment-skipping — unlike
+every other parser in this codebase — so a key mentioned only inside a
+file's own template comment (never given a real line yet, as on a fresh
+bootstrap) leaked the comment's placeholder text into `STATE.md` as if it
+were live data. That surfaced a second, independent bug:
+`workflows/active.md`'s template nests a second `<!-- -->` inside the
+outer one (an aside on the Protocol field) — invalid comment syntax that
+closes the outer block early — and the real skeleton below the comment
+was simply missing a `- **Target:** —` line the comment documents but
+never seeds. Both fixed: `field()`/`Get-Field` now skip `<!-- -->` blocks
+(single-level, matching `log_digest`/`check_roster`/`prune`); the
+template's nested aside is now a plain parenthetical, and the missing
+`Target` placeholder line is added. Flaw logged with the general lesson —
+`<!-- -->` never nests in this codebase's parsers.
+
+- **Migration:** none required — `ledger-sync update` picks it up; no
+  file moves, no format changes for already-filled `workflows/active.md`
+  files (this only affected freshly bootstrapped, still-placeholder
+  ones).
+
+---
+
+## 2.0.0 — 2026-09-18
+
+**The protocol stops taxing product work to pay for its own bookkeeping.**
+Measured at the top of this release: a plain local-agent kickoff read
+`AGENTS.md` (158 lines) + `kickoff.md` (322) + ~9 small memory files
+(~550 lines) + the full edition (1159–1228 lines) — **~2,760 lines of
+protocol overhead before any host-repo work**, the same tax for a
+one-line fix as for a big feature. Four coordinated changes, all
+backward-compatible in *behavior* but a MAJOR bump because the reading
+order and the entry-point file shapes both change:
+
+- **`AGENTS.md` / `CLAUDE.md` become pure routers.** Both used to restate
+  the check-in/roster/collab/gate/commit-prefix ceremony that
+  `kickoff.md` also stated, which the edition stated a third time.
+  `AGENTS.md`: 158 → 28 lines. `CLAUDE.md`: 32 → 14 lines. Their only job
+  now: what this repo uses, the one rule that can't wait (never write
+  under `.context_ledger/core/`), and a pointer to `kickoff.md`.
+- **`kickoff.md` becomes six numbered Phases with an explicit,
+  task-scaled routing table**, replacing "Entry Steps" that mixed
+  pointers with restated ceremony prose. Phase 2 (check in) now also
+  regenerates the new `STATE.md` digest; Phase 3 (orient) reads it
+  instead of ~8 separate files; **Phase 4 replaces "read your edition in
+  full" with a routing table** — read the edition's always-relevant core,
+  then load only the playbook(s) your task's shape actually calls for.
+- **`memory/office/STATE.md` — one generated digest**, standing in for
+  `workflows/active.md` + `agents/roster.md` + `tasks/current.md` +
+  `tasks/backlog.md`'s High rows + entry counts from `flaws/log.md` /
+  `inefficiencies/log.md` / `plans/decisions.md`. New `ledger-state`
+  (sh + ps1) generates it — never hand-edited, regenerated at check-in
+  and at exit. Every line points back at its source file for when a task
+  needs more than the summary.
+- **Both editions split: playbooks extracted, the schema is the single
+  source of truth again.** `core/rules/playbooks/` now holds
+  `code-review.md`, `functional-testing.md`, `ux-review.md`,
+  `performance-review.md`, `security-review.md` — loaded only per
+  `kickoff.md`'s Phase 4 table, not unconditionally. Each edition's
+  ~190-line "`.context_ledger/` Directory" section (structure tree,
+  write-mode rules, entry-template examples — duplicating
+  `ledger-schema.md` almost verbatim) is now a short pointer to the
+  schema. **Common Pitfalls stays inline in each edition** — it's
+  cross-referenced by number from the Ten Binding Rules and the two
+  editions number their pitfalls differently (PAT-specific entries
+  interleave in the cloud edition), so extracting it would break those
+  references. `ai-engineering-protocol-local.md`: 1159 → 958 lines.
+  `ai-engineering-protocol.md`: 1228 → 1053 lines — and a session whose
+  task doesn't touch `core/`, collaboration, UI, security, performance,
+  or a new feature now skips the playbooks entirely on top of that.
+- **Append-only compaction stops being purely advisory.**
+  `ledger-mem prune --apply` (sh + ps1) mechanically moves every entry
+  whose own Status/Fixed-in-package line carries a closed marker,
+  verbatim, into the log's `archive.md` (created with a header if
+  missing) — the 3+-repeat roll-up stays a manual edit, since composing
+  the consolidated entry needs an agent's judgment. Two new
+  `history.conf` keys, `flaws_cap` / `inefficiencies_cap` (default 15
+  each), give `ledger-mem check` a warn-only nudge mirroring
+  `backlog_cap`. `ledger-gates run exit` now calls `ledger-mem prune`
+  (report mode) as an advisory nudge at the natural moment.
+- Schema (md + json) updated throughout: `STATE.md` in the file
+  inventory, a rewritten "Reading order (session start)" that reads
+  `STATE.md` first, a rewritten "Translation layer" describing the new
+  tier-1 router size, and the compaction section documenting `--apply`
+  and the two new caps.
+
+Tests 23 → 27 (new: `prune --apply`'s closed-entry move + idempotency,
+`flaws_cap` default + `history.conf` override).
+
+- **Migration:** `ledger-sync update --major` (a MAJOR bump needs the
+  user's go-ahead per this repo's own rule). `AGENTS.md`, `CLAUDE.md`,
+  and `kickoff.md` are **regenerated from their new templates**, never
+  hand-patched — a project with local edits to any of the three loses
+  them on this update; move project-specific text into
+  `memory/overrides/rules.md` first if it must survive. `STATE.md` is
+  created fresh (`ledger-state generate`) — nothing to migrate, it has
+  no prior state. No file is renamed or moved; `core/rules/playbooks/`
+  is new. Everything below the moved playbook sections in each edition
+  is otherwise unchanged.
+
+---
+
+## 1.2.0 — 2026-09-15
+
+**The backlog becomes a capped work queue, and what was never work moves
+to a new parking lot.** A backlog row is a promise to act; for a while
+the template invited every kind of note into the queue — research
+findings, design questions, deferred ideas, "someday" items — and the
+result was a 57-row document posing as a queue: the header said "delete
+rows when done", the culture said never lose information, so nothing
+left and nothing got worked. The two roles split:
+
+- `tasks/backlog.md` (template rewritten) holds actionable work only —
+  the test for a row is "can an agent start on this and finish it?" —
+  capped at `backlog_cap` (default 20, `workflows/history.conf`).
+  Adding a row past the cap means pruning the lowest-value open row
+  first, to the parking lot or the bin. Done rows and stale rows are
+  deleted, not annotated. `ledger-mem check` reports a warn-only nudge
+  past the cap (both ports; the cap is read from `history.conf`, so a
+  project can raise it by intent).
+- `tasks/parking-lot.md` (new template) is the knowledge base:
+  Findings / Open questions / Deferred work / Someday, `P-<date>-<n>`
+  IDs, no cap, no urgency. A parking-lot row is not a task; when one
+  grows an owner and a next step, it is promoted to the queue.
+- Office close re-seeds WORK, not knowledge: the fresh backlog inherits
+  only rows with an active owner or a clear next step; parking-lot
+  content survives the close in the permanent record (`Open threads`),
+  not in the queue. Both `ledger-history` ports' pre-close checklists,
+  record templates, and post-close messages carry the rule.
+- Schema (md + json), both protocol editions (startup reads, door-close
+  re-seed, deep-scan, promotion routing, pitfalls, report template),
+  and the AGENTS / kickoff / ledger-README / sessions / collaboration
+  templates updated to match. Tests 36 → 41: at-cap silent, over-cap
+  warn-only, `backlog_cap` conf override, ps1 parity, and the
+  work-not-knowledge checklist line.
+
+No existing file moves or renames; projects that never write a
+parking-lot file keep working — `check` only reads `backlog.md`.
+
+- **Migration:** none required. `ledger-sync update` to 1.2.0 seeds
+  `tasks/parking-lot.md` in new offices; existing offices can add the
+  file by copying the template and splitting non-actionable rows out of
+  the live backlog at the next convenient session.
+
+---
+
 ## 1.1.3 — 2026-09-14
 
 **Harvest reaches office-era projects, and the core's own path pointers
