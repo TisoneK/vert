@@ -5,7 +5,7 @@ at check-in and at exit. This is a DERIVED VIEW for fast orientation;
 open the file a line points at when your task needs more than the
 line gives you. Full reading order: ledger-schema.md. -->
 
-_Regenerated: 2026-10-14T20:14:01Z_
+_Regenerated: 2026-10-14T20:29:53Z_
 
 ## Standing params
 - **Core:** 2.2.0 (locked, verified 2026-10-14)
@@ -15,7 +15,7 @@ _Regenerated: 2026-10-14T20:14:01Z_
 - Full params: `memory/workflows/active.md`
 
 ## Office — who's in, right now
-- **Ada** (S002) — Done — Vercel deploy outage investigation
+(office empty — no live roster rows)
 
 ## Current task
 (idle — no task recorded)
@@ -24,7 +24,7 @@ _Regenerated: 2026-10-14T20:14:01Z_
 | B-2026-09-15-1 | **Content / seed-data realism (owner, mostly non-code)** — the dominant "prototype" signal: catalog is essentially one creator + scraped watermarked clips ("SR"-style third-party marks), seed-scale counts (40 views, 1 subscriber, 0 likes), placeholder "T" avatars, TikTok-hashtag "popular tags", auto-"verified" badge on a 1-subscriber channel. Needs several creators' rights-cleared content, real avatars, plausible numbers, verified-badge gating. Also a content-rights liability on a public site. |
 | B-2026-09-15-2 | **Test runner + tests (Vitest unit / Playwright E2E)** — no tests exist; CI workflow already runs typecheck + build (hard) and lint (blocking). Remaining blockers: GitHub Actions is billing-locked (owner) — no green run yet. When tests land, backfill regression coverage for the 400-malformed-body and non-string-body-field API fixes. Optional follow-on: extend `main` branch protection with required status checks once CI runs green (force-push + deletion already blocked; PR/check requirements deliberately left off to preserve the direct-push policy). |
 
-_13 medium, 3 low priority row(s) — see tasks/backlog.md_
+_14 medium, 3 low priority row(s) — see tasks/backlog.md_
 
 ## Logs at a glance — open only if your task touches these
 - flaws/log.md (protocol/.context_ledger friction): 0 entries
