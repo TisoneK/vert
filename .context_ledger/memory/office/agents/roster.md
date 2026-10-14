@@ -50,6 +50,7 @@ is your stable session tag.
 | Name | Codename | Model | Doing | Status | Status detail |
 |------|----------|-------|-------|--------|---------------|
 | Ada | S002 | qwen3.8-flash | Vercel deploy outage investigation | Done | Shipped: 0.9.2 — next bumped to 16.3.5 (upstream #96646 regression), production deploys green after 13 days, v0.9.2 tagged |
+| Noor | S003 | claude-opus-4-8 | Session ledger update — apply pending core update (2.0.1→2.2.0) + refresh routers | Working | Phase 1: core updated, routers refreshed; checking in |
 
 **Keep your Status cells current — that is what the board is for.** The
 next live worker reads it to know at a glance what a peer has finished,
