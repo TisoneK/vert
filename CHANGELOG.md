@@ -37,6 +37,16 @@ _No unreleased changes yet._
 
 ---
 
+## [0.9.3] — 2026-10-14
+
+### Security
+- **Applied a critical security update.** A serious security issue was
+  reported in one of the building blocks Vert is built on. We've moved to the
+  patched release that closes it. Nothing about how you use Vert changes, and
+  no action is needed on your part.
+
+---
+
 ## [0.9.2] — 2026-09-15
 
 ### Fixed

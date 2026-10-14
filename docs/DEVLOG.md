@@ -21,6 +21,37 @@ _No unreleased changes yet._
 
 ---
 
+## [0.9.3] — 2026-10-14
+
+### Security
+- **`next` 16.3.5 → 16.3.6 — patches critical RCE in `next/og` (GHSA-vcvr-r3jv-pc5j).**
+  Dependabot critical alert #7. Next.js `>= 16.2.0, < 16.3.6` is vulnerable to
+  a remote code execution reachable through the `next/og` `ImageResponse` path;
+  fixed upstream in 16.3.6. Bumped the exact pin in `package.json` and updated
+  `bun.lock` in lockstep — `next`, `@next/env`, and the eight `@next/swc-*`
+  platform binaries, each integrity taken from the npm registry
+  (`npm view <pkg>@16.3.6 dist.integrity`). 16.3.6 is a patch over the 16.3.5
+  release 0.9.2 shipped, so it retains the Vercel-deploy backport
+  (vercel/next.js#97287 via #98167) — no deploy regression expected.
+
+  **Verification gap:** bun is not installed on the authoring machine, so
+  `bun install --frozen-lockfile` could not be run locally. The lockfile edit
+  was applied by exact string replacement against registry integrities (dep
+  graph for 16.3.5 and 16.3.6 is identical — same transitive pins), and the
+  CI job (`oven-sh/setup-bun` + `bun install --frozen-lockfile`) plus the
+  Vercel preview deploy are the gate that proves it.
+
+  Scope note: a stale `package-lock.json` (pinning `next` 16.2.9) sits in the
+  working tree but is **gitignored** (`.gitignore` line 16, added precisely to
+  stop a stray `npm install` from recreating an npm lockfile and raising
+  false-positive Dependabot alerts). It is untracked, absent from the repo and
+  GitHub's dependency graph, and plays no part in alert #7 — so remediating
+  `package.json` + `bun.lock` is the complete fix; nothing needed removing.
+
+**Files:** `package.json`, `bun.lock`.
+
+---
+
 ## [0.9.2] — 2026-09-15
 
 ### Fixed
