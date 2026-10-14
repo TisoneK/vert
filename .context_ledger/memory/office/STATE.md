@@ -5,7 +5,7 @@ at check-in and at exit. This is a DERIVED VIEW for fast orientation;
 open the file a line points at when your task needs more than the
 line gives you. Full reading order: ledger-schema.md. -->
 
-_Regenerated: 2026-10-14T20:11:58Z_
+_Regenerated: 2026-10-14T20:14:01Z_
 
 ## Standing params
 - **Core:** 2.2.0 (locked, verified 2026-10-14)
@@ -16,7 +16,6 @@ _Regenerated: 2026-10-14T20:11:58Z_
 
 ## Office — who's in, right now
 - **Ada** (S002) — Done — Vercel deploy outage investigation
-- **Noor** (S003) — Working — Session ledger update — apply pending core update (2.0.1→2.2.0) + refresh routers
 
 ## Current task
 (idle — no task recorded)
