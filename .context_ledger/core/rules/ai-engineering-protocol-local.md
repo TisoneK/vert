@@ -28,11 +28,11 @@ session starts by reading it and ends by updating it — that's how each
 agent knows what every prior agent did, on which system, with which
 model, and what went wrong before.
 
-## The Ten Binding Rules (if your context is fading, keep THESE)
+## The Binding Rules (if your context is fading, keep THESE)
 
 > The full protocol below is binding, top to bottom. But long sessions
 > erode recall, and the rules below are the ones whose violation costs
-> the most. If you can hold only ten things, hold these:
+> the most. If you can hold only these things, hold these:
 
 1. **Check in at the roster the moment you're through the door — before the deep read, before any analysis, before product work; keep your row current until the session ends.** (Step 3 — sign first, then read the rest of memory; Steps 15–17 at wrap-up. Sign in with Status `Working` and a status detail naming where you are; edit your own row's Status cells as the work moves — `Done` + what shipped, or `Blocked` + the blocker — so the next live worker can coordinate with you at a glance. The push claims your codename: whoever's check-in commit lands first keeps the number. An empty board does not prove you're alone — a live row you didn't write means a peer is here, and the two of you coordinate from minute zero, not after both of you have finished reading.)
 2. **Two zones under `.context_ledger/`:** `core/` is the vendored protocol — **read-only, never write one byte there** (it updates only as a whole tree via `core/bin/ledger-sync`); `memory/` is this project's writable memory. Nothing needs to be cloned or fetched to run a session — the protocol travels inside the repo.
@@ -44,6 +44,8 @@ model, and what went wrong before.
 8. **Never guess your model version or today's date** — system prompt / `date -u +%F`, or record `unknown`.
 9. **Phase 1 runs for every session**, however small the task. (Pitfall #28)
 10. **Re-read the Exit checklist right before finishing** — that's the moment your memory of it is weakest and the cost of skipping it highest.
+11. **`.context_ledger/` reflects what was true when written, not what's true now.** If it contradicts the codebase, the codebase wins — fix the `.context_ledger/` entry (append a correction; don't build on the stale claim).
+12. **Small and current beats big and stale.** Session entries run ~10 lines, not transcripts — detail belongs in a report, not the duty log. A bloated entry is next session's context tax.
 
 ---
 
@@ -255,6 +257,26 @@ command and observed result before retrying.
   **strip every hit on sight** — a leaked reference is a safe fix: drop it (state
   the reason in plain words if one was pointed at), commit the strip as a normal
   product fix, and continue the session; never leave a known leak or defer it.
+- **The guard backs the pre-commit rule mechanically.** A passing
+  `run pre-commit` records the staged tree it passed for (inside `.git/`,
+  untracked); `sh .context_ledger/core/bin/ledger-guard install` wires a git
+  pre-commit hook that refuses any commit whose staged tree has no fresh pass
+  (a red gate revokes it; staging more after the pass invalidates it), plus
+  Claude Code hooks that re-inject the protocol floor every turn and block
+  piping a gate (`| tail` masks a red verdict) and `--no-verify`. One commit
+  may pass with `LEDGER_GUARD_SKIP=1` — loud, logged, and a flaw to record.
+- **Identity and push-time checks.** Your check-in commit registers your
+  codename (a heartbeat file in `.git/`, never tracked); every later commit
+  gets a `Ledger-Session: S<NNN>` trailer and refreshes it. With one live
+  session that is automatic; with several in one checkout, prefix commits
+  with `LEDGER_SESSION=S<NNN>` (an unattributed commit is refused). A
+  heartbeat older than `LEDGER_SESSION_TTL_HOURS` (default 4) marks the
+  session stale: `ledger-guard sessions` and the per-turn reminder flag its
+  still-open roster row — ask the supervisor, then clock it out; never edit a
+  peer's row on a guess. `ledger-guard push-check` (the git pre-push hook,
+  and CI via `ledger-guard install --ci`) fails a push containing a commit
+  that touches both surfaces or removes/rewrites a line of an append-only log
+  that was not merely moved to an archive.
 - **Before branch integration:** run
   `sh .context_ledger/core/bin/ledger-gates run integration --session <id> --issue <id>`.
   This includes `ledger-collab check` and configured build/integration
@@ -346,7 +368,7 @@ git pull --ff-only
 
 **Step 3 — Read `.context_ledger/` (agent memory)**
 - **Reading `workflows/active.md` is a binding instruction, not passive documentation.** It records the standing session parameters and confirms the protocol in force. The protocol itself is already on disk — vendored at `.context_ledger/core/` — so there is nothing to fetch: your edition is `.context_ledger/core/rules/` + the file matching YOUR agent type (see Pitfall #43 — memory never chooses your edition).
-- **Check the vendored core first (never fatal):** `sh .context_ledger/core/bin/ledger-sync verify` — a failure means core was hand-edited or corrupted: run `ledger-sync rollback`, log a flaw, continue on the restored core. Then `ledger-sync status` — a newer core with the same MAJOR may be applied with `ledger-sync update` (it replaces `core/` only, never memory; commit as `chore(ledger): update core to <version>`); a MAJOR bump or no reachable source = note it and move on.
+- **Check the vendored core first (never fatal):** `sh .context_ledger/core/bin/ledger-sync verify` — a failure means core was hand-edited or corrupted: run `ledger-sync rollback`, log a flaw, continue on the restored core. Then `ledger-sync status` — it compares the update source with that source's own upstream and records the result in `core.lock`, so a stale clone is never reported as up to date; a newer core with the same MAJOR may be applied with `ledger-sync update` (it replaces `core/` only, never memory; commit as `chore(ledger): update core to <version>`); a MAJOR bump or no reachable source = note it and move on.
 - **Check in first — at the entrance, before the deep read.** Signing needs exactly two files: `.context_ledger/memory/office/agents/roster.md` (the board) and the last entry of `.context_ledger/memory/office/agents/sessions.md` (the next free session number). Read just those two, add your row, commit, and push (full check-in rules below). Everything else — the rest of memory, the protocol read, product code, analysis — comes AFTER your row is on the board: a worker who spends the startup read on protocol and product code checks in late, and two workers launched together then both see an empty office, both take the same codename, and meet mid-session as strangers fighting over the main tree. The push is what makes presence visible in minutes and claims your codename.
 - If `.context_ledger/` exists, read it in this order:
   1. `.context_ledger/README.md` — the zone map (core = read-only protocol; memory = this project's data)
@@ -595,7 +617,7 @@ invent formats.
 
 The binding rules on append-only logs, secrets, commit prefixes, friction
 logging, and session-data disposability are already stated once each — the
-Ten Binding Rules above, `.context_ledger/core/schemas/ledger-schema.md`'s
+Binding Rules above, `.context_ledger/core/schemas/ledger-schema.md`'s
 `bindingRules`, and this document's own Common Pitfalls; find them there
 rather than a fourth restatement here. Every writable memory file's exact
 entry template lives in an HTML comment at that file's own top — read it
@@ -766,13 +788,13 @@ Treat this as a production project. Think like an owner, not a contractor.
 > Task-shaped guidance, loaded only when kickoff.md's Phase 4 table says
 > your task calls for it — not part of the always-relevant core above.
 > Common Pitfalls (below) stays inline: it's cross-referenced by number
-> from the Ten Binding Rules and is itself frequently the answer when
+> from the Binding Rules and is itself frequently the answer when
 > something goes wrong, so it earns its place in the always-read core.
 
 | Playbook | Read it when… |
 |---|---|
-| `playbooks/code-review.md` | the task is a new feature or a substantial review |
-| `playbooks/functional-testing.md` | same — has a Local-agent subsection for you |
+| `playbooks/code-review.md` | **any task that touches product code, however small** — v1 read this checklist unconditionally every session; extracting it into a playbook didn't relax that, it just stopped forcing everyone to also read the other four |
+| `playbooks/functional-testing.md` | the task is a new feature or a substantial review — has a Local-agent subsection for you |
 | `playbooks/ux-review.md` | the task is a UI/UX change |
 | `playbooks/performance-review.md` | the task touches performance-sensitive code |
 | `playbooks/security-review.md` | the task touches security-sensitive code |

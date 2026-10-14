@@ -79,9 +79,16 @@ here. This is deliberate: a fresh session used to pay for the check-in
 ceremony, the reading order, and the gate rules being explained three
 times over (this file, `AGENTS.md`, the edition) before any real work
 started. Now each of those is written once, and this file's only job is
-routing to the right one at the right moment. Reading ahead (the full
-edition before checking in, say) is exactly how two sessions collide on a
-codename — follow the order.
+routing to the right one at the right moment.
+
+**Execute each phase before reading the next one — do not read this
+whole file front-to-back first and start acting afterward.** If you
+arrived here already having skimmed Phase 3 or later, stop: go back and
+push Phase 2's check-in now, from what you already know, before reading
+any further. Reading ahead (the full edition before checking in, the
+rest of these phases before checking in) is exactly how two sessions
+collide on a codename — the check-in is a write these phases are
+building up to, not a topic covered somewhere in the reading.
 
 ### Phase 0 — Identify
 
@@ -129,6 +136,20 @@ the `.ps1` port with `-ExecutionPolicy Bypass` (same commands, same output):
 .context_ledger/core/bin/ledger-sync.cmd status
 ```
 
+Then install the guard hooks (idempotent; the git hook lives in `.git/`,
+so every fresh clone needs it once):
+
+```bash
+sh .context_ledger/core/bin/ledger-guard install    # Windows: .context_ledger/core/bin/ledger-guard.cmd install
+```
+
+It installs a git pre-commit hook that refuses a commit with no fresh
+`ledger-gates run pre-commit` pass for the staged tree, and writes the
+Claude Code hooks (`.claude/settings.json`) that re-inject the protocol
+floor every turn and block a piped gate verdict / `--no-verify`. Commit
+a new `.claude/settings.json` on its own. Other agents: wire
+`ledger-guard remind` into their prompt hook; the git hook covers all.
+
 - `verify` fails → core was hand-edited or corrupted. Run
   `sh .context_ledger/core/bin/ledger-sync rollback` (Windows:
   `.context_ledger/core/bin/ledger-sync.cmd rollback`), log a flaw in
@@ -144,12 +165,18 @@ the `.ps1` port with `-ExecutionPolicy Bypass` (same commands, same output):
 
 ### Phase 2 — Check in
 
-**Before the deep read, before analysis, before product work.** Needs
-only two files: `memory/office/agents/roster.md` (the board) and the last
+**Before the deep read, before analysis, before product work.** The
+board you sign must be the real one, so the first step is a sync —
+`git pull --ff-only` on a clean tree (Phase 1 did it; redo it if any time
+passed). A sync is not analysis. Needs only two files: `memory/office/agents/roster.md` (the board) and the last
 entry of `memory/office/agents/sessions.md` (the next free session
 number). Pick a real name (not your own model/product name — see the
 roster's own header), add your row, commit and push it now:
-`chore(ledger): <name> (<codename>) checks in — <task>`. Then regenerate
+`chore(ledger): <name> (<codename>) checks in — <task>` (stage only the
+roster, run `ledger-gates run pre-commit`, commit — the guard hook
+requires the gate pass). If the push is rejected, a peer signed
+concurrently: re-read the board, fix your own row to the next free
+codename, never drop theirs. Then regenerate
 the session digest for Phase 3:
 
 ```bash
@@ -206,13 +233,13 @@ only the playbooks your task's shape actually calls for:
 
 | Your task… | Also read |
 |---|---|
-| Touches only product code, no `.context_ledger/core/` changes | (nothing more) |
-| Is a UI/UX change | `core/rules/playbooks/ux-review.md` |
-| Touches security-sensitive code | `core/rules/playbooks/security-review.md` |
-| Is a new feature or a substantial review | `code-review.md` + `functional-testing.md` |
-| Touches performance-sensitive code | `performance-review.md` |
+| Touches product code at all, however small | `core/rules/playbooks/code-review.md` — the baseline checklist, not optional (this row replaces "nothing more": v1 read it unconditionally for every session and that guarantee is worth keeping even after the extraction) |
+| Is a UI/UX change | + `core/rules/playbooks/ux-review.md` |
+| Touches security-sensitive code | + `core/rules/playbooks/security-review.md` |
+| Is a new feature or a substantial review | + `functional-testing.md` |
+| Touches performance-sensitive code | + `core/rules/playbooks/performance-review.md` |
 | Touches `.context_ledger/core/` itself, or spans multiple sessions | every playbook — read the edition in full |
-| Hit a snag partway through | `pitfalls.md` (Common Pitfalls) |
+| Hit a snag partway through | the edition's own **Common Pitfalls** section — it stayed inline, so this row does not point at a separate playbook file |
 
 Also read any role overlay from `.context_ledger/core/roles/` and the
 project's `memory/overrides/rules.md` (overrides beat the edition, except
@@ -250,7 +277,8 @@ Not done until:
    more — the digest should reflect this session's outcome for whoever
    reads it next.
 6. You clock out: remove your row from `memory/office/agents/roster.md`
-   in the closing commit — but only when actually leaving. The session
+   in the closing commit (and run `ledger-guard release <codename>` to drop
+   your heartbeat) — but only when actually leaving. The session
    isn't over until the user says so; if more work arrives after
    clock-out, check back in first (same name and codename) and extend
    your existing `sessions.md` entry, never open a second one.

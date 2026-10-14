@@ -10,6 +10,348 @@ bump MINOR; wording and fixes bump PATCH.
 
 ---
 
+## 2.2.0 — 2026-10-04
+
+**`ledger-guard` finishes the enforcement set from the host-repo audit:
+push-time checks and per-session identity.** 2.1.x shipped the turn-time
+reminder, the commit gate and sync-first; this adds the two mechanisms that
+needed a server-side or identity layer.
+
+- **Push-time checks** (`ledger-guard push-check [range]`, run by a new git
+  `pre-push` hook and, optionally, CI): a commit that touches both the
+  ledger and the product surface fails; so does removing or rewriting a
+  line of an append-only log (`sessions.md`, `flaws/log.md`, `decisions.md`,
+  `inefficiencies/log.md`) — unless the same line is re-added in the same
+  commit, which is how a move to an archive looks. Advisory notices (never
+  fail): product commits pushed with no session entry in the range (normal
+  mid-session) and commits with no `Ledger-Session` trailer.
+  `ledger-guard install --ci` writes `.github/workflows/ledger-guard.yml`
+  (core integrity + push-check on every push and PR) from
+  `templates/ci/ledger-guard.yml`; it is opt-in and never overwrites.
+- **Per-session identity.** A check-in commit (`... (S018) checks in ...`)
+  registers the codename with a heartbeat file under the git common dir
+  (untracked, shared by worktrees). A new `prepare-commit-msg` hook adds a
+  `Ledger-Session: S018` trailer to every commit and refreshes the heartbeat.
+  One live session is attributed automatically; with several live in one
+  checkout an unattributed commit is refused until you prefix
+  `LEDGER_SESSION=S<NNN>` (a malformed value is refused too).
+- **Heartbeat expiry.** A heartbeat older than `LEDGER_SESSION_TTL_HOURS`
+  (default 4) is stale. `ledger-guard sessions` and the per-turn reminder
+  list still-open roster rows whose session has gone quiet — report only; a
+  peer's row is never edited on a guess. `heartbeat S<NNN> [Name]` registers
+  by hand, `release S<NNN>` drops it at clock-out.
+- `install` now installs three git hooks (`pre-commit`, `prepare-commit-msg`,
+  `pre-push`); `status` reports all of them, the CI workflow and live sessions.
+
+Not done, and said so: a model string is still not an identity, and the
+trailer is only as honest as the committing agent (`LEDGER_SESSION` can be set
+to anyone's codename). Per-turn rule injection covers only agents with a prompt
+hook; the git hooks cover every agent. The PowerShell port runs `sessions`,
+`heartbeat`, `release`, `push-check` and `remind` through the sh edition (git
+ships its own sh, so it must exist on any machine that commits) and is UNRUN.
+
+Migration: re-run `ledger-guard install` once per clone to add the two new git
+hooks; add `--ci` to opt into the workflow.
+
+---
+
+## 2.1.2 — 2026-10-04
+
+**Fix: `ledger-guard tool-check` blocked commands that only mention a gate.**
+The piped-gate pattern matched the word `ledger-gates` anywhere in the tool call
+and then any `|` after it, so a heredoc that merely named the tool followed by a
+`| tail` several lines later was refused — it locked the session that shipped
+2.1.0 out of editing its own files. The pattern now needs a real invocation
+(`ledger-gates run|checkpoint`) and stops at a backslash, backtick or `)` (a JSON
+newline is `\n`), so prose cannot reach a pipe on a later line; `2>&1|tail`
+is still caught. Two tests added (tight pipe blocked, prose allowed).
+
+Migration: none; `ledger-sync update` picks it up.
+
+---
+
+## 2.1.1 — 2026-10-04
+
+**Fix: `ledger-guard install` wrote an invalid `.claude/settings.json`.** The
+hook command embeds `"$CLAUDE_PROJECT_DIR"` inside a JSON string and its quotes
+were not backslash-escaped, so Claude Code could not load the file and none of
+the three hooks ran (found the first time the repo dogfooded 2.1.0). The sh and
+PowerShell ports now escape them, and a test parses the generated file as JSON.
+
+Migration: a project that ran `ledger-guard install` on 2.1.0 must delete the
+generated `.claude/settings.json` (or fix its quotes) and re-run
+`ledger-guard install`; the install never overwrites an existing file.
+
+---
+
+## 2.1.0 — 2026-10-04
+
+**`ledger-guard`: the rules that were enforced only by an agent's goodwill
+now have a mechanism behind them.** A host-repo agent audited its own
+session and found every protocol rule was prose it chose to follow: no git
+hooks, no CI, nothing re-injecting the rules after a context compaction,
+gate results read through `| tail`, a commit made behind a red gate. Three
+of the gaps are closed here; the rest (push-time CI, per-session identity)
+stay open in `flaws/log.md`.
+
+- **Gate-pass marker.** `ledger-gates run pre-commit` records, inside the
+  git dir (never tracked), the index tree it passed for (`git write-tree`).
+  A red run revokes it. The same marker is written by the PowerShell port.
+- **Git pre-commit hook** (`ledger-guard install`): refuses a commit whose
+  staged tree has no fresh pass — so staging more after the gate, or never
+  running it, blocks the commit. Works for every agent, not just Claude.
+  Skipped (noticed) during a merge/rebase/cherry-pick; one commit may pass
+  with `LEDGER_GUARD_SKIP=1`, which is loud and logged to
+  `<git-dir>/ledger-guard.log`.
+- **Claude Code hooks** (same install, written to `.claude/settings.json`
+  when absent, otherwise printed to merge): `SessionStart` and
+  `UserPromptSubmit` run `ledger-guard remind` — a short protocol floor
+  (`templates/guard-reminder.md`) plus the live roster rows and the current
+  task, every turn, which survives compaction; `PreToolUse` on Bash runs
+  `ledger-guard tool-check`, blocking a piped `ledger-gates` verdict
+  (`| tail` masking red) and `--no-verify`.
+- **`ledger-gates checkpoint`** nudges when the git hook is not installed.
+- **Sync before check-in.** The entrance rule in `AGENTS.md`, `CLAUDE.md` and
+  kickoff Phase 2 now says the first step is `git pull --ff-only` on a
+  clean tree — a sync is not analysis — so the board you sign is the real
+  one (twice-logged flaw: stale clone, wrong codename, rebase conflict).
+  Phase 1 also runs `ledger-guard install` once per clone.
+
+Migration: run `ledger-guard install` once per clone after updating; refresh
+`AGENTS.md`/`CLAUDE.md` from the templates to pick up the sync wording. The
+PowerShell port of `ledger-guard` is written but UNRUN (no engine on the
+authoring machine) — the git hook itself always runs the sh edition, since
+git ships its own sh.
+
+---
+
+## 2.0.5 — 2026-10-03
+
+*Numbering: this was first pushed as 2.1.0 and renumbered within the hour, before
+any known host took it — it fixes a defect (`status` never checked upstream), so it is a
+PATCH. A project that did sync to 2.1.0 cannot `update` down to 2.0.5
+(`ledger-sync` refuses a downgrade); it takes the next release instead.*
+
+**`ledger-sync status` now compares the update source with upstream, and
+records where the core comes from.** Until now `status` only looked at a
+local sibling clone, so a clone that had not been fetched read "up to
+date" while origin was a release ahead — a host session found its core
+outdated only by reading origin's log. And nothing said whether an
+upgrade came from a published release or from someone's unpushed clone.
+
+- **`status` compares first.** Before reporting, it fetches the source
+  clone's `origin` branch (into `FETCH_HEAD` only — the clone's working
+  tree and branches are never touched) and reports one of: in sync,
+  BEHIND upstream (with the upstream core version, which becomes the
+  target — "UPDATE AVAILABLE" no longer depends on the clone being
+  fresh), AHEAD of upstream (a local-only core), DIVERGED, UNREACHABLE
+  (never printed as "up to date"), or no remote. Uncommitted edits to the
+  source's `core/` count as local.
+- **`status` logs the source.** The resolved source is written to
+  `memory/core.lock` as `source_kind` / `source_state` / `source_url` /
+  `source_path` / `source_ref` / `source_commit` / `source_version` /
+  `source_checked`. The write is skipped when only the date would change,
+  so a repeated `status` leaves a clean tree; `status --no-record` never
+  writes.
+- **`update` and `migrate` read the record.** Source lookup order is: an
+  explicit path, the recorded `source_path`, `LEDGER_PKG`, the sibling
+  guesses, and finally a shallow clone of the recorded `source_url`
+  (also `--upstream URL` or `LEDGER_UPSTREAM`) — so a host with no clone
+  can still update from upstream. The stale check runs *before* the
+  same-version shortcut: a clone behind upstream no longer answers
+  "already at X — nothing to do" while a release exists. It refuses unless
+  you pass `--from-upstream` (install straight from origin) or
+  `--allow-stale`; a local-only or unverified source installs with a
+  warning.
+- **`update` records the upgrade.** `installed_version`,
+  `installed_from_version`, `installed_kind` (`upstream`/`local`/
+  `unverified`), `installed_url`, `installed_path`, `installed_commit`,
+  `installed_on` — so a host can tell what it was upgraded from. `verify`
+  and `lock` re-write `core.lock` but preserve both groups.
+- Offline or CI: `LEDGER_OFFLINE=1` skips the network (the source reads
+  as unreachable/unverified).
+
+Migration: none. A `core.lock` without the new keys is read as "no
+record yet"; the first `status` writes one.
+
+Package tests: 59 green on the sh edition, 17 new (stale/in-sync/ahead/
+offline states, the recorded fields, no churn on re-run, `--no-record`,
+the stale refusal and its remedy, `--from-upstream` install provenance,
+and provenance surviving a re-lock). **The PowerShell port of all of this
+(`ledger-sync.ps1`) was written without a PowerShell engine on the
+authoring machine and has not been run** — it is ASCII-clean and brace-
+balanced, and one gated test exercises its status path where an engine
+exists; a Windows pass should run `status`, `status --no-record`, and
+`update --from-upstream` before this is trusted there.
+
+---
+
+## 2.0.4 — 2026-09-23
+
+**Windows sessions could not pass their exit gate at all.** 2.0.3 shipped
+PowerShell ports that fail to parse on a stock Windows box, and
+`ledger-sync verify` treats an unparseable port as a core integrity
+failure (exit 3) — so every gate that calls it failed there. Reported from
+a consumer project that hit it while migrating to 2.0.3.
+
+- **`ledger-state.ps1` did not parse on any engine.** Its `Get-Field`
+  built a regex as `"...\*\*$Label:\*\*..."`; the parser reads `$Label:`
+  as a scope-qualified variable reference (`$env:`-style) and rejects the
+  whole file — Windows PowerShell 5.1 and pwsh 7 alike. Now `${Label}`.
+- **Non-ASCII bytes in a port are a latent 5.1 parse failure.** Windows
+  PowerShell 5.1 decodes a BOM-less script with the *system codepage*,
+  not UTF-8, so a literal em-dash (E2 80 94) arrives as U+201D — which
+  the parser reads as a string terminator and fails the rest of the file,
+  while pwsh 7 parses the very same bytes fine. That asymmetry is how a
+  release ships broken: the authoring host had no PowerShell to try, and
+  a pwsh-only host cannot reproduce the failure. All seven ports are now
+  pure ASCII; text that needs a non-ASCII character builds it from its
+  code point (`[char]0x2014`, `[char]0x2026`), so a port still emits
+  exactly the bytes its sh twin emits. The rule sits at the top of every
+  port and is enforced (below).
+- **`parse_ports` now checks every engine on PATH, not just the first.**
+  It ran the ps1 half through `powershell` when present, else `pwsh` — so
+  on a Windows box carrying both, a port that only pwsh could parse passed
+  verification and then failed at runtime, because the `.cmd` launchers
+  deliberately target 5.1 (it ships with every Windows 10+ install). A
+  port must now parse under *every* engine found; `verify` prints which
+  engines and versions it used, so a failure is diagnosable at a glance.
+- **An engine-free encoding guard, in both editions.** `verify` fails a
+  `bin/*.ps1` carrying a non-ASCII byte, with the sh and ps1 editions
+  agreeing on the verdict — so the release this bug came from would have
+  been caught by `verify` on the authoring machine, whatever its OS.
+- **A pre-existing divergence between the ports, fixed in passing.**
+  `ledger-state.ps1` wrote a plain hyphen where the sh port writes an
+  em-dash in five places — the Core block's drift note among them — so
+  STATE.md differed by punctuation depending on which port generated it.
+  Both ports now produce byte-identical STATE.md, and a test pins it.
+
+Package tests: 63 green, four of them new — every engine on PATH parses
+every port; the sh port's encoding guard fires on a non-ASCII byte; the
+shipped ports are ASCII; sh and ps1 write the same STATE.md. Verified on
+Windows under both engines (5.1.26100.9444 and 7.6.6): `ledger-sync
+verify` exits 0 under each, and the `.cmd` launcher path (5.1) runs the
+gates again.
+
+---
+
+## 2.0.3 — 2026-09-19
+
+**A supervisor audit of the whole 2.0.0 token-optimization pass, not just
+the one collision 2.0.2 fixed.** The check-in regression 2.0.2 patched
+was a symptom of a broader pattern in 2.0.0: content that got moved or
+condensed on the assumption that routing would reliably carry weak
+agents to it, and in a couple of cases content that was cut with no
+replacement at all. Four fixes, found by diffing 2.0.0/2.0.1/2.0.2
+directly against the last v1 release (1.2.0) rather than trusting each
+release's own account of itself:
+
+- **A shipped broken reference.** `kickoff.md`'s Phase 4 routing table
+  told a session that hit a snag to read `core/rules/playbooks/pitfalls.md`
+  — a file that has never existed. Common Pitfalls stayed inline in each
+  edition on purpose (2.0.0's own changelog says so), but the table was
+  never corrected to match, and neither 2.0.1 nor 2.0.2 — both live-tested
+  bug-fix releases — caught it. Fixed in `kickoff.md` (template + this
+  repo's own copy) and in `ledger-schema.md`'s directory diagram, which
+  listed the same phantom file.
+- **Two v1 rules were deleted outright, not deduplicated.** "`.context_ledger/`
+  reflects what was true when written — if it contradicts the codebase,
+  the codebase wins" and "small and current beats big and stale — session
+  entries run ~10 lines, not transcripts" existed in v1's edition `### Rules`
+  list and had zero equivalent anywhere in 2.0.0 through 2.0.2 (confirmed by
+  grep across the whole vendored core, not just the obvious spots). The
+  second one isn't hypothetical: this office's own `sessions.md` entries
+  for Sessions 11–14 are dense multi-paragraph blocks, not ~10-line
+  summaries — the bloat the rule existed to prevent. Both restored as
+  items 11–12 of what was "The Ten Binding Rules" in both editions
+  (renamed to "The Binding Rules" since the count is no longer ten and
+  hard-coding it was never load-bearing).
+- **The weak-agent floor only got the one line that had already caused an
+  incident.** 2.0.2 restored check-in to `AGENTS.md`/`CLAUDE.md` after it
+  regressed into a real collision, but left ~8 other rules 2.0.0 cut from
+  the same files exposed to the identical failure mode (a session that
+  reads only the floor file and never reliably chains into `kickoff.md`).
+  The most consequential of those — the door-triggered close at
+  `office_size` sessions (a session could now read a full, stale board and
+  never find out), no-secrets-in-tracked-files, the two-surface commit
+  split, and "not done until pushed" — are now restated directly in both
+  floor files, same treatment 2.0.2 gave check-in: short, load-bearing,
+  not the full v1 ceremony.
+- **Playbook extraction quietly changed a guarantee, not just a file
+  layout.** The playbook content itself was verified byte-faithful to what
+  it replaced — that part of 2.0.0 was clean. But v1's edition read the
+  Code Review Checklist unconditionally, every session; 2.0.0's routing
+  table made it conditional on the agent correctly self-classifying its
+  own task as "a new feature or a substantial review," and its default row
+  for an ordinary product-code change was "(nothing more)." Changed in
+  `kickoff.md`'s table and both editions' own Playbooks index:
+  `code-review.md` is back to unconditional for any product-code task,
+  however small; the other four stay conditional on task shape.
+
+No file moves, no memory-layout changes — everything above is a content
+restoration or a reference fix inside files 2.0.0–2.0.2 already ship.
+
+- **Migration:** `ledger-sync update` picks this up automatically. If a
+  project customized `AGENTS.md`/`CLAUDE.md` since 2.0.0, this update
+  overwrites them again (regenerated, never hand-patched) — move
+  project-specific text into `memory/overrides/rules.md` first if it must
+  survive.
+
+---
+
+## 2.0.2 — 2026-09-19
+
+**A real collision, reported directly: sessions were fighting during
+initialization because check-in-before-analysis stopped happening.**
+Core 2.0.0's token-optimization pass reduced `AGENTS.md` from a 158-line
+digest to a ~28-line pure router ("go read `kickoff.md` and follow it")
+— and in doing so dropped the one restated rule that was there on
+purpose: `AGENTS.md` is the **weak-agent floor**, the one file some
+sessions on this repo will ever read in full, and it used to state
+"check in before any analysis" directly rather than only routing to it.
+Some agents evidently don't chain reliably into a multi-file, multi-phase
+routing sequence — they read the floor, or read a whole file
+front-to-back before acting on any of it, and by the time a check-in
+happened it was too late to prevent a collision. This is the same
+failure class core 1.0.6 fixed once already (two sessions launched
+together both seeing an empty board); de-duplication treated all
+repetition as pure waste, but some repetition was a deliberate safety
+margin against exactly this.
+
+- `AGENTS.md` and `CLAUDE.md` (templates + this repo's own copies) each
+  gain back a short, standalone "check in — before reading anything
+  else, including the rest of this file" directive, placed *before* the
+  "go read `kickoff.md`" pointer rather than after. Still far shorter
+  than pre-2.0.0 (~40 and ~20 lines vs. 158 and 32) — this restores the
+  one line that mattered, not the whole restated ceremony.
+- `kickoff.md`'s Phases intro gains an explicit instruction to execute
+  each phase before reading the next, with a named recovery step: if you
+  already read ahead to Phase 3 or later, stop and push Phase 2's
+  check-in now, before reading further.
+- `ledger-schema.md`'s "Translation layer" section corrected — it had
+  described tier 1 as restating *nothing*, which was no longer accurate
+  even before this fix's own change (mostly a router now, but not
+  purely one, and deliberately so).
+- New regression test (`tests/run-tests.sh`): asserts `AGENTS.md` and
+  `CLAUDE.md` state check-in-before-analysis directly, so a future
+  token-optimization pass can't silently strip this again without a
+  test noticing. Flaw logged with the general lesson: before removing a
+  restated rule as duplication, check whether the repetition was a
+  documented safety margin, not an oversight.
+
+Tests 27 → 29.
+
+- **Migration:** `ledger-sync update` picks this up automatically — no
+  file moves. If a project customized `AGENTS.md`/`CLAUDE.md` after the
+  2.0.0 update, this update overwrites them again (they are regenerated,
+  never hand-patched, per the 2.0.0 migration note) — move any
+  project-specific text into `memory/overrides/rules.md` first if it
+  must survive. **This update is urgent** for any project mid-fleet
+  running with concurrent/multi-agent sessions: 2.0.0/2.0.1 carry the
+  regression described above.
+
+---
+
 ## 2.0.1 — 2026-09-18
 
 **A live bootstrap test of 2.0.0 (fresh scratch project, not just the unit
