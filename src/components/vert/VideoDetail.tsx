@@ -33,6 +33,13 @@ interface VideoDetailProps {
   videoId: string
 }
 
+// Video IDs that autoplay has already advanced to in this browsing session.
+// Autoplay-next skips them so it walks forward through Up Next instead of
+// bouncing into a short cycle (A→B→A→B…), since each video's top related is
+// often the one you just came from. Module scope so it survives SPA
+// navigation between watch pages; resets on a full reload.
+const autoplayedVideoIds = new Set<string>()
+
 async function checkIfSaved(videoId: string): Promise<boolean> {
   const res = await fetch('/api/v1/saved?limit=100')
   if (!res.ok) return false
@@ -68,7 +75,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
   // one fetch). Used to pick the video to auto-advance to when the current one
   // ends. See ADR-31.
   const { data: relatedVideos } = useQuery(relatedVideosQueryOptions(videoId))
-  const nextVideo = relatedVideos?.find((v) => v.id !== videoId) ?? null
+  const nextVideo = relatedVideos?.find((v) => v.id !== videoId && !autoplayedVideoIds.has(v.id)) ?? null
   const video = data?.video ?? null
   const userVote = data?.userVote ?? null
   const currentVideoId = video?.id as string | undefined
@@ -188,7 +195,7 @@ export function VideoDetail({ videoId }: VideoDetailProps) {
                 // next Up Next video, or loop if there is no next. See ADR-31.
                 autoPlay
                 loop={!nextVideo}
-                onEnded={nextVideo ? () => navigate({ page: 'video', videoId: nextVideo.id }) : undefined}
+                onEnded={nextVideo ? () => { autoplayedVideoIds.add(videoId); navigate({ page: 'video', videoId: nextVideo.id }) } : undefined}
               />
             </div>
           </div>
