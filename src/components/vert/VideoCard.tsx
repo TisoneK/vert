@@ -1,11 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { isNextImageSafeUrl } from '@/lib/image-utils'
 import { useNavigation, viewToPath } from '@/lib/store'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
-import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
-import { CategoryBadge } from './CategoryBadge'
+import { formatViews, formatDuration } from '@/lib/utils-vert'
 import { PlaylistPicker } from './PlaylistPicker'
 import { ThumbnailFallback } from './ThumbnailFallback'
 import { Play, Smartphone, Monitor, Square, MoreVertical, ListVideo, Bookmark } from 'lucide-react'
@@ -65,7 +63,6 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false)
   const [thumbnailFailed, setThumbnailFailed] = useState(false)
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false)
-  const [avatarFailed, setAvatarFailed] = useState(false)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const desktopMenuRef = useRef<HTMLDivElement>(null)
 
@@ -130,7 +127,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       // to read, the original complaint behind v0.6.4's full-width cards.
       // Portrait/square cards stay 2-up for browse density. md:col-span-1
       // restores normal flow in the 4/5-column desktop grids.
-      className={`group relative shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 h-full flex flex-col ${format === 'landscape' ? 'col-span-2 md:col-span-1' : ''}`}
+      className={`group relative rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 ${format === 'landscape' ? 'col-span-2 md:col-span-1' : ''}`}
       // Pre-fetch the watch page's data on hover/touch intent so the click
       // renders from cache instead of a loading skeleton. See .context ADR-3.
       onMouseEnter={() => prefetchVideo(video.id)}
@@ -165,34 +162,39 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
           <ThumbnailFallback seed={video.title} />
         )}
 
-        {/* Duration badge */}
-        {video.durationSeconds && (
-          <div className="absolute bottom-1.5 right-1.5 bg-zinc-900/80 text-white text-xs font-medium px-1.5 py-0.5 rounded">
-            {formatDuration(video.durationSeconds)}
-          </div>
-        )}
+        {/* Whole-card link to the video. Metadata is overlaid on the
+            thumbnail (vertical-video style), so the click target is the
+            thumbnail itself; secondary actions (channel, context menu) sit
+            above this with a higher z-index. See .context ADR-26. */}
+        <a
+          href={watchHref}
+          onClick={handleNav}
+          onFocus={() => prefetchVideo(video.id)}
+          aria-label={video.title}
+          className="absolute inset-0 z-10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400"
+        />
 
         {/* Format indicator */}
         {format !== 'portrait' && (
-          <div className="absolute top-1.5 left-1.5">
+          <div className="absolute top-1.5 left-1.5 z-20">
             <FormatIcon format={format} />
           </div>
         )}
 
-        {/* Watch progress bar */}
+        {/* Hover overlay */}
+        <div className="absolute inset-0 z-20 pointer-events-none bg-black/0 group-hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
+          <Play className="h-8 w-8 text-white opacity-0 group-hover:opacity-80 transition-opacity duration-200 drop-shadow" />
+        </div>
+
+        {/* Watch progress bar — above the scrim so it stays visible */}
         {watchProgress !== undefined && watchProgress > 0 && watchProgress < 1 && (
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-200 dark:bg-zinc-700">
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/25 z-30">
             <div
-              className="h-full bg-violet-600"
+              className="h-full bg-violet-500"
               style={{ width: `${watchProgress * 100}%` }}
             />
           </div>
         )}
-
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
-          <Play className="h-8 w-8 text-white opacity-0 group-hover:opacity-80 transition-opacity duration-200" />
-        </div>
 
         {/* Context menu button — always visible on touch devices (md:hidden),
             hover-reveal on desktop (hidden md:block). The whole card is a
@@ -316,93 +318,31 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
             </div>
           </>
         )}
-      </div>
 
-      {/* Video info — flex-1 so it grows to fill the card height
-          (the parent is h-full flex flex-col). This keeps cards in the
-          same grid row at equal height even when titles have different
-          lengths. */}
-      <div className="mt-2 flex gap-2 flex-1">
-        {/* Channel avatar */}
-        <div className="shrink-0 mt-0.5">
-          {video.channel.user.avatarUrl && !avatarFailed ? (
-            isNextImageSafeUrl(video.channel.user.avatarUrl) ? (
-              <Image
-                src={video.channel.user.avatarUrl}
-                alt={video.channel.channelName}
-                width={24}
-                height={24}
-                loading="lazy"
-                onError={() => setAvatarFailed(true)}
-                className="w-6 h-6 rounded-full object-cover"
-              />
-            ) : (
-              <img
-                src={video.channel.user.avatarUrl}
-                alt={video.channel.channelName}
-                loading="lazy"
-                decoding="async"
-                onError={() => setAvatarFailed(true)}
-                className="w-6 h-6 rounded-full object-cover"
-              />
-            )
-          ) : (
-            <div className="w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-[10px] font-bold">
-              {video.channel.channelName[0]?.toUpperCase()}
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          {/* Stretched-link: this <a> carries the real href and, via its
-              inset-0 ::after overlay, makes the whole card a single crawlable,
-              keyboard-focusable click target. Controls below sit above it with
-              relative z-10. See .context ADR-26. */}
-          <a
-            href={watchHref}
-            onClick={handleNav}
-            onFocus={() => prefetchVideo(video.id)}
-            className="block rounded-sm after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600"
-          >
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight">
-              {video.title}
-            </h3>
-          </a>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              navigate({ page: 'channel', channelId: video.channel.id })
-            }}
-            className="relative z-10 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors mt-0.5 block"
-          >
-            {video.channel.channelName}
-          </button>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
-            {formatViews(video.viewCount)} views · {timeAgo(video.createdAt)}
-          </p>
-          {video.categories && video.categories.length > 0 && (
-            <CategoryBadge categories={video.categories} max={2} />
-          )}
-          {/* Tags — show up to 3 as clickable chips */}
-          {video.tags && video.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {video.tags.slice(0, 3).map((tag) => (
-                <button
-                  key={tag.name}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    navigate({ page: 'tag', slug: tag.name })
-                  }}
-                  className="relative z-10 text-[10px] text-violet-600 hover:text-violet-800 hover:underline font-medium transition-colors"
-                >
-                  {tag.label}
-                </button>
-              ))}
-              {video.tags.length > 3 && (
-                <span className="text-[10px] text-zinc-400">+{video.tags.length - 3}</span>
-              )}
-            </div>
-          )}
+        {/* Metadata overlay (vertical-video style): title + channel · views
+            over a bottom scrim. The container is pointer-events-none so taps
+            fall through to the whole-card link; the channel button re-enables
+            pointer events to navigate to the channel instead. */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-2.5 pt-10 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+          <h3 className="text-[13px] font-semibold text-white line-clamp-2 leading-snug drop-shadow-sm">
+            {video.title}
+          </h3>
+          <div className="mt-1 flex items-center gap-1.5 text-[11px] text-white/85">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                navigate({ page: 'channel', channelId: video.channel.id })
+              }}
+              className="pointer-events-auto truncate hover:text-white transition-colors"
+            >
+              {video.channel.channelName}
+            </button>
+            <span className="text-white/50">·</span>
+            <span className="whitespace-nowrap">{formatViews(video.viewCount)} views</span>
+            {video.durationSeconds && (
+              <span className="ml-auto whitespace-nowrap text-white/75">{formatDuration(video.durationSeconds)}</span>
+            )}
+          </div>
         </div>
       </div>
 
