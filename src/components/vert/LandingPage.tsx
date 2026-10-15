@@ -79,7 +79,7 @@ export function LandingPage() {
       </nav>
 
       {/* Main content */}
-      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-10 md:py-16">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 md:py-10">
         {/* Hero */}
         <section className="relative">
           {/* soft brand glow for depth — purely decorative */}
@@ -88,10 +88,7 @@ export function LandingPage() {
             className="pointer-events-none absolute -top-28 -left-20 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl"
           />
           <div className="relative">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 dark:border-violet-900/60 bg-violet-50 dark:bg-violet-950/40 px-3 py-1 text-xs font-medium text-violet-700 dark:text-violet-300">
-              Made for your phone
-            </span>
-            <h1 className="mt-4 text-3xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight max-w-2xl leading-[1.1]">
+            <h1 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight max-w-2xl leading-[1.1]">
               Vertical video, without the noise.
             </h1>
             <p className="text-zinc-500 dark:text-zinc-400 mt-4 text-base md:text-lg leading-relaxed max-w-xl">
