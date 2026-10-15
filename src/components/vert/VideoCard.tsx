@@ -7,6 +7,7 @@ import { usePrefetchVideo } from '@/lib/use-prefetch-video'
 import { formatViews, timeAgo, formatDuration } from '@/lib/utils-vert'
 import { CategoryBadge } from './CategoryBadge'
 import { PlaylistPicker } from './PlaylistPicker'
+import { ThumbnailFallback } from './ThumbnailFallback'
 import { Play, Smartphone, Monitor, Square, MoreVertical, ListVideo, Bookmark } from 'lucide-react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 
@@ -161,9 +162,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
             />
           </>
         ) : (
-          <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
-            <Play className="h-8 w-8 text-zinc-500 dark:text-zinc-400" />
-          </div>
+          <ThumbnailFallback seed={video.title} />
         )}
 
         {/* Duration badge */}

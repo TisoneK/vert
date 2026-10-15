@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState, useCallback } from 'react'
-import { Play } from 'lucide-react'
+import { ThumbnailFallback } from './ThumbnailFallback'
 
 /**
  * Thumbnail image with a built-in loading skeleton + fade-in and an onError
@@ -36,11 +36,7 @@ export function ThumbnailImage({
   }, [])
 
   if (!show) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800">
-        <Play className={`${iconClassName} text-zinc-400 dark:text-zinc-500`} />
-      </div>
-    )
+    return <ThumbnailFallback seed={alt} iconClassName={iconClassName} />
   }
 
   // The skeleton is an underlay BEHIND an always-visible image. The <img> is
