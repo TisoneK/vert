@@ -39,18 +39,17 @@ export function ThumbnailImage({
     return <ThumbnailFallback seed={alt} iconClassName={iconClassName} />
   }
 
-  // The skeleton is an underlay BEHIND an always-visible image. The <img> is
-  // transparent until the browser paints its pixels, so the pulsing skeleton
-  // shows through while loading and the image paints over it when ready — with
-  // no dependency on `onLoad` firing. (An opacity-0-until-onLoad approach leaves
-  // the thumbnail stuck invisible whenever the load event doesn't fire — e.g. a
-  // throttled/background tab or a bfcache restore.) `onLoad`/`ref` here only
-  // remove the now-covered skeleton for cleanliness.
+  // The gradient fallback doubles as the loading underlay BEHIND an
+  // always-visible image. The <img> is transparent until the browser paints
+  // its pixels, so the branded gradient poster shows through while loading and
+  // the image paints over it when ready — with no dependency on `onLoad`
+  // firing. (An opacity-0-until-onLoad approach leaves the thumbnail stuck
+  // invisible whenever the load event doesn't fire — e.g. a throttled/
+  // background tab or a bfcache restore.) `onLoad`/`ref` here only remove the
+  // now-covered poster for cleanliness.
   return (
     <>
-      {!loaded && (
-        <div className="absolute inset-0 animate-pulse bg-zinc-200 dark:bg-zinc-800" aria-hidden />
-      )}
+      {!loaded && <ThumbnailFallback seed={alt} iconClassName={iconClassName} />}
       <Image
         ref={imgRef}
         src={src}

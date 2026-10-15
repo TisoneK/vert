@@ -140,13 +140,13 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
       <div className={`relative ${aspectClass} rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800`}>
         {showThumbnail ? (
           <>
-            {/* Skeleton underlay: pulses behind the always-visible image until
-                the image paints over it, so the card never flashes a flat empty
-                gray box (review [P1]) and never gets stuck invisible if the
-                image's load event doesn't fire. */}
-            {!thumbnailLoaded && (
-              <div className="absolute inset-0 animate-pulse bg-zinc-200 dark:bg-zinc-800" aria-hidden />
-            )}
+            {/* Gradient-poster underlay: sits behind the always-visible image
+                until the image paints over it, so the card shows an intentional
+                branded poster while the real thumbnail loads (never a flat gray
+                box — review [P1]) and never gets stuck invisible if the image's
+                load event doesn't fire. Cached images mark loaded on mount
+                (thumbRef), so they skip even this one frame. */}
+            {!thumbnailLoaded && <ThumbnailFallback seed={video.title} />}
             <Image
               ref={thumbRef}
               src={video.thumbnailUrl!}
