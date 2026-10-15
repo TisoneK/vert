@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigation, viewToPath, type View } from '@/lib/store'
 import { usePrefetchVideo } from '@/lib/use-prefetch-video'
+import { formatViews } from '@/lib/utils-vert'
 import { Button } from '@/components/ui/button'
 import { Hash } from 'lucide-react'
 import { ThumbnailImage } from './ThumbnailImage'
@@ -132,24 +133,25 @@ export function LandingPage() {
                   // pre-fetch as the main VideoCard (see .context ADR-3).
                   onMouseEnter={() => prefetchVideo(v.id)}
                   onTouchStart={() => prefetchVideo(v.id)}
-                  // h-full + flex flex-col so cards in the same row stretch to
-                  // equal height regardless of title length. Without this, a
-                  // card with a 1-line title is shorter than one with a 2-line
-                  // title, making the grid look ragged.
-                  className="group h-full flex flex-col"
+                  // Overlay metadata on the thumbnail (vertical-video style),
+                  // matching VideoCard — cards are equal-height thumbnails, so
+                  // no flex equalization is needed.
+                  className="group block relative aspect-[9/16] rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800"
                 >
-                  <div className="aspect-[9/16] rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 relative">
-                    <ThumbnailImage
-                      src={v.thumbnailUrl}
-                      alt={v.title}
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                      imgClassName="group-hover:scale-[1.02]"
-                    />
+                  <ThumbnailImage
+                    src={v.thumbnailUrl}
+                    alt={v.title}
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                    imgClassName="group-hover:scale-[1.02]"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 p-2.5 pt-10 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+                    <h3 className="text-[13px] font-semibold text-white line-clamp-2 leading-snug drop-shadow-sm">
+                      {v.title}
+                    </h3>
+                    <p className="text-[11px] text-white/85 mt-0.5 truncate">
+                      {v.channel.channelName} · {formatViews(v.viewCount)} views
+                    </p>
                   </div>
-                  <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mt-2 line-clamp-2 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors">
-                    {v.title}
-                  </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{v.channel.channelName}</p>
                 </a>
               ))}
             </div>
