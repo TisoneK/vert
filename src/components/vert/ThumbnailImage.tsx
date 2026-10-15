@@ -49,7 +49,7 @@ export function ThumbnailImage({
   // now-covered poster for cleanliness.
   return (
     <>
-      {!loaded && <ThumbnailFallback seed={alt} iconClassName={iconClassName} />}
+      {!loaded && <ThumbnailFallback seed={alt} iconClassName={iconClassName} loading />}
       <Image
         ref={imgRef}
         src={src}

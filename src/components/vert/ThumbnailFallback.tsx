@@ -35,9 +35,14 @@ function pickGradient(seed: string): readonly [string, string] {
 export function ThumbnailFallback({
   seed,
   iconClassName = 'h-8 w-8',
+  loading = false,
 }: {
   seed: string
   iconClassName?: string
+  /** When true, a ring spins around the play button to signal a real
+   *  thumbnail is still loading. Omit for the final no-thumbnail state —
+   *  a ring that never stops would wrongly imply it's still loading. */
+  loading?: boolean
 }) {
   const [from, to] = pickGradient(seed || 'vert')
   return (
@@ -49,6 +54,12 @@ export function ThumbnailFallback({
       {/* soft top-left highlight for a sense of depth */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.28),transparent_60%)]" />
       <div className="relative flex items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30 backdrop-blur-sm p-3">
+        {loading && (
+          <span
+            className="absolute -inset-1.5 rounded-full border-2 border-white/25 border-t-white animate-spin"
+            aria-hidden
+          />
+        )}
         <Play className={`${iconClassName} text-white fill-white`} />
       </div>
     </div>

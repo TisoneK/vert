@@ -146,7 +146,7 @@ export function VideoCard({ video, watchProgress, showContextMenu = true, onCont
                 box — review [P1]) and never gets stuck invisible if the image's
                 load event doesn't fire. Cached images mark loaded on mount
                 (thumbRef), so they skip even this one frame. */}
-            {!thumbnailLoaded && <ThumbnailFallback seed={video.title} />}
+            {!thumbnailLoaded && <ThumbnailFallback seed={video.title} loading />}
             <Image
               ref={thumbRef}
               src={video.thumbnailUrl!}
