@@ -49,6 +49,7 @@ is your stable session tag.
 
 | Name | Codename | Model | Doing | Status | Status detail |
 |------|----------|-------|-------|--------|---------------|
+| Noor | S004 | claude-opus-4-8 | Product polish — make it feel finished: media fallbacks (thumbnails/poster), visual/UX polish, signed-out first impression | Working | Checked in; scoping the thumbnail-fallback + landing code |
 
 **Keep your Status cells current — that is what the board is for.** The
 next live worker reads it to know at a glance what a peer has finished,

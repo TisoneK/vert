@@ -5,7 +5,7 @@ at check-in and at exit. This is a DERIVED VIEW for fast orientation;
 open the file a line points at when your task needs more than the
 line gives you. Full reading order: ledger-schema.md. -->
 
-_Regenerated: 2026-10-14T20:29:53Z_
+_Regenerated: 2026-10-15T15:58:43Z_
 
 ## Standing params
 - **Core:** 2.2.0 (locked, verified 2026-10-14)
@@ -15,7 +15,7 @@ _Regenerated: 2026-10-14T20:29:53Z_
 - Full params: `memory/workflows/active.md`
 
 ## Office — who's in, right now
-(office empty — no live roster rows)
+- **Noor** (S004) — Working — Product polish — make it feel finished: media fallbacks (thumbnails/poster), visual/UX …
 
 ## Current task
 (idle — no task recorded)
