@@ -49,7 +49,7 @@ is your stable session tag.
 
 | Name | Codename | Model | Doing | Status | Status detail |
 |------|----------|-------|-------|--------|---------------|
-| Noor | S004 | claude-opus-4-8 | Card/landing polish — overlay video-card metadata (vertical-video style) | Working | Overlay cards shipped on BOTH feed (052f6af) and landing (41c8cac); consistent. Copy still placeholder pending owner feel-pass |
+| Noor | S004 | claude-opus-4-8 | Watch-page fixes — autoplay/Up Next + responsive | Working | Fixed Up Next infinite 2-video loop (c11e607); found channel-row overlap at ~800px (not yet fixed). Overlay cards shipped earlier |
 
 **Keep your Status cells current — that is what the board is for.** The
 next live worker reads it to know at a glance what a peer has finished,
