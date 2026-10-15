@@ -21,7 +21,7 @@ export async function generateMetadata({
 
     const label = tag?.label || slug
     const title = `#${label} · ${SITE_NAME}`
-    const description = clampDescription(`Watch #${label} portrait videos on ${SITE_NAME}.`)
+    const description = clampDescription(`Watch #${label} vertical videos on ${SITE_NAME}.`)
     const canonical = absoluteUrl(`/tag/${slug}`)
 
     return {

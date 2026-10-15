@@ -74,7 +74,7 @@ export function LoginForm() {
             Vert
           </button>
           <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mt-4">Welcome back</h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Log in to continue watching and creating</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Pick up right where you left off</p>
         </div>
 
         {/* Google sign-in */}

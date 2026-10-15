@@ -113,7 +113,7 @@ export function SignupForm() {
             Vert
           </button>
           <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mt-4">Create your channel</h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Join Vert and start sharing portrait video</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Set up your channel in a minute and start posting</p>
         </div>
 
         {/* Google sign-in */}

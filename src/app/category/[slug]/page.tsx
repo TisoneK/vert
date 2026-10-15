@@ -23,7 +23,7 @@ export async function generateMetadata({
 
     const title = `${category.name} videos · ${SITE_NAME}`
     const description = clampDescription(
-      category.description || `Watch ${category.name} portrait videos on ${SITE_NAME}.`
+      category.description || `Watch ${category.name} vertical videos on ${SITE_NAME}.`
     )
     const canonical = absoluteUrl(`/category/${slug}`)
 

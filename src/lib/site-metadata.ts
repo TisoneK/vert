@@ -22,7 +22,7 @@ export const SITE_URL: string = (() => {
 
 /** Site-wide defaults, reused by the root layout and as metadata fallbacks. */
 export const SITE_NAME = 'Vert'
-export const SITE_DESCRIPTION = 'Watch and share portrait video.'
+export const SITE_DESCRIPTION = 'Watch and share vertical video, without the algorithm.'
 
 /** Join the site origin with a path, producing an absolute URL. */
 export function absoluteUrl(path: string): string {

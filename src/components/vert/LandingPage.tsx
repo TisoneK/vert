@@ -79,13 +79,40 @@ export function LandingPage() {
       </nav>
 
       {/* Main content */}
-      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-10 md:py-14">
-        <h1 className="text-2xl md:text-4xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight max-w-2xl">
-          Watch and share portrait video.
-        </h1>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-3 text-sm md:text-base leading-relaxed">
-          A clean player, real notifications, no algorithm noise.
-        </p>
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-10 md:py-16">
+        {/* Hero */}
+        <section className="relative">
+          {/* soft brand glow for depth — purely decorative */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-28 -left-20 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl"
+          />
+          <div className="relative">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 dark:border-violet-900/60 bg-violet-50 dark:bg-violet-950/40 px-3 py-1 text-xs font-medium text-violet-700 dark:text-violet-300">
+              Made for your phone
+            </span>
+            <h1 className="mt-4 text-3xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight max-w-2xl leading-[1.1]">
+              Vertical video, without the noise.
+            </h1>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-4 text-base md:text-lg leading-relaxed max-w-xl">
+              Watch what you came for and hear when people like your videos. No algorithm deciding for you.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Button
+                onClick={() => navigate({ page: 'signup' })}
+                className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
+              >
+                Start watching
+              </Button>
+              <a
+                {...spaLink({ page: 'trending' })}
+                className="inline-flex items-center justify-center rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 h-9 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                See what&apos;s trending
+              </a>
+            </div>
+          </div>
+        </section>
 
         {/* Trending */}
         {trending.length > 0 && (
@@ -154,16 +181,16 @@ export function LandingPage() {
         {/* Sign-up CTA */}
         <section className="mt-14 p-6 md:p-8 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700">
           <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            Start your channel
+            Got something to post?
           </h2>
           <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1 mb-4">
-            Upload portrait video, get notified when people engage, build an audience.
+            Share your videos and know the moment someone watches, likes, or follows.
           </p>
           <Button
             onClick={() => navigate({ page: 'signup' })}
             className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
           >
-            Create an account
+            Create your channel
           </Button>
         </section>
       </div>
