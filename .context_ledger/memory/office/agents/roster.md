@@ -49,6 +49,7 @@ is your stable session tag.
 
 | Name | Codename | Model | Doing | Status | Status detail |
 |------|----------|-------|-------|--------|---------------|
+| Noor | S004 | claude-opus-4-8 | Landing polish — compact hero so trending videos sit above the fold | Working | Shipped eyebrow-removal + hero compaction (75db583, e5f1481); iterating on owner's landing feedback |
 
 **Keep your Status cells current — that is what the board is for.** The
 next live worker reads it to know at a glance what a peer has finished,
