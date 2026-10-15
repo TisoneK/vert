@@ -79,7 +79,7 @@ export function LandingPage() {
       </nav>
 
       {/* Main content */}
-      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 md:py-10">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-5 md:py-8">
         {/* Hero */}
         <section className="relative">
           {/* soft brand glow for depth — purely decorative */}
@@ -88,13 +88,13 @@ export function LandingPage() {
             className="pointer-events-none absolute -top-28 -left-20 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl"
           />
           <div className="relative">
-            <h1 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight max-w-2xl leading-[1.1]">
+            <h1 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight max-w-2xl leading-[1.1]">
               Vertical video, without the noise.
             </h1>
-            <p className="text-zinc-500 dark:text-zinc-400 mt-4 text-base md:text-lg leading-relaxed max-w-xl">
+            <p className="text-zinc-500 dark:text-zinc-400 mt-3 text-sm md:text-base leading-relaxed max-w-xl">
               Watch what you came for and hear when people like your videos. No algorithm deciding for you.
             </p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               <Button
                 onClick={() => navigate({ page: 'signup' })}
                 className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
@@ -113,7 +113,7 @@ export function LandingPage() {
 
         {/* Trending */}
         {trending.length > 0 && (
-          <section className="mt-10">
+          <section className="mt-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Trending</h2>
               <a
